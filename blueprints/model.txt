@@ -1,0 +1,292 @@
+Here is a Lean-oriented blueprint for defining the SYK model with even `q` and `β ≥ 0`.
+
+1. Parameters
+
+Use a structure collecting the basic parameters:
+
+```lean
+structure SYKParams where
+  N : ℕ
+  q : ℕ
+  hq_even : Even q
+  hq_pos : 0 < q
+  hq_le_N : q ≤ N
+  β : ℝ
+  hβ_nonneg : 0 ≤ β
+```
+
+You may also take `β : ℝ≥0` to encode nonnegativity by type.
+
+2. Index set for interaction terms
+
+Use `Fin N` for fermion labels.
+
+For the `q`-body interaction, define the index set as `q`-element subsets of `Fin N`:
+
+```lean
+InteractionIndex N q := {s : Finset (Fin N) // s.card = q}
+```
+
+This avoids needing fully antisymmetric tensors. Each term corresponds to one ordered product over a finite set, using a canonical order inherited from `Fin N`.
+
+3. Majorana algebra
+
+Define Majorana operators `χ i` satisfying the Clifford relations.
+
+A convenient mathematical specification is:
+
+```lean
+χ i * χ j + χ j * χ i = if i = j then 2 else 0
+```
+
+and
+
+```lean
+star (χ i) = χ i
+```
+
+In Lean, you can implement this in one of two ways:
+
+Option A: abstract interface
+
+```lean
+structure MajoranaSystem (N : ℕ) where
+  A : Type
+  instStarRing : StarRing A
+  χ : Fin N → A
+  majorana_rel :
+    ∀ i j, χ i * χ j + χ j * χ i = if i = j then 2 else 0
+  self_adjoint :
+    ∀ i, star (χ i) = χ i
+```
+
+Option B: use a Clifford algebra from mathlib, if convenient.
+
+For a first formalization, option A is simpler.
+
+4. Product of Majoranas over a `q`-subset
+
+For `s : InteractionIndex N q`, define
+
+```lean
+χ_prod s := ∏ i in s.val.sort, χ i
+```
+
+Conceptually, this is the ordered product
+
+```text
+χ_{i₁} χ_{i₂} ... χ_{i_q}
+```
+
+where `i₁ < i₂ < ... < i_q`.
+
+In Lean, it is often easiest to define this using a sorted list from the finset.
+
+5. Couplings
+
+The SYK couplings are real random variables indexed by `q`-subsets:
+
+```lean
+J : InteractionIndex N q → ℝ
+```
+
+If you want the probabilistic SYK model, later add a probability space and assume
+
+```text
+J_s ∼ Gaussian(0, variance)
+```
+
+Usually the variance is chosen as
+
+```text
+Var(J_s) = (q - 1)! J0^2 / N^(q - 1)
+```
+
+or a conventionally equivalent normalization.
+
+For just defining the Hamiltonian, deterministic `J` is enough.
+
+6. Phase factor for even `q`
+
+Since `q` is even, write
+
+```lean
+m := q / 2
+```
+
+The Hermitian SYK Hamiltonian uses the factor
+
+```text
+i^(q/2)
+```
+
+so define
+
+```lean
+phase q := Complex.I ^ (q / 2)
+```
+
+Because `q` is even, this gives the correct self-adjointness factor.
+
+7. Hamiltonian
+
+The SYK Hamiltonian is
+
+```text
+H = ∑_{|s| = q} J_s · i^(q/2) · χ_prod s
+```
+
+In Lean blueprint form:
+
+```lean
+def SYKHamiltonian
+  (P : SYKParams)
+  (M : MajoranaSystem P.N)
+  (J : InteractionIndex P.N P.q → ℝ) : M.A :=
+    ∑ s : InteractionIndex P.N P.q,
+      (J s : ℂ) • phase P.q * χ_prod M s
+```
+
+Depending on your algebra setup, scalar multiplication may be by `ℂ`, or you may embed real scalars into the algebra.
+
+8. Self-adjointness theorem
+
+You will want a theorem:
+
+```lean
+theorem SYKHamiltonian_self_adjoint :
+  star H = H
+```
+
+Main ingredients:
+
+```text
+star(χ_i) = χ_i
+```
+
+```text
+star(χ_{i₁} ... χ_{i_q})
+= χ_{i_q} ... χ_{i₁}
+= (-1)^{q(q-1)/2} χ_{i₁} ... χ_{i_q}
+```
+
+For even `q = 2m`,
+
+```text
+(-1)^{q(q-1)/2} = (-1)^m
+```
+
+and
+
+```text
+conj(i^m) · (-1)^m = i^m
+```
+
+so each summand is self-adjoint when `J_s ∈ ℝ`.
+
+9. Partition function
+
+For finite-dimensional Hilbert space representation, define
+
+```text
+Z(β) = Tr(exp(-β H))
+```
+
+Blueprint:
+
+```lean
+def PartitionFunction
+  (β : ℝ≥0)
+  (H : Matrix d d ℂ) : ℂ :=
+    trace (Matrix.exp (-(β : ℝ) • H))
+```
+
+If you stay in an abstract algebra, you need an abstract trace functional:
+
+```lean
+structure TracialAlgebra (A : Type) where
+  tr : A → ℂ
+  tr_cyclic : ∀ a b, tr (a * b) = tr (b * a)
+```
+
+Then
+
+```lean
+Z β H := tr (exp (-β • H))
+```
+
+10. Gibbs state
+
+Define the thermal expectation of an observable `O` by
+
+```text
+⟨O⟩_β = Tr(O exp(-βH)) / Z(β)
+```
+
+Lean blueprint:
+
+```lean
+def GibbsState
+  (β : ℝ≥0)
+  (H O : Matrix d d ℂ) : ℂ :=
+    trace (O * Matrix.exp (-(β : ℝ) • H)) / PartitionFunction β H
+```
+
+11. Disorder average, optional
+
+If you want the full random SYK model, add:
+
+```lean
+structure SYKDisorder (P : SYKParams) where
+  Ω : Type
+  prob : Measure Ω
+  J : Ω → InteractionIndex P.N P.q → ℝ
+  gaussian_law : ...
+  independent : ...
+```
+
+Then the random Hamiltonian is
+
+```lean
+H(ω) = SYKHamiltonian P M (J ω)
+```
+
+and the quenched/free energy quantities are:
+
+```text
+E_J[log Z_J(β)]
+```
+
+or annealed:
+
+```text
+log E_J[Z_J(β)]
+```
+
+12. Suggested dependency order
+
+Define in this order:
+
+```text
+SYKParams
+InteractionIndex
+MajoranaSystem
+ordered Majorana product
+phase i^(q/2)
+Hamiltonian
+self-adjointness theorem
+matrix representation
+partition function
+Gibbs state
+optional probability/disorder layer
+```
+
+The minimal deterministic definition only needs:
+
+```text
+N, q, q even, q ≤ N, β ≥ 0,
+Majorana operators,
+real couplings J_s,
+Hamiltonian H,
+partition function Z(β).
+```
