@@ -1,0 +1,371 @@
+
+
+
+\begin{lemma}
+Let \(A_1,\dots,A_m\) be Hermitian operators satisfying
+\[
+A_a^2=\mathbf 1,
+\qquad
+A_aA_b=-A_bA_a
+\quad\text{for }a\neq b.
+\]
+Then, for any density matrix \(\rho\),
+\[
+\sum_{a=1}^m
+\left|\operatorname{Tr}(\rho A_a)\right|^2
+\le 1.
+\]
+\end{lemma}
+
+\begin{proof}
+Since each \(A_a\) is Hermitian, the numbers
+\[
+x_a=\operatorname{Tr}(\rho A_a)
+\]
+are real. Define
+\[
+B=\sum_{a=1}^m x_a A_a.
+\]
+Using the anticommutation relations,
+\[
+B^2
+=
+\sum_a x_a^2 A_a^2
++
+\sum_{a<b}x_ax_b(A_aA_b+A_bA_a)
+=
+\left(\sum_a x_a^2\right)\mathbf 1.
+\]
+Therefore
+\[
+\|B\|=\left(\sum_a x_a^2\right)^{1/2}.
+\]
+On the other hand,
+\[
+\operatorname{Tr}(\rho B)
+=
+\sum_a x_a\operatorname{Tr}(\rho A_a)
+=
+\sum_a x_a^2.
+\]
+Thus
+\[
+\sum_a x_a^2
+=
+|\operatorname{Tr}(\rho B)|
+\le \|B\|
+=
+\left(\sum_a x_a^2\right)^{1/2}.
+\]
+It follows that
+\[
+\sum_a x_a^2\le 1.
+\]
+\end{proof}
+
+Let \(H_{n,q}\) be the SYK Hamiltonian, and let
+\[
+\rho=\frac{e^{\beta H_{n,q}}}{Z_{n,q}}
+\]
+be the corresponding thermal state. For \(I=(i_1<\cdots<i_q)\), define
+\[
+\Psi_I
+=
+i^{q(q-1)/2}\psi_{i_1}\cdots \psi_{i_q}.
+\]
+We prove that, for fixed even \(q\),
+\[
+\sum_{|I|=q}
+\operatorname{Tr}(\rho\Psi_I)
+\operatorname{Tr}(\rho\Psi_I)^*
+=
+O(n^{q-1}).
+\]
+
+The proof does not use the detailed form of the SYK Hamiltonian. It only uses the Clifford algebra relations for the Majorana operators.
+
+
+Now fix a subset
+\[
+A\subset \{1,\dots,n\},
+\qquad |A|=q-1.
+\]
+For each \(j\notin A\), consider
+\[
+\Psi_{A\cup\{j\}}.
+\]
+If \(j\neq k\), then
+\[
+(A\cup\{j\})\cap(A\cup\{k\})=A,
+\]
+so the intersection has cardinality \(q-1\).
+
+Majorana monomials satisfy
+\[
+\Psi_I\Psi_J
+=
+(-1)^{|I||J|-|I\cap J|}
+\Psi_J\Psi_I.
+\]
+Here \(|I|=|J|=q\), and since \(q\) is even, \(q^2\) is even. Also,
+\[
+|I\cap J|=q-1
+\]
+is odd. Hence
+\[
+(-1)^{q^2-|I\cap J|}=-1.
+\]
+Therefore the operators
+\[
+\Psi_{A\cup\{j\}},
+\qquad j\notin A,
+\]
+are pairwise anticommuting Hermitian involutions.
+
+Applying the lemma gives
+\[
+\sum_{j\notin A}
+\left|
+\operatorname{Tr}
+\left(
+\rho\Psi_{A\cup\{j\}}
+\right)
+\right|^2
+\le 1.
+\]
+
+Now sum this inequality over all subsets \(A\subset\{1,\dots,n\}\) with \(|A|=q-1\). We obtain
+\[
+\sum_{|A|=q-1}
+\sum_{j\notin A}
+\left|
+\operatorname{Tr}
+\left(
+\rho\Psi_{A\cup\{j\}}
+\right)
+\right|^2
+\le
+\binom{n}{q-1}.
+\]
+Each \(q\)-element subset \(I\subset\{1,\dots,n\}\) appears exactly \(q\) times on the left-hand side, because it appears once for each choice of an element \(j\in I\), with
+\[
+A=I\setminus\{j\}.
+\]
+Therefore
+\[
+q
+\sum_{|I|=q}
+\left|
+\operatorname{Tr}(\rho\Psi_I)
+\right|^2
+\le
+\binom{n}{q-1}.
+\]
+Equivalently,
+\[
+\sum_{|I|=q}
+\left|
+\operatorname{Tr}(\rho\Psi_I)
+\right|^2
+\le
+\frac{1}{q}
+\binom{n}{q-1}.
+\]
+Since \(q\) is fixed,
+\[
+\frac{1}{q}\binom{n}{q-1}
+=
+O(n^{q-1}).
+\]
+Hence
+\[
+\boxed{
+\sum_{|I|=q}
+\operatorname{Tr}(\rho\Psi_I)
+\operatorname{Tr}(\rho\Psi_I)^*
+=
+O(n^{q-1})
+}.
+\]
+
+
+
+\title{Gaussian Concentration of the SYK Log Partition Function}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+
+\section{Model and normalization}
+
+Let $n$ and $q$ be even integers with $2\le q\le n$. Let
+$\psi_1,\ldots,\psi_n$ be Hermitian Majorana operators satisfying
+$$
+\{\psi_i,\psi_j\}=2\delta_{ij}I.
+$$
+They act on a Hilbert space of dimension $d_n=2^{n/2}$. For
+$I=\{i_1<\cdots<i_q\}$, define
+$$
+\Gamma_I=i^{q(q-1)/2}\psi_{i_1}\cdots\psi_{i_q}.
+$$
+If $m=q(q-1)/2$, reversing the order of the Majorana operators gives
+$$
+(\psi_{i_1}\cdots\psi_{i_q})^*
+=(-1)^m\psi_{i_1}\cdots\psi_{i_q}.
+$$
+It follows that $\Gamma_I^*=\Gamma_I$ and $\Gamma_I^2=I$. Therefore
+$$
+\|\Gamma_I\|_{\mathrm{op}}=1.
+$$
+
+Let $(J_I)_{|I|=q}$ be independent standard real Gaussian random variables.
+For an interaction scale $\mathcal J>0$, define
+$$
+H_{n,q}(J)
+=a_{n,q}\sum_{|I|=q}J_I\Gamma_I,
+\qquad
+a_{n,q}=\mathcal J\sqrt{\frac{(q-1)!}{n^{q-1}}}.
+$$
+For $\beta\in\R$, set
+$$
+Z_{n,q}(\beta,J)=\Tr e^{-\beta H_{n,q}(J)},
+\qquad
+X_{n,q}(\beta,J)=\log Z_{n,q}(\beta,J).
+$$
+Because $H_{n,q}(J)$ is a finite-dimensional Hermitian matrix,
+$Z_{n,q}(\beta,J)>0$ for every $J$ and every finite $\beta$.
+
+Define
+$$
+\vartheta_{n,q}
+=\prod_{k=0}^{q-1}\left(1-\frac{k}{n}\right)\le 1.
+$$
+
+\begin{theorem}\label{thm:main}
+For every $\beta\ne0$ and $t>0$,
+$$
+\Pp\left(
+ \left|X_{n,q}(\beta,J)-\E X_{n,q}(\beta,J)\right|
+ \ge t\sqrt n
+\right)
+\le
+2\exp\left(
+ -\frac{qt^2}{2\beta^2\mathcal J^2\vartheta_{n,q}}
+\right)
+\le
+2\exp\left(-\frac{qt^2}{2\beta^2\mathcal J^2}\right).
+$$
+For $\beta=0$, $X_{n,q}(0,J)=\log d_n$ is deterministic, so the probability
+on the left is zero.
+\end{theorem}
+
+\section{Gaussian concentration}
+
+\begin{lemma}\label{lem:gaussian}
+Let $G$ be a standard Gaussian vector in $\R^M$. If
+$F:\R^M\to\R$ is $L$-Lipschitz in Euclidean distance, then for every $r>0$,
+$$
+\Pp\bigl(|F(G)-\E F(G)|\ge r\bigr)
+\le 2\exp\left(-\frac{r^2}{2L^2}\right).
+$$
+This is the classical concentration inequality for Lipschitz functions of a
+Gaussian vector.
+\end{lemma}
+
+\section{Derivative of the log partition function}
+
+If $A(s)$ is a differentiable matrix-valued function, the Duhamel formula is
+$$
+\frac{d}{ds}e^{A(s)}
+=\int_0^1e^{(1-u)A(s)}A'(s)e^{uA(s)}\,du.
+\tag{1}
+$$
+Taking the trace and using cyclicity gives
+$$
+\begin{aligned}
+\frac{d}{ds}\Tr e^{A(s)}
+&=\int_0^1
+  \Tr\left(A'(s)e^{uA(s)}e^{(1-u)A(s)}\right)du\\
+&=\Tr\left(A'(s)e^{A(s)}\right).
+\end{aligned}
+\tag{2}
+$$
+Apply (2) with $A=-\beta H_{n,q}(J)$ and differentiate with respect to one
+Gaussian coordinate. Since
+$$
+\frac{\partial H_{n,q}}{\partial J_I}=a_{n,q}\Gamma_I,
+$$
+we obtain
+$$
+\frac{\partial Z_{n,q}}{\partial J_I}
+=-\beta a_{n,q}\Tr\left(\Gamma_Ie^{-\beta H_{n,q}(J)}\right).
+$$
+Define the Gibbs density matrix
+$$
+\rho_{\beta,J}
+=\frac{e^{-\beta H_{n,q}(J)}}{Z_{n,q}(\beta,J)}.
+$$
+Dividing the derivative of $Z_{n,q}$ by $Z_{n,q}$ gives
+$$
+\frac{\partial X_{n,q}}{\partial J_I}
+=-\beta a_{n,q}\Tr(\rho_{\beta,J}\Gamma_I).
+\tag{3}
+$$
+The matrix $\rho_{\beta,J}$ is positive and has trace one. For every bounded
+operator $B$,
+$$
+|\Tr(\rho_{\beta,J}B)|\le\|B\|_{\mathrm{op}}.
+$$
+Since $\|\Gamma_I\|_{\mathrm{op}}=1$, equation (3) implies
+$$
+\left|\frac{\partial X_{n,q}}{\partial J_I}\right|
+\le |\beta|a_{n,q}.
+\tag{4}
+$$
+
+\section{Proof of Theorem~\ref{thm:main}}
+
+There are $M=\binom nq$ independent Gaussian coordinates. Summing the squares
+in (4) yields
+$$
+\|\nabla_JX_{n,q}(\beta,J)\|_2^2
+\le\beta^2a_{n,q}^2\binom nq.
+\tag{5}
+$$
+A direct calculation gives
+$$
+\begin{aligned}
+a_{n,q}^2\binom nq
+&=\mathcal J^2\frac{(q-1)!}{n^{q-1}}\binom nq\\
+&=\mathcal J^2\frac nq
+  \prod_{k=0}^{q-1}\left(1-\frac{k}{n}\right)\\
+&=\mathcal J^2\frac nq\vartheta_{n,q}.
+\end{aligned}
+\tag{6}
+$$
+Equations (5) and (6) show that the map
+$J\mapsto X_{n,q}(\beta,J)$ is Lipschitz with
+$$
+L_{n,q,\beta}^2
+=\beta^2\mathcal J^2\frac nq\vartheta_{n,q}
+\le\beta^2\mathcal J^2\frac nq.
+$$
+Its mean is finite because every Lipschitz function of a finite-dimensional
+Gaussian vector is integrable. Applying Lemma~\ref{lem:gaussian} with
+$r=t\sqrt n$ gives
+$$
+\begin{aligned}
+\Pp\left(
+ |X_{n,q}-\E X_{n,q}|\ge t\sqrt n
+\right)
+&\le2\exp\left(-\frac{nt^2}{2L_{n,q,\beta}^2}\right)\\
+&=2\exp\left(
+ -\frac{qt^2}{2\beta^2\mathcal J^2\vartheta_{n,q}}
+\right).
+\end{aligned}
+$$
+Using $\vartheta_{n,q}\le1$ gives the simpler bound in the theorem. No
+smallness assumption on $\beta$ was used.
