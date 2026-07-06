@@ -32,6 +32,7 @@ def IsDensityMatrix (ρ : Matrix d d ℂ) : Prop :=
 noncomputable def expectation (ρ A : Matrix d d ℂ) : ℂ :=
   Matrix.trace (ρ * A)
 
+omit [DecidableEq d] in
 theorem expectation_star_eq
     {ρ A : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hA : star A = A) :
     star (expectation ρ A) = expectation ρ A := by
@@ -43,12 +44,14 @@ theorem expectation_star_eq
   rw [hA, hsρ]
   exact Matrix.trace_mul_comm A ρ
 
+omit [DecidableEq d] in
 theorem expectation_im_eq_zero
     {ρ A : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hA : star A = A) :
     (expectation ρ A).im = 0 := by
   have h := expectation_star_eq hρ hA
   exact Complex.conj_eq_iff_im.mp h
 
+omit [DecidableEq d] in
 theorem expectation_eq_ofReal_re
     {ρ A : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hA : star A = A) :
     ((expectation ρ A).re : ℂ) = expectation ρ A := by
@@ -103,6 +106,7 @@ section AnticommutingFamily
 
 variable {ι d : Type*} [Fintype ι] [Fintype d] [DecidableEq d]
 
+omit [Fintype ι] in
 private theorem weighted_sum_sq_aux
     (A : ι → Matrix d d ℂ) (c : ι → ℂ)
     (hsq : ∀ i, A i * A i = 1)
@@ -317,7 +321,6 @@ theorem interactionOperator_sq
           rw [interactionOperator, star_smul, smul_mul_smul_comm]
     _ = (star (phase q) * phase q) • (1 : A) := by
           rw [M.chiProduct_star_mul_self]
-  change (star (phase q) * phase q) • (1 : A) = 1
   have hp : star (phase q) * phase q = 1 := by
     change star (Complex.I ^ (q / 2)) * Complex.I ^ (q / 2) = 1
     rw [star_pow, ← mul_pow]
@@ -406,14 +409,14 @@ theorem extendInteraction_anticommute
       _ = -((M.χ k.1 * D) * (M.χ j.1 * D)) := by simp only [mul_assoc]
   rw [interactionOperator, interactionOperator, hcⱼ, hcₖ,
     smul_smul, smul_smul, smul_mul_smul_comm, smul_mul_smul_comm, hbase]
-  simpa [D, mul_comm]
+  simp [D, mul_comm]
 
 end MajoranaSystem
 
 abbrev ChosenPoint (I : InteractionIndex N q) :=
   {j : Fin N // j ∈ I.1}
 
-private def eraseChosenPoint (hq : 0 < q) (I : InteractionIndex N q)
+private def eraseChosenPoint (_hq : 0 < q) (I : InteractionIndex N q)
     (j : ChosenPoint I) : InteractionIndex N (q - 1) :=
   ⟨I.1.erase j.1, by
     rw [Finset.card_erase_of_mem j.2, I.2]⟩
@@ -463,7 +466,7 @@ theorem sum_over_extensions (hq : 0 < q)
     _ = ∑ I : InteractionIndex N q, ∑ _j : ChosenPoint I, f I := by
       exact Fintype.sum_sigma' (fun I (_j : ChosenPoint I) ↦ f I)
     _ = (q : ℝ) * ∑ I : InteractionIndex N q, f I := by
-      simp [Fintype.card_coe, show ∀ I : InteractionIndex N q,
+      simp [show ∀ I : InteractionIndex N q,
         I.1.card = q from fun I ↦ I.2, Finset.mul_sum]
 
 end FixedCore
@@ -530,10 +533,12 @@ theorem gibbsOperator_posDef (β : NNReal) {H : Matrix d d ℂ}
       module
     · exact Commute.refl _
   have hpsd : (NormedSpace.exp A).PosSemidef := by
-    rw [Matrix.posSemidef_iff_eq_conjTranspose_mul_self]
-    refine ⟨B, ?_⟩
-    change NormedSpace.exp A = star B * B
-    rw [hB, hBB]
+    have hnonneg : 0 ≤ NormedSpace.exp A := by
+      rw [CStarAlgebra.nonneg_iff_eq_star_mul_self]
+      refine ⟨B, ?_⟩
+      change NormedSpace.exp A = star B * B
+      rw [hB, hBB]
+    exact Matrix.nonneg_iff_posSemidef.mp hnonneg
   apply hpsd.posDef_iff_isUnit.mpr
   exact Matrix.isUnit_exp A
 
@@ -609,6 +614,7 @@ variable {d : Type*} [Fintype d] [DecidableEq d]
 noncomputable def matrixTraceCLM : Matrix d d ℂ →L[ℝ] ℂ :=
   LinearMap.toContinuousLinearMap (Matrix.traceLinearMap d ℝ ℂ)
 
+omit [DecidableEq d] in
 @[simp]
 theorem matrixTraceCLM_apply (A : Matrix d d ℂ) :
     matrixTraceCLM A = Matrix.trace A := rfl
@@ -636,8 +642,8 @@ private theorem hasDerivAt_trace_exp_term
         ((((n.factorial : ℝ))⁻¹) •
           (B * (A + t • B) ^ n))) t := by
   have hpath : HasDerivAt (fun s : ℝ ↦ A + s • B) B t := by
-    convert (hasDerivAt_const t A).add ((hasDerivAt_id t).smul_const B) using 1 <;>
-      simp
+    convert (hasDerivAt_const t A).add ((hasDerivAt_id t).smul_const B) using 1
+    simp
   have hpow := hpath.fun_pow' (n + 1)
   have hscaled := hpow.const_smul (((n + 1).factorial : ℝ)⁻¹)
   have htrace := (hasDerivAt_const t (matrixTraceCLM (d := d))).clm_apply hscaled
@@ -660,7 +666,6 @@ private theorem hasDerivAt_trace_exp_term
     exact Finset.sum_congr rfl fun i hi ↦ hterm i hi
   rw [hsum]
   rw [Finset.sum_const, Finset.card_range]
-  push_cast
   rw [Nat.factorial_succ]
   rw [← Nat.cast_smul_eq_nsmul ℝ, smul_smul]
   congr 1
