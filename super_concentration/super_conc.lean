@@ -53,10 +53,12 @@ theorem expectation_eq_ofReal_re
 theorem density_variance_nonneg
     {ρ B : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hB : star B = B) :
     0 ≤ (expectation ρ (B * B)).re - (expectation ρ B).re ^ 2 := by
-  let x : ℝ := (expectation ρ B).re
-  let C : Matrix d d ℂ := B - (x : ℂ) • (1 : Matrix d d ℂ)
+  let z : ℂ := expectation ρ B
+  let C : Matrix d d ℂ := B - z • (1 : Matrix d d ℂ)
+  have hzstar : star z = z := by
+    exact expectation_star_eq hρ hB
   have hC : star C = C := by
-    simp [C, hB]
+    simp [C, hB, hzstar]
   have hpos := hρ.1.conjTranspose_mul_mul_same C
   have htrace : 0 ≤ (Matrix.trace (star C * ρ * C)).re := by
     have hz : 0 ≤ Matrix.trace (Matrix.conjTranspose C * ρ * C) :=
@@ -67,32 +69,219 @@ theorem density_variance_nonneg
     rw [hC, Matrix.trace_mul_cycle C ρ C,
       Matrix.trace_mul_comm (C * C) ρ]
   have hCC : C * C =
-      B * B - ((2 * x : ℝ) : ℂ) • B + ((x ^ 2 : ℝ) : ℂ) • 1 := by
-    have htwo : ((2 * x : ℝ) : ℂ) = 2 * (x : ℂ) := by norm_num
-    have hpow : ((x ^ 2 : ℝ) : ℂ) = (x : ℂ) ^ 2 := by norm_num [pow_two]
-    rw [htwo, hpow]
+      B * B - (2 * z) • B + z ^ 2 • 1 := by
     simp only [C, sub_mul, mul_sub]
     simp [Algebra.smul_mul_assoc, Algebra.mul_smul_comm]
-    rw [show (2 : ℂ) * (x : ℂ) = (x : ℂ) + x by ring, add_smul]
+    rw [show (2 : ℂ) * z = z + z by ring, add_smul]
     simp only [smul_smul, pow_two]
     abel
   rw [hcycle, hCC] at htrace
-  have hexpB : expectation ρ B = (x : ℂ) := by
-    rw [← expectation_eq_ofReal_re hρ hB]
   have htraceρ : Matrix.trace ρ = (1 : ℂ) := hρ.2
   simp only [Matrix.mul_sub, Matrix.mul_add, Matrix.mul_smul,
     Matrix.trace_sub, Matrix.trace_add, Matrix.trace_smul,
     Matrix.mul_one, smul_eq_mul] at htrace
   have htrace' : 0 ≤
-      (expectation ρ (B * B) - (2 * x : ℂ) * expectation ρ B +
-        (x ^ 2 : ℂ) * Matrix.trace ρ).re := by
+      (expectation ρ (B * B) - (2 * z) * expectation ρ B +
+        z ^ 2 * Matrix.trace ρ).re := by
     simpa [expectation] using htrace
-  rw [hexpB, htraceρ] at htrace'
-  norm_num [pow_two] at htrace'
-  dsimp [x] at htrace' ⊢
+  rw [show expectation ρ B = z from rfl, htraceρ] at htrace'
+  have hzim : z.im = 0 := by
+    exact expectation_im_eq_zero hρ hB
+  dsimp [z] at htrace' hzim ⊢
+  norm_num [Complex.mul_re, pow_two] at htrace'
   nlinarith
 
 end DensityMatrix
+
+section AnticommutingFamily
+
+variable {ι d : Type*} [Fintype ι] [Fintype d] [DecidableEq d]
+
+private theorem weighted_sum_sq_aux
+    (A : ι → Matrix d d ℂ) (c : ι → ℂ)
+    (hsq : ∀ i, A i * A i = 1)
+    (hanti : ∀ i j, i ≠ j → A i * A j = -(A j * A i))
+    (s : Finset ι) :
+    (∑ i ∈ s, c i • A i) * (∑ i ∈ s, c i • A i) =
+      (∑ i ∈ s, c i ^ 2) • (1 : Matrix d d ℂ) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp
+  | @insert a s ha ih =>
+      rw [Finset.sum_insert ha, Finset.sum_insert ha]
+      let S : Matrix d d ℂ := ∑ i ∈ s, c i • A i
+      have hAS : A a * S = -(S * A a) := by
+        dsimp [S]
+        rw [Finset.mul_sum, Finset.sum_mul, ← Finset.sum_neg_distrib]
+        apply Finset.sum_congr rfl
+        intro i hi
+        simp only [Algebra.mul_smul_comm, Algebra.smul_mul_assoc]
+        rw [hanti a i (fun hai => ha (hai ▸ hi))]
+        simp
+      have hcross : (c a • A a) * S = -(S * (c a • A a)) := by
+        rw [Algebra.smul_mul_assoc, Algebra.mul_smul_comm, hAS]
+        simp
+      have haa : (c a • A a) * (c a • A a) =
+          c a ^ 2 • (1 : Matrix d d ℂ) := by
+        rw [smul_mul_smul_comm, hsq, pow_two]
+      change (c a • A a + S) * (c a • A a + S) =
+        (c a ^ 2 + ∑ i ∈ s, c i ^ 2) • (1 : Matrix d d ℂ)
+      rw [mul_add, add_mul, add_mul, hcross, haa, ih]
+      module
+
+theorem sum_sq_expectation_le_one
+    (ρ : Matrix d d ℂ) (A : ι → Matrix d d ℂ)
+    (hρ : IsDensityMatrix ρ)
+    (hstar : ∀ i, star (A i) = A i)
+    (hsq : ∀ i, A i * A i = 1)
+    (hanti : ∀ i j, i ≠ j → A i * A j = -(A j * A i)) :
+    ∑ i, ‖expectation ρ (A i)‖ ^ 2 ≤ 1 := by
+  classical
+  let c : ι → ℂ := fun i => expectation ρ (A i)
+  let B : Matrix d d ℂ := ∑ i, c i • A i
+  let s : ℝ := ∑ i, ‖c i‖ ^ 2
+  have hcstar (i : ι) : star (c i) = c i := by
+    exact expectation_star_eq hρ (hstar i)
+  have hcim (i : ι) : (c i).im = 0 := by
+    exact expectation_im_eq_zero hρ (hstar i)
+  have hBstar : star B = B := by
+    classical
+    simp only [B, star_sum, star_smul]
+    apply Finset.sum_congr rfl
+    intro i _
+    rw [hcstar i, hstar i]
+  have hBsqC : B * B = (∑ i, c i ^ 2) • (1 : Matrix d d ℂ) := by
+    simpa [B] using weighted_sum_sq_aux A c hsq hanti Finset.univ
+  have hsumC : (∑ i, c i ^ 2) = (s : ℂ) := by
+    apply Complex.ext
+    · rw [Complex.re_sum]
+      change (∑ i, (c i ^ 2).re) = s
+      dsimp [s]
+      apply Finset.sum_congr rfl
+      intro i _
+      rw [Complex.sq_norm]
+      simp [pow_two, Complex.mul_re, Complex.normSq_apply, hcim i]
+    · rw [Complex.im_sum]
+      simp only [Complex.ofReal_im]
+      apply Finset.sum_eq_zero
+      intro i _
+      simp [pow_two, Complex.mul_im, hcim i]
+  have hBsq : B * B = (s : ℂ) • (1 : Matrix d d ℂ) := by
+    rw [hBsqC, hsumC]
+  have hexpB : expectation ρ B = (s : ℂ) := by
+    simp only [B, expectation, Matrix.mul_sum, Matrix.mul_smul,
+      Matrix.trace_sum, Matrix.trace_smul, smul_eq_mul]
+    rw [← hsumC]
+    apply Finset.sum_congr rfl
+    intro i _
+    change c i * c i = c i ^ 2
+    rw [pow_two]
+  have hexpBsq : expectation ρ (B * B) = (s : ℂ) := by
+    rw [hBsq]
+    simp [expectation, hρ.2]
+  have hvar := density_variance_nonneg hρ hBstar
+  rw [hexpBsq, hexpB] at hvar
+  have hs0 : 0 ≤ s := by
+    exact Finset.sum_nonneg fun i _ => sq_nonneg ‖c i‖
+  have hs1 : s ≤ 1 := by
+    norm_num at hvar
+    nlinarith
+  simpa [s, c] using hs1
+
+end AnticommutingFamily
+
+namespace MajoranaSystem
+
+variable {N q : ℕ} {A : Type*}
+  [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
+  (M : MajoranaSystem N A)
+
+/-- A phase-corrected Majorana interaction observable. -/
+noncomputable def interactionOperator (s : InteractionIndex N q) : A :=
+  phase q • M.chiProduct s
+
+theorem majorana_sq (i : Fin N) : M.χ i * M.χ i = 1 := by
+  have h := M.majorana_rel i i
+  rw [if_pos rfl] at h
+  module at h ⊢
+
+private theorem listProduct_mul_generator
+    (i : Fin N) (l : List (Fin N))
+    (hi : i ∉ l) :
+    (l.map M.χ).prod * M.χ i =
+      ((-1 : ℂ) ^ l.length) • (M.χ i * (l.map M.χ).prod) := by
+  induction l with
+  | nil => simp
+  | cons j l ih =>
+      have hij : j ≠ i := by
+        intro hji
+        apply hi
+        simp [hji]
+      have hil : i ∉ l := by
+        intro hil
+        exact hi (by simp [hil])
+      simp only [List.map_cons, List.prod_cons, List.length_cons]
+      rw [mul_assoc, ih hil, Algebra.mul_smul_comm, ← mul_assoc,
+        M.anticommute hij, neg_mul, mul_assoc]
+      rw [show ((-1 : ℂ) ^ l.length) •
+          (-(M.χ i * (M.χ j * (l.map M.χ).prod))) =
+          (((-1 : ℂ) ^ l.length) * (-1)) •
+            (M.χ i * (M.χ j * (l.map M.χ).prod)) by simp]
+      rw [pow_succ]
+
+private theorem star_listProduct_mul_self
+    (l : List (Fin N)) (hl : l.Nodup) :
+    star ((l.map M.χ).prod) * (l.map M.χ).prod = 1 := by
+  induction l with
+  | nil => simp
+  | cons i l ih =>
+      rw [List.nodup_cons] at hl
+      simp only [List.map_cons, List.prod_cons, star_mul, M.self_adjoint]
+      rw [← mul_assoc, mul_assoc (star ((l.map M.χ).prod)),
+        M.majorana_sq, one_mul, ih hl.2]
+
+theorem chiProduct_star_mul_self (s : InteractionIndex N q) :
+    star (M.chiProduct s) * M.chiProduct s = 1 := by
+  apply M.star_listProduct_mul_self
+  simp [orderedIndices]
+
+private theorem star_phase_mul_sign' (q : ℕ) :
+    star (phase q) * ((-1 : ℂ) ^ (q / 2)) = phase q := by
+  change star (Complex.I ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2)) =
+    Complex.I ^ (q / 2)
+  rw [star_pow, Complex.star_def, Complex.conj_I, neg_pow]
+  have hsign :
+      ((-1 : ℂ) ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2)) = 1 := by
+    rw [← mul_pow]
+    simp
+  calc
+    ((-1 : ℂ) ^ (q / 2) * Complex.I ^ (q / 2)) *
+        ((-1 : ℂ) ^ (q / 2)) =
+      (((-1 : ℂ) ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2))) *
+        Complex.I ^ (q / 2) := by ring
+    _ = Complex.I ^ (q / 2) := by rw [hsign, one_mul]
+
+theorem interactionOperator_star
+    (hq : Even q) (s : InteractionIndex N q) :
+    star (M.interactionOperator s) = M.interactionOperator s := by
+  rw [interactionOperator, star_smul, M.star_chiProduct_of_even s hq,
+    smul_smul, star_phase_mul_sign']
+
+theorem interactionOperator_sq
+    (hq : Even q) (s : InteractionIndex N q) :
+    M.interactionOperator s * M.interactionOperator s = 1 := by
+  have hstar := M.interactionOperator_star hq s
+  rw [← hstar]
+  rw [interactionOperator, star_smul, smul_mul_smul_comm,
+    M.chiProduct_star_mul_self]
+  change (star (phase q) * phase q) • (1 : A) = 1
+  have hp : star (phase q) * phase q = 1 := by
+    change star (Complex.I ^ (q / 2)) * Complex.I ^ (q / 2) = 1
+    rw [star_pow, ← mul_pow]
+    norm_num
+  rw [hp, one_smul]
+
+end MajoranaSystem
 
 /-- The Euclidean space of real SYK couplings. -/
 abbrev CouplingSpace (N q : ℕ) :=
