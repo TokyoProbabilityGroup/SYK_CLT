@@ -3,6 +3,8 @@ import Mathlib.Analysis.CStarAlgebra.Matrix
 import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.Calculus.MeanValue
+import Mathlib.Analysis.Calculus.SmoothSeries
+import Mathlib.Analysis.Calculus.FDeriv.Pow
 import Mathlib.Analysis.Matrix.Order
 import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.ExpLog.Basic
 import Mathlib.Data.Fintype.Powerset
@@ -12,6 +14,7 @@ import Mathlib.Probability.Distributions.Gaussian.Real
 
 open scoped BigOperators ComplexOrder ENNReal NNReal
 open scoped MatrixOrder
+open scoped Matrix.Norms.Operator
 open MeasureTheory
 open ProbabilityTheory
 
@@ -513,16 +516,26 @@ variable {d : Type*} [Fintype d] [DecidableEq d]
 
 theorem gibbsOperator_posDef (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) : (gibbsOperator β H).PosDef := by
-  rw [← Matrix.isStrictlyPositive_iff_posDef]
   let A : Matrix d d ℂ := -((β : ℝ) : ℂ) • H
-  have hA : IsSelfAdjoint A := by
-    change star A = A
+  have hA : star A = A := by
     simp [A, hH]
-  change IsStrictlyPositive (NormedSpace.exp A)
-  rw [← CFC.real_exp_eq_normedSpace_exp hA,
-    cfc_isStrictlyPositive_iff]
-  intro x _hx
-  exact Real.exp_pos x
+  let B : Matrix d d ℂ := NormedSpace.exp ((2 : ℂ)⁻¹ • A)
+  have hB : star B = B := by
+    exact (show Matrix.IsHermitian ((2 : ℂ)⁻¹ • A) by
+      simpa [Matrix.IsHermitian, hA]).exp.eq
+  have hBB : B * B = NormedSpace.exp A := by
+    dsimp [B]
+    rw [← Matrix.exp_add_of_commute]
+    · congr 1
+      module
+    · exact Commute.refl _
+  have hpsd : (NormedSpace.exp A).PosSemidef := by
+    rw [Matrix.posSemidef_iff_eq_conjTranspose_mul_self]
+    refine ⟨B, ?_⟩
+    change NormedSpace.exp A = star B * B
+    rw [hB, hBB]
+  apply hpsd.posDef_iff_isUnit.mpr
+  exact Matrix.isUnit_exp A
 
 theorem partitionFunction_star_eq (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) :
@@ -564,7 +577,8 @@ theorem thermalDensity_isDensityMatrix [Nonempty d] (β : NNReal)
       apply Complex.ext
       · simp
       · simp [partitionFunction_im_eq_zero β hH]
-    rw [← hreal, ← Complex.ofReal_inv]
+    rw [← hreal]
+    simp only [Complex.ofReal_re]
     simp [ne_of_gt hZ]
 
 theorem gibbsState_eq_expectation_thermalDensity [Nonempty d]
@@ -581,11 +595,68 @@ theorem gibbsState_eq_expectation_thermalDensity [Nonempty d]
   change Matrix.trace (O * gibbsOperator β H) / partitionFunction β H =
     (((partitionFunction β H).re⁻¹ : ℝ) : ℂ) *
       Matrix.trace (gibbsOperator β H * O)
-  rw [← hreal, ← Complex.ofReal_inv]
+  rw [← hreal]
+  simp only [Complex.ofReal_re]
   field_simp
-  exact Matrix.trace_mul_comm O (gibbsOperator β H)
+  simpa [ne_of_gt hZ] using Matrix.trace_mul_comm O (gibbsOperator β H)
 
 end GibbsDensity
+
+section TraceExponentialDerivative
+
+variable {d : Type*} [Fintype d] [DecidableEq d]
+
+noncomputable def matrixTraceCLM : Matrix d d ℂ →L[ℝ] ℂ :=
+  LinearMap.toContinuousLinearMap (Matrix.traceLinearMap d ℝ ℂ)
+
+@[simp]
+theorem matrixTraceCLM_apply (A : Matrix d d ℂ) :
+    matrixTraceCLM A = Matrix.trace A := rfl
+
+private theorem trace_pow_mul_cycle (A B : Matrix d d ℂ)
+    {n i : ℕ} (hi : i ≤ n) :
+    Matrix.trace (A ^ (n - i) * B * A ^ i) =
+      Matrix.trace (B * A ^ n) := by
+  calc
+    Matrix.trace (A ^ (n - i) * B * A ^ i) =
+        Matrix.trace (A ^ i * A ^ (n - i) * B) :=
+      Matrix.trace_mul_cycle _ _ _
+    _ = Matrix.trace (A ^ n * B) := by
+      congr 1
+      rw [← pow_add, Nat.add_sub_of_le hi]
+    _ = Matrix.trace (B * A ^ n) := Matrix.trace_mul_comm _ _
+
+private theorem hasDerivAt_trace_exp_term
+    (A B : Matrix d d ℂ) (n : ℕ) (t : ℝ) :
+    HasDerivAt
+      (fun s : ℝ ↦ matrixTraceCLM
+        (((((n + 1).factorial : ℝ))⁻¹) •
+          (A + s • B) ^ (n + 1)))
+      (matrixTraceCLM
+        ((((n.factorial : ℝ))⁻¹) •
+          (B * (A + t • B) ^ n))) t := by
+  have hpath : HasDerivAt (fun s : ℝ ↦ A + s • B) B t := by
+    convert (hasDerivAt_const t A).add ((hasDerivAt_id t).smul_const B) using 1 <;>
+      simp
+  have hpow := hpath.fun_pow' (n + 1)
+  have hscaled := hpow.const_smul (((n + 1).factorial : ℝ)⁻¹)
+  have htrace := (hasDerivAt_const t (matrixTraceCLM (d := d))).clm_apply hscaled
+  convert htrace using 1
+  simp only [ContinuousLinearMap.zero_apply, zero_add, matrixTraceCLM_apply,
+    map_smul, Matrix.trace_sum]
+  have hterm (i : ℕ) (hi : i ∈ Finset.range (n + 1)) :
+      Matrix.trace
+          ((A + t • B) ^ ((n + 1).pred - i) * B *
+            (A + t • B) ^ i) =
+        Matrix.trace (B * (A + t • B) ^ n) := by
+    simpa using trace_pow_mul_cycle (A + t • B) B (Nat.le_of_lt_succ (Finset.mem_range.mp hi))
+  simp_rw [hterm]
+  rw [Finset.sum_const, Finset.card_range]
+  push_cast
+  rw [Nat.factorial_succ]
+  field_simp
+
+end TraceExponentialDerivative
 
 /-- The Euclidean space of real SYK couplings. -/
 abbrev CouplingSpace (N q : ℕ) :=
