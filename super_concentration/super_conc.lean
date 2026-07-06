@@ -3,12 +3,15 @@ import Mathlib.Analysis.CStarAlgebra.Matrix
 import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.Calculus.MeanValue
+import Mathlib.Analysis.Matrix.Order
+import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.ExpLog.Basic
 import Mathlib.Data.Fintype.Powerset
 import Mathlib.Data.Nat.Choose.Bounds
 import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.Probability.Distributions.Gaussian.Real
 
 open scoped BigOperators ComplexOrder ENNReal NNReal
+open scoped MatrixOrder
 open MeasureTheory
 open ProbabilityTheory
 
@@ -203,11 +206,9 @@ noncomputable def interactionOperator (s : InteractionIndex N q) : A :=
 theorem majorana_sq (i : Fin N) : M.χ i * M.χ i = 1 := by
   have h := M.majorana_rel i i
   rw [if_pos rfl] at h
-  calc
-    M.χ i * M.χ i = (2 : ℂ)⁻¹ •
-        (M.χ i * M.χ i + M.χ i * M.χ i) := by module
-    _ = (2 : ℂ)⁻¹ • (2 : A) := by rw [h]
-    _ = 1 := by norm_num
+  rw [← one_add_one_eq_two] at h
+  apply smul_right_injective A (show (2 : ℂ) ≠ 0 by norm_num)
+  simpa [two_smul] using h
 
 private theorem listProduct_mul_generator
     (i : Fin N) (l : List (Fin N))
@@ -232,6 +233,35 @@ private theorem listProduct_mul_generator
           (((-1 : ℂ) ^ l.length) * (-1)) •
             (M.χ i * (M.χ j * (l.map M.χ).prod)) by simp]
       rw [pow_succ]
+
+private theorem listProduct_eq_smul_of_perm
+    (l₁ l₂ : List (Fin N)) (h : l₁.Perm l₂) :
+    ∃ c : ℂ, (l₁.map M.χ).prod = c • (l₂.map M.χ).prod := by
+  induction h with
+  | nil => exact ⟨1, by simp⟩
+  | @cons i l₁ l₂ _ ih =>
+      rcases ih with ⟨c, hc⟩
+      refine ⟨c, ?_⟩
+      simp only [List.map_cons, List.prod_cons]
+      rw [hc, Algebra.mul_smul_comm]
+  | @swap i j l =>
+      by_cases hij : i = j
+      · subst j
+        exact ⟨1, by simp⟩
+      · refine ⟨-1, ?_⟩
+        simp only [List.map_cons, List.prod_cons]
+        calc
+          M.χ j * (M.χ i * (l.map M.χ).prod) =
+              (M.χ j * M.χ i) * (l.map M.χ).prod := by rw [mul_assoc]
+          _ = (-(M.χ i * M.χ j)) * (l.map M.χ).prod := by
+            rw [M.anticommute (Ne.symm hij)]
+          _ = (-1 : ℂ) • (M.χ i * (M.χ j * (l.map M.χ).prod)) := by
+            simp [mul_assoc]
+  | @trans l₁ l₂ l₃ _ _ ih₁ ih₂ =>
+      rcases ih₁ with ⟨c₁, hc₁⟩
+      rcases ih₂ with ⟨c₂, hc₂⟩
+      refine ⟨c₁ * c₂, ?_⟩
+      rw [hc₁, hc₂, smul_smul]
 
 private theorem star_listProduct_mul_self
     (l : List (Fin N)) (hl : l.Nodup) :
@@ -292,6 +322,270 @@ theorem interactionOperator_sq
   rw [hp, one_smul]
 
 end MajoranaSystem
+
+section FixedCore
+
+variable {N q : ℕ}
+
+/-- Labels outside a fixed interaction core. -/
+abbrev Outside (A : InteractionIndex N (q - 1)) :=
+  {j : Fin N // j ∉ A.1}
+
+/-- Add one label to a fixed `(q - 1)`-body core. -/
+def extendInteraction (hq : 0 < q) (A : InteractionIndex N (q - 1))
+    (j : Outside A) : InteractionIndex N q :=
+  ⟨insert j.1 A.1, by
+    rw [Finset.card_insert_of_notMem j.2, A.2]
+    omega⟩
+
+namespace MajoranaSystem
+
+variable {A : Type*}
+  [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
+  (M : MajoranaSystem N A)
+
+private theorem chiProduct_extend_eq_smul
+    (hq : 0 < q) (C : InteractionIndex N (q - 1)) (j : Outside C) :
+    ∃ c : ℂ, M.chiProduct (extendInteraction hq C j) =
+      c • (M.χ j.1 * M.chiProduct C) := by
+  have hperm : List.Perm
+      (orderedIndices (extendInteraction hq C j))
+      (j.1 :: orderedIndices C) := by
+    apply (List.perm_ext_iff_of_nodup (by simp [orderedIndices])
+      (by simp [orderedIndices, j.2])).2
+    intro i
+    simp [orderedIndices, extendInteraction]
+  simpa [chiProduct] using
+    M.listProduct_eq_smul_of_perm _ _ hperm
+
+theorem extendInteraction_anticommute
+    (hq0 : 0 < q) (hq : Even q)
+    (C : InteractionIndex N (q - 1))
+    (j k : Outside C) (hjk : j ≠ k) :
+    M.interactionOperator (extendInteraction hq0 C j) *
+        M.interactionOperator (extendInteraction hq0 C k) =
+      -(M.interactionOperator (extendInteraction hq0 C k) *
+        M.interactionOperator (extendInteraction hq0 C j)) := by
+  rcases M.chiProduct_extend_eq_smul hq0 C j with ⟨cⱼ, hcⱼ⟩
+  rcases M.chiProduct_extend_eq_smul hq0 C k with ⟨cₖ, hcₖ⟩
+  let D : A := M.chiProduct C
+  have hjmem : j.1 ∉ orderedIndices C := by
+    simpa [orderedIndices] using j.2
+  have hkmem : k.1 ∉ orderedIndices C := by
+    simpa [orderedIndices] using k.2
+  have hodd : Odd (q - 1) := by
+    rcases hq with ⟨m, rfl⟩
+    exact ⟨m - 1, by omega⟩
+  have hDⱼ : D * M.χ j.1 = -(M.χ j.1 * D) := by
+    have h := M.listProduct_mul_generator j.1 (orderedIndices C) hjmem
+    rw [length_orderedIndices, hodd.neg_one_pow] at h
+    simpa [D, chiProduct] using h
+  have hDₖ : D * M.χ k.1 = -(M.χ k.1 * D) := by
+    have h := M.listProduct_mul_generator k.1 (orderedIndices C) hkmem
+    rw [length_orderedIndices, hodd.neg_one_pow] at h
+    simpa [D, chiProduct] using h
+  have hjk' : j.1 ≠ k.1 := by
+    intro h
+    apply hjk
+    exact Subtype.ext h
+  have hχ : M.χ j.1 * M.χ k.1 = -(M.χ k.1 * M.χ j.1) :=
+    M.anticommute hjk'
+  have hbase :
+      (M.χ j.1 * D) * (M.χ k.1 * D) =
+        -((M.χ k.1 * D) * (M.χ j.1 * D)) := by
+    calc
+      (M.χ j.1 * D) * (M.χ k.1 * D) =
+          M.χ j.1 * (D * M.χ k.1) * D := by simp only [mul_assoc]
+      _ = M.χ j.1 * (-(M.χ k.1 * D)) * D := by rw [hDₖ]
+      _ = -((M.χ j.1 * M.χ k.1) * (D * D)) := by noncomm_ring
+      _ = (M.χ k.1 * M.χ j.1) * (D * D) := by rw [hχ]; simp
+      _ = -(M.χ k.1 * (D * M.χ j.1) * D) := by rw [hDⱼ]; noncomm_ring
+      _ = -((M.χ k.1 * D) * (M.χ j.1 * D)) := by simp only [mul_assoc]
+  rw [interactionOperator, interactionOperator, hcⱼ, hcₖ,
+    smul_smul, smul_smul, smul_mul_smul_comm, smul_mul_smul_comm, hbase]
+  simpa [D, mul_comm]
+
+end MajoranaSystem
+
+abbrev ChosenPoint (I : InteractionIndex N q) :=
+  {j : Fin N // j ∈ I.1}
+
+private def eraseChosenPoint (hq : 0 < q) (I : InteractionIndex N q)
+    (j : ChosenPoint I) : InteractionIndex N (q - 1) :=
+  ⟨I.1.erase j.1, by
+    rw [Finset.card_erase_of_mem j.2, I.2]⟩
+
+/-- Double-counting equivalence between cores with an added point and
+interactions with a chosen point. -/
+def extensionEquiv (hq : 0 < q) :
+    (Σ C : InteractionIndex N (q - 1), Outside C) ≃
+      (Σ I : InteractionIndex N q, ChosenPoint I) where
+  toFun p :=
+    ⟨extendInteraction hq p.1 p.2,
+      ⟨p.2.1, by simp [extendInteraction]⟩⟩
+  invFun p :=
+    ⟨eraseChosenPoint hq p.1 p.2,
+      ⟨p.2.1, by simp [eraseChosenPoint]⟩⟩
+  left_inv p := by
+    rcases p with ⟨C, j⟩
+    apply Sigma.ext
+    · apply Subtype.ext
+      simp [eraseChosenPoint, extendInteraction, j.2]
+    · apply (Subtype.heq_iff_coe_eq (fun i ↦ by
+        simp [eraseChosenPoint, extendInteraction, j.2])).2
+      rfl
+  right_inv p := by
+    rcases p with ⟨I, j⟩
+    apply Sigma.ext
+    · apply Subtype.ext
+      simp [eraseChosenPoint, extendInteraction, j.2]
+    · apply (Subtype.heq_iff_coe_eq (fun i ↦ by
+        simp [eraseChosenPoint, extendInteraction, j.2])).2
+      rfl
+
+theorem sum_over_extensions (hq : 0 < q)
+    (f : InteractionIndex N q → ℝ) :
+    ∑ C : InteractionIndex N (q - 1),
+      ∑ j : Outside C, f (extendInteraction hq C j) =
+    (q : ℝ) * ∑ I : InteractionIndex N q, f I := by
+  calc
+    ∑ C : InteractionIndex N (q - 1),
+        ∑ j : Outside C, f (extendInteraction hq C j) =
+      ∑ p : Σ C : InteractionIndex N (q - 1), Outside C,
+        f (extendInteraction hq p.1 p.2) := by
+          exact (Fintype.sum_sigma'
+            (fun C j ↦ f (extendInteraction hq C j))).symm
+    _ = ∑ p : Σ I : InteractionIndex N q, ChosenPoint I, f p.1 := by
+      exact Fintype.sum_equiv (extensionEquiv hq) _ _ (fun _ ↦ rfl)
+    _ = ∑ I : InteractionIndex N q, ∑ _j : ChosenPoint I, f I := by
+      exact Fintype.sum_sigma' (fun I (_j : ChosenPoint I) ↦ f I)
+    _ = (q : ℝ) * ∑ I : InteractionIndex N q, f I := by
+      simp [Fintype.card_coe, show ∀ I : InteractionIndex N q,
+        I.1.card = q from fun I ↦ I.2, Finset.mul_sum]
+
+end FixedCore
+
+section ExactSYKBound
+
+variable {N q : ℕ} {d : Type*} [Fintype d] [DecidableEq d]
+
+theorem syk_sum_sq_expectation_le
+    (hq0 : 0 < q) (hq : Even q)
+    (M : MajoranaSystem N (Matrix d d ℂ))
+    (ρ : Matrix d d ℂ) (hρ : IsDensityMatrix ρ) :
+    ∑ I : InteractionIndex N q,
+        ‖expectation ρ (M.interactionOperator I)‖ ^ 2 ≤
+      (Nat.choose N (q - 1) : ℝ) / q := by
+  let f : InteractionIndex N q → ℝ := fun I ↦
+    ‖expectation ρ (M.interactionOperator I)‖ ^ 2
+  have hcore (C : InteractionIndex N (q - 1)) :
+      ∑ j : Outside C, f (extendInteraction hq0 C j) ≤ 1 := by
+    simpa [f] using
+      (sum_sq_expectation_le_one ρ
+        (fun j : Outside C ↦ M.interactionOperator
+          (extendInteraction hq0 C j)) hρ
+        (fun j ↦ M.interactionOperator_star hq _)
+        (fun j ↦ M.interactionOperator_sq hq _)
+        (fun j k hjk ↦
+          M.extendInteraction_anticommute hq0 hq C j k hjk))
+  have hsum :
+      ∑ C : InteractionIndex N (q - 1),
+          ∑ j : Outside C, f (extendInteraction hq0 C j) ≤
+        Nat.choose N (q - 1) := by
+    calc
+      ∑ C : InteractionIndex N (q - 1),
+          ∑ j : Outside C, f (extendInteraction hq0 C j) ≤
+          ∑ _C : InteractionIndex N (q - 1), (1 : ℝ) :=
+        Finset.sum_le_sum fun C _ ↦ hcore C
+      _ = Nat.choose N (q - 1) := by
+        simp [Fintype.card_finset_len]
+  rw [sum_over_extensions hq0] at hsum
+  have hqR : 0 < (q : ℝ) := by exact_mod_cast hq0
+  dsimp [f] at hsum ⊢
+  apply (le_div_iff₀ hqR).2
+  simpa [mul_comm] using hsum
+
+end ExactSYKBound
+
+section GibbsDensity
+
+variable {d : Type*} [Fintype d] [DecidableEq d]
+
+theorem gibbsOperator_posDef (β : NNReal) {H : Matrix d d ℂ}
+    (hH : star H = H) : (gibbsOperator β H).PosDef := by
+  rw [← Matrix.isStrictlyPositive_iff_posDef]
+  let A : Matrix d d ℂ := -((β : ℝ) : ℂ) • H
+  have hA : IsSelfAdjoint A := by
+    change star A = A
+    simp [A, hH]
+  change IsStrictlyPositive (NormedSpace.exp A)
+  rw [← CFC.real_exp_eq_normedSpace_exp hA,
+    cfc_isStrictlyPositive_iff]
+  intro x _hx
+  exact Real.exp_pos x
+
+theorem partitionFunction_star_eq (β : NNReal) {H : Matrix d d ℂ}
+    (hH : star H = H) :
+    star (partitionFunction β H) = partitionFunction β H := by
+  have hG : star (gibbsOperator β H) = gibbsOperator β H :=
+    (gibbsOperator_posDef β hH).isHermitian.eq
+  change star (Matrix.trace (gibbsOperator β H)) =
+    Matrix.trace (gibbsOperator β H)
+  rw [← Matrix.trace_conjTranspose]
+  change Matrix.trace (star (gibbsOperator β H)) = _
+  rw [hG]
+
+theorem partitionFunction_im_eq_zero (β : NNReal) {H : Matrix d d ℂ}
+    (hH : star H = H) : (partitionFunction β H).im = 0 :=
+  Complex.conj_eq_iff_im.mp (partitionFunction_star_eq β hH)
+
+theorem partitionFunction_pos [Nonempty d] (β : NNReal)
+    {H : Matrix d d ℂ} (hH : star H = H) :
+    0 < (partitionFunction β H).re := by
+  have h := (gibbsOperator_posDef β hH).trace_pos
+  exact (RCLike.pos_iff.mp h).1
+
+/-- The normalized Gibbs matrix, using the real positive partition function. -/
+noncomputable def thermalDensity (β : NNReal) (H : Matrix d d ℂ) :
+    Matrix d d ℂ :=
+  ((partitionFunction β H).re⁻¹ : ℝ) • gibbsOperator β H
+
+theorem thermalDensity_isDensityMatrix [Nonempty d] (β : NNReal)
+    {H : Matrix d d ℂ} (hH : star H = H) :
+    IsDensityMatrix (thermalDensity β H) := by
+  have hZ : 0 < (partitionFunction β H).re := partitionFunction_pos β hH
+  constructor
+  · exact ((gibbsOperator_posDef β hH).smul (inv_pos.mpr hZ)).posSemidef
+  · rw [thermalDensity, Matrix.trace_smul]
+    change (((partitionFunction β H).re⁻¹ : ℝ) : ℂ) *
+        partitionFunction β H = 1
+    have hreal : ((partitionFunction β H).re : ℂ) =
+        partitionFunction β H := by
+      apply Complex.ext
+      · simp
+      · simp [partitionFunction_im_eq_zero β hH]
+    rw [← hreal, ← Complex.ofReal_inv]
+    simp [ne_of_gt hZ]
+
+theorem gibbsState_eq_expectation_thermalDensity [Nonempty d]
+    (β : NNReal) {H O : Matrix d d ℂ} (hH : star H = H) :
+    gibbsState β H O = expectation (thermalDensity β H) O := by
+  have hZ : 0 < (partitionFunction β H).re := partitionFunction_pos β hH
+  have hreal : ((partitionFunction β H).re : ℂ) =
+      partitionFunction β H := by
+    apply Complex.ext
+    · simp
+    · simp [partitionFunction_im_eq_zero β hH]
+  rw [gibbsState, expectation, thermalDensity, Matrix.smul_mul,
+    Matrix.trace_smul]
+  change Matrix.trace (O * gibbsOperator β H) / partitionFunction β H =
+    (((partitionFunction β H).re⁻¹ : ℝ) : ℂ) *
+      Matrix.trace (gibbsOperator β H * O)
+  rw [← hreal, ← Complex.ofReal_inv]
+  field_simp
+  exact Matrix.trace_mul_comm O (gibbsOperator β H)
+
+end GibbsDensity
 
 /-- The Euclidean space of real SYK couplings. -/
 abbrev CouplingSpace (N q : ℕ) :=
