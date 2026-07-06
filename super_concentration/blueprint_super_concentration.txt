@@ -1,371 +1,476 @@
+# Lean blueprint for the SYK superconcentration bound
 
+## Target
 
+The first formal target should be the exact finite-dimensional inequality
 
-\begin{lemma}
-Let \(A_1,\dots,A_m\) be Hermitian operators satisfying
-\[
-A_a^2=\mathbf 1,
+$
+\sum_{|I|=q}\left|\operatorname{Tr}(\rho\Gamma_I)\right|^2
+\le \frac{1}{q}\binom{N}{q-1},
+$
+
+where $q>0$ is even, $\rho$ is a density matrix, and
+$\Gamma_I=i^{q/2}\prod_{j\in I}\chi_j$ is the Hermitian Majorana monomial
+already represented by `phase` and `MajoranaSystem.chiProduct` in
+`SYK/lean_files/model.lean`.
+
+The asymptotic statement $O(N^{q-1})$ should be a corollary of this exact
+bound. The exact theorem is more useful in later gradient estimates and is
+easier to reuse in Lean.
+
+The algebraic theorem does not depend on the Hamiltonian, inverse temperature,
+or probability. Prove it for an arbitrary density matrix before connecting it
+to `gibbsOperator`.
+
+## Corrections and representation decisions
+
+- Use the Gibbs sign from `model.lean`: $\rho=e^{-\beta H}/Z$.
+- Use `phase q = Complex.I ^ (q / 2)`. For even $q$, this equals the alternate
+  phase $i^{q(q-1)/2}$.
+- Work with `Matrix d d ℂ` for the density-matrix part. The current abstract
+  `MajoranaSystem` does not contain positivity or a trace.
+- State squared absolute values as real numbers with
+  `‖expectation ρ A‖ ^ 2`.
+- Keep the Gaussian concentration theorem separate. The local mathlib version
+  has Gaussian distribution APIs, but no immediately reusable theorem giving
+  the required concentration inequality for every Euclidean Lipschitz map.
+
+## Project setup
+
+To import the existing model by module name, add a library entry to
+`lakefile.lean`:
+
+```lean
+lean_lib SYK where
+  srcDir := "."
+  globs := #[.submodules `SYK]
+```
+
+Then start `SYK/super_concentration/super_conc.lean` with imports close to:
+
+```lean
+import SYK.lean_files.model
+import Mathlib.Analysis.CStarAlgebra.Matrix
+import Mathlib.Analysis.Matrix.PosDef
+import Mathlib.Data.Fintype.Powerset
+import Mathlib.Data.Nat.Choose.Bounds
+```
+
+`Mathlib.Analysis.Matrix.PosDef` supplies the analytic positive-semidefinite
+matrix API. `Fintype.card_finset_len` gives the number of fixed-cardinality
+finsets, and `Nat.choose_le_pow` or `Nat.choose_le_pow_div` gives the final
+polynomial bound.
+
+The signatures below are intended as stable targets. Small changes in explicit
+coercions or namespaces may be needed while compiling.
+
+## Density matrices and expectations
+
+Introduce a small interface in the matrix section:
+
+```lean
+namespace SYK
+
+open scoped BigOperators ComplexConjugate
+
+section DensityMatrix
+
+variable {d : Type*} [Fintype d] [DecidableEq d]
+
+def IsDensityMatrix (ρ : Matrix d d ℂ) : Prop :=
+  ρ.PosSemidef ∧ Matrix.trace ρ = 1
+
+def expectation (ρ A : Matrix d d ℂ) : ℂ :=
+  Matrix.trace (ρ * A)
+
+end DensityMatrix
+
+end SYK
+```
+
+Using a predicate rather than a subtype keeps theorem statements and rewriting
+simple. A subtype can be added later if many functions need to carry the same
+hypotheses.
+
+Prove these foundational lemmas:
+
+```lean
+theorem expectation_star_eq
+    (hρ : IsDensityMatrix ρ) (hA : star A = A) :
+    star (expectation ρ A) = expectation ρ A
+
+theorem expectation_im_eq_zero
+    (hρ : IsDensityMatrix ρ) (hA : star A = A) :
+    (expectation ρ A).im = 0
+
+theorem expectation_eq_ofReal_re
+    (hρ : IsDensityMatrix ρ) (hA : star A = A) :
+    ((expectation ρ A).re : ℂ) = expectation ρ A
+```
+
+For `expectation_star_eq`, use `Matrix.trace_conjTranspose`, the Hermitian part
+of `hρ.1`, `hA`, and `Matrix.trace_mul_comm`. This lemma is required because
+the coefficients in the anticommuting-family argument must be real.
+
+## The variance lemma
+
+The paper proof uses the operator norm inequality
+$|\operatorname{Tr}(\rho B)|\leq\|B\|$. A shorter Lean route is positivity of
+variance. Prove:
+
+```lean
+theorem density_variance_nonneg
+    (hρ : IsDensityMatrix ρ) (hB : star B = B) :
+    0 ≤ (expectation ρ (B * B)).re - (expectation ρ B).re ^ 2
+```
+
+Suggested proof construction:
+
+- Set `x : ℝ := (expectation ρ B).re`.
+- Set `C := B - (x : ℂ) • (1 : Matrix d d ℂ)`.
+- Show `star C = C`.
+- From `hρ.1.conjTranspose_mul_mul_same C`, obtain that
+  `Cᴴ * ρ * C` is positive semidefinite.
+- Apply `Matrix.PosSemidef.trace_nonneg`.
+- Rewrite the trace by cyclicity, expand `C`, use `Matrix.trace_mul_comm`, and
+  use `hρ.2` and `expectation_eq_ofReal_re`.
+- Finish the real polynomial identity with `ring_nf` or `nlinarith`.
+
+This isolates all positivity work in one lemma. No matrix square root or
+operator-norm estimate is needed for the main result.
+
+## Majorana observables
+
+Define the phase-corrected interaction observable in the existing namespace:
+
+```lean
+namespace MajoranaSystem
+
+noncomputable def interactionOperator
+    (M : MajoranaSystem N A) (s : InteractionIndex N q) : A :=
+  phase q • M.chiProduct s
+
+end MajoranaSystem
+```
+
+The following algebraic lemmas should be proved for the abstract algebra when
+possible. This makes the matrix theorem only a specialization.
+
+```lean
+theorem majorana_sq (i : Fin N) :
+    M.χ i * M.χ i = 1
+
+theorem chiProduct_sq (s : InteractionIndex N q) :
+    M.chiProduct s * M.chiProduct s =
+      ((-1 : ℂ) ^ (q * (q - 1) / 2)) • 1
+
+theorem interactionOperator_star
+    (hq : Even q) (s : InteractionIndex N q) :
+    star (M.interactionOperator s) = M.interactionOperator s
+
+theorem interactionOperator_sq
+    (hq : Even q) (s : InteractionIndex N q) :
+    M.interactionOperator s * M.interactionOperator s = 1
+```
+
+`majorana_sq` follows from `majorana_rel i i`; normalize the two occurrences of
+the same product and cancel the nonzero complex scalar $2$. For
+`chiProduct_sq`, induction on the sorted list is preferable to a large
+commutative-ring calculation. Moving the head generator across the tail gives
+one sign per tail element.
+
+`interactionOperator_star` should reuse
+`MajoranaSystem.star_chiProduct_of_even` and the existing phase identity. The
+current theorem `star_phase_mul_sign` is private, so either put these new
+observable lemmas in `model.lean` or make that scalar identity public first.
+For `interactionOperator_sq`, combine `chiProduct_sq` with the scalar phase
+identity
+
+$
+(i^{q/2})^2(-1)^{q(q-1)/2}=1.
+$
+
+Also prove the monomial commutation formula:
+
+```lean
+theorem chiProduct_mul_comm_sign
+    (s : InteractionIndex N r) (t : InteractionIndex N k) :
+    M.chiProduct s * M.chiProduct t =
+      ((-1 : ℂ) ^ (r * k - (s.1 ∩ t.1).card)) •
+        (M.chiProduct t * M.chiProduct s)
+```
+
+The same formula for `interactionOperator` follows because complex scalars are
+central. Prove the list version first, then rewrite the sorted lists back to
+finsets. The exponent counts pairs of distinct generators; a generator in the
+intersection is not swapped with itself.
+
+If the general intersection formula takes too much code, it is acceptable to
+prove only the fixed-core specialization below. The final theorem needs no
+other case.
+
+## Fixed-core family
+
+For a $(q-1)$-subset $A$, index the remaining labels by a subtype:
+
+```lean
+abbrev Outside (A : InteractionIndex N (q - 1)) :=
+  {j : Fin N // j ∉ A.1}
+
+def extendInteraction
+    (hq : 0 < q) (A : InteractionIndex N (q - 1)) (j : Outside A) :
+    InteractionIndex N q :=
+  ⟨insert j.1 A.1, by
+    rw [Finset.card_insert_of_notMem j.2, A.2]
+    omega⟩
+```
+
+The exact arithmetic proof may instead use `Nat.sub_add_cancel hq` after
+turning `hq` into `1 ≤ q`.
+
+Prove the fixed-core anticommutation theorem:
+
+```lean
+theorem extendInteraction_anticommute
+    (hq0 : 0 < q) (hq : Even q)
+    (A : InteractionIndex N (q - 1))
+    (j k : Outside A) (hjk : j ≠ k) :
+    M.interactionOperator (extendInteraction hq0 A j) *
+        M.interactionOperator (extendInteraction hq0 A k) =
+      -(M.interactionOperator (extendInteraction hq0 A k) *
+        M.interactionOperator (extendInteraction hq0 A j))
+```
+
+Useful intermediate facts are:
+
+```lean
+(insert j.1 A.1 ∩ insert k.1 A.1) = A.1
+(insert j.1 A.1).card = q
+(insert k.1 A.1).card = q
+Odd (q - 1)
+```
+
+The intersection equality is an extensional `simp` proof using `j.2`, `k.2`,
+and `hjk`. The sign exponent is odd because $q^2$ is even and $q-1$ is odd.
+
+## Generic anticommuting-family estimate
+
+Prove a theorem independent of Majorana operators:
+
+```lean
+theorem sum_sq_expectation_le_one
+    {ι d : Type*} [Fintype ι] [Fintype d] [DecidableEq d]
+    (ρ : Matrix d d ℂ) (A : ι → Matrix d d ℂ)
+    (hρ : IsDensityMatrix ρ)
+    (hstar : ∀ i, star (A i) = A i)
+    (hsq : ∀ i, A i * A i = 1)
+    (hanti : ∀ i j, i ≠ j → A i * A j = -(A j * A i)) :
+    ∑ i, ‖expectation ρ (A i)‖ ^ 2 ≤ 1
+```
+
+Proof plan without operator norms:
+
+- Work classically and set `x i := (expectation ρ (A i)).re`.
+- Set `s := ∑ i, (x i) ^ 2` and
+  `B := ∑ i, ((x i : ℂ) • A i)`.
+- Use `hstar` to show `star B = B`.
+- Show `B * B = (s : ℂ) • 1` from `hsq` and `hanti`.
+- Show `expectation ρ B = (s : ℂ)` by linearity of trace and
+  `expectation_eq_ofReal_re`.
+- Apply `density_variance_nonneg hρ` to `B`.
+- Rewrite both expectations using the preceding two identities. This gives
+  $0\leq s-s^2$.
+- Since `s` is a sum of squares, `nlinarith` gives $s\leq1$.
+- Rewrite `‖expectation ρ (A i)‖ ^ 2` as `(x i) ^ 2` using
+  `expectation_eq_ofReal_re` and `Complex.norm_real`.
+
+For the identity for `B * B`, induction over `Finset.univ` is likely simpler
+than manipulating a double sum. When inserting one new index, the two cross
+terms cancel by `hanti`, and the square term reduces with `hsq`.
+
+## Double-counting equivalence
+
+Package the combinatorics as a reusable equivalence. Define
+
+```lean
+abbrev ChosenPoint (I : InteractionIndex N q) :=
+  {j : Fin N // j ∈ I.1}
+```
+
+Then construct
+
+```lean
+def extensionEquiv (hq : 0 < q) :
+    (Σ A : InteractionIndex N (q - 1), Outside A) ≃
+      (Σ I : InteractionIndex N q, ChosenPoint I)
+```
+
+The forward map sends $(A,j)$ to $(A\cup\{j\},j)$. The inverse sends $(I,j)$
+to $(I\setminus\{j\},j)$. Use `Finset.erase_insert`,
+`Finset.insert_erase`, `Finset.card_erase_of_mem`, and subtype extensionality
+for the inverse laws.
+
+Derive the summation identity:
+
+```lean
+theorem sum_over_extensions
+    (hq : 0 < q) (f : InteractionIndex N q → ℝ) :
+    ∑ A : InteractionIndex N (q - 1),
+      ∑ j : Outside A, f (extendInteraction hq A j) =
+    (q : ℝ) * ∑ I : InteractionIndex N q, f I
+```
+
+Use `Fintype.sum_equiv extensionEquiv`. On the right, the inner sum is constant
+and `Fintype.card (ChosenPoint I) = I.1.card = q`.
+
+This equivalence is safer than proving informally that every $q$-subset occurs
+$q$ times.
+
+## Exact SYK theorem
+
+The main algebraic theorem should have a signature close to:
+
+```lean
+theorem syk_sum_sq_expectation_le
+    {N q : ℕ} (hq0 : 0 < q) (hq : Even q)
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (M : MajoranaSystem N (Matrix d d ℂ))
+    (ρ : Matrix d d ℂ) (hρ : IsDensityMatrix ρ) :
+    ∑ I : InteractionIndex N q,
+        ‖expectation ρ (M.interactionOperator I)‖ ^ 2 ≤
+      (Nat.choose N (q - 1) : ℝ) / q
+```
+
+The proof is a short composition of earlier lemmas:
+
+- For every `A : InteractionIndex N (q - 1)`, apply
+  `sum_sq_expectation_le_one` to the family indexed by `Outside A`.
+- Sum these inequalities over `A`.
+- Rewrite the left side with `sum_over_extensions`.
+- Rewrite the number of cores with `Fintype.card_finset_len` and
+  `Fintype.card_fin N`.
+- Divide by the positive real number `(q : ℝ)` using `hq0`.
+
+A wrapper accepting `P : Params` can pass `P.q_pos` and `P.q_even`. The pure
+theorem should not depend on `P.β`.
+
+## Polynomial corollary
+
+First prove a pointwise estimate rather than introducing asymptotic notation:
+
+```lean
+theorem syk_sum_sq_expectation_le_pow ... :
+    ∑ I : InteractionIndex N q,
+        ‖expectation ρ (M.interactionOperator I)‖ ^ 2 ≤
+      (N : ℝ) ^ (q - 1) / q
+```
+
+This follows from `Nat.choose_le_pow N (q - 1)` after casting to `ℝ`. If an
+explicit big-O theorem is later required, use `isTheta_choose (q - 1)` from
+`Mathlib.Analysis.SpecialFunctions.Choose`, or derive big-O directly from the
+pointwise estimate.
+
+## Connection to the Gibbs state
+
+Do this only after the arbitrary-density theorem compiles. Add a normalized
+matrix, distinct from the existing scalar-valued `gibbsState`:
+
+```lean
+noncomputable def thermalDensity
+    (β : NNReal) (H : Matrix d d ℂ) : Matrix d d ℂ :=
+  (partitionFunction β H)⁻¹ • gibbsOperator β H
+```
+
+Required bridge lemmas are:
+
+```lean
+theorem gibbsOperator_posSemidef
+    (hH : star H = H) : (gibbsOperator β H).PosSemidef
+
+theorem partitionFunction_pos
+    [Nonempty d] (hH : star H = H) :
+    0 < (partitionFunction β H).re
+
+theorem thermalDensity_isDensityMatrix
+    [Nonempty d] (hH : star H = H) :
+    IsDensityMatrix (thermalDensity β H)
+
+theorem gibbsState_eq_expectation_thermalDensity
+    [Nonempty d] (hH : star H = H) :
+    gibbsState β H O = expectation (thermalDensity β H) O
+```
+
+`Matrix.IsHermitian.exp` already proves Hermiticity of the matrix exponential.
+Strict positivity of its eigenvalues can be proved with the Hermitian spectrum
+API in `Mathlib.Analysis.Matrix.Spectrum`. Keep this spectral work out of the
+generic anticommuting-family theorem.
+
+## Optional gradient and Gaussian layer
+
+For the normalized Hamiltonian
+
+$
+H(J)=a_{N,q}\sum_I J_I\Gamma_I,
 \qquad
-A_aA_b=-A_bA_a
-\quad\text{for }a\neq b.
-\]
-Then, for any density matrix \(\rho\),
-\[
-\sum_{a=1}^m
-\left|\operatorname{Tr}(\rho A_a)\right|^2
-\le 1.
-\]
-\end{lemma}
+a_{N,q}=\mathcal J\sqrt{\frac{(q-1)!}{N^{q-1}}},
+$
 
-\begin{proof}
-Since each \(A_a\) is Hermitian, the numbers
-\[
-x_a=\operatorname{Tr}(\rho A_a)
-\]
-are real. Define
-\[
-B=\sum_{a=1}^m x_a A_a.
-\]
-Using the anticommutation relations,
-\[
-B^2
-=
-\sum_a x_a^2 A_a^2
-+
-\sum_{a<b}x_ax_b(A_aA_b+A_bA_a)
-=
-\left(\sum_a x_a^2\right)\mathbf 1.
-\]
-Therefore
-\[
-\|B\|=\left(\sum_a x_a^2\right)^{1/2}.
-\]
-On the other hand,
-\[
-\operatorname{Tr}(\rho B)
-=
-\sum_a x_a\operatorname{Tr}(\rho A_a)
-=
-\sum_a x_a^2.
-\]
-Thus
-\[
-\sum_a x_a^2
-=
-|\operatorname{Tr}(\rho B)|
-\le \|B\|
-=
-\left(\sum_a x_a^2\right)^{1/2}.
-\]
-It follows that
-\[
-\sum_a x_a^2\le 1.
-\]
-\end{proof}
+the derivative identity should be isolated as:
 
-Let \(H_{n,q}\) be the SYK Hamiltonian, and let
-\[
-\rho=\frac{e^{\beta H_{n,q}}}{Z_{n,q}}
-\]
-be the corresponding thermal state. For \(I=(i_1<\cdots<i_q)\), define
-\[
-\Psi_I
-=
-i^{q(q-1)/2}\psi_{i_1}\cdots \psi_{i_q}.
-\]
-We prove that, for fixed even \(q\),
-\[
-\sum_{|I|=q}
-\operatorname{Tr}(\rho\Psi_I)
-\operatorname{Tr}(\rho\Psi_I)^*
-=
-O(n^{q-1}).
-\]
+```lean
+theorem fderiv_logPartition_apply ... :
+    fderiv ℝ logPartition J v =
+      -β * aNq * ∑ I, v I *
+        (expectation (thermalDensity β H) (M.interactionOperator I)).re
+```
 
-The proof does not use the detailed form of the SYK Hamiltonian. It only uses the Clifford algebra relations for the Majorana operators.
+The exact superconcentration theorem then gives
 
+$
+\|\nabla\log Z\|_2^2
+\leq \beta^2 a_{N,q}^2\frac{1}{q}\binom{N}{q-1}
+\leq \frac{\beta^2\mathcal J^2}{q}.
+$
 
-Now fix a subset
-\[
-A\subset \{1,\dots,n\},
-\qquad |A|=q-1.
-\]
-For each \(j\notin A\), consider
-\[
-\Psi_{A\cup\{j\}}.
-\]
-If \(j\neq k\), then
-\[
-(A\cup\{j\})\cap(A\cup\{k\})=A,
-\]
-so the intersection has cardinality \(q-1\).
+For the last inequality, use `Nat.choose_le_pow_div (α := ℝ) (q - 1) N`.
+This is the improved Lipschitz estimate. The coordinatewise estimate in the
+old note only gives a bound of order $N$ and does not use superconcentration.
 
-Majorana monomials satisfy
-\[
-\Psi_I\Psi_J
-=
-(-1)^{|I||J|-|I\cap J|}
-\Psi_J\Psi_I.
-\]
-Here \(|I|=|J|=q\), and since \(q\) is even, \(q^2\) is even. Also,
-\[
-|I\cap J|=q-1
-\]
-is odd. Hence
-\[
-(-1)^{q^2-|I\cap J|}=-1.
-\]
-Therefore the operators
-\[
-\Psi_{A\cup\{j\}},
-\qquad j\notin A,
-\]
-are pairwise anticommuting Hermitian involutions.
+Formalizing the derivative of `Matrix.exp`, the real positivity of the
+partition function, and the Gaussian isoperimetric inequality are independent
+projects. They should not block the exact sum-of-squares theorem.
 
-Applying the lemma gives
-\[
-\sum_{j\notin A}
-\left|
-\operatorname{Tr}
-\left(
-\rho\Psi_{A\cup\{j\}}
-\right)
-\right|^2
-\le 1.
-\]
+## Recommended implementation order
 
-Now sum this inequality over all subsets \(A\subset\{1,\dots,n\}\) with \(|A|=q-1\). We obtain
-\[
-\sum_{|A|=q-1}
-\sum_{j\notin A}
-\left|
-\operatorname{Tr}
-\left(
-\rho\Psi_{A\cup\{j\}}
-\right)
-\right|^2
-\le
-\binom{n}{q-1}.
-\]
-Each \(q\)-element subset \(I\subset\{1,\dots,n\}\) appears exactly \(q\) times on the left-hand side, because it appears once for each choice of an element \(j\in I\), with
-\[
-A=I\setminus\{j\}.
-\]
-Therefore
-\[
-q
-\sum_{|I|=q}
-\left|
-\operatorname{Tr}(\rho\Psi_I)
-\right|^2
-\le
-\binom{n}{q-1}.
-\]
-Equivalently,
-\[
-\sum_{|I|=q}
-\left|
-\operatorname{Tr}(\rho\Psi_I)
-\right|^2
-\le
-\frac{1}{q}
-\binom{n}{q-1}.
-\]
-Since \(q\) is fixed,
-\[
-\frac{1}{q}\binom{n}{q-1}
-=
-O(n^{q-1}).
-\]
-Hence
-\[
-\boxed{
-\sum_{|I|=q}
-\operatorname{Tr}(\rho\Psi_I)
-\operatorname{Tr}(\rho\Psi_I)^*
-=
-O(n^{q-1})
-}.
-\]
+Use this dependency order:
 
+```text
+IsDensityMatrix and expectation
+  -> expectation is real on Hermitian matrices
+  -> density_variance_nonneg
+  -> sum_sq_expectation_le_one
 
+majorana_sq
+  -> chiProduct_sq
+  -> interactionOperator_sq
 
-\title{Gaussian Concentration of the SYK Log Partition Function}
-\author{}
-\date{}
+chiProduct commutation sign
+  -> fixed-core anticommutation
 
-\begin{document}
+extendInteraction and extensionEquiv
+  -> sum_over_extensions
 
-\maketitle
+generic estimate + fixed-core family + counting
+  -> syk_sum_sq_expectation_le
+  -> polynomial corollary
 
+Gibbs positivity and normalization
+  -> thermal-state specialization
 
-\section{Model and normalization}
+log-partition derivative + Gaussian concentration input
+  -> final probability tail bound
+```
 
-Let $n$ and $q$ be even integers with $2\le q\le n$. Let
-$\psi_1,\ldots,\psi_n$ be Hermitian Majorana operators satisfying
-$$
-\{\psi_i,\psi_j\}=2\delta_{ij}I.
-$$
-They act on a Hilbert space of dimension $d_n=2^{n/2}$. For
-$I=\{i_1<\cdots<i_q\}$, define
-$$
-\Gamma_I=i^{q(q-1)/2}\psi_{i_1}\cdots\psi_{i_q}.
-$$
-If $m=q(q-1)/2$, reversing the order of the Majorana operators gives
-$$
-(\psi_{i_1}\cdots\psi_{i_q})^*
-=(-1)^m\psi_{i_1}\cdots\psi_{i_q}.
-$$
-It follows that $\Gamma_I^*=\Gamma_I$ and $\Gamma_I^2=I$. Therefore
-$$
-\|\Gamma_I\|_{\mathrm{op}}=1.
-$$
-
-Let $(J_I)_{|I|=q}$ be independent standard real Gaussian random variables.
-For an interaction scale $\mathcal J>0$, define
-$$
-H_{n,q}(J)
-=a_{n,q}\sum_{|I|=q}J_I\Gamma_I,
-\qquad
-a_{n,q}=\mathcal J\sqrt{\frac{(q-1)!}{n^{q-1}}}.
-$$
-For $\beta\in\R$, set
-$$
-Z_{n,q}(\beta,J)=\Tr e^{-\beta H_{n,q}(J)},
-\qquad
-X_{n,q}(\beta,J)=\log Z_{n,q}(\beta,J).
-$$
-Because $H_{n,q}(J)$ is a finite-dimensional Hermitian matrix,
-$Z_{n,q}(\beta,J)>0$ for every $J$ and every finite $\beta$.
-
-Define
-$$
-\vartheta_{n,q}
-=\prod_{k=0}^{q-1}\left(1-\frac{k}{n}\right)\le 1.
-$$
-
-\begin{theorem}\label{thm:main}
-For every $\beta\ne0$ and $t>0$,
-$$
-\Pp\left(
- \left|X_{n,q}(\beta,J)-\E X_{n,q}(\beta,J)\right|
- \ge t\sqrt n
-\right)
-\le
-2\exp\left(
- -\frac{qt^2}{2\beta^2\mathcal J^2\vartheta_{n,q}}
-\right)
-\le
-2\exp\left(-\frac{qt^2}{2\beta^2\mathcal J^2}\right).
-$$
-For $\beta=0$, $X_{n,q}(0,J)=\log d_n$ is deterministic, so the probability
-on the left is zero.
-\end{theorem}
-
-\section{Gaussian concentration}
-
-\begin{lemma}\label{lem:gaussian}
-Let $G$ be a standard Gaussian vector in $\R^M$. If
-$F:\R^M\to\R$ is $L$-Lipschitz in Euclidean distance, then for every $r>0$,
-$$
-\Pp\bigl(|F(G)-\E F(G)|\ge r\bigr)
-\le 2\exp\left(-\frac{r^2}{2L^2}\right).
-$$
-This is the classical concentration inequality for Lipschitz functions of a
-Gaussian vector.
-\end{lemma}
-
-\section{Derivative of the log partition function}
-
-If $A(s)$ is a differentiable matrix-valued function, the Duhamel formula is
-$$
-\frac{d}{ds}e^{A(s)}
-=\int_0^1e^{(1-u)A(s)}A'(s)e^{uA(s)}\,du.
-\tag{1}
-$$
-Taking the trace and using cyclicity gives
-$$
-\begin{aligned}
-\frac{d}{ds}\Tr e^{A(s)}
-&=\int_0^1
-  \Tr\left(A'(s)e^{uA(s)}e^{(1-u)A(s)}\right)du\\
-&=\Tr\left(A'(s)e^{A(s)}\right).
-\end{aligned}
-\tag{2}
-$$
-Apply (2) with $A=-\beta H_{n,q}(J)$ and differentiate with respect to one
-Gaussian coordinate. Since
-$$
-\frac{\partial H_{n,q}}{\partial J_I}=a_{n,q}\Gamma_I,
-$$
-we obtain
-$$
-\frac{\partial Z_{n,q}}{\partial J_I}
-=-\beta a_{n,q}\Tr\left(\Gamma_Ie^{-\beta H_{n,q}(J)}\right).
-$$
-Define the Gibbs density matrix
-$$
-\rho_{\beta,J}
-=\frac{e^{-\beta H_{n,q}(J)}}{Z_{n,q}(\beta,J)}.
-$$
-Dividing the derivative of $Z_{n,q}$ by $Z_{n,q}$ gives
-$$
-\frac{\partial X_{n,q}}{\partial J_I}
-=-\beta a_{n,q}\Tr(\rho_{\beta,J}\Gamma_I).
-\tag{3}
-$$
-The matrix $\rho_{\beta,J}$ is positive and has trace one. For every bounded
-operator $B$,
-$$
-|\Tr(\rho_{\beta,J}B)|\le\|B\|_{\mathrm{op}}.
-$$
-Since $\|\Gamma_I\|_{\mathrm{op}}=1$, equation (3) implies
-$$
-\left|\frac{\partial X_{n,q}}{\partial J_I}\right|
-\le |\beta|a_{n,q}.
-\tag{4}
-$$
-
-\section{Proof of Theorem~\ref{thm:main}}
-
-There are $M=\binom nq$ independent Gaussian coordinates. Summing the squares
-in (4) yields
-$$
-\|\nabla_JX_{n,q}(\beta,J)\|_2^2
-\le\beta^2a_{n,q}^2\binom nq.
-\tag{5}
-$$
-A direct calculation gives
-$$
-\begin{aligned}
-a_{n,q}^2\binom nq
-&=\mathcal J^2\frac{(q-1)!}{n^{q-1}}\binom nq\\
-&=\mathcal J^2\frac nq
-  \prod_{k=0}^{q-1}\left(1-\frac{k}{n}\right)\\
-&=\mathcal J^2\frac nq\vartheta_{n,q}.
-\end{aligned}
-\tag{6}
-$$
-Equations (5) and (6) show that the map
-$J\mapsto X_{n,q}(\beta,J)$ is Lipschitz with
-$$
-L_{n,q,\beta}^2
-=\beta^2\mathcal J^2\frac nq\vartheta_{n,q}
-\le\beta^2\mathcal J^2\frac nq.
-$$
-Its mean is finite because every Lipschitz function of a finite-dimensional
-Gaussian vector is integrable. Applying Lemma~\ref{lem:gaussian} with
-$r=t\sqrt n$ gives
-$$
-\begin{aligned}
-\Pp\left(
- |X_{n,q}-\E X_{n,q}|\ge t\sqrt n
-\right)
-&\le2\exp\left(-\frac{nt^2}{2L_{n,q,\beta}^2}\right)\\
-&=2\exp\left(
- -\frac{qt^2}{2\beta^2\mathcal J^2\vartheta_{n,q}}
-\right).
-\end{aligned}
-$$
-Using $\vartheta_{n,q}\le1$ gives the simpler bound in the theorem. No
-smallness assumption on $\beta$ was used.
+The first completion milestone is `syk_sum_sq_expectation_le` for an arbitrary
+density matrix. It contains the main algebraic and combinatorial content and
+does not require probability theory.
