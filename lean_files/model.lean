@@ -15,6 +15,13 @@ structure Params where
   β : ℝ
   β_nonneg : 0 ≤ β
 
+/-- The inverse temperature packaged with its nonnegativity proof. -/
+def Params.inverseTemperature (P : Params) : NNReal := ⟨P.β, P.β_nonneg⟩
+
+@[simp]
+theorem Params.coe_inverseTemperature (P : Params) :
+    (P.inverseTemperature : ℝ) = P.β := rfl
+
 /-- A label for a `q`-body interaction is a `q`-element subset of the fermion labels. -/
 abbrev InteractionIndex (N q : ℕ) := {s : Finset (Fin N) // s.card = q}
 
@@ -92,8 +99,8 @@ private theorem reverse_listProduct (l : List (Fin N)) (hl : l.Nodup) :
       have hanti : ∀ j ∈ l, M.χ j * M.χ i = -(M.χ i * M.χ j) := by
         intro j hj
         exact M.anticommute (fun hji ↦ hl.1 (hji ▸ hj))
-      simp only [List.reverse_cons, List.map_append, List.map_singleton, List.prod_append,
-        List.prod_singleton, List.map_cons, List.prod_cons, List.length_cons,
+      simp only [List.reverse_cons, List.map_append, List.prod_append,
+        List.map_cons, List.prod_cons, List.length_cons,
         List.map_nil, List.prod_nil, mul_one]
       rw [ih hl.2, Algebra.smul_mul_assoc, M.listProduct_mul i l hanti, smul_smul]
       have hexponent : (l.length + 1).choose 2 = l.length.choose 2 + l.length := by
@@ -115,7 +122,7 @@ theorem star_chiProduct (s : InteractionIndex N q) :
       ((-1 : ℂ) ^ (q * (q - 1) / 2)) • M.chiProduct s := by
   rw [chiProduct, M.star_listProduct, M.reverse_listProduct]
   · simp [Nat.choose_two_right]
-  · simpa [orderedIndices] using s.1.nodup_sort (· ≤ ·)
+  · simp [orderedIndices]
 
 /-- For even `q`, the reversal sign is `(-1)^(q/2)`. -/
 theorem star_chiProduct_of_even (s : InteractionIndex N q) (hq : Even q) :
@@ -160,12 +167,37 @@ private theorem star_phase_mul_sign (q : ℕ) :
           Complex.I ^ (q / 2) := by ring
     _ = Complex.I ^ (q / 2) := by rw [hsign, one_mul]
 
+private theorem star_coupling_mul_sign (r : ℝ) (q : ℕ) :
+    star (((r : ℝ) : ℂ) * phase q) * ((-1 : ℂ) ^ (q / 2)) =
+      ((r : ℝ) : ℂ) * phase q := by
+  rw [star_mul]
+  have hr : star (((r : ℝ) : ℂ)) = ((r : ℝ) : ℂ) := by
+    simp
+  rw [hr]
+  calc
+    (star (phase q) * (r : ℂ)) * ((-1 : ℂ) ^ (q / 2)) =
+        (r : ℂ) * (star (phase q) * ((-1 : ℂ) ^ (q / 2))) := by ring
+    _ = (r : ℂ) * phase q := by rw [star_phase_mul_sign]
+
 /-- The deterministic SYK Hamiltonian associated to real couplings `J`. -/
 noncomputable def hamiltonian
     {A : Type*} [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
     (P : Params) (M : MajoranaSystem P.N A)
     (J : InteractionIndex P.N P.q → ℝ) : A :=
   ∑ s, (((J s : ℝ) : ℂ) * phase P.q) • M.chiProduct s
+
+/-- The even-`q` phase makes the deterministic SYK Hamiltonian self-adjoint. -/
+theorem hamiltonian_self_adjoint
+    {A : Type*} [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
+    (P : Params) (M : MajoranaSystem P.N A)
+    (J : InteractionIndex P.N P.q → ℝ) :
+    star (hamiltonian P M J) = hamiltonian P M J := by
+  classical
+  rw [hamiltonian, star_sum]
+  apply Finset.sum_congr rfl
+  intro s _
+  rw [star_smul, M.star_chiProduct_of_even s P.q_even, smul_smul,
+    star_coupling_mul_sign]
 
 section MatrixThermodynamics
 
