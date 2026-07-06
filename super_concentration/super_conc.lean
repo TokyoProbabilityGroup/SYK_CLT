@@ -1,13 +1,98 @@
 import SYK.SYK_model.model
+import Mathlib.Analysis.CStarAlgebra.Matrix
+import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Analysis.Calculus.MeanValue
+import Mathlib.Data.Fintype.Powerset
+import Mathlib.Data.Nat.Choose.Bounds
 import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.Probability.Distributions.Gaussian.Real
 
-open scoped BigOperators ENNReal NNReal
+open scoped BigOperators ComplexOrder ENNReal NNReal
 open MeasureTheory
 open ProbabilityTheory
 
 namespace SYK
+
+section DensityMatrix
+
+variable {d : Type*} [Fintype d] [DecidableEq d]
+
+/-- A finite-dimensional density matrix. -/
+def IsDensityMatrix (ρ : Matrix d d ℂ) : Prop :=
+  ρ.PosSemidef ∧ Matrix.trace ρ = 1
+
+/-- Expectation of a matrix observable in a density matrix. -/
+noncomputable def expectation (ρ A : Matrix d d ℂ) : ℂ :=
+  Matrix.trace (ρ * A)
+
+theorem expectation_star_eq
+    {ρ A : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hA : star A = A) :
+    star (expectation ρ A) = expectation ρ A := by
+  rw [expectation, ← Matrix.trace_conjTranspose, Matrix.conjTranspose_mul]
+  change Matrix.trace (star A * star ρ) = Matrix.trace (ρ * A)
+  have hsρ : star ρ = ρ := by
+    change Matrix.conjTranspose ρ = ρ
+    exact hρ.1.isHermitian.eq
+  rw [hA, hsρ]
+  exact Matrix.trace_mul_comm A ρ
+
+theorem expectation_im_eq_zero
+    {ρ A : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hA : star A = A) :
+    (expectation ρ A).im = 0 := by
+  have h := expectation_star_eq hρ hA
+  exact Complex.conj_eq_iff_im.mp h
+
+theorem expectation_eq_ofReal_re
+    {ρ A : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hA : star A = A) :
+    ((expectation ρ A).re : ℂ) = expectation ρ A := by
+  apply Complex.ext
+  · simp
+  · simp [expectation_im_eq_zero hρ hA]
+
+theorem density_variance_nonneg
+    {ρ B : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hB : star B = B) :
+    0 ≤ (expectation ρ (B * B)).re - (expectation ρ B).re ^ 2 := by
+  let x : ℝ := (expectation ρ B).re
+  let C : Matrix d d ℂ := B - (x : ℂ) • (1 : Matrix d d ℂ)
+  have hC : star C = C := by
+    simp [C, hB]
+  have hpos := hρ.1.conjTranspose_mul_mul_same C
+  have htrace : 0 ≤ (Matrix.trace (star C * ρ * C)).re := by
+    have hz : 0 ≤ Matrix.trace (Matrix.conjTranspose C * ρ * C) :=
+      hpos.trace_nonneg
+    exact (RCLike.nonneg_iff.mp hz).1
+  have hcycle : Matrix.trace (star C * ρ * C) =
+      Matrix.trace (ρ * (C * C)) := by
+    rw [hC, Matrix.trace_mul_cycle C ρ C,
+      Matrix.trace_mul_comm (C * C) ρ]
+  have hCC : C * C =
+      B * B - ((2 * x : ℝ) : ℂ) • B + ((x ^ 2 : ℝ) : ℂ) • 1 := by
+    have htwo : ((2 * x : ℝ) : ℂ) = 2 * (x : ℂ) := by norm_num
+    have hpow : ((x ^ 2 : ℝ) : ℂ) = (x : ℂ) ^ 2 := by norm_num [pow_two]
+    rw [htwo, hpow]
+    simp only [C, sub_mul, mul_sub]
+    simp [Algebra.smul_mul_assoc, Algebra.mul_smul_comm]
+    rw [show (2 : ℂ) * (x : ℂ) = (x : ℂ) + x by ring, add_smul]
+    simp only [smul_smul, pow_two]
+    abel
+  rw [hcycle, hCC] at htrace
+  have hexpB : expectation ρ B = (x : ℂ) := by
+    rw [← expectation_eq_ofReal_re hρ hB]
+  have htraceρ : Matrix.trace ρ = (1 : ℂ) := hρ.2
+  simp only [Matrix.mul_sub, Matrix.mul_add, Matrix.mul_smul,
+    Matrix.trace_sub, Matrix.trace_add, Matrix.trace_smul,
+    Matrix.mul_one, smul_eq_mul] at htrace
+  have htrace' : 0 ≤
+      (expectation ρ (B * B) - (2 * x : ℂ) * expectation ρ B +
+        (x ^ 2 : ℂ) * Matrix.trace ρ).re := by
+    simpa [expectation] using htrace
+  rw [hexpB, htraceρ] at htrace'
+  norm_num [pow_two] at htrace'
+  dsimp [x] at htrace' ⊢
+  nlinarith
+
+end DensityMatrix
 
 /-- The Euclidean space of real SYK couplings. -/
 abbrev CouplingSpace (N q : ℕ) :=
