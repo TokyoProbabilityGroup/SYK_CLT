@@ -146,7 +146,10 @@ def phase (q : ℕ) : ℂ := Complex.I ^ (q / 2)
 
 private theorem star_phase_mul_sign (q : ℕ) :
     star (phase q) * ((-1 : ℂ) ^ (q / 2)) = phase q := by
-  simp only [phase, map_pow, Complex.star_def, Complex.conj_I, neg_pow]
+  change star (Complex.I ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2)) =
+    Complex.I ^ (q / 2)
+  rw [star_pow, Complex.star_def, Complex.conj_I]
+  rw [neg_pow]
   have hsign :
       ((-1 : ℂ) ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2)) = 1 := by
     rw [← mul_pow]
