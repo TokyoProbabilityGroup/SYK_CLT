@@ -203,7 +203,11 @@ noncomputable def interactionOperator (s : InteractionIndex N q) : A :=
 theorem majorana_sq (i : Fin N) : M.χ i * M.χ i = 1 := by
   have h := M.majorana_rel i i
   rw [if_pos rfl] at h
-  module at h ⊢
+  calc
+    M.χ i * M.χ i = (2 : ℂ)⁻¹ •
+        (M.χ i * M.χ i + M.χ i * M.χ i) := by module
+    _ = (2 : ℂ)⁻¹ • (2 : A) := by rw [h]
+    _ = 1 := by norm_num
 
 private theorem listProduct_mul_generator
     (i : Fin N) (l : List (Fin N))
@@ -238,7 +242,7 @@ private theorem star_listProduct_mul_self
       rw [List.nodup_cons] at hl
       simp only [List.map_cons, List.prod_cons, star_mul, M.self_adjoint]
       rw [← mul_assoc, mul_assoc (star ((l.map M.χ).prod)),
-        M.majorana_sq, one_mul, ih hl.2]
+        M.majorana_sq, mul_one, ih hl.2]
 
 theorem chiProduct_star_mul_self (s : InteractionIndex N q) :
     star (M.chiProduct s) * M.chiProduct s = 1 := by
@@ -271,9 +275,15 @@ theorem interactionOperator_sq
     (hq : Even q) (s : InteractionIndex N q) :
     M.interactionOperator s * M.interactionOperator s = 1 := by
   have hstar := M.interactionOperator_star hq s
-  rw [← hstar]
-  rw [interactionOperator, star_smul, smul_mul_smul_comm,
-    M.chiProduct_star_mul_self]
+  calc
+    M.interactionOperator s * M.interactionOperator s =
+        star (M.interactionOperator s) * M.interactionOperator s := by
+          rw [hstar]
+    _ = (star (phase q) * phase q) •
+        (star (M.chiProduct s) * M.chiProduct s) := by
+          rw [interactionOperator, star_smul, smul_mul_smul_comm]
+    _ = (star (phase q) * phase q) • (1 : A) := by
+          rw [M.chiProduct_star_mul_self]
   change (star (phase q) * phase q) • (1 : A) = 1
   have hp : star (phase q) * phase q = 1 := by
     change star (Complex.I ^ (q / 2)) * Complex.I ^ (q / 2) = 1
