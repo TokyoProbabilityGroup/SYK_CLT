@@ -1,8 +1,32 @@
-# Lean blueprint for the SYK superconcentration bound
+# Lean blueprint for concentration of the SYK log partition function
 
 ## Target
 
-The first formal target should be the exact finite-dimensional inequality
+Let the couplings $J_I$ be independent standard real Gaussians and set
+
+$
+a_{N,q}=\mathcal J\sqrt{\frac{(q-1)!}{N^{q-1}}},
+\qquad
+H(J)=a_{N,q}\sum_{|I|=q}J_I\Gamma_I,
+$
+
+$
+X(J)=\log\operatorname{Tr}(e^{-\beta H(J)}).
+$
+
+The final formal target is the two-sided concentration estimate
+
+$
+\mathbb P\left(|X-\mathbb E X|>t\right)
+\leq
+2\exp\left(-\frac{q t^2}{2\beta^2\mathcal J^2}\right)
+$
+
+for $t>0$, $\beta\neq0$, and $\mathcal J>0$. When $\beta=0$, $X$ is
+constant and the probability is zero.
+
+The key input already developed in this blueprint is the exact
+finite-dimensional inequality
 
 $
 \sum_{|I|=q}\left|\operatorname{Tr}(\rho\Gamma_I)\right|^2
@@ -12,11 +36,10 @@ $
 where $q>0$ is even, $\rho$ is a density matrix, and
 $\Gamma_I=i^{q/2}\prod_{j\in I}\chi_j$ is the Hermitian Majorana monomial
 already represented by `phase` and `MajoranaSystem.chiProduct` in
-`SYK/lean_files/model.lean`.
+`SYK/SYK_model/model.lean`.
 
-The asymptotic statement $O(N^{q-1})$ should be a corollary of this exact
-bound. The exact theorem is more useful in later gradient estimates and is
-easier to reuse in Lean.
+It changes the squared Lipschitz bound for $X$ from order $N$ to order $1$.
+The asymptotic statement $O(N^{q-1})$ is only an intermediate corollary.
 
 The algebraic theorem does not depend on the Hamiltonian, inverse temperature,
 or probability. Prove it for an arbitrary density matrix before connecting it
@@ -34,6 +57,9 @@ to `gibbsOperator`.
 - Keep the Gaussian concentration theorem separate. The local mathlib version
   has Gaussian distribution APIs, but no immediately reusable theorem giving
   the required concentration inequality for every Euclidean Lipschitz map.
+- Use the Euclidean norm on the coupling space. The ordinary function-space
+  norm on `InteractionIndex N q → ℝ` is a supremum norm and is not suitable for
+  the gradient calculation.
 
 ## Project setup
 
@@ -49,11 +75,14 @@ lean_lib SYK where
 Then start `SYK/super_concentration/super_conc.lean` with imports close to:
 
 ```lean
-import SYK.lean_files.model
+import SYK.SYK_model.model
 import Mathlib.Analysis.CStarAlgebra.Matrix
 import Mathlib.Analysis.Matrix.PosDef
+import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Data.Fintype.Powerset
 import Mathlib.Data.Nat.Choose.Bounds
+import Mathlib.MeasureTheory.Constructions.Pi
+import Mathlib.Probability.Distributions.Gaussian.Real
 ```
 
 `Mathlib.Analysis.Matrix.PosDef` supplies the analytic positive-semidefinite
@@ -405,40 +434,253 @@ Strict positivity of its eigenvalues can be proved with the Hermitian spectrum
 API in `Mathlib.Analysis.Matrix.Spectrum`. Keep this spectral work out of the
 generic anticommuting-family theorem.
 
-## Optional gradient and Gaussian layer
+## Coupling space and probability measure
 
-For the normalized Hamiltonian
-
-$
-H(J)=a_{N,q}\sum_I J_I\Gamma_I,
-\qquad
-a_{N,q}=\mathcal J\sqrt{\frac{(q-1)!}{N^{q-1}}},
-$
-
-the derivative identity should be isolated as:
+Use an actual Euclidean space so that its norm is the square root of the sum of
+coordinate squares:
 
 ```lean
-theorem fderiv_logPartition_apply ... :
-    fderiv ℝ logPartition J v =
-      -β * aNq * ∑ I, v I *
-        (expectation (thermalDensity β H) (M.interactionOperator I)).re
+abbrev CouplingIndex (N q : ℕ) := InteractionIndex N q
+
+abbrev CouplingSpace (N q : ℕ) :=
+  EuclideanSpace ℝ (CouplingIndex N q)
 ```
 
-The exact superconcentration theorem then gives
+One possible construction of the standard Gaussian measure is the finite
+product measure transported to `EuclideanSpace`:
+
+```lean
+noncomputable def standardGaussianMeasure (N q : ℕ) :
+    Measure (CouplingSpace N q) :=
+  (Measure.pi fun _ : CouplingIndex N q => gaussianReal 0 1).map
+    (WithLp.toLp 2)
+```
+
+The exact expression may need an explicit measurability proof for
+`WithLp.toLp 2`. Alternatively, state the concentration theorem for a random
+vector `G : Ω → CouplingSpace N q` whose coordinates are independent with law
+`gaussianReal 0 1`.
+
+The product measure is preferable because the mean can be written directly as
+
+```lean
+∫ J, logPartition P M 𝓙 J ∂standardGaussianMeasure P.N P.q
+```
+
+and the probability of the event is the measure of a set in the same space.
+
+## Normalized Hamiltonian and real log partition function
+
+The existing `hamiltonian` does not include the SYK normalization. Define:
+
+```lean
+noncomputable def couplingScale (P : Params) (𝓙 : ℝ) : ℝ :=
+  𝓙 * Real.sqrt ((P.q - 1).factorial / (P.N : ℝ) ^ (P.q - 1))
+
+noncomputable def normalizedHamiltonian
+    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝓙 : ℝ) (J : CouplingSpace P.N P.q) : Matrix d d ℂ :=
+  hamiltonian P M (fun I => couplingScale P 𝓙 * J I)
+```
+
+Since `partitionFunction` is complex-valued, define the real function only
+after proving positivity:
+
+```lean
+noncomputable def logPartition
+    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝓙 : ℝ) (J : CouplingSpace P.N P.q) : ℝ :=
+  Real.log
+    (partitionFunction P.inverseTemperature
+      (normalizedHamiltonian P M 𝓙 J)).re
+```
+
+The theorem `partitionFunction_pos` from the Gibbs bridge proves that the
+argument of `Real.log` is positive. This positivity is also needed for the
+derivative of the logarithm.
+
+## Derivative formula
+
+The coordinate derivative is
 
 $
-\|\nabla\log Z\|_2^2
-\leq \beta^2 a_{N,q}^2\frac{1}{q}\binom{N}{q-1}
-\leq \frac{\beta^2\mathcal J^2}{q}.
+\frac{\partial X}{\partial J_I}
+=-\beta a_{N,q}\operatorname{Tr}(\rho_J\Gamma_I).
 $
 
-For the last inequality, use `Nat.choose_le_pow_div (α := ℝ) (q - 1) N`.
-This is the improved Lipschitz estimate. The coordinatewise estimate in the
-old note only gives a bound of order $N$ and does not use superconcentration.
+Prove its Fréchet form:
 
-Formalizing the derivative of `Matrix.exp`, the real positivity of the
-partition function, and the Gaussian isoperimetric inequality are independent
-projects. They should not block the exact sum-of-squares theorem.
+```lean
+theorem hasFDerivAt_logPartition
+    (J : CouplingSpace P.N P.q) :
+    HasFDerivAt (logPartition P M 𝓙)
+      (ContinuousLinearMap.toSpanSingleton ℝ
+        (fun v =>
+          -P.β * couplingScale P 𝓙 *
+            ∑ I, v I *
+              (expectation
+                (thermalDensity P.inverseTemperature
+                  (normalizedHamiltonian P M 𝓙 J))
+                (M.interactionOperator I)).re)) J
+```
+
+The displayed constructor is schematic. In compiled code it may be easier to
+define the linear functional separately and prove its continuity by finite
+dimensionality.
+
+The mathematical derivation is:
+
+$
+D\operatorname{Tr}(e^{A(J)})[v]
+=\operatorname{Tr}(DA(J)[v]e^{A(J)}).
+$
+
+For noncommuting matrices, do not rewrite the derivative of the exponential as
+$e^A DA$. Use the Duhamel integral and cyclicity of trace. This derivative
+result is not presently available as a direct theorem in the local matrix
+exponential API, so isolate it as its own lemma.
+
+## Gradient bound from the sum-of-squares estimate
+
+Set
+
+$
+L_{N,q}^2
+=\beta^2 a_{N,q}^2\frac{1}{q}\binom{N}{q-1}.
+$
+
+Prove the exact bound first:
+
+```lean
+noncomputable def exactLipschitzSq (P : Params) (𝓙 : ℝ) : ℝ :=
+  P.β ^ 2 * couplingScale P 𝓙 ^ 2 *
+    (Nat.choose P.N (P.q - 1) : ℝ) / P.q
+
+theorem norm_fderiv_logPartition_sq_le
+    (J : CouplingSpace P.N P.q) :
+    ‖fderiv ℝ (logPartition P M 𝓙) J‖ ^ 2 ≤
+      exactLipschitzSq P 𝓙
+```
+
+Apply `syk_sum_sq_expectation_le` to the thermal density matrix at $J$. The
+operator norm of the derivative is bounded by the Euclidean norm of its
+coefficient vector; this is finite-dimensional Cauchy-Schwarz.
+
+Next prove the uniform simplification
+
+```lean
+theorem exactLipschitzSq_le
+    (h𝓙 : 0 ≤ 𝓙) :
+    exactLipschitzSq P 𝓙 ≤ P.β ^ 2 * 𝓙 ^ 2 / P.q
+```
+
+Use
+
+```lean
+Nat.choose_le_pow_div (α := ℝ) (P.q - 1) P.N
+```
+
+and the assumptions `P.q_pos` and `P.q_le_N` to handle all positive
+denominators. After unfolding `couplingScale`, `Real.sq_sqrt` removes the
+square root. The result is
+
+$
+\|\nabla X(J)\|_2^2\leq\frac{\beta^2\mathcal J^2}{q}
+$
+
+uniformly in $J$.
+
+Define the nonnegative Lipschitz constant
+
+```lean
+noncomputable def simpleLipschitzConstant (P : Params) (𝓙 : ℝ) : ℝ≥0 :=
+  Real.toNNReal (|P.β| * |𝓙| / Real.sqrt P.q)
+```
+
+The required real value is
+$|\beta|\mathcal J/\sqrt q$ when $\mathcal J\geq0$.
+
+Turn the derivative bound into a global Lipschitz theorem with the existing
+mathlib mean-value result:
+
+```lean
+theorem logPartition_lipschitzWith
+    (h𝓙 : 0 ≤ 𝓙) :
+    LipschitzWith (simpleLipschitzConstant P 𝓙)
+      (logPartition P M 𝓙) := by
+  apply lipschitzWith_of_nnnorm_fderiv_le
+  · exact differentiable_logPartition ...
+  · intro J
+    exact nnnorm_fderiv_logPartition_le ...
+```
+
+## Gaussian concentration input
+
+Place the general probability theorem in a separate file. Its mathematical
+statement is:
+
+```lean
+theorem gaussian_lipschitz_concentration
+    {ι : Type*} [Fintype ι]
+    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ)
+    (hL : 0 < L) (hF : LipschitzWith L.toNNReal F)
+    (t : ℝ) (ht : 0 < t) :
+    let γ := standardGaussianMeasureOnEuclidean ι
+    let m := ∫ x, F x ∂γ
+    γ {x | |F x - m| > t} ≤
+      ENNReal.ofReal (2 * Real.exp (-t ^ 2 / (2 * L ^ 2)))
+```
+
+It is useful to prove the two one-sided estimates first, each with no factor
+$2$, and then use `measure_union_le` for the absolute-value event. A proof from
+the Gaussian log-Sobolev inequality and the Herbst argument is substantial and
+independent of SYK. Until that theorem is formalized, make it an explicit
+hypothesis of the final SYK theorem rather than introducing an axiom.
+
+The concentration theorem also gives integrability of a Lipschitz function, so
+the mean is finite. If the chosen general theorem assumes integrability, prove
+it from
+
+```lean
+‖F x‖ ≤ ‖F 0‖ + L * ‖x‖
+```
+
+and Gaussian integrability of the Euclidean norm.
+
+## Final two-sided theorem
+
+The main Lean statement should be close to:
+
+```lean
+theorem logPartition_two_sided_tail
+    (hβ : P.β ≠ 0) (h𝓙 : 0 < 𝓙)
+    (t : ℝ) (ht : 0 < t) :
+    let γ := standardGaussianMeasure P.N P.q
+    let X := logPartition P M 𝓙
+    let m := ∫ J, X J ∂γ
+    γ {J | |X J - m| > t} ≤
+      ENNReal.ofReal
+        (2 * Real.exp
+          (-(P.q : ℝ) * t ^ 2 / (2 * P.β ^ 2 * 𝓙 ^ 2)))
+```
+
+Apply `gaussian_lipschitz_concentration` with
+$L=|\beta|\mathcal J/\sqrt q$. The exponent simplifies because
+$L^2=\beta^2\mathcal J^2/q$.
+
+Also add the zero-temperature theorem:
+
+```lean
+theorem logPartition_tail_of_beta_zero
+    (hβ : P.β = 0) (t : ℝ) (ht : 0 < t) :
+    let γ := standardGaussianMeasure P.N P.q
+    let X := logPartition P M 𝓙
+    let m := ∫ J, X J ∂γ
+    γ {J | |X J - m| > t} = 0
+```
+
+Here the Hamiltonian may still depend on $J$, but the factor $\beta=0$ makes
+the Gibbs exponential equal to the identity, so $X$ is constant.
 
 ## Recommended implementation order
 
@@ -466,11 +708,15 @@ generic estimate + fixed-core family + counting
 
 Gibbs positivity and normalization
   -> thermal-state specialization
+  -> derivative of logPartition
+  -> exact and simplified derivative bounds
+  -> logPartition_lipschitzWith
 
-log-partition derivative + Gaussian concentration input
-  -> final probability tail bound
+general Euclidean Gaussian concentration theorem
+  + logPartition_lipschitzWith
+  -> logPartition_two_sided_tail
 ```
 
 The first completion milestone is `syk_sum_sq_expectation_le` for an arbitrary
-density matrix. It contains the main algebraic and combinatorial content and
-does not require probability theory.
+density matrix. The final milestone is `logPartition_two_sided_tail`; the
+theorem states the required two-sided probability bound.
