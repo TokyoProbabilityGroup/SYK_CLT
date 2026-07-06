@@ -650,11 +650,145 @@ private theorem hasDerivAt_trace_exp_term
             (A + t • B) ^ i) =
         Matrix.trace (B * (A + t • B) ^ n) := by
     simpa using trace_pow_mul_cycle (A + t • B) B (Nat.le_of_lt_succ (Finset.mem_range.mp hi))
-  simp_rw [hterm]
+  have hsum :
+      ∑ i ∈ Finset.range (n + 1),
+          Matrix.trace
+            ((A + t • B) ^ ((n + 1).pred - i) * B *
+              (A + t • B) ^ i) =
+        ∑ _i ∈ Finset.range (n + 1),
+          Matrix.trace (B * (A + t • B) ^ n) := by
+    exact Finset.sum_congr rfl fun i hi ↦ hterm i hi
+  rw [hsum]
   rw [Finset.sum_const, Finset.card_range]
   push_cast
   rw [Nat.factorial_succ]
+  rw [← Nat.cast_smul_eq_nsmul ℝ, smul_smul]
+  congr 1
   field_simp
+  push_cast
+  ring
+
+theorem hasDerivAt_trace_exp_affine [Nonempty d]
+    (A B : Matrix d d ℂ) (t : ℝ) :
+    HasDerivAt
+      (fun s : ℝ ↦ Matrix.trace (NormedSpace.exp (A + s • B)))
+      (Matrix.trace (B * NormedSpace.exp (A + t • B))) t := by
+  let C : ℝ → Matrix d d ℂ := fun s ↦ A + s • B
+  let g : ℕ → ℝ → ℂ := fun n s ↦ matrixTraceCLM
+    ((((n + 1).factorial : ℝ)⁻¹) • C s ^ (n + 1))
+  let g' : ℕ → ℝ → ℂ := fun n s ↦ matrixTraceCLM
+    (((n.factorial : ℝ)⁻¹) • (B * C s ^ n))
+  let R : ℝ := ‖A‖ + (|t| + 1) * ‖B‖
+  let K : ℝ := ‖matrixTraceCLM (d := d)‖ * ‖B‖
+  let u : ℕ → ℝ := fun n ↦ K * ‖((n.factorial : ℝ)⁻¹)‖ * R ^ n
+  have hR : 0 ≤ R := by positivity
+  have hK : 0 ≤ K := by positivity
+  have hu : Summable u := by
+    have h := NormedSpace.norm_expSeries_summable'
+      (𝕂 := ℝ) (𝔸 := ℝ) R
+    have h' := h.mul_left K
+    simpa [u, norm_smul, abs_of_nonneg hR, mul_assoc] using h'
+  have hCnorm {y : ℝ} (hy : y ∈ Set.Ioo (t - 1) (t + 1)) : ‖C y‖ ≤ R := by
+    have hyt : |y - t| < 1 := by
+      rw [abs_lt]
+      constructor <;> linarith [hy.1, hy.2]
+    have hyabs : |y| ≤ |t| + 1 := by
+      calc
+        |y| = |t + (y - t)| := by ring_nf
+        _ ≤ |t| + |y - t| := abs_add_le _ _
+        _ ≤ |t| + 1 := by linarith
+    calc
+      ‖C y‖ = ‖A + y • B‖ := rfl
+      _ ≤ ‖A‖ + ‖y • B‖ := norm_add_le _ _
+      _ = ‖A‖ + |y| * ‖B‖ := by rw [norm_smul, Real.norm_eq_abs]
+      _ ≤ R := by
+        dsimp [R]
+        gcongr
+  have hg (n : ℕ) (y : ℝ) (_hy : y ∈ Set.Ioo (t - 1) (t + 1)) :
+      HasDerivAt (g n) (g' n y) y := by
+    simpa [g, g', C] using hasDerivAt_trace_exp_term A B n y
+  have hg_bound (n : ℕ) (y : ℝ) (hy : y ∈ Set.Ioo (t - 1) (t + 1)) :
+      ‖g' n y‖ ≤ u n := by
+    have hpow : ‖C y ^ n‖ ≤ R ^ n := by
+      exact (norm_pow_le (C y) n).trans
+        (pow_le_pow_left₀ (norm_nonneg _) (hCnorm hy) n)
+    calc
+      ‖g' n y‖ = ‖matrixTraceCLM
+          (((n.factorial : ℝ)⁻¹) • (B * C y ^ n))‖ := rfl
+      _ ≤ ‖matrixTraceCLM (d := d)‖ *
+          ‖((n.factorial : ℝ)⁻¹) • (B * C y ^ n)‖ :=
+        ContinuousLinearMap.le_opNorm _ _
+      _ = ‖matrixTraceCLM (d := d)‖ *
+          (‖((n.factorial : ℝ)⁻¹)‖ * ‖B * C y ^ n‖) := by
+        rw [norm_smul]
+      _ ≤ ‖matrixTraceCLM (d := d)‖ *
+          (‖((n.factorial : ℝ)⁻¹)‖ * (‖B‖ * ‖C y ^ n‖)) := by
+        gcongr
+        exact norm_mul_le _ _
+      _ ≤ ‖matrixTraceCLM (d := d)‖ *
+          (‖((n.factorial : ℝ)⁻¹)‖ * (‖B‖ * R ^ n)) := by
+        gcongr
+      _ = u n := by simp [u, K]; ring
+  have hg0 : Summable fun n ↦ g n t := by
+    have htail : Summable fun n : ℕ ↦
+        (((n + 1).factorial : ℝ)⁻¹) • C t ^ (n + 1) := by
+      exact (NormedSpace.expSeries_summable' (𝕂 := ℝ) (C t)).comp_injective
+        Nat.succ_injective
+    rcases htail with ⟨a, ha⟩
+    refine ⟨matrixTraceCLM (d := d) a, ?_⟩
+    simpa [g, Function.comp_def] using
+      ha.map (matrixTraceCLM (d := d)) (matrixTraceCLM (d := d)).continuous
+  have htmem : t ∈ Set.Ioo (t - 1) (t + 1) := by constructor <;> linarith
+  have htailDeriv : HasDerivAt (fun s ↦ ∑' n, g n s) (∑' n, g' n t) t :=
+    hasDerivAt_tsum_of_isPreconnected hu isOpen_Ioo isPreconnected_Ioo
+      hg hg_bound htmem hg0 htmem
+  have hfull (s : ℝ) : Summable fun n : ℕ ↦
+      ((n.factorial : ℝ)⁻¹) • C s ^ n :=
+    NormedSpace.expSeries_summable' (𝕂 := ℝ) (C s)
+  have hfun (s : ℝ) :
+      Matrix.trace (NormedSpace.exp (C s)) =
+        Matrix.trace (1 : Matrix d d ℂ) + ∑' n, g n s := by
+    rw [show NormedSpace.exp (C s) =
+        ∑' n : ℕ, ((n.factorial : ℝ)⁻¹) • C s ^ n by
+      simpa using congrFun (NormedSpace.exp_eq_tsum ℝ) (C s)]
+    change matrixTraceCLM (d := d)
+      (∑' n : ℕ, ((n.factorial : ℝ)⁻¹) • C s ^ n) = _
+    rw [ContinuousLinearMap.map_tsum (matrixTraceCLM (d := d)) (hfull s)]
+    have htrace : Summable fun n : ℕ ↦ matrixTraceCLM (d := d)
+        (((n.factorial : ℝ)⁻¹) • C s ^ n) := by
+      rcases hfull s with ⟨a, ha⟩
+      exact ⟨matrixTraceCLM (d := d) a,
+        ha.map (matrixTraceCLM (d := d)) (matrixTraceCLM (d := d)).continuous⟩
+    rw [← htrace.sum_add_tsum_nat_add 1]
+    simp [g]
+  have hderiv :
+      (∑' n, g' n t) =
+        Matrix.trace (B * NormedSpace.exp (C t)) := by
+    let a : ℕ → Matrix d d ℂ := fun n ↦
+      ((n.factorial : ℝ)⁻¹) • C t ^ n
+    have ha : Summable a := hfull t
+    have hBa : Summable fun n ↦ B * a n := ha.mul_left B
+    calc
+      (∑' n, g' n t) =
+          ∑' n, matrixTraceCLM (d := d) (B * a n) := by
+        congr 1
+        funext n
+        simp [g', a, Algebra.mul_smul_comm]
+      _ = matrixTraceCLM (d := d) (∑' n, B * a n) :=
+        (ContinuousLinearMap.map_tsum (matrixTraceCLM (d := d)) hBa).symm
+      _ = matrixTraceCLM (d := d) (B * ∑' n, a n) := by
+        congr 1
+        exact (ha.hasSum.mul_left B).tsum_eq
+      _ = Matrix.trace (B * NormedSpace.exp (C t)) := by
+        rw [show NormedSpace.exp (C t) = ∑' n, a n by
+          simpa [a] using congrFun (NormedSpace.exp_eq_tsum ℝ) (C t)]
+        rfl
+  have hsum := (hasDerivAt_const t (Matrix.trace (1 : Matrix d d ℂ))).add htailDeriv
+  rw [hderiv] at hsum
+  convert hsum using 1
+  · funext s
+    exact hfun s
+  · simp [C]
 
 end TraceExponentialDerivative
 
@@ -687,6 +821,76 @@ noncomputable def logPartition
   Real.log
     (partitionFunction P.inverseTemperature
       (normalizedHamiltonian P M 𝒥 J)).re
+
+theorem normalizedHamiltonian_affine
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ) (J V : CouplingSpace P.N P.q) (s : ℝ) :
+    normalizedHamiltonian P M 𝒥 (J + s • V) =
+      normalizedHamiltonian P M 𝒥 J +
+        s • normalizedHamiltonian P M 𝒥 V := by
+  classical
+  simp only [normalizedHamiltonian, hamiltonian]
+  rw [Finset.smul_sum, ← Finset.sum_add_distrib]
+  apply Finset.sum_congr rfl
+  intro I _hI
+  change (((couplingScale P 𝒥 * (J I + s * V I) : ℝ) : ℂ) * phase P.q) •
+      M.chiProduct I =
+    ((((couplingScale P 𝒥 * J I : ℝ) : ℂ) * phase P.q) • M.chiProduct I) +
+      s • ((((couplingScale P 𝒥 * V I : ℝ) : ℂ) * phase P.q) • M.chiProduct I)
+  sorry
+
+theorem normalizedHamiltonian_self_adjoint
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ) (J : CouplingSpace P.N P.q) :
+    star (normalizedHamiltonian P M 𝒥 J) =
+      normalizedHamiltonian P M 𝒥 J := by
+  exact hamiltonian_self_adjoint P M _
+
+theorem hasDerivAt_logPartition_line
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ) (J V : CouplingSpace P.N P.q) (s : ℝ) :
+    let Hs := normalizedHamiltonian P M 𝒥 (J + s • V)
+    let Bs := -((P.β : ℂ)) • normalizedHamiltonian P M 𝒥 V
+    HasDerivAt (fun r : ℝ ↦ logPartition P M 𝒥 (J + r • V))
+      ((Matrix.trace (Bs * gibbsOperator P.inverseTemperature Hs)).re /
+        (partitionFunction P.inverseTemperature Hs).re) s := by
+  dsimp only
+  let A : Matrix d d ℂ :=
+    -((P.β : ℂ)) • normalizedHamiltonian P M 𝒥 J
+  let B : Matrix d d ℂ :=
+    -((P.β : ℂ)) • normalizedHamiltonian P M 𝒥 V
+  have hexp (r : ℝ) :
+      -(((P.inverseTemperature : ℝ) : ℂ)) •
+          normalizedHamiltonian P M 𝒥 (J + r • V) =
+        A + r • B := by
+    rw [P.coe_inverseTemperature, normalizedHamiltonian_affine]
+    dsimp [A, B]
+    module
+  have hexp' (r : ℝ) :
+      -((((P.inverseTemperature : ℝ) : ℂ)) •
+          normalizedHamiltonian P M 𝒥 (J + r • V)) =
+        A + r • B := by
+    rw [← neg_smul]
+    exact hexp r
+  have htrace := hasDerivAt_trace_exp_affine A B s
+  have hre := (hasDerivAt_const s Complex.reCLM).clm_apply htrace
+  have hpos : 0 < (partitionFunction P.inverseTemperature
+      (normalizedHamiltonian P M 𝒥 (J + s • V))).re :=
+    partitionFunction_pos _ (normalizedHamiltonian_self_adjoint P M 𝒥 _)
+  have hpos' : 0 < Complex.reCLM
+      (Matrix.trace (NormedSpace.exp (A + s • B))) := by
+    sorry
+  have hlog := hre.log (ne_of_gt hpos')
+  convert hlog using 1
+  · funext r
+    simp only [logPartition, partitionFunction, gibbsOperator,
+      Complex.reCLM_apply]
+    sorry
+  · simp only [B, partitionFunction, gibbsOperator, Complex.reCLM_apply]
+    sorry
 
 /--
 The Gaussian concentration input isolated by the blueprint.  Mathlib does not
@@ -755,8 +959,6 @@ theorem logPartition_two_sided_tail_standardGaussian
     (𝒥 : ℝ) (h𝒥 : 0 < 𝒥) (hβ : P.β ≠ 0)
     (hγ : GaussianLipschitzConcentration
       (standardGaussianMeasure P.N P.q))
-    (hLip : LipschitzWith (simpleLipschitzConstant P 𝒥)
-      (logPartition P M 𝒥))
     (t : ℝ) (ht : 0 < t) :
     standardGaussianMeasure P.N P.q
         {J | |logPartition P M 𝒥 J -
@@ -765,7 +967,5 @@ theorem logPartition_two_sided_tail_standardGaussian
       ENNReal.ofReal
         (2 * Real.exp
           (-(P.q : ℝ) * t ^ 2 / (2 * P.β ^ 2 * 𝒥 ^ 2))) := by
-  exact logPartition_two_sided_tail P M 𝒥 h𝒥 hβ
-    (standardGaussianMeasure P.N P.q) hγ hLip t ht
-
+  sorry
 end SYK
