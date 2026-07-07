@@ -801,6 +801,12 @@ end TraceExponentialDerivative
 abbrev CouplingSpace (N q : ℕ) :=
   EuclideanSpace ℝ (InteractionIndex N q)
 
+@[simp]
+theorem couplingSpace_card (N q : ℕ) :
+    Fintype.card (InteractionIndex N q) = Nat.choose N q := by
+  simpa [InteractionIndex] using
+    (Fintype.card_finset_len (α := Fin N) q)
+
 /-- The product standard Gaussian measure transported to coupling space. -/
 noncomputable def standardGaussianMeasure (N q : ℕ) :
     Measure (CouplingSpace N q) :=
@@ -905,16 +911,15 @@ theorem hasDerivAt_logPartition_line
     simp [B, smul_smul, smul_neg]
 
 /--
-The Gaussian concentration input isolated by the blueprint.  Mathlib does not
-currently provide this theorem in the required finite-dimensional form, so the
-final SYK theorem accepts this proposition as a hypothesis.
+Gaussian concentration for the product standard Gaussian on the SYK coupling
+space.  The coupling space has `Nat.choose N q` coordinates by
+`couplingSpace_card`.
 -/
-def GaussianLipschitzConcentration {E : Type*}
-    [MeasurableSpace E] [PseudoMetricSpace E]
-    (γ : Measure E) : Prop :=
-  ∀ (F : E → ℝ) (L t : ℝ),
+noncomputable def GaussianLipschitzConcentration (N q : ℕ) : Prop :=
+  ∀ (F : CouplingSpace N q → ℝ) (L t : ℝ),
     0 < L → 0 < t → LipschitzWith L.toNNReal F →
-      γ {x | |F x - ∫ y, F y ∂γ| > t} ≤
+      standardGaussianMeasure N q
+          {x | |F x - ∫ y, F y ∂standardGaussianMeasure N q| > t} ≤
         ENNReal.ofReal (2 * Real.exp (-t ^ 2 / (2 * L ^ 2)))
 
 /-- The Lipschitz constant obtained from the SYK sum-of-squares estimate. -/
@@ -922,7 +927,8 @@ noncomputable def simpleLipschitzConstant (P : Params) (𝒥 : ℝ) : ℝ≥0 :=
   Real.toNNReal (|P.β| * 𝒥 / Real.sqrt (P.q : ℝ))
 
 /--
-The two-sided superconcentration estimate.  Its only analytic input not
+The two-sided superconcentration estimate for the product standard Gaussian
+coupling measure.  Its only analytic input not
 available in mathlib is `GaussianLipschitzConcentration`; the SYK gradient
 estimate is supplied in the reusable `hLip` hypothesis.
 -/
@@ -930,14 +936,14 @@ theorem logPartition_two_sided_tail
     {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (h𝒥 : 0 < 𝒥) (hβ : P.β ≠ 0)
-    (γ : Measure (CouplingSpace P.N P.q))
-    (hγ : GaussianLipschitzConcentration
-      (E := CouplingSpace P.N P.q) γ)
+    (hγ : GaussianLipschitzConcentration P.N P.q)
     (hLip : LipschitzWith (simpleLipschitzConstant P 𝒥)
       (logPartition P M 𝒥))
     (t : ℝ) (ht : 0 < t) :
-    γ {J | |logPartition P M 𝒥 J -
-        ∫ K, logPartition P M 𝒥 K ∂γ| > t} ≤
+    standardGaussianMeasure P.N P.q
+        {J | |logPartition P M 𝒥 J -
+          ∫ K, logPartition P M 𝒥 K
+            ∂standardGaussianMeasure P.N P.q| > t} ≤
       ENNReal.ofReal
         (2 * Real.exp
           (-(P.q : ℝ) * t ^ 2 / (2 * P.β ^ 2 * 𝒥 ^ 2))) := by
@@ -1077,8 +1083,7 @@ theorem logPartition_two_sided_tail_standardGaussian
     {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (h𝒥 : 0 < 𝒥) (hβ : P.β ≠ 0)
-    (hγ : GaussianLipschitzConcentration
-      (standardGaussianMeasure P.N P.q))
+    (hγ : GaussianLipschitzConcentration P.N P.q)
     (t : ℝ) (ht : 0 < t) :
     standardGaussianMeasure P.N P.q
         {J | |logPartition P M 𝒥 J -
@@ -1103,7 +1108,6 @@ theorem logPartition_two_sided_tail_standardGaussian
       exact ht.le
     rw [hset]
     simp
-  · exact logPartition_two_sided_tail P M 𝒥 h𝒥 hβ
-      (standardGaussianMeasure P.N P.q) hγ
+  · exact logPartition_two_sided_tail P M 𝒥 h𝒥 hβ hγ
       (logPartition_lipschitz P M 𝒥 h𝒥.le) t ht
 end SYK
