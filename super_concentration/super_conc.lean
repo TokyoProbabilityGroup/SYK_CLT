@@ -1,7 +1,6 @@
-import SYK.SYK_model.model
+import SYK.Gaussian_concentration.gaussian_concentration
 import Mathlib.Analysis.CStarAlgebra.Matrix
 import Mathlib.Analysis.Matrix.PosDef
-import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Analysis.Calculus.SmoothSeries
 import Mathlib.Analysis.Calculus.FDeriv.Pow
@@ -9,8 +8,6 @@ import Mathlib.Analysis.Matrix.Order
 import Mathlib.Analysis.SpecialFunctions.ContinuousFunctionalCalculus.ExpLog.Basic
 import Mathlib.Data.Fintype.Powerset
 import Mathlib.Data.Nat.Choose.Bounds
-import Mathlib.MeasureTheory.Constructions.Pi
-import Mathlib.Probability.Distributions.Gaussian.Real
 
 open scoped BigOperators ComplexOrder ENNReal NNReal
 open scoped MatrixOrder
@@ -797,22 +794,6 @@ theorem hasDerivAt_trace_exp_affine [Nonempty d]
 
 end TraceExponentialDerivative
 
-/-- The Euclidean space of real SYK couplings. -/
-abbrev CouplingSpace (N q : ℕ) :=
-  EuclideanSpace ℝ (InteractionIndex N q)
-
-@[simp]
-theorem couplingSpace_card (N q : ℕ) :
-    Fintype.card (InteractionIndex N q) = Nat.choose N q := by
-  simpa [InteractionIndex] using
-    (Fintype.card_finset_len (α := Fin N) q)
-
-/-- The product standard Gaussian measure transported to coupling space. -/
-noncomputable def standardGaussianMeasure (N q : ℕ) :
-    Measure (CouplingSpace N q) :=
-  (Measure.pi fun _ : InteractionIndex N q => gaussianReal 0 1).map
-    (WithLp.toLp 2)
-
 /-- The normalization multiplying each Gaussian coupling. -/
 noncomputable def couplingScale (P : Params) (𝒥 : ℝ) : ℝ :=
   𝒥 * Real.sqrt ((P.q - 1).factorial / (P.N : ℝ) ^ (P.q - 1))
@@ -910,33 +891,19 @@ theorem hasDerivAt_logPartition_line
     rw [hexp s]
     simp [B, smul_smul, smul_neg]
 
-/--
-Gaussian concentration for the product standard Gaussian on the SYK coupling
-space.  The coupling space has `Nat.choose N q` coordinates by
-`couplingSpace_card`.
--/
-noncomputable def GaussianLipschitzConcentration (N q : ℕ) : Prop :=
-  ∀ (F : CouplingSpace N q → ℝ) (L t : ℝ),
-    0 < L → 0 < t → LipschitzWith L.toNNReal F →
-      standardGaussianMeasure N q
-          {x | |F x - ∫ y, F y ∂standardGaussianMeasure N q| > t} ≤
-        ENNReal.ofReal (2 * Real.exp (-t ^ 2 / (2 * L ^ 2)))
-
 /-- The Lipschitz constant obtained from the SYK sum-of-squares estimate. -/
 noncomputable def simpleLipschitzConstant (P : Params) (𝒥 : ℝ) : ℝ≥0 :=
   Real.toNNReal (|P.β| * 𝒥 / Real.sqrt (P.q : ℝ))
 
 /--
 The two-sided superconcentration estimate for the product standard Gaussian
-coupling measure.  Its only analytic input not
-available in mathlib is `GaussianLipschitzConcentration`; the SYK gradient
-estimate is supplied in the reusable `hLip` hypothesis.
+coupling measure. The SYK gradient estimate is supplied in the reusable
+`hLip` hypothesis.
 -/
 theorem logPartition_two_sided_tail
     {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (h𝒥 : 0 < 𝒥) (hβ : P.β ≠ 0)
-    (hγ : GaussianLipschitzConcentration P.N P.q)
     (hLip : LipschitzWith (simpleLipschitzConstant P 𝒥)
       (logPartition P M 𝒥))
     (t : ℝ) (ht : 0 < t) :
@@ -953,7 +920,9 @@ theorem logPartition_two_sided_tail
   have hL : 0 < L := div_pos (mul_pos (abs_pos.mpr hβ) h𝒥) hsqrt
   have hLip' : LipschitzWith L.toNNReal (logPartition P M 𝒥) := by
     simpa [L, simpleLipschitzConstant] using hLip
-  have htail := hγ (logPartition P M 𝒥) L t hL ht hLip'
+  have htail :=
+    gaussian_lipschitz_concentration P.N P.q
+      (logPartition P M 𝒥) L t hL ht hLip'
   have hq0 : (P.q : ℝ) ≠ 0 := ne_of_gt hq
   have hsqrt0 : Real.sqrt (P.q : ℝ) ≠ 0 := ne_of_gt hsqrt
   have hβ0 : P.β ^ 2 ≠ 0 := pow_ne_zero 2 hβ
@@ -1083,7 +1052,6 @@ theorem logPartition_two_sided_tail_standardGaussian
     {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (h𝒥 : 0 < 𝒥) (hβ : P.β ≠ 0)
-    (hγ : GaussianLipschitzConcentration P.N P.q)
     (t : ℝ) (ht : 0 < t) :
     standardGaussianMeasure P.N P.q
         {J | |logPartition P M 𝒥 J -
@@ -1108,6 +1076,6 @@ theorem logPartition_two_sided_tail_standardGaussian
       exact ht.le
     rw [hset]
     simp
-  · exact logPartition_two_sided_tail P M 𝒥 h𝒥 hβ hγ
+  · exact logPartition_two_sided_tail P M 𝒥 h𝒥 hβ
       (logPartition_lipschitz P M 𝒥 h𝒥.le) t ht
 end SYK
