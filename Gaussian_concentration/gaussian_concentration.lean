@@ -16,8 +16,7 @@ abbrev CouplingSpace (N q : ℕ) :=
 @[simp]
 theorem couplingSpace_card (N q : ℕ) :
     Fintype.card (InteractionIndex N q) = Nat.choose N q := by
-  simpa [InteractionIndex] using
-    (Fintype.card_finset_len (α := Fin N) q)
+  simp [InteractionIndex]
 
 /-- The product standard Gaussian measure transported to coupling space. -/
 noncomputable def standardGaussianMeasure (N q : ℕ) :
