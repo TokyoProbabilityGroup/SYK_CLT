@@ -1,3 +1,4 @@
+import SYK.SYK_model.model
 import SYK.Gaussian_concentration.gaussian_concentration
 import Mathlib.Analysis.CStarAlgebra.Matrix
 import Mathlib.Analysis.Matrix.PosDef
