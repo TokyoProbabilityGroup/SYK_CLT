@@ -1,4 +1,4 @@
-import SYK.Gaussian_concentration.GaussianConcentrationAux
+import SYK.super_concentration.Gaussian_concentration.GaussianConcentrationAux
 
 /-!
 # Mollification of Lipschitz functions
