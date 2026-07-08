@@ -1,312 +1,202 @@
-import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.MeasureTheory.Constructions.Pi
-import Mathlib.Probability.Distributions.Gaussian.Real
+import GaussianConcentrationAux
+import GaussianCovSmooth
+import GaussianCovMollify
 
-open scoped BigOperators ENNReal
+open scoped BigOperators ENNReal NNReal
 open MeasureTheory
 open ProbabilityTheory
 
 namespace SYK
 
-/-- The Euclidean space of real SYK couplings. -/
-abbrev CouplingSpace (N q : ℕ) :=
-  EuclideanSpace ℝ (InteractionIndex N q)
-
-@[simp]
-theorem couplingSpace_card (N q : ℕ) :
-    Fintype.card (InteractionIndex N q) = Nat.choose N q := by
-  simp [InteractionIndex]
-
-/-- The product standard Gaussian measure transported to coupling space. -/
-noncomputable def standardGaussianMeasure (N q : ℕ) :
-    Measure (CouplingSpace N q) :=
-  (Measure.pi fun _ : InteractionIndex N q => gaussianReal 0 1).map
-    (WithLp.toLp 2)
+/-
+The sharp Gaussian covariance bound for a `C¹` function with globally bounded gradient
+(the smooth case, proved via rotation invariance of `μ.prod μ` and Gaussian integration by
+parts).  The general Lipschitz case follows by mollification.
+-/
+lemma gaussian_cov_bound_smooth {ι : Type*} [Fintype ι]
+    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
+    (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s : ℝ) :
+    |(∫ x, F x * Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)
+        - (∫ x, F x ∂standardGaussianMeasureOnEuclidean ι)
+          * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)|
+      ≤ L ^ 2 * |s| * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι) := by
+  rw [ gaussian_cov_repr F L hL hF hgrad s ];
+  rw [ intervalIntegral.integral_of_le Real.pi_div_two_pos.le ];
+  refine' le_trans ( MeasureTheory.norm_integral_le_integral_norm ( _ : ℝ → ℝ ) ) ( le_trans ( MeasureTheory.integral_mono_of_nonneg _ _ _ ) _ );
+  refine' fun θ => |Real.sin θ| * ( |s| * L ^ 2 * ∫ x, Real.exp ( s * F x ) ∂standardGaussianMeasureOnEuclidean ι );
+  · exact Filter.Eventually.of_forall fun x => norm_nonneg _;
+  · exact Continuous.integrableOn_Ioc ( by continuity );
+  · filter_upwards [ MeasureTheory.ae_restrict_mem measurableSet_Ioc ] with θ hθ;
+    simpa only [ norm_mul, Real.norm_eq_abs ] using mul_le_mul_of_nonneg_left ( gaussian_cov_H_bound F L hL hF hgrad s θ ) ( abs_nonneg _ );
+  · rw [ MeasureTheory.setIntegral_congr_fun measurableSet_Ioc fun x hx => by rw [ abs_of_nonneg ( Real.sin_nonneg_of_nonneg_of_le_pi hx.1.le ( by linarith [ Real.pi_pos, hx.2 ] ) ) ], ← intervalIntegral.integral_of_le Real.pi_div_two_pos.le ] ; norm_num ; ring_nf ; norm_num
 
 /-
-Blueprint for `gaussian_lipschitz_concentration`
+**The sharp Gaussian covariance bound** for an `L`-Lipschitz `F`:
+`|Cov(F, e^{sF})| ≤ L² |s| ∫ e^{sF}` against the standard Gaussian.  This is the last
+remaining analytic input to `product_standardGaussian_mgf_le`.  It reduces to the smooth
+case `gaussian_cov_bound_smooth` (proved via rotation invariance of `μ.prod μ` and the
+Gaussian integration-by-parts lemma `gaussian_ibp`) by mollifying `F` into a sequence of
+`C¹` functions with the same Lipschitz constant and passing to the limit by dominated
+convergence.  The supporting infrastructure (`gaussian_ibp`, `map_rotation_fst`,
+`gradient_exp_smul`, `contDiff_abs_le_of_gradient_le`, the mean-zero and integrability
+lemmas) is fully proved; the smooth-case assembly and the mollification limit remain.
+-/
+lemma gaussian_cov_bound {ι : Type*} [Fintype ι]
+    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 < L)
+    (hLip : LipschitzWith L.toNNReal F) (s : ℝ) :
+    |(∫ x, F x * Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)
+        - (∫ x, F x ∂standardGaussianMeasureOnEuclidean ι)
+          * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)|
+      ≤ L ^ 2 * |s| * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι) := by
+  obtain ⟨Fn, hCD, hgr, hbd, htd⟩ := SYK.exists_smooth_lipschitz_approx F L hL.le hLip;
+  obtain ⟨t1, t2, t3⟩ := SYK.tendsto_integrals_of_approx F Fn (|F 0| + L) L (by positivity) hL.le (fun n => (hCD n).continuous) hbd htd s;
+  convert le_of_tendsto_of_tendsto' ( Filter.Tendsto.abs ( t3.sub ( t1.mul t2 ) ) ) ( t2.const_mul ( L ^ 2 * |s| ) ) _ using 1;
+  exact fun n => gaussian_cov_bound_smooth _ _ hL.le ( hCD n ) ( hgr n ) s
 
-Goal in `SYK/Gaussian_concentration/gaussian_concentration.lean`:
+/-- The centered Lipschitz function of a standard Gaussian vector has a sub-Gaussian
+moment-generating function with parameter `L ^ 2`.  This is Herbst's conclusion from the
+Gaussian logarithmic Sobolev inequality: for every `t`,
+`𝔼[exp (t (F - 𝔼 F))] ≤ exp (L² t² / 2)`.
 
-```lean
-theorem gaussian_lipschitz_concentration
-    (N q : Nat) (F : CouplingSpace N q -> Real) (L t : Real)
-    (hL : 0 < L) (ht : 0 < t)
+This is the analytic heart of Gaussian concentration and is not currently available in
+Mathlib; a full proof requires the Gaussian log-Sobolev inequality (or the equivalent
+Ornstein–Uhlenbeck semigroup interpolation) together with Rademacher's theorem
+(`LipschitzWith.ae_differentiableAt`) giving `‖∇F‖ ≤ L` almost everywhere. -/
+theorem product_standardGaussian_mgf_le
+    {ι : Type*} [Fintype ι]
+    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 < L)
+    (hLip : LipschitzWith L.toNNReal F) (t : ℝ) :
+    mgf (fun x => F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι)
+        (standardGaussianMeasureOnEuclidean ι) t ≤
+      Real.exp (L ^ 2 * t ^ 2 / 2) :=
+  herbst_of_cov_bound F L hL hLip (gaussian_cov_bound F L hL hLip) t
+
+/-- The centered Lipschitz function of a standard Gaussian vector has a sub-Gaussian
+moment-generating function with parameter `L ^ 2`. -/
+theorem product_standardGaussian_hasSubgaussianMGF
+    {ι : Type*} [Fintype ι]
+    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 < L)
     (hLip : LipschitzWith L.toNNReal F) :
-    standardGaussianMeasure N q
-        {x | |F x - integral (fun y => F y) (standardGaussianMeasure N q)| > t} <=
-      ENNReal.ofReal (2 * Real.exp (-t ^ 2 / (2 * L ^ 2))) := by
-```
+    HasSubgaussianMGF
+      (fun x => F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι)
+      (Real.toNNReal (L ^ 2)) (standardGaussianMeasureOnEuclidean ι) := by
+  refine ⟨fun t => ?_, fun t => ?_⟩
+  · -- Integrability of `exp (t · (F - ∫ F))`.
+    have hbound : ∀ x : EuclideanSpace ℝ ι, |F x| ≤ |F 0| + L * ‖x‖ := by
+      intro x
+      have h := hLip.dist_le_mul x 0
+      simp only [dist_eq_norm, sub_zero, Real.coe_toNNReal L hL.le] at h
+      cases abs_cases (F x) <;> cases abs_cases (F 0) <;>
+        [skip; skip; skip; skip] <;> nlinarith [abs_le.mp h, norm_nonneg x]
+    set μ := standardGaussianMeasureOnEuclidean ι
+    have hdom := (integrable_exp_mul_norm (ι := ι) (|t| * L)).const_mul
+      (Real.exp (|t| * |F 0| + |t| * |∫ y, F y ∂μ|))
+    refine hdom.mono' ?_ ?_
+    · exact (Real.continuous_exp.comp (continuous_const.mul
+        ((hLip.continuous).sub continuous_const))).aestronglyMeasurable
+    · filter_upwards [] with x
+      rw [Real.norm_of_nonneg (Real.exp_nonneg _), ← Real.exp_add]
+      refine Real.exp_le_exp.mpr ?_
+      have hFx : F x - ∫ y, F y ∂μ ≤ |F 0| + L * ‖x‖ + |∫ y, F y ∂μ| := by
+        have := abs_le.mp (hbound x)
+        have h2 := neg_abs_le (∫ y, F y ∂μ)
+        nlinarith [this.1, this.2]
+      have hneg : -(|F 0| + L * ‖x‖ + |∫ y, F y ∂μ|) ≤ F x - ∫ y, F y ∂μ := by
+        have := abs_le.mp (hbound x)
+        have h2 := le_abs_self (∫ y, F y ∂μ)
+        nlinarith [this.1, this.2]
+      have hnn : (0:ℝ) ≤ L * ‖x‖ := mul_nonneg hL.le (norm_nonneg x)
+      rcases abs_cases t with ⟨ht, _⟩ | ⟨ht, _⟩ <;> rw [ht] <;> nlinarith [hFx, hneg, hnn]
+  · -- The moment-generating-function bound, from the deep Herbst inequality.
+    have hmgf := product_standardGaussian_mgf_le F L hL hLip t
+    have hcoe : ((Real.toNNReal (L ^ 2) : ℝ≥0) : ℝ) = L ^ 2 :=
+      Real.coe_toNNReal _ (sq_nonneg L)
+    rw [hcoe]
+    exact hmgf
 
-The SYK theorem should be a short reduction to a general finite-dimensional
-Gaussian concentration theorem. Keep the analytic theorem reusable and keep the
-SYK-specific file limited to identifying the measure and index type.
-
-## Local definitions
-
-Use one standard Gaussian measure for every finite Euclidean coordinate type:
-
-```lean
-noncomputable def standardGaussianMeasureOnEuclidean
-    (iota : Type*) [Fintype iota] :
-    Measure (EuclideanSpace Real iota) :=
-  (Measure.pi fun _ : iota => gaussianReal 0 1).map (WithLp.toLp 2)
-```
-
-Connect it to the SYK measure:
-
-```lean
-@[simp]
-theorem standardGaussianMeasure_eq_onEuclidean (N q : Nat) :
-    standardGaussianMeasure N q =
-      standardGaussianMeasureOnEuclidean (InteractionIndex N q) := rfl
-```
-
-This works because
-
-```lean
-CouplingSpace N q = EuclideanSpace Real (InteractionIndex N q)
-```
-
-by definition, and both measures are the same pushed-forward product measure.
-
-## Measure facts
-
-Prove these helper facts before the concentration proof:
-
-```lean
-instance standardGaussianMeasureOnEuclidean_isProbability
-    {iota : Type*} [Fintype iota] :
-    IsProbabilityMeasure (standardGaussianMeasureOnEuclidean iota) := by
-```
-
-Use:
-
-- `gaussianReal 0 1` has `IsProbabilityMeasure`.
-- `Measure.pi` preserves `IsProbabilityMeasure` for finite products.
-- `Measure.map` preserves total mass when the map is measurable.
-- `WithLp.toLp 2` is measurable, usually by `fun_prop` or the `WithLp`
-  measurable lemma.
-
-Also prove measurability of tail events as needed. Since `hLip` implies
-continuity, the function
-
-```lean
-fun x => |F x - integral (fun y => F y) gamma|
-```
-
-is measurable, so `{x | |F x - m| > t}` is measurable.
-
-## Integrability of the mean
-
-The integral in the statement should be a real Bochner integral. Prove:
-
-```lean
-lemma integrable_of_lipschitz_standardGaussian
-    {iota : Type*} [Fintype iota]
-    (F : EuclideanSpace Real iota -> Real) (L : Real)
-    (hL : 0 < L) (hLip : LipschitzWith L.toNNReal F) :
-    Integrable F (standardGaussianMeasureOnEuclidean iota) := by
-```
-
-The useful pointwise bound is:
-
-```lean
-have hbound : forall x,
-    |F x| <= |F 0| + L * ||x|| := by
-```
-
-Derive it from the triangle inequality and `hLip.dist_le_mul x 0`. Since
-`0 <= L`, rewrite
-
-```lean
-((L.toNNReal : NNReal) : Real) = L
-```
-
-with `Real.coe_toNNReal _ hL.le` or the closest available simp lemma in the
-local mathlib version.
-
-For the Gaussian norm term, either use Fernique:
-
-```lean
-ProbabilityTheory.IsGaussian.memLp_id
-```
-
-after importing
-
-```lean
-import Mathlib.Probability.Distributions.Gaussian.Fernique
-```
-
-or prove the finite-dimensional bound directly by pulling back through
-`WithLp.toLp 2` and bounding the Euclidean norm by the sum of coordinate
-absolute values.
-
-## Analytic input
-
-Isolate the main probability theorem. This is the only substantial analytic
-ingredient.
-
-```lean
+/-- Upper-tail concentration for Lipschitz functions of a standard Gaussian vector. -/
 theorem product_standardGaussian_upper_tail
-    {iota : Type*} [Fintype iota]
-    (F : EuclideanSpace Real iota -> Real) (L t : Real)
+    {ι : Type*} [Fintype ι]
+    (F : EuclideanSpace ℝ ι → ℝ) (L t : ℝ)
     (hL : 0 < L) (ht : 0 < t)
     (hLip : LipschitzWith L.toNNReal F) :
-    let gamma := standardGaussianMeasureOnEuclidean iota
-    gamma {x | F x - integral (fun y => F y) gamma > t} <=
+    standardGaussianMeasureOnEuclidean ι
+        {x | F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι > t} ≤
       ENNReal.ofReal (Real.exp (-t ^ 2 / (2 * L ^ 2))) := by
-```
+  set μ := standardGaussianMeasureOnEuclidean ι with hμ
+  have hsg := product_standardGaussian_hasSubgaussianMGF F L hL hLip
+  have hchern := hsg.measure_ge_le (ε := t) ht.le
+  have hcoe : ((Real.toNNReal (L ^ 2) : ℝ≥0) : ℝ) = L ^ 2 :=
+    Real.coe_toNNReal _ (sq_nonneg L)
+  rw [hcoe] at hchern
+  -- `hchern : μ.real {ω | t ≤ F ω - ∫ F} ≤ exp (-t ^ 2 / (2 * L ^ 2))`
+  have hsubset :
+      {x | F x - ∫ y, F y ∂μ > t} ⊆
+        {x | t ≤ F x - ∫ y, F y ∂μ} := by
+    intro x hx
+    simp only [Set.mem_setOf_eq, gt_iff_lt] at hx ⊢
+    exact le_of_lt hx
+  calc
+    μ {x | F x - ∫ y, F y ∂μ > t}
+        ≤ μ {x | t ≤ F x - ∫ y, F y ∂μ} := measure_mono hsubset
+    _ = ENNReal.ofReal (μ.real {x | t ≤ F x - ∫ y, F y ∂μ}) := by
+          rw [measureReal_def, ENNReal.ofReal_toReal (measure_ne_top _ _)]
+    _ ≤ ENNReal.ofReal (Real.exp (-t ^ 2 / (2 * L ^ 2))) :=
+          ENNReal.ofReal_le_ofReal hchern
 
-This theorem is normally proved by the Gaussian log-Sobolev inequality and the
-Herbst argument. If formalizing that proof is outside the current scope, keep a
-single local `sorry` here, with a comment saying that this is the analytic
-Gaussian concentration input. Do not introduce a global axiom.
-
-The matching lower tail follows from the same theorem applied to `-F`:
-
-```lean
+/-- Lower-tail concentration for Lipschitz functions of a standard Gaussian vector. -/
 theorem product_standardGaussian_lower_tail
-    {iota : Type*} [Fintype iota]
-    (F : EuclideanSpace Real iota -> Real) (L t : Real)
+    {ι : Type*} [Fintype ι]
+    (F : EuclideanSpace ℝ ι → ℝ) (L t : ℝ)
     (hL : 0 < L) (ht : 0 < t)
     (hLip : LipschitzWith L.toNNReal F) :
-    let gamma := standardGaussianMeasureOnEuclidean iota
-    gamma {x | integral (fun y => F y) gamma - F x > t} <=
+    standardGaussianMeasureOnEuclidean ι
+        {x | (∫ y, F y ∂standardGaussianMeasureOnEuclidean ι) - F x > t} ≤
       ENNReal.ofReal (Real.exp (-t ^ 2 / (2 * L ^ 2))) := by
-```
+  convert product_standardGaussian_upper_tail ( fun x => -F x ) L t hL ht ( hLip.neg ) using 2 ; simp +decide [ sub_eq_neg_add ];
+  rw [ MeasureTheory.integral_neg ] ; ext ; simp +decide [ add_comm ]
 
-The required Lipschitz fact is either:
+theorem abs_gt_iff_pos_or_neg {a t : ℝ} : |a| > t ↔ a > t ∨ -a > t := by
+  rw [ abs_eq_max_neg, gt_iff_lt, gt_iff_lt, gt_iff_lt, lt_max_iff, lt_neg ]
 
-```lean
-have hLip_neg : LipschitzWith L.toNNReal (fun x => -F x) := hLip.neg
-```
-
-or a direct proof using `dist_neg_neg`.
-
-For the mean of `-F`, use linearity of the integral after applying the
-integrability lemma:
-
-```lean
-integral (fun x => -F x) gamma = - integral (fun x => F x) gamma
-```
-
-## Two-sided Euclidean theorem
-
-Prove the reusable result:
-
-```lean
+/-- Two-sided Gaussian concentration on a finite-dimensional Euclidean space. -/
 theorem euclidean_lipschitz_gaussian_concentration
-    {iota : Type*} [Fintype iota]
-    (F : EuclideanSpace Real iota -> Real) (L t : Real)
+    {ι : Type*} [Fintype ι]
+    (F : EuclideanSpace ℝ ι → ℝ) (L t : ℝ)
     (hL : 0 < L) (ht : 0 < t)
     (hLip : LipschitzWith L.toNNReal F) :
-    let gamma := standardGaussianMeasureOnEuclidean iota
-    gamma {x | |F x - integral (fun y => F y) gamma| > t} <=
+    standardGaussianMeasureOnEuclidean ι
+        {x | |F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι| > t} ≤
       ENNReal.ofReal (2 * Real.exp (-t ^ 2 / (2 * L ^ 2))) := by
-```
+  have hexp : (0 : ℝ) ≤ Real.exp (-t ^ 2 / (2 * L ^ 2)) := Real.exp_nonneg _
+  have hsubset :
+      {x | |F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι| > t} ⊆
+        {x | F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι > t} ∪
+          {x | (∫ y, F y ∂standardGaussianMeasureOnEuclidean ι) - F x > t} := by
+    intro x hx
+    rcases abs_gt_iff_pos_or_neg.mp hx with h | h
+    · exact Or.inl h
+    · exact Or.inr (by simpa [neg_sub] using h)
+  calc
+    standardGaussianMeasureOnEuclidean ι
+          {x | |F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι| > t}
+        ≤ standardGaussianMeasureOnEuclidean ι
+            ({x | F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι > t} ∪
+              {x | (∫ y, F y ∂standardGaussianMeasureOnEuclidean ι) - F x > t}) :=
+          measure_mono hsubset
+    _ ≤ standardGaussianMeasureOnEuclidean ι
+            {x | F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι > t} +
+          standardGaussianMeasureOnEuclidean ι
+            {x | (∫ y, F y ∂standardGaussianMeasureOnEuclidean ι) - F x > t} :=
+          measure_union_le _ _
+    _ ≤ ENNReal.ofReal (Real.exp (-t ^ 2 / (2 * L ^ 2))) +
+          ENNReal.ofReal (Real.exp (-t ^ 2 / (2 * L ^ 2))) :=
+          add_le_add (product_standardGaussian_upper_tail F L t hL ht hLip)
+            (product_standardGaussian_lower_tail F L t hL ht hLip)
+    _ = ENNReal.ofReal (2 * Real.exp (-t ^ 2 / (2 * L ^ 2))) := by
+          rw [← ENNReal.ofReal_add hexp hexp]; congr 1; ring
 
-Let:
-
-```lean
-let gamma := standardGaussianMeasureOnEuclidean iota
-let m := integral (fun y => F y) gamma
-let A : Set (EuclideanSpace Real iota) := {x | F x - m > t}
-let B : Set (EuclideanSpace Real iota) := {x | m - F x > t}
-```
-
-Use the elementary real lemma:
-
-```lean
-lemma abs_gt_iff_pos_or_neg {a t : Real} :
-    |a| > t <-> a > t \/ -a > t := by
-```
-
-Then prove the event inclusion:
-
-```lean
-have hsubset : {x | |F x - m| > t} <= Set.union A B := by
-  intro x hx
-  have hx' : F x - m > t \/ -(F x - m) > t := by
-    simpa using (abs_gt_iff_pos_or_neg.mp hx)
-  exact hx'.elim
-    (fun h => Or.inl h)
-    (fun h => Or.inr (by simpa [sub_eq_add_neg] using h))
-```
-
-Apply the union bound:
-
-```lean
-have h_event_le : gamma {x | |F x - m| > t} <= gamma (Set.union A B) :=
-  measure_mono hsubset
-have h_union : gamma (Set.union A B) <= gamma A + gamma B :=
-  measure_union_le A B
-```
-
-Apply `product_standardGaussian_upper_tail` to `A` and
-`product_standardGaussian_lower_tail` to `B`.
-
-Finish the right side with:
-
-```lean
-have hexp_nonneg : 0 <= Real.exp (-t ^ 2 / (2 * L ^ 2)) := Real.exp_nonneg _
-rw [show
-    2 * Real.exp (-t ^ 2 / (2 * L ^ 2))
-      = Real.exp (-t ^ 2 / (2 * L ^ 2))
-        + Real.exp (-t ^ 2 / (2 * L ^ 2)) by ring]
-rw [ENNReal.ofReal_add hexp_nonneg hexp_nonneg]
-```
-
-Useful real side facts:
-
-```lean
-have hL2pos : 0 < L ^ 2 := sq_pos_of_pos hL
-have hdenpos : 0 < 2 * L ^ 2 := mul_pos (by norm_num) hL2pos
-have hrhs_nonneg :
-    0 <= 2 * Real.exp (-t ^ 2 / (2 * L ^ 2)) := by positivity
-```
-
-## Final SYK theorem
-
-Once `euclidean_lipschitz_gaussian_concentration` is available, the target
-proof should be only:
-
-```lean
-theorem gaussian_lipschitz_concentration
-    (N q : Nat) (F : CouplingSpace N q -> Real) (L t : Real)
-    (hL : 0 < L) (ht : 0 < t)
-    (hLip : LipschitzWith L.toNNReal F) :
-    standardGaussianMeasure N q
-        {x | |F x - integral (fun y => F y) (standardGaussianMeasure N q)| > t} <=
-      ENNReal.ofReal (2 * Real.exp (-t ^ 2 / (2 * L ^ 2))) := by
-  simpa [standardGaussianMeasureOnEuclidean, standardGaussianMeasure]
-    using euclidean_lipschitz_gaussian_concentration
-      (iota := InteractionIndex N q) F L t hL ht hLip
-```
-
-## Order of implementation
-
-- Define `standardGaussianMeasureOnEuclidean`.
-- Prove it matches `standardGaussianMeasure`.
-- Prove probability and measurability helper facts.
-- Prove integrability of Lipschitz functions under the standard Gaussian.
-- Add the upper-tail analytic input.
-- Derive the lower-tail theorem from the upper-tail theorem applied to `-F`.
-- Derive the two-sided Euclidean theorem by the union bound.
-- Close the SYK theorem with `simpa`.
-
-## Main risk
-
-The analytic upper-tail theorem is the hard part. Everything after it is
-finite-dimensional bookkeeping, event inclusion, the union bound, and `ENNReal`
-algebra.
--/
-
-/--
-Gaussian concentration for the product standard Gaussian on the SYK coupling
-space. The coupling space has `Nat.choose N q` coordinates by
-`couplingSpace_card`.
--/
+/-- Gaussian concentration for the product standard Gaussian on the SYK coupling space. -/
 theorem gaussian_lipschitz_concentration
     (N q : ℕ) (F : CouplingSpace N q → ℝ) (L t : ℝ)
     (hL : 0 < L) (ht : 0 < t)
@@ -314,6 +204,8 @@ theorem gaussian_lipschitz_concentration
     standardGaussianMeasure N q
         {x | |F x - ∫ y, F y ∂standardGaussianMeasure N q| > t} ≤
       ENNReal.ofReal (2 * Real.exp (-t ^ 2 / (2 * L ^ 2))) := by
-  sorry
+  simpa using
+    euclidean_lipschitz_gaussian_concentration
+      (ι := ({s : Finset (Fin N) // s.card = q})) F L t hL ht hLip
 
 end SYK
