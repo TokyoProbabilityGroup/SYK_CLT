@@ -127,7 +127,7 @@ More explicitly, the proof is organized through the following chain.
 The parts proved in this note are the following.
 \begin{enumerate}[label=\textup{(\roman*)},leftmargin=*]
   \item The derivative convergence
-  $n^{-1}\partial_\beta\E L_n(\beta)\to\ell_q'(\beta)$ is derived from the
+  $N^{-1}\partial_\beta\E L_N(\beta)\to\ell_q'(\beta)$ is derived from the
   locally uniform LLN by convexity; see Proposition~\ref{prop:derivative-lln-from-lln}.
 
   \item The first chaos vanishes by Majorana sign-gauge symmetry, and the second
@@ -154,7 +154,7 @@ The parts proved in this note are the following.
 
 The parts not proved in this note are deliberately isolated.  The naive
 single-replica activity expansion fails because the absolute activity has size
-$n^{(q-1)/2}$ near a marked edge.  The naive coefficientwise tree expansion also
+$N^{(q-1)/2}$ near a marked edge.  The naive coefficientwise tree expansion also
 fails because repeated hyperedges create occurrence-level entropy which should
 be resummed.  These failures are recorded in
 Subsection~\ref{subsec:why-naive-cluster-fails}.  Thus the correct missing input
@@ -170,54 +170,59 @@ strong.
 
 \section{Model and main theorem}
 
-Fix an even integer $q\geq4$.  Let $n$ be even and let
-$\psi_1,\ldots,\psi_n$ be Majorana operators on $\C^{2^{n/2}}$ satisfying
+Fix an even integer $q\geq4$.  Let $N$ be even and let
+$\psi_1,\ldots,\psi_N$ be Majorana operators on $\C^{2^{N/2}}$ satisfying
 \begin{equation}\label{eq:majorana-relations}
-  \psi_i\psi_j+\psi_j\psi_i=\delta_{ij}\I.
+  \psi_i\psi_j+\psi_j\psi_i=2\delta_{ij}\I.
 \end{equation}
-Thus $\psi_i^2=\frac12\I$.  For $I=\{i_1<\cdots<i_q\}\subset[n]$, set
+Thus $\psi_i^2=\I$.  For $I=\{i_1<\cdots<i_q\}\subset[N]$, set
 \begin{equation}\label{eq:psiI}
   \psi_I=i^{q/2}\psi_{i_1}\cdots\psi_{i_q}.
 \end{equation}
-Then $\psi_I$ is Hermitian and $\psi_I^2=2^{-q}\I$.
+This is the paper notation for the Lean term
+$(\operatorname{phase} q)\cdot M.\operatorname{psiProduct}(I)$.  Then
+$\psi_I$ is Hermitian and $\psi_I^2=\I$.
 
 Let
 \begin{equation}\label{eq:calI-Nn}
-  \calI_n=\{I\subset[n]: |I|=q\},
+  \calI_N=\{I\subset[N]: |I|=q\},
   \qquad
-  N_n=|\calI_n|=\binom{n}{q}.
+  M_N=|\calI_N|=\binom{N}{q}.
 \end{equation}
-Let $(g_I)_{I\in\calI_n}$ be i.i.d. standard Gaussian random variables and set
+Thus $\calI_N$ is the paper notation for Lean's
+$\operatorname{InteractionIndex}\,N\,q$.
+Let $(g_I)_{I\in\calI_N}$ be i.i.d. standard Gaussian random variables and set
 \begin{equation}\label{eq:sigma}
-  \sigma_n^2=\frac{(q-1)!}{n^{q-1}}.
+  \sigma_N^2=\frac{(q-1)!}{N^{q-1}}.
 \end{equation}
 The Gaussian SYK Hamiltonian is
 \begin{equation}\label{eq:Hn}
-  H_n(g)=\sigma_n\sum_{I\in\calI_n}g_I\psi_I.
+  H_N(g)=\sigma_N\sum_{I\in\calI_N}g_I\psi_I.
 \end{equation}
-We use normalized trace $\tr=2^{-n/2}\Tr$ and define
+Equivalently, this is the Lean Hamiltonian with coupling
+$J_I=\sigma_Ng_I$.  We use normalized trace $\tr=2^{-N/2}\Tr$ and define
 \begin{equation}\label{eq:Zn-Ln}
-  Z_n(\beta)=\tr\exp(\beta H_n(g)),
+  Z_N(\beta)=\tr\exp(-\beta H_N(g)),
   \qquad
-  L_n(\beta)=\log Z_n(\beta).
+  L_N(\beta)=\log Z_N(\beta).
 \end{equation}
 
 For an observable $A$, write
 \begin{equation}\label{eq:thermal-average}
   \langle A\rangle_{\beta,g}
   =
-  \frac{\tr(Ae^{\beta H_n(g)})}{\tr(e^{\beta H_n(g)})}.
+  \frac{\tr(Ae^{-\beta H_N(g)})}{\tr(e^{-\beta H_N(g)})}.
 \end{equation}
-For $I,J\in\calI_n$, define the Kubo connected covariance
+For $I,J\in\calI_N$, define the Kubo connected covariance
 \begin{equation}\label{eq:kubo-covariance}
   \mathcal C_{I,J}(\beta,g)
   =
   \int_0^1
   \left\{
     \frac{
-      \tr\left(\psi_I e^{s\beta H_n(g)}
-      \psi_J e^{(1-s)\beta H_n(g)}\right)
-    }{Z_n(\beta)}
+      \tr\left(\psi_I e^{-s\beta H_N(g)}
+      \psi_J e^{-(1-s)\beta H_N(g)}\right)
+    }{Z_N(\beta)}
     -
     \langle\psi_I\rangle_{\beta,g}
     \langle\psi_J\rangle_{\beta,g}
@@ -226,7 +231,7 @@ For $I,J\in\calI_n$, define the Kubo connected covariance
 \end{equation}
 The rescaled centered fluctuation is
 \begin{equation}\label{eq:Xn}
-  X_n(\beta)=n^{q/2-1}\bigl(L_n(\beta)-\E L_n(\beta)\bigr).
+  X_N(\beta)=N^{q/2-1}\bigl(L_N(\beta)-\E L_N(\beta)\bigr).
 \end{equation}
 Let $P_r$ be the orthogonal projection in $L^2$ of the Gaussian disorder onto
 the $r$-th homogeneous Wiener chaos.
@@ -242,7 +247,7 @@ Proposition~\ref{prop:derivative-lln-from-lln}.
   \begin{equation}\label{eq:local-lln}
     \sup_{\beta\in K}
     \left|
-      \frac1n\E L_n(\beta)-\ell_q(\beta)
+      \frac1N\E L_N(\beta)-\ell_q(\beta)
     \right|\to0.
   \end{equation}
 \end{assumption}
@@ -252,7 +257,7 @@ Proposition~\ref{prop:derivative-lln-from-lln}.
   LLN form extracted from the high-temperature result of
   \cite{GPSZ2026}, together with the Gaussian universality used there and the
   annealed/quenched comparison of \cite{ACKK2025}.  The latter gives an error
-  $O_q(\beta^2n^{-q/2})$ at the level of free-energy density, so it is smaller
+  $O_q(\beta^2N^{-q/2})$ at the level of free-energy density, so it is smaller
   than the LLN scale.  The proof below does not use any CLT statement from
   these references.
 \end{remark}
@@ -270,10 +275,10 @@ Assumption~\ref{ass:two-replica-cluster-expansion}.
   \begin{equation}\label{eq:two-marked-susceptibility}
     S_{q,K}
     :=
-    \sup_{n\geq1}
+    \sup_{N\geq1}
     \sup_{\beta\in K}
-    \sup_{I\in\calI_n}
-    \sum_{J\in\calI_n}
+    \sup_{I\in\calI_N}
+    \sum_{J\in\calI_N}
     \E\left[
       \left|
         \mathcal C_{I,J}(\beta,g)
@@ -292,7 +297,7 @@ Assumption~\ref{ass:two-replica-cluster-expansion}.
   \end{equation}
   Then, for every finite set $\beta_1,\ldots,\beta_k\in(-\beta_*,\beta_*)$,
   \begin{equation}\label{eq:fdd-clt}
-    (X_n(\beta_1),\ldots,X_n(\beta_k))
+    (X_N(\beta_1),\ldots,X_N(\beta_k))
     \Rightarrow
     \left(
       \sqrt{\frac{q!}{2}}\,\beta_1\ell_q'(\beta_1)\xi,
@@ -312,11 +317,11 @@ Assumption~\ref{ass:two-replica-cluster-expansion}.
 
 \begin{lemma}[Convex convergence implies derivative convergence]
   \label{lem:convex-derivative}
-  Let $I\subset\R$ be an open interval.  Let $f_n:I\to\R$ be differentiable
-  convex functions and assume that $f_n\to f$ locally uniformly on $I$, where
+  Let $I\subset\R$ be an open interval.  Let $f_N:I\to\R$ be differentiable
+  convex functions and assume that $f_N\to f$ locally uniformly on $I$, where
   $f\in C^1(I)$.  Then, for every compact $K\subset I$,
   \begin{equation}\label{eq:convex-derivative-conclusion}
-    \sup_{x\in K}|f_n'(x)-f'(x)|\to0.
+    \sup_{x\in K}|f_N'(x)-f'(x)|\to0.
   \end{equation}
 \end{lemma}
 
@@ -324,33 +329,33 @@ Assumption~\ref{ass:two-replica-cluster-expansion}.
   Fix a compact $K\subset I$.  Choose $h_0>0$ such that
   $K+[-h_0,h_0]\subset I$.  For $0<h<h_0$ and $x\in K$, convexity gives
   \begin{equation}\label{eq:convex-difference-squeeze}
-    \frac{f_n(x)-f_n(x-h)}{h}
-    \leq f_n'(x)
+    \frac{f_N(x)-f_N(x-h)}{h}
+    \leq f_N'(x)
     \leq
-    \frac{f_n(x+h)-f_n(x)}{h}.
+    \frac{f_N(x+h)-f_N(x)}{h}.
   \end{equation}
   Put
   \begin{equation}\label{eq:epsilon-nh}
-    \epsilon_n(h)=\sup_{y\in K+[-h,h]}|f_n(y)-f(y)|.
+    \epsilon_N(h)=\sup_{y\in K+[-h,h]}|f_N(y)-f(y)|.
   \end{equation}
-  Then $\epsilon_n(h)\to0$ for fixed $h$.  From
+  Then $\epsilon_N(h)\to0$ for fixed $h$.  From
   \eqref{eq:convex-difference-squeeze},
   \begin{equation}\label{eq:upper-convex-derivative}
-    f_n'(x)-f'(x)
+    f_N'(x)-f'(x)
     \leq
     \frac{f(x+h)-f(x)}{h}-f'(x)
-    +\frac{2\epsilon_n(h)}{h},
+    +\frac{2\epsilon_N(h)}{h},
   \end{equation}
   and
   \begin{equation}\label{eq:lower-convex-derivative}
-    f_n'(x)-f'(x)
+    f_N'(x)-f'(x)
     \geq
     \frac{f(x)-f(x-h)}{h}-f'(x)
-    -\frac{2\epsilon_n(h)}{h}.
+    -\frac{2\epsilon_N(h)}{h}.
   \end{equation}
   Since $f'$ is uniformly continuous on $K+[-h_0,h_0]$, the deterministic
   difference-quotient errors converge to zero uniformly on $K$ as $h\downarrow0$.
-  First choose $h$ and then choose $n$ to make $\epsilon_n(h)/h$ small.  This
+  First choose $h$ and then choose $N$ to make $\epsilon_N(h)/h$ small.  This
   proves the claim.
 \end{proof}
 
@@ -361,74 +366,74 @@ Assumption~\ref{ass:two-replica-cluster-expansion}.
   \begin{equation}\label{eq:derivative-lln}
     \sup_{\beta\in K}
     \left|
-      \frac1n\partial_\beta\E L_n(\beta)-\ell_q'(\beta)
+      \frac1N\partial_\beta\E L_N(\beta)-\ell_q'(\beta)
     \right|
     \to0.
   \end{equation}
 \end{proposition}
 
 \begin{proof}
-  Let $f_n(\beta)=n^{-1}\E L_n(\beta)$.  For fixed disorder,
-  $\beta\mapsto L_n(\beta)$ is convex, because $L_n''(\beta)$ is the thermal
-  variance of $H_n(g)$.  Therefore $f_n$ is convex.  Differentiability follows
+  Let $f_N(\beta)=N^{-1}\E L_N(\beta)$.  For fixed disorder,
+  $\beta\mapsto L_N(\beta)$ is convex, because $L_N''(\beta)$ is the thermal
+  variance of $H_N(g)$.  Therefore $f_N$ is convex.  Differentiability follows
   by differentiating under the Gaussian expectation; this is justified by
-  $\norm{H_n(g)}\leq 2^{-q/2}\sigma_n\sum_{I\in\calI_n}|g_I|$ and Gaussian
+  $\norm{H_N(g)}\leq \sigma_N\sum_{I\in\calI_N}|g_I|$ and Gaussian
   exponential integrability in finite dimension.  Assumption~\ref{ass:local-lln} gives
-  locally uniform convergence of $f_n$ to the analytic, hence $C^1$, function
+  locally uniform convergence of $f_N$ to the analytic, hence $C^1$, function
   $\ell_q$.  Lemma~\ref{lem:convex-derivative} gives
   \eqref{eq:derivative-lln}.
 \end{proof}
 
 \section{Hermite decomposition and gauge selection}
 
-Let $\gamma_n$ be the product Gaussian law of $(g_I)_{I\in\calI_n}$.  For a
-multi-index $\alpha=(\alpha_I)_{I\in\calI_n}$ define
+Let $\gamma_N$ be the product Gaussian law of $(g_I)_{I\in\calI_N}$.  For a
+multi-index $\alpha=(\alpha_I)_{I\in\calI_N}$ define
 \begin{equation}\label{eq:multi-index}
-  |\alpha|=\sum_{I\in\calI_n}\alpha_I,
+  |\alpha|=\sum_{I\in\calI_N}\alpha_I,
   \qquad
-  \alpha!=\prod_{I\in\calI_n}\alpha_I!,
+  \alpha!=\prod_{I\in\calI_N}\alpha_I!,
   \qquad
-  H_\alpha(g)=\prod_{I\in\calI_n}h_{\alpha_I}(g_I),
+  H_\alpha(g)=\prod_{I\in\calI_N}h_{\alpha_I}(g_I),
 \end{equation}
 where $h_k$ is the probabilists' Hermite polynomial.
 
 \begin{lemma}[Hermite coefficient formula]\label{lem:hermite-coeff}
   For every fixed $\beta\in\R$,
   \begin{equation}\label{eq:chaos-decomposition}
-    L_n(\beta)-\E L_n(\beta)
+    L_N(\beta)-\E L_N(\beta)
     =
-    \sum_{r\geq1}P_rL_n(\beta)
+    \sum_{r\geq1}P_rL_N(\beta)
   \end{equation}
-  in $L^2(\gamma_n)$, and
+  in $L^2(\gamma_N)$, and
   \begin{equation}\label{eq:hermite-coeff}
-    P_rL_n(\beta)
+    P_rL_N(\beta)
     =
-    \sum_{|\alpha|=r}c_{n,\alpha}(\beta)H_\alpha(g),
+    \sum_{|\alpha|=r}c_{N,\alpha}(\beta)H_\alpha(g),
     \qquad
-    c_{n,\alpha}(\beta)
+    c_{N,\alpha}(\beta)
     =
-    \frac1{\alpha!}\E[\partial^\alpha L_n(\beta)].
+    \frac1{\alpha!}\E[\partial^\alpha L_N(\beta)].
   \end{equation}
 \end{lemma}
 
 \begin{proof}
-  The map $g\mapsto L_n(\beta)$ is $C^\infty$ and has at most exponential
+  The map $g\mapsto L_N(\beta)$ is $C^\infty$ and has at most exponential
   growth in the finite-dimensional Gaussian vector $g$.  Hence its Hermite
-  expansion converges in $L^2(\gamma_n)$.  Orthogonality gives
+  expansion converges in $L^2(\gamma_N)$.  Orthogonality gives
   \begin{equation}\label{eq:hermite-projection}
-    P_rL_n(\beta)
+    P_rL_N(\beta)
     =
     \sum_{|\alpha|=r}
-    \frac{\E[L_n(\beta)H_\alpha(g)]}{\alpha!}H_\alpha(g).
+    \frac{\E[L_N(\beta)H_\alpha(g)]}{\alpha!}H_\alpha(g).
   \end{equation}
   Repeated Gaussian integration by parts gives
   \begin{equation}\label{eq:gibp-hermite}
-    \E[L_n(\beta)H_\alpha(g)]=\E[\partial^\alpha L_n(\beta)],
+    \E[L_N(\beta)H_\alpha(g)]=\E[\partial^\alpha L_N(\beta)],
   \end{equation}
   proving \eqref{eq:hermite-coeff}.
 \end{proof}
 
-For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
+For $s=(s_1,\ldots,s_N)\in\{\pm1\}^N$ define
 \begin{equation}\label{eq:chi-s}
   \chi_s(I)=\prod_{a\in I}s_a,
   \qquad
@@ -436,60 +441,60 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
 \end{equation}
 
 \begin{lemma}[Majorana sign-gauge invariance]\label{lem:gauge-invariance}
-  For every $s\in\{\pm1\}^n$ and every $g$,
+  For every $s\in\{\pm1\}^N$ and every $g$,
   \begin{equation}\label{eq:gauge-invariance}
-    L_n(\beta,g)=L_n(\beta,\chi_sg).
+    L_N(\beta,g)=L_N(\beta,\chi_sg).
   \end{equation}
 \end{lemma}
 
 \begin{proof}
-  The family $(s_a\psi_a)_{a=1}^n$ satisfies the same Clifford relations as
-  $(\psi_a)_{a=1}^n$.  By uniqueness of the irreducible complex Clifford
+  The family $(s_a\psi_a)_{a=1}^N$ satisfies the same Clifford relations as
+  $(\psi_a)_{a=1}^N$.  By uniqueness of the irreducible complex Clifford
   representation, there exists a unitary $U_s$ such that
   \begin{equation}\label{eq:unitary-sign-flip}
     U_s\psi_aU_s^*=s_a\psi_a
     \qquad
-    \text{for all }a\in[n].
+    \text{for all }a\in[N].
   \end{equation}
   Hence $U_s\psi_IU_s^*=\chi_s(I)\psi_I$ and
   \begin{equation}\label{eq:H-gauge}
-    U_sH_n(g)U_s^*=H_n(\chi_sg).
+    U_sH_N(g)U_s^*=H_N(\chi_sg).
   \end{equation}
-  The normalized trace is unitary invariant, so $Z_n(\beta,g)=Z_n(\beta,\chi_sg)$.
+  The normalized trace is unitary invariant, so $Z_N(\beta,g)=Z_N(\beta,\chi_sg)$.
   Taking logarithms proves the claim.
 \end{proof}
 
 \begin{lemma}[Gauge parity selection rule]\label{lem:selection}
-  Let $\alpha$ be a multi-index.  If there exists $a\in[n]$ such that
+  Let $\alpha$ be a multi-index.  If there exists $a\in[N]$ such that
   \begin{equation}\label{eq:selection-rule}
     \sum_{I\ni a}\alpha_I\equiv1\pmod2,
   \end{equation}
-  then $c_{n,\alpha}(\beta)=0$.  In particular,
+  then $c_{N,\alpha}(\beta)=0$.  In particular,
   \begin{equation}\label{eq:first-chaos-zero}
-    P_1L_n(\beta)=0,
+    P_1L_N(\beta)=0,
   \end{equation}
   and for $I\neq J$,
   \begin{equation}\label{eq:off-diag-second-zero}
-    \E[\partial_{g_I}\partial_{g_J}L_n(\beta)]=0.
+    \E[\partial_{g_I}\partial_{g_J}L_N(\beta)]=0.
   \end{equation}
 \end{lemma}
 
 \begin{proof}
-  Since $\chi_sg$ has the same law as $g$ and $L_n(\beta,\chi_sg)=L_n(\beta,g)$,
+  Since $\chi_sg$ has the same law as $g$ and $L_N(\beta,\chi_sg)=L_N(\beta,g)$,
   \begin{equation}\label{eq:coeff-gauge}
-    c_{n,\alpha}(\beta)
+    c_{N,\alpha}(\beta)
     =
-    \frac1{\alpha!}\E[L_n(\beta,g)H_\alpha(\chi_sg)].
+    \frac1{\alpha!}\E[L_N(\beta,g)H_\alpha(\chi_sg)].
   \end{equation}
   Since $h_k(-x)=(-1)^kh_k(x)$,
   \begin{equation}\label{eq:Hermite-sign}
     H_\alpha(\chi_sg)
     =
-    \prod_{a=1}^n s_a^{\sum_{I\ni a}\alpha_I}H_\alpha(g).
+    \prod_{a=1}^N s_a^{\sum_{I\ni a}\alpha_I}H_\alpha(g).
   \end{equation}
   If \eqref{eq:selection-rule} holds, choose $s_a=-1$ and $s_b=1$ for
-  $b\neq a$.  Then $c_{n,\alpha}(\beta)=-c_{n,\alpha}(\beta)$, so
-  $c_{n,\alpha}(\beta)=0$.  The first-chaos statement follows by taking
+  $b\neq a$.  Then $c_{N,\alpha}(\beta)=-c_{N,\alpha}(\beta)$, so
+  $c_{N,\alpha}(\beta)=0$.  The first-chaos statement follows by taking
   $\alpha=e_I$.  If $I\neq J$, choose $a\in I\triangle J$ and take
   $\alpha=e_I+e_J$.
 \end{proof}
@@ -497,48 +502,48 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
 \section{Exact second chaos}
 
 \begin{lemma}[First derivative identity]\label{lem:first-derivative}
-  For every $I\in\calI_n$,
+  For every $I\in\calI_N$,
   \begin{equation}\label{eq:first-derivative}
-    \partial_{g_I}L_n(\beta)=\beta\sigma_n\langle\psi_I\rangle_{\beta,g}.
+    \partial_{g_I}L_N(\beta)=-\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
   \end{equation}
 \end{lemma}
 
 \begin{proof}
   By the derivative formula for the matrix exponential,
   \begin{equation}\label{eq:exp-derivative}
-    \partial_{g_I}e^{\beta H_n(g)}
+    \partial_{g_I}e^{-\beta H_N(g)}
     =
-    \beta\sigma_n
+    -\beta\sigma_N
     \int_0^1
-      e^{(1-t)\beta H_n(g)}\psi_I e^{t\beta H_n(g)}
+      e^{-(1-t)\beta H_N(g)}\psi_I e^{-t\beta H_N(g)}
     \dd t.
   \end{equation}
   After taking normalized trace, cyclicity makes the integrand independent of
-  $t$ and equal to $\tr(\psi_Ie^{\beta H_n(g)})$.  Dividing by $Z_n(\beta)$
+  $t$ and equal to $\tr(\psi_Ie^{-\beta H_N(g)})$.  Dividing by $Z_N(\beta)$
   proves \eqref{eq:first-derivative}.
 \end{proof}
 
 \begin{lemma}[Exact second chaos]\label{lem:second-chaos}
   Set
   \begin{equation}\label{eq:an-explicit-def}
-    a_n(\beta)=\frac{\beta\partial_\beta\E L_n(\beta)}{2N_n}.
+    a_N(\beta)=\frac{\beta\partial_\beta\E L_N(\beta)}{2M_N}.
   \end{equation}
   Then
   \begin{equation}\label{eq:p2-exact}
-    P_2L_n(\beta)=a_n(\beta)\sum_{I\in\calI_n}(g_I^2-1).
+    P_2L_N(\beta)=a_N(\beta)\sum_{I\in\calI_N}(g_I^2-1).
   \end{equation}
   Moreover,
   \begin{equation}\label{eq:an-coeff}
-    2N_na_n(\beta)=\beta\partial_\beta\E L_n(\beta).
+    2M_Na_N(\beta)=\beta\partial_\beta\E L_N(\beta).
   \end{equation}
 \end{lemma}
 
 \begin{proof}
   The second chaos has the form
   \begin{equation}\label{eq:p2-general}
-    P_2L_n(\beta)
+    P_2L_N(\beta)
     =
-    \sum_{I\in\calI_n}c_{2e_I}(\beta)(g_I^2-1)
+    \sum_{I\in\calI_N}c_{2e_I}(\beta)(g_I^2-1)
     +
     \sum_{I<J}c_{e_I+e_J}(\beta)g_Ig_J.
   \end{equation}
@@ -546,34 +551,34 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
   diagonal coefficient is independent of $I$ by permutation symmetry of the
   Majorana labels and exchangeability of the disorder.  Thus
   \begin{equation*}
-    P_2L_n(\beta)
+    P_2L_N(\beta)
     =
-    \widetilde a_n(\beta)\sum_{I\in\calI_n}(g_I^2-1)
+    \widetilde a_N(\beta)\sum_{I\in\calI_N}(g_I^2-1)
   \end{equation*}
-  for the common diagonal coefficient $\widetilde a_n(\beta)$.
+  for the common diagonal coefficient $\widetilde a_N(\beta)$.
 
   By Lemma~\ref{lem:hermite-coeff},
   \begin{equation}\label{eq:an-second-derivative}
-    \widetilde a_n(\beta)=\frac12\E[\partial_{g_I}^2L_n(\beta)].
+    \widetilde a_N(\beta)=\frac12\E[\partial_{g_I}^2L_N(\beta)].
   \end{equation}
   Summing over $I$ and using Gaussian integration by parts,
   \begin{equation}\label{eq:gibp-second-chaos}
-    2N_n\widetilde a_n(\beta)
+    2M_N\widetilde a_N(\beta)
     =
-    \sum_{I\in\calI_n}\E[\partial_{g_I}^2L_n(\beta)]
+    \sum_{I\in\calI_N}\E[\partial_{g_I}^2L_N(\beta)]
     =
-    \sum_{I\in\calI_n}\E[g_I\partial_{g_I}L_n(\beta)].
+    \sum_{I\in\calI_N}\E[g_I\partial_{g_I}L_N(\beta)].
   \end{equation}
   By Lemma~\ref{lem:first-derivative},
   \begin{equation}\label{eq:g-derivative-sum}
-    \sum_{I\in\calI_n}g_I\partial_{g_I}L_n(\beta)
+    \sum_{I\in\calI_N}g_I\partial_{g_I}L_N(\beta)
     =
-    \beta\sigma_n\sum_{I\in\calI_n}g_I\langle\psi_I\rangle_{\beta,g}
+    -\beta\sigma_N\sum_{I\in\calI_N}g_I\langle\psi_I\rangle_{\beta,g}
     =
-    \beta\partial_\beta L_n(\beta).
+    \beta\partial_\beta L_N(\beta).
   \end{equation}
   Taking expectation proves
-  $\widetilde a_n(\beta)=\beta\partial_\beta\E L_n(\beta)/(2N_n)$, hence
+  $\widetilde a_N(\beta)=\beta\partial_\beta\E L_N(\beta)/(2M_N)$, hence
   \eqref{eq:an-explicit-def} and \eqref{eq:an-coeff}.
 \end{proof}
 
@@ -581,21 +586,21 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
   \label{prop:exact-reduction}
   For every fixed $\beta\in\R$,
   \begin{equation}\label{eq:exact-reduction}
-    L_n(\beta)-\E L_n(\beta)
+    L_N(\beta)-\E L_N(\beta)
     =
-    \frac{\beta\partial_\beta\E L_n(\beta)}{2N_n}
-    \sum_{I\in\calI_n}(g_I^2-1)
+    \frac{\beta\partial_\beta\E L_N(\beta)}{2M_N}
+    \sum_{I\in\calI_N}(g_I^2-1)
     +
-    R_n(\beta),
+    R_N(\beta),
   \end{equation}
   where
   \begin{equation}\label{eq:Rn}
-    R_n(\beta)=\sum_{r\geq3}P_rL_n(\beta).
+    R_N(\beta)=\sum_{r\geq3}P_rL_N(\beta).
   \end{equation}
 \end{proposition}
 
 \begin{proof}
-  Combine the Hermite decomposition, the identity $P_1L_n=0$, and
+  Combine the Hermite decomposition, the identity $P_1L_N=0$, and
   Lemma~\ref{lem:second-chaos}.
 \end{proof}
 
@@ -607,7 +612,7 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
   \begin{equation}\label{eq:coefficient-limit}
     \sup_{\beta\in K}
     \left|
-      n^{q/2-1}\sqrt{2N_n}\,a_n(\beta)
+      N^{q/2-1}\sqrt{2M_N}\,a_N(\beta)
       -
       \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)
     \right|
@@ -618,16 +623,16 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
 \begin{proof}
   By \eqref{eq:an-coeff},
   \begin{equation}\label{eq:an-from-derivative}
-    a_n(\beta)=\frac{\beta\partial_\beta\E L_n(\beta)}{2N_n}.
+    a_N(\beta)=\frac{\beta\partial_\beta\E L_N(\beta)}{2M_N}.
   \end{equation}
   Proposition~\ref{prop:derivative-lln-from-lln} gives, uniformly for
   $\beta\in K$,
   \begin{equation}\label{eq:derivative-asymptotic}
-    \partial_\beta\E L_n(\beta)=n\ell_q'(\beta)+o(n).
+    \partial_\beta\E L_N(\beta)=N\ell_q'(\beta)+o(N).
   \end{equation}
-  Since $N_n=\binom{n}{q}\sim n^q/q!$,
+  Since $M_N=\binom{N}{q}\sim N^q/q!$,
   \begin{equation}\label{eq:Nn-asymptotic}
-    \frac{n^{q/2}}{\sqrt{2N_n}}\to\sqrt{\frac{q!}{2}}.
+    \frac{N^{q/2}}{\sqrt{2M_N}}\to\sqrt{\frac{q!}{2}}.
   \end{equation}
   Substituting these estimates into \eqref{eq:an-from-derivative} proves the
   result.
@@ -638,8 +643,8 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
   $\beta_1,\ldots,\beta_k\in(-\beta_0,\beta_0)$,
   \begin{equation}\label{eq:p2-clt}
     \left(
-      n^{q/2-1}P_2L_n(\beta_1),\ldots,
-      n^{q/2-1}P_2L_n(\beta_k)
+      N^{q/2-1}P_2L_N(\beta_1),\ldots,
+      N^{q/2-1}P_2L_N(\beta_k)
     \right)
     \Rightarrow
     \left(
@@ -655,8 +660,8 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
   Define
   \begin{equation}\label{eq:Sn}
     S_n=
-    \frac1{\sqrt{2N_n}}
-    \sum_{I\in\calI_n}(g_I^2-1).
+    \frac1{\sqrt{2M_N}}
+    \sum_{I\in\calI_N}(g_I^2-1).
   \end{equation}
   Since the variables $g_I^2-1$ are i.i.d., centered, have variance $2$, and
   have finite third moment, the Lindeberg CLT gives
@@ -667,9 +672,9 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
   \end{equation}
   By \eqref{eq:p2-exact},
   \begin{equation}\label{eq:p2-Sn}
-    n^{q/2-1}P_2L_n(\beta)
+    N^{q/2-1}P_2L_N(\beta)
     =
-    \left(n^{q/2-1}\sqrt{2N_n}\,a_n(\beta)\right)S_n.
+    \left(N^{q/2-1}\sqrt{2M_N}\,a_N(\beta)\right)S_n.
   \end{equation}
   Lemma~\ref{lem:coefficient-limit} identifies the deterministic coefficient.
   The joint convergence follows because all coordinates are deterministic
@@ -683,11 +688,11 @@ assumption by a second-derivative estimate.
 
 \begin{lemma}[Kubo covariance identity]
   \label{lem:kubo-hessian}
-  For every $I,J\in\calI_n$ and every $\beta\in\R$,
+  For every $I,J\in\calI_N$ and every $\beta\in\R$,
   \begin{equation}\label{eq:hessian-kubo}
-    \partial_{g_I}\partial_{g_J}L_n(\beta)
+    \partial_{g_I}\partial_{g_J}L_N(\beta)
     =
-    \beta^2\sigma_n^2\mathcal C_{I,J}(\beta,g).
+    \beta^2\sigma_N^2\mathcal C_{I,J}(\beta,g).
   \end{equation}
   Consequently, under Assumption~\ref{ass:two-marked-susceptibility}, for
   every compact $K\subset(-\beta_{\rm sus},\beta_{\rm sus})$, with
@@ -695,76 +700,76 @@ assumption by a second-derivative estimate.
   \begin{equation}\label{eq:hessian-hs-bound}
     \sup_{\beta\in K}
     \E
-    \sum_{I,J\in\calI_n}
+    \sum_{I,J\in\calI_N}
     \left|
-      \partial_{g_I}\partial_{g_J}L_n(\beta)
+      \partial_{g_I}\partial_{g_J}L_N(\beta)
     \right|^2
     \leq
-    \beta_K^4\frac{((q-1)!)^2}{q!}S_{q,K}n^{2-q}.
+    \beta_K^4\frac{((q-1)!)^2}{q!}S_{q,K}N^{2-q}.
   \end{equation}
 \end{lemma}
 
 \begin{proof}
   Lemma~\ref{lem:first-derivative} gives
   \begin{equation}\label{eq:first-derivative-before-kubo}
-    \partial_{g_I}L_n(\beta)
+    \partial_{g_I}L_N(\beta)
     =
-    \beta\sigma_n\langle\psi_I\rangle_{\beta,g}.
+    -\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
   \end{equation}
   Differentiate $\langle\psi_I\rangle_{\beta,g}$ with respect to $g_J$.
   Using the Duhamel formula
   \begin{equation}\label{eq:duhamel-kubo}
-    \partial_{g_J}e^{\beta H_n(g)}
+    \partial_{g_J}e^{-\beta H_N(g)}
     =
-    \beta\sigma_n
+    -\beta\sigma_N
     \int_0^1
-      e^{s\beta H_n(g)}\psi_J e^{(1-s)\beta H_n(g)}
+      e^{-s\beta H_N(g)}\psi_J e^{-(1-s)\beta H_N(g)}
     \dd s
   \end{equation}
-  and differentiating the denominator $Z_n(\beta)$ gives
+  and differentiating the denominator $Z_N(\beta)$ gives
   \begin{align}\label{eq:derivative-thermal-average}
     \partial_{g_J}\langle\psi_I\rangle_{\beta,g}
     &=
-    \beta\sigma_n
+    -\beta\sigma_N
     \int_0^1
     \left\{
       \frac{
-        \tr\left(\psi_I e^{s\beta H_n(g)}
-        \psi_J e^{(1-s)\beta H_n(g)}\right)
-      }{Z_n(\beta)}
+        \tr\left(\psi_I e^{-s\beta H_N(g)}
+        \psi_J e^{-(1-s)\beta H_N(g)}\right)
+      }{Z_N(\beta)}
       -
       \langle\psi_I\rangle_{\beta,g}
       \langle\psi_J\rangle_{\beta,g}
     \right\}
     \dd s \\
     &=
-    \beta\sigma_n\mathcal C_{I,J}(\beta,g).
+    -\beta\sigma_N\mathcal C_{I,J}(\beta,g).
   \end{align}
   This proves \eqref{eq:hessian-kubo}.  By
   Assumption~\ref{ass:two-marked-susceptibility},
   \begin{align}\label{eq:hessian-hs-bound-proof}
     \sup_{\beta\in K}
     \E
-    \sum_{I,J\in\calI_n}
+    \sum_{I,J\in\calI_N}
     \left|
-      \partial_{g_I}\partial_{g_J}L_n(\beta)
+      \partial_{g_I}\partial_{g_J}L_N(\beta)
     \right|^2
     &\leq
-    \beta_K^4\sigma_n^4
-    \sum_{I\in\calI_n}
+    \beta_K^4\sigma_N^4
+    \sum_{I\in\calI_N}
     S_{q,K} \\
     &\leq
-    \beta_K^4S_{q,K}\sigma_n^4N_n
+    \beta_K^4S_{q,K}\sigma_N^4M_N
     \leq
-    \beta_K^4\frac{((q-1)!)^2}{q!}S_{q,K}n^{2-q},
+    \beta_K^4\frac{((q-1)!)^2}{q!}S_{q,K}N^{2-q},
   \end{align}
-  because $N_n\leq n^q/q!$ and
-  $\sigma_n^4=((q-1)!)^2n^{-2(q-1)}$.
+  because $M_N\leq N^q/q!$ and
+  $\sigma_N^4=((q-1)!)^2N^{-2(q-1)}$.
 \end{proof}
 
 \begin{lemma}[Second Malliavin derivative and chaos tail]
   \label{lem:malliavin-second-tail}
-  Let $F\in\mathbb D^{2,2}(\gamma_n)$ have Hermite expansion
+  Let $F\in\mathbb D^{2,2}(\gamma_N)$ have Hermite expansion
   $F=\sum_{r\geq0}P_rF$.  Then
   \begin{equation}\label{eq:second-malliavin-chaos}
     \E\norm{D^2F}_{\HS}^2
@@ -813,7 +818,7 @@ assumption by a second-derivative estimate.
     \sup_{\beta\in K}
     \E\left[
       \left|
-        n^{q/2-1}\sum_{r\geq3}P_rL_n(\beta)
+        N^{q/2-1}\sum_{r\geq3}P_rL_N(\beta)
       \right|^2
     \right]
     \to0.
@@ -825,43 +830,43 @@ assumption by a second-derivative estimate.
   \begin{equation}\label{eq:higher-orthogonal-sum}
     \E\left[
       \left|
-        n^{q/2-1}\sum_{r\geq3}P_rL_n(\beta)
+        N^{q/2-1}\sum_{r\geq3}P_rL_N(\beta)
       \right|^2
     \right]
     =
-    n^{q-2}\sum_{r\geq3}\norm{P_rL_n(\beta)}_2^2.
+    N^{q-2}\sum_{r\geq3}\norm{P_rL_N(\beta)}_2^2.
   \end{equation}
   Fix $R\geq3$.  Split the sum into $3\leq r\leq R$ and $r>R$.
   Proposition~\ref{prop:finite-chaos-closure} gives
   \begin{equation}\label{eq:finite-part-vanishes}
     \sup_{\beta\in K}
-    n^{q-2}
-    \sum_{r=3}^R\norm{P_rL_n(\beta)}_2^2
+    N^{q-2}
+    \sum_{r=3}^R\norm{P_rL_N(\beta)}_2^2
     \to0.
   \end{equation}
   For the tail, apply Lemma~\ref{lem:malliavin-second-tail} to
-  $F=L_n(\beta)-\E L_n(\beta)$.  Since $D^2F=D^2L_n(\beta)$,
+  $F=L_N(\beta)-\E L_N(\beta)$.  Since $D^2F=D^2L_N(\beta)$,
   Lemma~\ref{lem:kubo-hessian} gives, with
   $\beta_K=\sup_{\beta\in K}|\beta|$,
   \begin{equation}\label{eq:tail-hessian-bound}
     \sup_{\beta\in K}
-    n^{q-2}
-    \sum_{r>R}\norm{P_rL_n(\beta)}_2^2
+    N^{q-2}
+    \sum_{r>R}\norm{P_rL_N(\beta)}_2^2
     \leq
     \frac{\beta_K^4((q-1)!)^2S_{q,K}}{q!R(R-1)}.
   \end{equation}
-  Taking $\limsup_{n\to\infty}$ and then $R\to\infty$ proves
+  Taking $\limsup_{N\to\infty}$ and then $R\to\infty$ proves
   \eqref{eq:higher-chaos-closure}.
 \end{proof}
 
 \begin{proof}[Proof of Theorem~\ref{thm:main-clt}]
   By Proposition~\ref{prop:exact-reduction},
   \begin{equation}\label{eq:Xn-decomposition}
-    X_n(\beta)
+    X_N(\beta)
     =
-    n^{q/2-1}P_2L_n(\beta)
+    N^{q/2-1}P_2L_N(\beta)
     +
-    n^{q/2-1}R_n(\beta).
+    N^{q/2-1}R_N(\beta).
   \end{equation}
   Lemma~\ref{lem:p2-clt} gives the finite-dimensional convergence of the first
   term.  Proposition~\ref{prop:higher-from-two-marked} shows that the second
@@ -963,7 +968,7 @@ Assumption~\ref{ass:two-marked-susceptibility}.
 For a multi-index $\alpha$, call it even if
 \begin{equation}\label{eq:alpha-even-def}
   \sum_{I\ni a}\alpha_I\equiv0\pmod2
-  \qquad\text{for all }a\in[n].
+  \qquad\text{for all }a\in[N].
 \end{equation}
 Only even multi-indices survive by Lemma~\ref{lem:selection}.
 
@@ -976,11 +981,11 @@ Only even multi-indices survive by Lemma~\ref{lem:selection}.
     \left(\left\lfloor\frac{Rq}{2}\right\rfloor+1\right)
     \left(\frac{Rq}{2}\right)^{qR}.
   \end{equation}
-  Then, for every $1\leq r\leq R$ and every $n$,
+  Then, for every $1\leq r\leq R$ and every $N$,
   \begin{equation}\label{eq:even-marked-count}
     \sum_{\substack{|\alpha|=r\\ \alpha\text{ even}}}\frac1{\alpha!}
     \leq
-    E_{q,R}n^{rq/2}.
+    E_{q,R}N^{rq/2}.
   \end{equation}
 \end{lemma}
 
@@ -990,8 +995,8 @@ Only even multi-indices survive by Lemma~\ref{lem:selection}.
   $2$.  Hence the union of the marked edges has size at most $rq/2$.  The number
   of ordered $r$-tuples $(I_1,\ldots,I_r)$ with even incidence is bounded by
   \begin{equation}\label{eq:ordered-even-count}
-    \sum_{v\leq rq/2}\binom{n}{v}\binom{v}{q}^r
-    \leq E_{q,R}n^{rq/2},
+    \sum_{v\leq rq/2}\binom{N}{v}\binom{v}{q}^r
+    \leq E_{q,R}N^{rq/2},
     \qquad 1\leq r\leq R.
   \end{equation}
   A multi-index $\alpha$ with $|\alpha|=r$ corresponds to $r!/\alpha!$
@@ -1007,11 +1012,11 @@ Only even multi-indices survive by Lemma~\ref{lem:selection}.
 
 \begin{remark}[Why the fixed-order formulation is necessary]
   The estimate in Lemma~\ref{lem:even-marked-count} is intentionally stated
-  with $R$ fixed.  A bound of the form $C_q^rn^{rq/2}/r!$, uniformly in $r$, is
+  with $R$ fixed.  A bound of the form $C_q^rN^{rq/2}/r!$, uniformly in $r$, is
   false in general.  For instance, when $q=4$, take disjoint two-point blocks
   $B_1,\ldots,B_r$ and set $I_j=B_j\cup B_{j+1}$, with $B_{r+1}=B_1$.  The
   marked incidence is even, and such cyclic marked cores already have entropy
-  of order $n^{2r}$, with no compensating factor $1/r!$ available uniformly in
+  of order $N^{2r}$, with no compensating factor $1/r!$ available uniformly in
   $r$.  This is why the finite-chaos argument below is valid only for fixed
   $R$.  The present proof avoids any uniform all-orders marked-core counting by
   using the Hessian estimate coming from
@@ -1023,48 +1028,48 @@ Only even multi-indices survive by Lemma~\ref{lem:selection}.
   $\beta_K=\sup_{\beta\in K}|\beta|$.  Then
   \begin{align}\label{eq:finite-chaos-explicit-bound}
     \sup_{\beta\in K}
-    \sum_{r=3}^R\norm{P_rL_n(\beta)}_2^2
+    \sum_{r=3}^R\norm{P_rL_N(\beta)}_2^2
     &\leq
     E_{q,R}
     \sum_{r=3}^R
-    (2^rr!)^2\beta_K^{2r}2^{-qr}((q-1)!)^r
-    n^{r(1-q/2)}.
+    (2^rr!)^2\beta_K^{2r}((q-1)!)^r
+    N^{r(1-q/2)}.
   \end{align}
   In particular,
   \begin{equation}\label{eq:finite-chaos-closure}
     \sup_{\beta\in K}
-    \sum_{r=3}^R\norm{P_rL_n(\beta)}_2^2
+    \sum_{r=3}^R\norm{P_rL_N(\beta)}_2^2
     =
-    o(n^{2-q}).
+    o(N^{2-q}).
   \end{equation}
 \end{proposition}
 
 \begin{proof}
   For $|\alpha|=r$, write $\alpha=e_{I_1}+\cdots+e_{I_r}$ with repetitions.
   Applying Lemma~\ref{lem:log-partition-derivative-bound} with
-  $B_j=\beta\sigma_n\psi_{I_j}$ gives, for $\beta\in K$ and $r\leq R$,
+  $B_j=-\beta\sigma_N\psi_{I_j}$ gives, for $\beta\in K$ and $r\leq R$,
   \begin{equation}\label{eq:fixed-alpha-bound}
-    \left|\E\partial^\alpha L_n(\beta)\right|
+    \left|\E\partial^\alpha L_N(\beta)\right|
     \leq
-    2^rr!\beta_K^r\sigma_n^r2^{-qr/2}.
+    2^rr!\beta_K^r\sigma_N^r.
   \end{equation}
   By Lemma~\ref{lem:hermite-coeff} and orthogonality,
   \begin{equation}\label{eq:Pr-norm-coeff}
-    \norm{P_rL_n(\beta)}_2^2
+    \norm{P_rL_N(\beta)}_2^2
     =
     \sum_{|\alpha|=r}\frac1{\alpha!}
-    \left(\E\partial^\alpha L_n(\beta)\right)^2.
+    \left(\E\partial^\alpha L_N(\beta)\right)^2.
   \end{equation}
   Lemma~\ref{lem:selection} restricts the sum to even $\alpha$.  Hence, using
   Lemma~\ref{lem:even-marked-count},
   \begin{equation}\label{eq:Pr-fixed-bound}
-    \norm{P_rL_n(\beta)}_2^2
+    \norm{P_rL_N(\beta)}_2^2
     \leq
-    E_{q,R}(2^rr!)^2\beta_K^{2r}2^{-qr}
-    \sigma_n^{2r}n^{rq/2}
+    E_{q,R}(2^rr!)^2\beta_K^{2r}
+    \sigma_N^{2r}N^{rq/2}
     =
-    E_{q,R}(2^rr!)^2\beta_K^{2r}2^{-qr}((q-1)!)^r
-    n^{r(1-q/2)}.
+    E_{q,R}(2^rr!)^2\beta_K^{2r}((q-1)!)^r
+    N^{r(1-q/2)}.
   \end{equation}
   Summing \eqref{eq:Pr-fixed-bound} gives
   \eqref{eq:finite-chaos-explicit-bound}.  For $q\geq4$ and $r\geq3$,
@@ -1082,7 +1087,7 @@ Assumption~\ref{ass:two-marked-susceptibility} to a precise high-temperature
 cluster-expansion input.  The source-derivative identity, the finite-order Wick
 reductions, the Duhamel cumulant tree bound, and the connected parity counting
 lemma below are rigorous.  These results explain why the desired estimate has
-the correct power of $n$ and why the remaining small parameter should be
+the correct power of $N$ and why the remaining small parameter should be
 $\beta^2$.  They do not, however, by themselves prove the needed summability:
 repeated hyperedges make a coefficientwise or occurrence-level tree summation
 too crude.  The only unproved input left in this section is therefore stated as
@@ -1096,31 +1101,31 @@ Lemma~\ref{lem:trace-orth} below gives
   =
   \tr(\psi_I\psi_J)
   =
-  2^{-q}\ind_{I=J}.
+  \ind_{I=J}.
 \end{equation}
 Hence
 \begin{equation}\label{eq:kubo-beta-zero-sum}
-  \sup_{I\in\calI_n}
-  \sum_{J\in\calI_n}
+  \sup_{I\in\calI_N}
+  \sum_{J\in\calI_N}
   \left|\mathcal C_{I,J}(0,g)\right|^2
   =
-  2^{-2q}.
+  1.
 \end{equation}
 The target estimate says that this bounded row-susceptibility persists, in
 annealed $L^2$, for sufficiently small $|\beta|$.
 
 \subsection{Source derivatives and finite-order connected coefficients}
 
-For fixed $I,J\in\calI_n$ introduce source variables $u,v$ and set
+For fixed $I,J\in\calI_N$ introduce source variables $u,v$ and set
 \begin{equation}\label{eq:source-log-partition}
   \Lambda_{I,J}(u,v;\beta,g)
   =
-  \log\tr\exp\left(\beta H_n(g)+u\psi_I+v\psi_J\right).
+  \log\tr\exp\left(-\beta H_N(g)+u\psi_I+v\psi_J\right).
 \end{equation}
 
 \begin{lemma}[Kubo covariance as a source derivative]
   \label{lem:kubo-source-derivative}
-  For every $I,J\in\calI_n$,
+  For every $I,J\in\calI_N$,
   \begin{equation}\label{eq:kubo-source-derivative}
     \mathcal C_{I,J}(\beta,g)
     =
@@ -1144,9 +1149,9 @@ For fixed $I,J\in\calI_n$ introduce source variables $u,v$ and set
     \int_0^1
     \left\{
       \frac{
-        \tr\left(\psi_I e^{s\beta H_n(g)}
-        \psi_J e^{(1-s)\beta H_n(g)}\right)
-      }{Z_n(\beta)}
+        \tr\left(\psi_I e^{-s\beta H_N(g)}
+        \psi_J e^{-(1-s)\beta H_N(g)}\right)
+      }{Z_N(\beta)}
       -
       \langle\psi_I\rangle_{\beta,g}
       \langle\psi_J\rangle_{\beta,g}
@@ -1156,7 +1161,7 @@ For fixed $I,J\in\calI_n$ introduce source variables $u,v$ and set
   This is exactly \eqref{eq:kubo-covariance}.
 \end{proof}
 
-For $m\geq0$ and $K_1,\ldots,K_m\in\calI_n$, define the connected Duhamel
+For $m\geq0$ and $K_1,\ldots,K_m\in\calI_N$, define the connected Duhamel
 coefficient
 \begin{equation}\label{eq:connected-duhamel-coeff}
   \kappa(I,J;K_1,
@@ -1173,17 +1178,17 @@ For $M\geq0$, let the $M$-th formal truncation be
   \mathcal C^{[M]}_{I,J}(\beta,g)
   =
   \sum_{m=0}^M
-  \frac{(\beta\sigma_n)^m}{m!}
+  \frac{(-\beta\sigma_N)^m}{m!}
   \sum_{K_1,
-  \ldots,K_m\in\calI_n}
+  \ldots,K_m\in\calI_N}
   g_{K_1}\cdots g_{K_m}
   \kappa(I,J;K_1,
   \ldots,K_m).
 \end{equation}
 
 \begin{remark}[Why only truncations are asserted here]
-  For fixed $n$ and $g$, the source log-partition function is real analytic near
-  the origin, but its complex Taylor radius need not be uniform in $n$ or $g$.
+  For fixed $N$ and $g$, the source log-partition function is real analytic near
+  the origin, but its complex Taylor radius need not be uniform in $N$ or $g$.
   Therefore we do not claim, without an additional high-temperature expansion,
   that the infinite series obtained by sending $M\to\infty$ in
   \eqref{eq:truncated-connected-expansion} converges uniformly.  The needed
@@ -1210,7 +1215,7 @@ informal statement that ``the logarithm keeps only connected diagrams.''  In
 particular, the sharp dependency-graph tree bound for the zero-source
 Duhamel coefficients is proved below.
 
-Let $r\geq1$ and let $E_1,\ldots,E_r\in\calI_n$.  Put
+Let $r\geq1$ and let $E_1,\ldots,E_r\in\calI_N$.  Put
 $A_a=\psi_{E_a}$.  For $S\subset[r]$, define the symmetrized trace moment
 \begin{equation}\label{eq:sym-trace-moment}
   \mu_{\mathbf E}(S)
@@ -1233,7 +1238,7 @@ $E_a\cap E_b\neq\emptyset$.
 
 \begin{lemma}[Duhamel coefficient as an ordinary cumulant]
   \label{lem:duhamel-as-cumulant}
-  For $E_1,\ldots,E_r\in\calI_n$,
+  For $E_1,\ldots,E_r\in\calI_N$,
   \begin{equation}\label{eq:duhamel-as-cumulant}
     \partial_{t_1}\cdots\partial_{t_r}
     \log\tr\exp\left(\sum_{a=1}^r t_a\psi_{E_a}\right)\bigg|_{t=0}
@@ -1324,7 +1329,7 @@ $E_a\cap E_b\neq\emptyset$.
 
 \begin{lemma}[A crude absolute cumulant bound]
   \label{lem:crude-cumulant-bound}
-  For all $E_1,\ldots,E_r\in\calI_n$,
+  For all $E_1,\ldots,E_r\in\calI_N$,
   \begin{equation}\label{eq:crude-cumulant-bound}
     \left|
       \partial_{t_1}\cdots\partial_{t_r}
@@ -1336,7 +1341,7 @@ $E_a\cap E_b\neq\emptyset$.
 \end{lemma}
 
 \begin{proof}
-  Since $\norm{\psi_E}\leq1$ for every $E\in\calI_n$, each symmetrized trace
+  Since $\norm{\psi_E}\leq1$ for every $E\in\calI_N$, each symmetrized trace
   moment satisfies $|\mu_{\mathbf E}(S)|\leq1$.  Hence
   \eqref{eq:duhamel-as-cumulant} gives
   \begin{equation}\label{eq:cumulant-partition-sum-bound}
@@ -1518,7 +1523,7 @@ sharper tree-graph estimate that was previously left as a hypothesis.
 
 \begin{proposition}[Duhamel cumulant tree-graph inequality]
   \label{prop:duhamel-tree-graph}
-  For every $r\geq2$ and every $E_1,\ldots,E_r\in\calI_n$,
+  For every $r\geq2$ and every $E_1,\ldots,E_r\in\calI_N$,
   \begin{equation}\label{eq:duhamel-tree-graph}
     \left|
       \partial_{t_1}\cdots\partial_{t_r}
@@ -1564,7 +1569,7 @@ sharper tree-graph estimate that was previously left as a hypothesis.
   of their unmarked occurrences.  A naive summation over occurrence-level tree
   pairs loses a superexponential factor because repeated hyperedges are counted
   too many times.  The connected parity count below gives the correct power of
-  $n$, but the remaining summability must be proved by the resummed
+  $N$, but the remaining summability must be proved by the resummed
   two-replica cluster-expansion estimate isolated in
   Assumption~\ref{ass:two-replica-cluster-expansion}.
 \end{remark}
@@ -1605,7 +1610,7 @@ coefficients in \eqref{eq:diagram-value} are nonzero.
 
 \begin{lemma}[Finite annealed two-replica formula]
   \label{lem:finite-two-replica-formula}
-  For fixed $M,n,I,J$ and $\beta\in\R$,
+  For fixed $M,N,I,J$ and $\beta\in\R$,
   \begin{equation}\label{eq:finite-two-replica-formula}
     \E\left[
       \left|
@@ -1614,7 +1619,7 @@ coefficients in \eqref{eq:diagram-value} are nonzero.
     \right]
     =
     \sum_{p=0}^M
-    (\beta\sigma_n)^{2p}
+    (\beta\sigma_N)^{2p}
     \sum_{\Gamma\in\mathfrak D_p^{[M]}(I,J)}
     W(\Gamma).
   \end{equation}
@@ -1627,7 +1632,7 @@ coefficients in \eqref{eq:diagram-value} are nonzero.
     \right]
     \leq
     \sum_{p=0}^M
-    |\beta|^{2p}\sigma_n^{2p}
+    |\beta|^{2p}\sigma_N^{2p}
     \sum_{\Gamma\in\mathfrak D_p^{[M]}(I,J)}
     |W(\Gamma)|.
   \end{equation}
@@ -1668,15 +1673,15 @@ freedom.  It is useful in any attempt to prove the cluster-expansion estimate be
 
 \begin{lemma}[Connected parity counting]
   \label{lem:connected-parity-counting}
-  Fix $I\in\calI_n$, $p\geq0$, and $C\subset[p]$.  For
-  $H_1,\ldots,H_p\in\calI_n$, set
+  Fix $I\in\calI_N$, $p\geq0$, and $C\subset[p]$.  For
+  $H_1,\ldots,H_p\in\calI_N$, set
   \begin{equation}\label{eq:J-from-cross-pairs-counting}
     J
     =
     I\triangle\bigtriangleup_{a\in C}H_a.
   \end{equation}
   Let $N_p(I,C)$ be the number of ordered $p$-tuples
-  $(H_1,\ldots,H_p)$ such that $J\in\calI_n$ and the intersection graph on the
+  $(H_1,\ldots,H_p)$ such that $J\in\calI_N$ and the intersection graph on the
   labelled hyperedges
   \begin{equation}\label{eq:counting-labelled-hyperedges}
     I,
@@ -1689,7 +1694,7 @@ freedom.  It is useful in any attempt to prove the cluster-expansion estimate be
   \begin{equation}\label{eq:connected-parity-counting}
     N_p(I,C)
     \leq
-    (2e^2q^2)^p p! n^{(q-1)p}.
+    (2e^2q^2)^p p! N^{(q-1)p}.
   \end{equation}
 \end{lemma}
 
@@ -1786,25 +1791,25 @@ freedom.  It is useful in any attempt to prove the cluster-expansion estimate be
     \leq
     (eq)^p
   \end{equation}
-  ways.  Their labels can be chosen in at most $n^{(q-1)p}$ ways.  Each of the
+  ways.  Their labels can be chosen in at most $N^{(q-1)p}$ ways.  Each of the
   remaining $p$ positions is either one of the $q$ labels in $I$ or copies one
   of the representative outside labels, hence has at most $q+(q-1)p\leq qp+q$
   choices.  Thus
   \begin{equation}\label{eq:counting-final-before-factorial}
     N_p(I,C)
     \leq
-    (eq)^p(qp+q)^p n^{(q-1)p}.
+    (eq)^p(qp+q)^p N^{(q-1)p}.
   \end{equation}
   Since $p+1\leq2p$ and $p^p\leq e^p p!$ for $p\geq1$, this is bounded by
-  $(2e^2q^2)^p p! n^{(q-1)p}$.
+  $(2e^2q^2)^p p! N^{(q-1)p}$.
 \end{proof}
 
 \begin{remark}[Use and limitation of the parity count]
-  Lemma~\ref{lem:connected-parity-counting} gives the correct $n$-power for
+  Lemma~\ref{lem:connected-parity-counting} gives the correct $N$-power for
   Wick-paired diagrams: the cross-pair set $C$ determines
   $J=I\triangle\bigtriangleup_{a\in C}H_a$, so summing over $J$ costs no extra
-  factor $n^{q-1}$.  This is exactly the power needed to cancel
-  $\sigma_n^{2p}=((q-1)!)^p n^{-(q-1)p}$.  However, the lemma counts only label
+  factor $N^{q-1}$.  This is exactly the power needed to cancel
+  $\sigma_N^{2p}=((q-1)!)^p N^{-(q-1)p}$.  However, the lemma counts only label
   assignments.  It does not by itself control the entropy of two occurrence-level
   Duhamel trees after Wick pairing.  That remaining entropy is exactly why the remaining input is stated as a
   resummed cluster-expansion estimate below.
@@ -1840,18 +1845,18 @@ show why the last input must be a genuinely annealed two-replica estimate.
   \label{lem:single-replica-activity-fails}
   Let
   \begin{equation}\label{eq:single-activity-def}
-    \eta_K(g)=\exp\left(c|\beta|\sigma_n|g_K|\right)-1
+    \eta_K(g)=\exp\left(c|\beta|\sigma_N|g_K|\right)-1
   \end{equation}
-  for a fixed constant $c>0$.  For every fixed $I\in\calI_n$ and every fixed
+  for a fixed constant $c>0$.  For every fixed $I\in\calI_N$ and every fixed
   $\beta\neq0$,
   \begin{equation}\label{eq:single-activity-diverges}
-    \sum_{K\in\calI_n:K\cap I\neq\emptyset}\E\eta_K(g)
+    \sum_{K\in\calI_N:K\cap I\neq\emptyset}\E\eta_K(g)
     \geq
     \frac{cq|\beta|}{2}
     \sqrt{\frac{2}{\pi(q-1)!}}\,
-    n^{(q-1)/2}
+    N^{(q-1)/2}
   \end{equation}
-  for all large $n$.
+  for all large $N$.
 \end{lemma}
 
 \begin{proof}
@@ -1859,27 +1864,27 @@ show why the last input must be a genuinely annealed two-replica estimate.
   \begin{equation}\label{eq:eta-first-order}
     \E\eta_K(g)
     \geq
-    c|\beta|\sigma_n\sqrt{\frac2\pi}.
+    c|\beta|\sigma_N\sqrt{\frac2\pi}.
   \end{equation}
   On the other hand,
   \begin{equation}\label{eq:number-touching-I}
-    \#\{K\in\calI_n:K\cap I\neq\emptyset\}
+    \#\{K\in\calI_N:K\cap I\neq\emptyset\}
     =
-    \binom nq-\binom{n-q}{q}
+    \binom Nq-\binom{N-q}{q}
     \geq
-    \frac{q}{2(q-1)!}n^{q-1}
+    \frac{q}{2(q-1)!}N^{q-1}
   \end{equation}
-  for all large $n$, because the left-hand side is a polynomial in $n$ with
+  for all large $N$, because the left-hand side is a polynomial in $N$ with
   leading coefficient $q/(q-1)!$.  Using
-  $\sigma_n=((q-1)!)^{1/2}n^{-(q-1)/2}$ gives
+  $\sigma_N=((q-1)!)^{1/2}N^{-(q-1)/2}$ gives
   \eqref{eq:single-activity-diverges}.
 \end{proof}
 
 \begin{remark}
   Lemma~\ref{lem:single-replica-activity-fails} rules out a standard
   deterministic Kotecky--Preiss proof based on absolute single-edge activities.
-  The small parameter cannot be $\sigma_n$ itself.  It must be the Wick-paired
-  parameter $\sigma_n^2n^{q-1}=O_q(1)$ together with $\beta^2$.
+  The small parameter cannot be $\sigma_N$ itself.  It must be the Wick-paired
+  parameter $\sigma_N^2N^{q-1}=O_q(1)$ together with $\beta^2$.
 \end{remark}
 
 The next observation records the other failure mode.  Even after identifying
@@ -1907,7 +1912,7 @@ coefficient is too fine a decomposition.
 \end{lemma}
 
 \begin{proof}
-  Choose a fixed set $S\subset[n]$ with $|S|=q-1$ and distinct points
+  Choose a fixed set $S\subset[N]$ with $|S|=q-1$ and distinct points
   $x_0,x_1,\ldots,x_s\notin S$.  Set
   \begin{equation}\label{eq:bad-family-Ej}
     E_j=S\cup\{x_j\},
@@ -1915,19 +1920,18 @@ coefficient is too fine a decomposition.
     A_j=\psi_{E_j}.
   \end{equation}
   Since $|E_i\cap E_j|=q-1$ is odd for $i\neq j$, the operators
-  $A_0,A_1,\ldots,A_s$ anticommute pairwise.  Also $A_j^2=2^{-q}\I$.
+  $A_0,A_1,\ldots,A_s$ anticommute pairwise.  Also $A_j^2=\I$.
   Therefore
   \begin{equation}\label{eq:anticommuting-cosh}
     \tr\exp\left(x_0A_0+\sum_{j=1}^s z_jA_j\right)
     =
     \cosh\left(
-      2^{-q/2}
       \sqrt{x_0^2+\sum_{j=1}^s z_j^2}
     \right).
   \end{equation}
   Writing
   \begin{equation}\label{eq:hq-def}
-    h_q(w)=\log\cosh\left(2^{-q/2}\sqrt w\right),
+    h_q(w)=\log\cosh\left(\sqrt w\right),
   \end{equation}
   we get
   \begin{equation}\label{eq:bad-source-derivative-hq}
@@ -1981,7 +1985,7 @@ coefficient is too fine a decomposition.
   There exist constants $B_q<\infty$ and $\beta_{\rm ce}>0$, depending only on
   $q$, such that the following statements hold for $|\beta|<\beta_{\rm ce}$.
 
-  First, for all $n$ and $I,J\in\calI_n$,
+  First, for all $N$ and $I,J\in\calI_N$,
   \begin{equation}\label{eq:cluster-convergence}
     \mathcal C^{[M]}_{I,J}(\beta,g)
     \to
@@ -2016,9 +2020,9 @@ coefficient is too fine a decomposition.
   The layers satisfy the row-wise $L^2$ estimate
   \begin{equation}\label{eq:resummed-layer-bound}
     \sup_{M\geq0}
-    \sup_{n\geq1}
-    \sup_{I\in\calI_n}
-    \sum_{J\in\calI_n}
+    \sup_{N\geq1}
+    \sup_{I\in\calI_N}
+    \sum_{J\in\calI_N}
     \E\left[
       \left|
         \mathcal A^{[M]}_{p;I,J}(\beta,g)
@@ -2039,10 +2043,10 @@ coefficient is too fine a decomposition.
   resummed two-replica cluster layers.  This is plausible for small $|\beta|$
   because each Wick pair contributes the factor
   \begin{equation}\label{eq:sigma-pair-cancellation}
-    \sigma_n^2=(q-1)!n^{-(q-1)},
+    \sigma_N^2=(q-1)!N^{-(q-1)},
   \end{equation}
-  while a new connected $q$-hyperedge has at most order $n^{q-1}$ choices once
-  it is required to touch the already exposed cluster.  Thus the $n$-powers
+  while a new connected $q$-hyperedge has at most order $N^{q-1}$ choices once
+  it is required to touch the already exposed cluster.  Thus the $N$-powers
   cancel pair by pair and the remaining expansion should be subcritical for
   small $|\beta|$.  This is the two-marked $L^2$ analogue of the sparse
   connected-component summability used in the high-temperature free-energy
@@ -2074,10 +2078,10 @@ coefficient is too fine a decomposition.
   Fix $|\beta|<\min\{\beta_{\rm ce},B_q^{-1/2}\}$.  For the finite truncation,
   Minkowski's inequality
   in the Hilbert space
-  $L^2(\dd\gamma(g);\ell^2(\calI_n))$ gives, uniformly in $M,n,I$,
+  $L^2(\dd\gamma(g);\ell^2(\calI_N))$ gives, uniformly in $M,N,I$,
   \begin{align}\label{eq:cluster-to-susceptibility-proof}
     \left(
-      \sum_{J\in\calI_n}
+      \sum_{J\in\calI_N}
       \E\left[
         \left|
           \mathcal C^{[M]}_{I,J}(\beta,g)
@@ -2087,7 +2091,7 @@ coefficient is too fine a decomposition.
     &\leq
     \sum_{p=0}^M
     \left(
-      \sum_{J\in\calI_n}
+      \sum_{J\in\calI_N}
       \E\left[
         \left|
           \mathcal A^{[M]}_{p;I,J}(\beta,g)
@@ -2098,10 +2102,10 @@ coefficient is too fine a decomposition.
     \sum_{p=0}^M
     (B_q^{1/2}|\beta|)^p.
   \end{align}
-  The right-hand side is bounded uniformly in $M,n,I$.  Taking $M\to\infty$
+  The right-hand side is bounded uniformly in $M,N,I$.  Taking $M\to\infty$
   and using \eqref{eq:cluster-convergence}, we obtain
   \begin{equation}\label{eq:susceptibility-from-cluster-limit}
-    \sum_{J\in\calI_n}
+    \sum_{J\in\calI_N}
     \E\left[
       \left|
         \mathcal C_{I,J}(\beta,g)
@@ -2123,7 +2127,7 @@ coefficient is too fine a decomposition.
   The exact source-derivative representation, the finite connected Duhamel
   coefficients, the dependency-graph Duhamel tree bound, the connected parity
   counting lemma, and the finite Wick-paired two-replica formula are proved
-  above.  These results justify the structure and the expected $n$-scaling of
+above.  These results justify the structure and the expected $N$-scaling of
   the remaining cluster expansion.  What is still not proved is
   Assumption~\ref{ass:two-replica-cluster-expansion}: the construction of a
   resummed two-replica expansion for the Kubo covariance and the uniform row-wise
@@ -2134,7 +2138,7 @@ coefficient is too fine a decomposition.
 \section{\texorpdfstring{Small-$\beta$ consistency check}{Small-beta consistency check}}
 
 \begin{lemma}[Trace of a nontrivial Majorana monomial]\label{lem:trace-monomial-zero}
-  If $A\subset[n]$ is nonempty, then
+  If $A\subset[N]$ is nonempty, then
   \begin{equation}\label{eq:trace-monomial-zero}
     \tr\left(\prod_{a\in A}\psi_a\right)=0.
   \end{equation}
@@ -2149,94 +2153,94 @@ coefficient is too fine a decomposition.
 \end{proof}
 
 \begin{lemma}[Trace orthogonality]\label{lem:trace-orth}
-  For $I,J\in\calI_n$,
+  For $I,J\in\calI_N$,
   \begin{equation}\label{eq:trace-orth}
-    \tr(\psi_I\psi_J)=2^{-q}\ind_{I=J}.
+    \tr(\psi_I\psi_J)=\ind_{I=J}.
   \end{equation}
 \end{lemma}
 
 \begin{proof}
-  If $I=J$, then $\psi_I^2=2^{-q}\I$.  If $I\neq J$, the product
+  If $I=J$, then $\psi_I^2=\I$.  If $I\neq J$, the product
   $\psi_I\psi_J$ is, up to a scalar, a nontrivial Majorana monomial supported
   on $I\triangle J$, so Lemma~\ref{lem:trace-monomial-zero} applies.
 \end{proof}
 
 \begin{proposition}[Leading small-$\beta$ fluctuation]\label{prop:small-beta}
-  As $\beta\to0$ with $n$ and $g$ fixed,
+  As $\beta\to0$ with $N$ and $g$ fixed,
   \begin{equation}\label{eq:small-beta-expansion}
-    L_n(\beta)
+    L_N(\beta)
     =
-    \frac{\beta^2}{2}\tr(H_n^2)
+    \frac{\beta^2}{2}\tr(H_N^2)
     +
-    \mathcal R_n(\beta),
+    \mathcal R_N(\beta),
     \qquad
-    |\mathcal R_n(\beta)|
+    |\mathcal R_N(\beta)|
     \leq
-    8|\beta|^3\norm{H_n}^3,
+    8|\beta|^3\norm{H_N}^3,
   \end{equation}
   and
   \begin{equation}\label{eq:tr-H2}
-    \tr(H_n^2)=2^{-q}\sigma_n^2\sum_{I\in\calI_n}g_I^2.
+    \tr(H_N^2)=\sigma_N^2\sum_{I\in\calI_N}g_I^2.
   \end{equation}
-  Consequently the leading random term in $L_n(\beta)-\E L_n(\beta)$ is
+  Consequently the leading random term in $L_N(\beta)-\E L_N(\beta)$ is
   \begin{equation}\label{eq:leading-random-term}
-    \frac{\beta^2}{2}2^{-q}\sigma_n^2
-    \sum_{I\in\calI_n}(g_I^2-1),
+    \frac{\beta^2}{2}\sigma_N^2
+    \sum_{I\in\calI_N}(g_I^2-1),
   \end{equation}
   and
   \begin{equation}\label{eq:small-beta-variance}
     \Var\left[
-      n^{q/2-1}
-      \frac{\beta^2}{2}2^{-q}\sigma_n^2
-      \sum_{I\in\calI_n}(g_I^2-1)
+      N^{q/2-1}
+      \frac{\beta^2}{2}\sigma_N^2
+      \sum_{I\in\calI_N}(g_I^2-1)
     \right]
     \to
-    \frac{((q-1)!)^2}{2^{2q+1}q!}\beta^4.
+    \frac{((q-1)!)^2}{2q!}\beta^4.
   \end{equation}
 \end{proposition}
 
 \begin{proof}
-  Let $F(\beta)=\log\tr e^{\beta H_n}$.  Since $\tr(H_n)=0$ by
+  Let $F(\beta)=\log\tr e^{-\beta H_N}$.  Since $\tr(H_N)=0$ by
   Lemma~\ref{lem:trace-monomial-zero}, we have $F(0)=F'(0)=0$ and
-  $F''(0)=\tr(H_n^2)$.  Lemma~\ref{lem:log-partition-derivative-bound}, applied
-  with $B_1=B_2=B_3=H_n$, gives
-  $|F'''(t)|\leq2^3 3!\norm{H_n}^3$ for all real $t$.  Taylor's formula gives
+  $F''(0)=\tr(H_N^2)$.  Lemma~\ref{lem:log-partition-derivative-bound}, applied
+  with $B_1=B_2=B_3=H_N$, gives
+  $|F'''(t)|\leq2^3 3!\norm{H_N}^3$ for all real $t$.  Taylor's formula gives
   the remainder bound in \eqref{eq:small-beta-expansion}.  By
   Lemma~\ref{lem:trace-orth},
   \begin{equation}\label{eq:tr-H2-proof}
-    \tr(H_n^2)
+    \tr(H_N^2)
     =
-    \sigma_n^2\sum_{I,J\in\calI_n}g_Ig_J\tr(\psi_I\psi_J)
+    \sigma_N^2\sum_{I,J\in\calI_N}g_Ig_J\tr(\psi_I\psi_J)
     =
-    2^{-q}\sigma_n^2\sum_{I\in\calI_n}g_I^2.
+    \sigma_N^2\sum_{I\in\calI_N}g_I^2.
   \end{equation}
   This proves \eqref{eq:tr-H2} and \eqref{eq:leading-random-term}.  Since
   $\Var(g_I^2-1)=2$,
   \begin{equation}\label{eq:small-beta-var-proof}
     \Var\left[
-      n^{q/2-1}
-      \frac{\beta^2}{2}2^{-q}\sigma_n^2
+      N^{q/2-1}
+      \frac{\beta^2}{2}\sigma_N^2
       \sum_I(g_I^2-1)
     \right]
     =
-    n^{q-2}\frac{\beta^4}{4}2^{-2q}\sigma_n^4 2N_n.
+    N^{q-2}\frac{\beta^4}{4}\sigma_N^4 2M_N.
   \end{equation}
-  Using $\sigma_n^2=(q-1)!n^{-(q-1)}$ and $N_n\sim n^q/q!$ gives
+  Using $\sigma_N^2=(q-1)!N^{-(q-1)}$ and $M_N\sim N^q/q!$ gives
   \eqref{eq:small-beta-variance}.
 \end{proof}
 
 \begin{remark}[Check against the covariance formula]
   The leading small-$\beta$ free-energy density is
   \begin{equation}\label{eq:ell-small-beta}
-    \ell_q(\beta)=\frac{\beta^2}{2^{q+1}q}+O(\beta^4),
+    \ell_q(\beta)=\frac{\beta^2}{2q}+O(\beta^4),
     \qquad
-    \ell_q'(\beta)=\frac{\beta}{2^q q}+O(\beta^3).
+    \ell_q'(\beta)=\frac{\beta}{q}+O(\beta^3).
   \end{equation}
   Hence
   \begin{equation}\label{eq:covariance-small-beta-match}
     \frac{q!}{2}(\beta\ell_q'(\beta))^2
     =
-    \frac{((q-1)!)^2}{2^{2q+1}q!}\beta^4+O(\beta^6),
+    \frac{((q-1)!)^2}{2q!}\beta^4+O(\beta^6),
   \end{equation}
   which matches \eqref{eq:small-beta-variance}.
 \end{remark}
