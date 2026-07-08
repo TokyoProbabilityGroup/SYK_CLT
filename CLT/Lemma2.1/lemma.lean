@@ -56,8 +56,8 @@ theorem convex_convergence_deriv_tendstoUniformlyOn
       exact mem_cthickening_of_dist_le (x + h) x δ K hxK (by
         simpa [Real.dist_eq, abs_of_nonneg hh.le] using hle)
     constructor
-    · exact (hconv n).slope_le_deriv hxmhI hxI (by linarith) (hfdiff n x hxI)
-    · exact (hconv n).deriv_le_slope hxI hxphI (by linarith) (hfdiff n x hxI)
+    · exact (hconv n).slope_le_deriv hxmhI hxI (sub_lt_self x hh) (hfdiff n x hxI)
+    · exact (hconv n).deriv_le_slope hxI hxphI (lt_add_of_pos_right x hh) (hfdiff n x hxI)
   -- The remaining argument is the standard secant squeeze from convexity:
   -- for `x ∈ K` and small positive `h`, the derivative of `f n` at `x` lies
   -- between the left and right secant slopes.  Uniform convergence controls
