@@ -1,0 +1,2215 @@
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,top=22mm,bottom=25mm,left=22mm,right=22mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\mathtoolsset{showonlyrefs=true}
+\setlength{\emergencystretch}{2em}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\calI}{\mathcal{I}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\dd}{\,d}
+\newcommand{\ind}{\mathbf{1}}
+\newcommand{\norm}[1]{\left\lVert #1\right\rVert}
+\newcommand{\abs}[1]{\left\lvert #1\right\rvert}
+\newcommand{\HS}{\mathrm{HS}}
+\newcommand{\Comp}{\operatorname{Comp}}
+
+\title{A high-temperature CLT for the SYK free energy: a two-replica cluster-expansion reduction}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  This note gives a detailed Gaussian-chaos proof of the finite-dimensional
+  high-temperature central limit theorem for the Gaussian SYK free energy,
+  conditional on one explicitly isolated two-marked susceptibility estimate.
+  The analytic derivative part of the LLN is proved from locally uniform
+  high-temperature convergence by a deterministic convexity argument.  The first
+  chaos vanishes by Majorana sign-gauge symmetry.  The second chaos is computed
+  exactly and is a scalar multiple of $\sum_I(g_I^2-1)$.  The fixed finite
+  higher chaoses are proved to be negligible.  The infinite chaos tail is no
+  longer controlled by a uniform all-orders marked-core estimate; instead it is
+  controlled by the Hilbert--Schmidt norm of the Hessian, via the standard
+  Malliavin identity.  The proof of the two-marked high-temperature susceptibility is pushed as far
+  as possible.  The Duhamel cumulant identities, the dependency-graph
+  tree bound for the zero-source Duhamel coefficients, and the connected
+  parity counting lemma are proved explicitly.  The remaining input is isolated
+  as a resummed two-replica $L^2$ cluster-expansion estimate.  This assumption
+  is deliberately stated separately from the proved coefficientwise and
+  counting lemmas, because repeated hyperedges make the naive occurrence-level
+  tree summation too crude.
+\end{abstract}
+
+\paragraph{Status.}
+The result of Gamarnik--Pernice--Schmidhuber--Zlokapa gives the high-temperature
+free-energy limit by a sparse-hypergraph and saddle-point analysis, while
+Anschuetz--Chen--Kiani--King give an annealed/quenched comparison strong enough
+for the LLN level.  The proof below uses these only as the locally uniform LLN
+input.  The CLT-level reduction is the Gaussian-chaos analysis.  The remaining
+input is reduced to a two-point, rather than all-orders, marked estimate: a
+uniform $L^2$ bound on the Kubo covariance matrix of two SYK monomials.  This is
+stated in Assumption~\ref{ass:two-marked-susceptibility}.
+
+
+\newpage
+\tableofcontents
+\newpage
+
+\section*{Reader's guide and dependency of assumptions}
+\addcontentsline{toc}{section}{Reader's guide and dependency of assumptions}
+
+This note is meant to separate the purely Gaussian-chaos part of the CLT from
+one genuinely high-temperature cluster-expansion input.  The only input which is
+not proved in the present note is the resummed two-replica $L^2$ cluster
+expansion, Assumption~\ref{ass:two-replica-cluster-expansion}.  Once this
+assumption is supplied, the rest of the CLT proof is self-contained.
+
+The logical dependencies are as follows.  The LLN input is
+Assumption~\ref{ass:local-lln}.  The remaining CLT-level input is first stated in
+the softer form of the two-marked susceptibility estimate,
+Assumption~\ref{ass:two-marked-susceptibility}.  Section~\ref{sec:two-marked-proof-attempt}
+then reduces this susceptibility estimate to the more structural cluster
+assumption, Assumption~\ref{ass:two-replica-cluster-expansion}.  In symbols,
+\begin{equation}\label{eq:reader-main-dependency}
+  \begin{gathered}
+    \text{Assumption~\ref{ass:local-lln}}
+    +
+    \text{Assumption~\ref{ass:two-replica-cluster-expansion}}
+    \\
+    \Longrightarrow
+    \text{Assumption~\ref{ass:two-marked-susceptibility}}
+    \Longrightarrow
+    \text{Theorem~\ref{thm:main-clt}}.
+  \end{gathered}
+\end{equation}
+Equivalently, after the LLN input, the only genuinely unproved input is
+Assumption~\ref{ass:two-replica-cluster-expansion}.
+
+More explicitly, the proof is organized through the following chain.
+\begin{equation}\label{eq:reader-chain}
+  \begin{gathered}
+    \text{resummed two-replica }L^2\text{ cluster expansion}
+    \\
+    \Longrightarrow
+    \text{two-marked susceptibility}
+    \Longrightarrow
+    \text{Hilbert--Schmidt Hessian bound}
+    \\
+    \Longrightarrow
+    \text{infinite chaos tail closure}
+    \Longrightarrow
+    \text{rank-one second-chaos CLT}.
+  \end{gathered}
+\end{equation}
+
+The parts proved in this note are the following.
+\begin{enumerate}[label=\textup{(\roman*)},leftmargin=*]
+  \item The derivative convergence
+  $n^{-1}\partial_\beta\E L_n(\beta)\to\ell_q'(\beta)$ is derived from the
+  locally uniform LLN by convexity; see Proposition~\ref{prop:derivative-lln-from-lln}.
+
+  \item The first chaos vanishes by Majorana sign-gauge symmetry, and the second
+  chaos is computed exactly; see Lemma~\ref{lem:selection},
+  Lemma~\ref{lem:second-chaos}, and Proposition~\ref{prop:exact-reduction}.
+
+  \item The second chaos gives the whole limiting Gaussian field once the higher
+  chaoses are negligible; see Lemma~\ref{lem:p2-clt}.
+
+  \item The two-marked susceptibility implies a Hilbert--Schmidt bound on the
+  Hessian, and this yields the infinite chaos tail closure by the Malliavin
+  identity; see Lemma~\ref{lem:kubo-hessian},
+  Lemma~\ref{lem:malliavin-second-tail}, and
+  Proposition~\ref{prop:higher-from-two-marked}.
+
+  \item The fixed finite chaoses are negligible by a finite marked-diagram
+  counting estimate; see Proposition~\ref{prop:finite-chaos-closure}.
+
+  \item The zero-source Duhamel cumulants admit a dependency-graph tree bound,
+  and the connected parity counting lemma is proved; see
+  Proposition~\ref{prop:duhamel-tree-graph} and
+  Lemma~\ref{lem:connected-parity-counting}.
+\end{enumerate}
+
+The parts not proved in this note are deliberately isolated.  The naive
+single-replica activity expansion fails because the absolute activity has size
+$n^{(q-1)/2}$ near a marked edge.  The naive coefficientwise tree expansion also
+fails because repeated hyperedges create occurrence-level entropy which should
+be resummed.  These failures are recorded in
+Subsection~\ref{subsec:why-naive-cluster-fails}.  Thus the correct missing input
+is not a coefficientwise tree estimate, but the resummed two-replica estimate of
+Assumption~\ref{ass:two-replica-cluster-expansion}.
+
+For a first reading, one can read Sections~1--7 for the CLT reduction, then read
+the statement of Assumption~\ref{ass:two-replica-cluster-expansion} and
+Proposition~\ref{prop:cluster-expansion-to-susceptibility}.  The remaining part
+of Section~\ref{sec:two-marked-proof-attempt} explains why this assumption is
+the natural high-temperature input and why the more naive alternatives are too
+strong.
+
+\section{Model and main theorem}
+
+Fix an even integer $q\geq4$.  Let $n$ be even and let
+$\psi_1,\ldots,\psi_n$ be Majorana operators on $\C^{2^{n/2}}$ satisfying
+\begin{equation}\label{eq:majorana-relations}
+  \psi_i\psi_j+\psi_j\psi_i=\delta_{ij}\I.
+\end{equation}
+Thus $\psi_i^2=\frac12\I$.  For $I=\{i_1<\cdots<i_q\}\subset[n]$, set
+\begin{equation}\label{eq:psiI}
+  \psi_I=i^{q/2}\psi_{i_1}\cdots\psi_{i_q}.
+\end{equation}
+Then $\psi_I$ is Hermitian and $\psi_I^2=2^{-q}\I$.
+
+Let
+\begin{equation}\label{eq:calI-Nn}
+  \calI_n=\{I\subset[n]: |I|=q\},
+  \qquad
+  N_n=|\calI_n|=\binom{n}{q}.
+\end{equation}
+Let $(g_I)_{I\in\calI_n}$ be i.i.d. standard Gaussian random variables and set
+\begin{equation}\label{eq:sigma}
+  \sigma_n^2=\frac{(q-1)!}{n^{q-1}}.
+\end{equation}
+The Gaussian SYK Hamiltonian is
+\begin{equation}\label{eq:Hn}
+  H_n(g)=\sigma_n\sum_{I\in\calI_n}g_I\psi_I.
+\end{equation}
+We use normalized trace $\tr=2^{-n/2}\Tr$ and define
+\begin{equation}\label{eq:Zn-Ln}
+  Z_n(\beta)=\tr\exp(\beta H_n(g)),
+  \qquad
+  L_n(\beta)=\log Z_n(\beta).
+\end{equation}
+
+For an observable $A$, write
+\begin{equation}\label{eq:thermal-average}
+  \langle A\rangle_{\beta,g}
+  =
+  \frac{\tr(Ae^{\beta H_n(g)})}{\tr(e^{\beta H_n(g)})}.
+\end{equation}
+For $I,J\in\calI_n$, define the Kubo connected covariance
+\begin{equation}\label{eq:kubo-covariance}
+  \mathcal C_{I,J}(\beta,g)
+  =
+  \int_0^1
+  \left\{
+    \frac{
+      \tr\left(\psi_I e^{s\beta H_n(g)}
+      \psi_J e^{(1-s)\beta H_n(g)}\right)
+    }{Z_n(\beta)}
+    -
+    \langle\psi_I\rangle_{\beta,g}
+    \langle\psi_J\rangle_{\beta,g}
+  \right\}
+  \dd s.
+\end{equation}
+The rescaled centered fluctuation is
+\begin{equation}\label{eq:Xn}
+  X_n(\beta)=n^{q/2-1}\bigl(L_n(\beta)-\E L_n(\beta)\bigr).
+\end{equation}
+Let $P_r$ be the orthogonal projection in $L^2$ of the Gaussian disorder onto
+the $r$-th homogeneous Wiener chaos.
+
+The proof uses the following LLN input from the high-temperature free-energy
+analysis.  The derivative part is not assumed separately; it is proved in
+Proposition~\ref{prop:derivative-lln-from-lln}.
+
+\begin{assumption}[Locally uniform high-temperature LLN]\label{ass:local-lln}
+  There exist $\beta_0=\beta_0(q)>0$ and an analytic function
+  $\ell_q:(-\beta_0,\beta_0)\to\R$ such that, for every compact
+  $K\subset(-\beta_0,\beta_0)$,
+  \begin{equation}\label{eq:local-lln}
+    \sup_{\beta\in K}
+    \left|
+      \frac1n\E L_n(\beta)-\ell_q(\beta)
+    \right|\to0.
+  \end{equation}
+\end{assumption}
+
+\begin{remark}\label{rem:literature-input}
+  In the present normalization, Assumption~\ref{ass:local-lln} is the precise
+  LLN form extracted from the high-temperature result of
+  \cite{GPSZ2026}, together with the Gaussian universality used there and the
+  annealed/quenched comparison of \cite{ACKK2025}.  The latter gives an error
+  $O_q(\beta^2n^{-q/2})$ at the level of free-energy density, so it is smaller
+  than the LLN scale.  The proof below does not use any CLT statement from
+  these references.
+\end{remark}
+
+The CLT-level input is the following high-temperature two-marked susceptibility
+estimate.  Section~\ref{sec:two-marked-proof-attempt} reduces this estimate to
+a single explicit, plausible, but presently unproved input: the resummed
+two-replica $L^2$ cluster-expansion estimate in
+Assumption~\ref{ass:two-replica-cluster-expansion}.
+
+\begin{assumption}[Two-marked high-temperature susceptibility]
+  \label{ass:two-marked-susceptibility}
+  There exists $\beta_{\rm sus}=\beta_{\rm sus}(q)>0$ such that, for every
+  compact $K\subset(-\beta_{\rm sus},\beta_{\rm sus})$, there is
+  $C_{q,K}<\infty$ satisfying, for all $n$,
+  \begin{equation}\label{eq:two-marked-susceptibility}
+    \sup_{\beta\in K}
+    \sup_{I\in\calI_n}
+    \sum_{J\in\calI_n}
+    \E\left[
+      \left|
+        \mathcal C_{I,J}(\beta,g)
+      \right|^2
+    \right]
+    \leq
+    C_{q,K}.
+  \end{equation}
+\end{assumption}
+
+\begin{theorem}[High-temperature CLT from two-marked susceptibility]
+  \label{thm:main-clt}
+  Assume Assumptions~\ref{ass:local-lln} and
+  \ref{ass:two-marked-susceptibility}.  Let
+  \begin{equation}\label{eq:beta-star}
+    \beta_*<\min\{\beta_0,\beta_{\rm sus}\}.
+  \end{equation}
+  Then, for every finite set $\beta_1,\ldots,\beta_k\in(-\beta_*,\beta_*)$,
+  \begin{equation}\label{eq:fdd-clt}
+    (X_n(\beta_1),\ldots,X_n(\beta_k))
+    \Rightarrow
+    \left(
+      \sqrt{\frac{q!}{2}}\,\beta_1\ell_q'(\beta_1)\xi,
+      \ldots,
+      \sqrt{\frac{q!}{2}}\,\beta_k\ell_q'(\beta_k)\xi
+    \right),
+  \end{equation}
+  where $\xi\sim\N(0,1)$.  Equivalently, the limiting covariance is
+  \begin{equation}\label{eq:limit-covariance}
+    \Cov(\calG_q(\beta),\calG_q(\beta'))
+    =
+    \frac{q!}{2}\beta\ell_q'(\beta)\beta'\ell_q'(\beta').
+  \end{equation}
+\end{theorem}
+
+\section{Derivative LLN from convexity}
+
+\begin{lemma}[Convex convergence implies derivative convergence]
+  \label{lem:convex-derivative}
+  Let $I\subset\R$ be an open interval.  Let $f_n:I\to\R$ be differentiable
+  convex functions and assume that $f_n\to f$ locally uniformly on $I$, where
+  $f\in C^1(I)$.  Then, for every compact $K\subset I$,
+  \begin{equation}\label{eq:convex-derivative-conclusion}
+    \sup_{x\in K}|f_n'(x)-f'(x)|\to0.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  Fix a compact $K\subset I$.  Choose $h_0>0$ such that
+  $K+[-h_0,h_0]\subset I$.  For $0<h<h_0$ and $x\in K$, convexity gives
+  \begin{equation}\label{eq:convex-difference-squeeze}
+    \frac{f_n(x)-f_n(x-h)}{h}
+    \leq f_n'(x)
+    \leq
+    \frac{f_n(x+h)-f_n(x)}{h}.
+  \end{equation}
+  Put
+  \begin{equation}\label{eq:epsilon-nh}
+    \epsilon_n(h)=\sup_{y\in K+[-h,h]}|f_n(y)-f(y)|.
+  \end{equation}
+  Then $\epsilon_n(h)\to0$ for fixed $h$.  From
+  \eqref{eq:convex-difference-squeeze},
+  \begin{equation}\label{eq:upper-convex-derivative}
+    f_n'(x)-f'(x)
+    \leq
+    \frac{f(x+h)-f(x)}{h}-f'(x)
+    +\frac{2\epsilon_n(h)}{h},
+  \end{equation}
+  and
+  \begin{equation}\label{eq:lower-convex-derivative}
+    f_n'(x)-f'(x)
+    \geq
+    \frac{f(x)-f(x-h)}{h}-f'(x)
+    -\frac{2\epsilon_n(h)}{h}.
+  \end{equation}
+  Since $f'$ is uniformly continuous on $K+[-h_0,h_0]$, the deterministic
+  difference-quotient errors converge to zero uniformly on $K$ as $h\downarrow0$.
+  First choose $h$ and then choose $n$ to make $\epsilon_n(h)/h$ small.  This
+  proves the claim.
+\end{proof}
+
+\begin{proposition}[Derivative-strength LLN]
+  \label{prop:derivative-lln-from-lln}
+  Under Assumption~\ref{ass:local-lln}, for every compact
+  $K\subset(-\beta_0,\beta_0)$,
+  \begin{equation}\label{eq:derivative-lln}
+    \sup_{\beta\in K}
+    \left|
+      \frac1n\partial_\beta\E L_n(\beta)-\ell_q'(\beta)
+    \right|
+    \to0.
+  \end{equation}
+\end{proposition}
+
+\begin{proof}
+  Let $f_n(\beta)=n^{-1}\E L_n(\beta)$.  For fixed disorder,
+  $\beta\mapsto L_n(\beta)$ is convex, because $L_n''(\beta)$ is the thermal
+  variance of $H_n(g)$.  Therefore $f_n$ is convex.  Differentiability follows
+  by differentiating under the Gaussian expectation; this is justified by
+  $\norm{H_n(g)}\leq C_{q,n}\sum_I|g_I|$ and Gaussian exponential
+  integrability in finite dimension.  Assumption~\ref{ass:local-lln} gives
+  locally uniform convergence of $f_n$ to the analytic, hence $C^1$, function
+  $\ell_q$.  Lemma~\ref{lem:convex-derivative} gives
+  \eqref{eq:derivative-lln}.
+\end{proof}
+
+\section{Hermite decomposition and gauge selection}
+
+Let $\gamma_n$ be the product Gaussian law of $(g_I)_{I\in\calI_n}$.  For a
+multi-index $\alpha=(\alpha_I)_{I\in\calI_n}$ define
+\begin{equation}\label{eq:multi-index}
+  |\alpha|=\sum_{I\in\calI_n}\alpha_I,
+  \qquad
+  \alpha!=\prod_{I\in\calI_n}\alpha_I!,
+  \qquad
+  H_\alpha(g)=\prod_{I\in\calI_n}h_{\alpha_I}(g_I),
+\end{equation}
+where $h_k$ is the probabilists' Hermite polynomial.
+
+\begin{lemma}[Hermite coefficient formula]\label{lem:hermite-coeff}
+  For every fixed $\beta\in\R$,
+  \begin{equation}\label{eq:chaos-decomposition}
+    L_n(\beta)-\E L_n(\beta)
+    =
+    \sum_{r\geq1}P_rL_n(\beta)
+  \end{equation}
+  in $L^2(\gamma_n)$, and
+  \begin{equation}\label{eq:hermite-coeff}
+    P_rL_n(\beta)
+    =
+    \sum_{|\alpha|=r}c_{n,\alpha}(\beta)H_\alpha(g),
+    \qquad
+    c_{n,\alpha}(\beta)
+    =
+    \frac1{\alpha!}\E[\partial^\alpha L_n(\beta)].
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  The map $g\mapsto L_n(\beta)$ is $C^\infty$ and has at most exponential
+  growth in the finite-dimensional Gaussian vector $g$.  Hence its Hermite
+  expansion converges in $L^2(\gamma_n)$.  Orthogonality gives
+  \begin{equation}\label{eq:hermite-projection}
+    P_rL_n(\beta)
+    =
+    \sum_{|\alpha|=r}
+    \frac{\E[L_n(\beta)H_\alpha(g)]}{\alpha!}H_\alpha(g).
+  \end{equation}
+  Repeated Gaussian integration by parts gives
+  \begin{equation}\label{eq:gibp-hermite}
+    \E[L_n(\beta)H_\alpha(g)]=\E[\partial^\alpha L_n(\beta)],
+  \end{equation}
+  proving \eqref{eq:hermite-coeff}.
+\end{proof}
+
+For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
+\begin{equation}\label{eq:chi-s}
+  \chi_s(I)=\prod_{a\in I}s_a,
+  \qquad
+  (\chi_sg)_I=\chi_s(I)g_I.
+\end{equation}
+
+\begin{lemma}[Majorana sign-gauge invariance]\label{lem:gauge-invariance}
+  For every $s\in\{\pm1\}^n$ and every $g$,
+  \begin{equation}\label{eq:gauge-invariance}
+    L_n(\beta,g)=L_n(\beta,\chi_sg).
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  The family $(s_a\psi_a)_{a=1}^n$ satisfies the same Clifford relations as
+  $(\psi_a)_{a=1}^n$.  By uniqueness of the irreducible complex Clifford
+  representation, there exists a unitary $U_s$ such that
+  \begin{equation}\label{eq:unitary-sign-flip}
+    U_s\psi_aU_s^*=s_a\psi_a
+    \qquad
+    \text{for all }a\in[n].
+  \end{equation}
+  Hence $U_s\psi_IU_s^*=\chi_s(I)\psi_I$ and
+  \begin{equation}\label{eq:H-gauge}
+    U_sH_n(g)U_s^*=H_n(\chi_sg).
+  \end{equation}
+  The normalized trace is unitary invariant, so $Z_n(\beta,g)=Z_n(\beta,\chi_sg)$.
+  Taking logarithms proves the claim.
+\end{proof}
+
+\begin{lemma}[Gauge parity selection rule]\label{lem:selection}
+  Let $\alpha$ be a multi-index.  If there exists $a\in[n]$ such that
+  \begin{equation}\label{eq:selection-rule}
+    \sum_{I\ni a}\alpha_I\equiv1\pmod2,
+  \end{equation}
+  then $c_{n,\alpha}(\beta)=0$.  In particular,
+  \begin{equation}\label{eq:first-chaos-zero}
+    P_1L_n(\beta)=0,
+  \end{equation}
+  and for $I\neq J$,
+  \begin{equation}\label{eq:off-diag-second-zero}
+    \E[\partial_{g_I}\partial_{g_J}L_n(\beta)]=0.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  Since $\chi_sg$ has the same law as $g$ and $L_n(\beta,\chi_sg)=L_n(\beta,g)$,
+  \begin{equation}\label{eq:coeff-gauge}
+    c_{n,\alpha}(\beta)
+    =
+    \frac1{\alpha!}\E[L_n(\beta,g)H_\alpha(\chi_sg)].
+  \end{equation}
+  Since $h_k(-x)=(-1)^kh_k(x)$,
+  \begin{equation}\label{eq:Hermite-sign}
+    H_\alpha(\chi_sg)
+    =
+    \prod_{a=1}^n s_a^{\sum_{I\ni a}\alpha_I}H_\alpha(g).
+  \end{equation}
+  If \eqref{eq:selection-rule} holds, choose $s_a=-1$ and $s_b=1$ for
+  $b\neq a$.  Then $c_{n,\alpha}(\beta)=-c_{n,\alpha}(\beta)$, so
+  $c_{n,\alpha}(\beta)=0$.  The first-chaos statement follows by taking
+  $\alpha=e_I$.  If $I\neq J$, choose $a\in I\triangle J$ and take
+  $\alpha=e_I+e_J$.
+\end{proof}
+
+\section{Exact second chaos}
+
+\begin{lemma}[First derivative identity]\label{lem:first-derivative}
+  For every $I\in\calI_n$,
+  \begin{equation}\label{eq:first-derivative}
+    \partial_{g_I}L_n(\beta)=\beta\sigma_n\langle\psi_I\rangle_{\beta,g}.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  By the derivative formula for the matrix exponential,
+  \begin{equation}\label{eq:exp-derivative}
+    \partial_{g_I}e^{\beta H_n(g)}
+    =
+    \beta\sigma_n
+    \int_0^1
+      e^{(1-t)\beta H_n(g)}\psi_I e^{t\beta H_n(g)}
+    \dd t.
+  \end{equation}
+  After taking normalized trace, cyclicity makes the integrand independent of
+  $t$ and equal to $\tr(\psi_Ie^{\beta H_n(g)})$.  Dividing by $Z_n(\beta)$
+  proves \eqref{eq:first-derivative}.
+\end{proof}
+
+\begin{lemma}[Exact second chaos]\label{lem:second-chaos}
+  There exists a scalar $a_n(\beta)$ such that
+  \begin{equation}\label{eq:p2-exact}
+    P_2L_n(\beta)=a_n(\beta)\sum_{I\in\calI_n}(g_I^2-1).
+  \end{equation}
+  Moreover,
+  \begin{equation}\label{eq:an-coeff}
+    2N_na_n(\beta)=\beta\partial_\beta\E L_n(\beta).
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  The second chaos has the form
+  \begin{equation}\label{eq:p2-general}
+    P_2L_n(\beta)
+    =
+    \sum_{I\in\calI_n}c_{2e_I}(\beta)(g_I^2-1)
+    +
+    \sum_{I<J}c_{e_I+e_J}(\beta)g_Ig_J.
+  \end{equation}
+  By Lemma~\ref{lem:selection}, the off-diagonal coefficients vanish.  The
+  diagonal coefficient is independent of $I$ by permutation symmetry of the
+  Majorana labels and exchangeability of the disorder.  This gives
+  \eqref{eq:p2-exact}; write the common coefficient as $a_n(\beta)$.
+
+  By Lemma~\ref{lem:hermite-coeff},
+  \begin{equation}\label{eq:an-second-derivative}
+    a_n(\beta)=\frac12\E[\partial_{g_I}^2L_n(\beta)].
+  \end{equation}
+  Summing over $I$ and using Gaussian integration by parts,
+  \begin{equation}\label{eq:gibp-second-chaos}
+    2N_na_n(\beta)
+    =
+    \sum_{I\in\calI_n}\E[\partial_{g_I}^2L_n(\beta)]
+    =
+    \sum_{I\in\calI_n}\E[g_I\partial_{g_I}L_n(\beta)].
+  \end{equation}
+  By Lemma~\ref{lem:first-derivative},
+  \begin{equation}\label{eq:g-derivative-sum}
+    \sum_{I\in\calI_n}g_I\partial_{g_I}L_n(\beta)
+    =
+    \beta\sigma_n\sum_{I\in\calI_n}g_I\langle\psi_I\rangle_{\beta,g}
+    =
+    \beta\partial_\beta L_n(\beta).
+  \end{equation}
+  Taking expectation proves \eqref{eq:an-coeff}.
+\end{proof}
+
+\begin{proposition}[Exact reduction to the diagonal second chaos]
+  \label{prop:exact-reduction}
+  For every fixed $\beta\in\R$,
+  \begin{equation}\label{eq:exact-reduction}
+    L_n(\beta)-\E L_n(\beta)
+    =
+    \frac{\beta\partial_\beta\E L_n(\beta)}{2N_n}
+    \sum_{I\in\calI_n}(g_I^2-1)
+    +
+    R_n(\beta),
+  \end{equation}
+  where
+  \begin{equation}\label{eq:Rn}
+    R_n(\beta)=\sum_{r\geq3}P_rL_n(\beta).
+  \end{equation}
+\end{proposition}
+
+\begin{proof}
+  Combine the Hermite decomposition, the identity $P_1L_n=0$, and
+  Lemma~\ref{lem:second-chaos}.
+\end{proof}
+
+\section{The second-chaos CLT}
+
+\begin{lemma}[Asymptotic coefficient]\label{lem:coefficient-limit}
+  Under Assumption~\ref{ass:local-lln}, for every compact
+  $K\subset(-\beta_0,\beta_0)$,
+  \begin{equation}\label{eq:coefficient-limit}
+    \sup_{\beta\in K}
+    \left|
+      n^{q/2-1}\sqrt{2N_n}\,a_n(\beta)
+      -
+      \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)
+    \right|
+    \to0.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  By \eqref{eq:an-coeff},
+  \begin{equation}\label{eq:an-from-derivative}
+    a_n(\beta)=\frac{\beta\partial_\beta\E L_n(\beta)}{2N_n}.
+  \end{equation}
+  Proposition~\ref{prop:derivative-lln-from-lln} gives, uniformly for
+  $\beta\in K$,
+  \begin{equation}\label{eq:derivative-asymptotic}
+    \partial_\beta\E L_n(\beta)=n\ell_q'(\beta)+o(n).
+  \end{equation}
+  Since $N_n=\binom{n}{q}\sim n^q/q!$,
+  \begin{equation}\label{eq:Nn-asymptotic}
+    \frac{n^{q/2}}{\sqrt{2N_n}}\to\sqrt{\frac{q!}{2}}.
+  \end{equation}
+  Substituting these estimates into \eqref{eq:an-from-derivative} proves the
+  result.
+\end{proof}
+
+\begin{lemma}[Second-chaos CLT]\label{lem:p2-clt}
+  Under Assumption~\ref{ass:local-lln}, for any fixed
+  $\beta_1,\ldots,\beta_k\in(-\beta_0,\beta_0)$,
+  \begin{equation}\label{eq:p2-clt}
+    \left(
+      n^{q/2-1}P_2L_n(\beta_1),\ldots,
+      n^{q/2-1}P_2L_n(\beta_k)
+    \right)
+    \Rightarrow
+    \left(
+      \sqrt{\frac{q!}{2}}\,\beta_1\ell_q'(\beta_1)\xi,
+      \ldots,
+      \sqrt{\frac{q!}{2}}\,\beta_k\ell_q'(\beta_k)\xi
+    \right),
+  \end{equation}
+  where $\xi\sim\N(0,1)$.
+\end{lemma}
+
+\begin{proof}
+  Define
+  \begin{equation}\label{eq:Sn}
+    S_n=
+    \frac1{\sqrt{2N_n}}
+    \sum_{I\in\calI_n}(g_I^2-1).
+  \end{equation}
+  Since the variables $g_I^2-1$ are i.i.d., centered, have variance $2$, and
+  have finite third moment, the Lindeberg CLT gives
+  \begin{equation}\label{eq:Sn-clt}
+    S_n\Rightarrow\xi,
+    \qquad
+    \xi\sim\N(0,1).
+  \end{equation}
+  By \eqref{eq:p2-exact},
+  \begin{equation}\label{eq:p2-Sn}
+    n^{q/2-1}P_2L_n(\beta)
+    =
+    \left(n^{q/2-1}\sqrt{2N_n}\,a_n(\beta)\right)S_n.
+  \end{equation}
+  Lemma~\ref{lem:coefficient-limit} identifies the deterministic coefficient.
+  The joint convergence follows because all coordinates are deterministic
+  multiples of the same scalar $S_n$.
+\end{proof}
+
+\section{Higher-chaos closure from two-marked susceptibility}
+
+The next two elementary facts replace the former all-orders marked-tail
+assumption by a second-derivative estimate.
+
+\begin{lemma}[Kubo covariance identity]
+  \label{lem:kubo-hessian}
+  For every $I,J\in\calI_n$ and every $\beta\in\R$,
+  \begin{equation}\label{eq:hessian-kubo}
+    \partial_{g_I}\partial_{g_J}L_n(\beta)
+    =
+    \beta^2\sigma_n^2\mathcal C_{I,J}(\beta,g).
+  \end{equation}
+  Consequently, under Assumption~\ref{ass:two-marked-susceptibility}, for
+  every compact $K\subset(-\beta_{\rm sus},\beta_{\rm sus})$,
+  \begin{equation}\label{eq:hessian-hs-bound}
+    \sup_{\beta\in K}
+    \E
+    \sum_{I,J\in\calI_n}
+    \left|
+      \partial_{g_I}\partial_{g_J}L_n(\beta)
+    \right|^2
+    \leq
+    C_{q,K}n^{2-q}.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  Lemma~\ref{lem:first-derivative} gives
+  \begin{equation}\label{eq:first-derivative-before-kubo}
+    \partial_{g_I}L_n(\beta)
+    =
+    \beta\sigma_n\langle\psi_I\rangle_{\beta,g}.
+  \end{equation}
+  Differentiate $\langle\psi_I\rangle_{\beta,g}$ with respect to $g_J$.
+  Using the Duhamel formula
+  \begin{equation}\label{eq:duhamel-kubo}
+    \partial_{g_J}e^{\beta H_n(g)}
+    =
+    \beta\sigma_n
+    \int_0^1
+      e^{s\beta H_n(g)}\psi_J e^{(1-s)\beta H_n(g)}
+    \dd s
+  \end{equation}
+  and differentiating the denominator $Z_n(\beta)$ gives
+  \begin{align}\label{eq:derivative-thermal-average}
+    \partial_{g_J}\langle\psi_I\rangle_{\beta,g}
+    &=
+    \beta\sigma_n
+    \int_0^1
+    \left\{
+      \frac{
+        \tr\left(\psi_I e^{s\beta H_n(g)}
+        \psi_J e^{(1-s)\beta H_n(g)}\right)
+      }{Z_n(\beta)}
+      -
+      \langle\psi_I\rangle_{\beta,g}
+      \langle\psi_J\rangle_{\beta,g}
+    \right\}
+    \dd s \\
+    &=
+    \beta\sigma_n\mathcal C_{I,J}(\beta,g).
+  \end{align}
+  This proves \eqref{eq:hessian-kubo}.  By
+  Assumption~\ref{ass:two-marked-susceptibility},
+  \begin{align}\label{eq:hessian-hs-bound-proof}
+    \E
+    \sum_{I,J\in\calI_n}
+    \left|
+      \partial_{g_I}\partial_{g_J}L_n(\beta)
+    \right|^2
+    &\leq
+    \beta^4\sigma_n^4
+    \sum_{I\in\calI_n}
+    C_{q,K} \\
+    &\leq
+    C_{q,K}\sigma_n^4N_n
+    \leq
+    C_{q,K}n^{2-q},
+  \end{align}
+  because $\sigma_n^4N_n\asymp n^{-2(q-1)}n^q=n^{2-q}$.
+\end{proof}
+
+\begin{lemma}[Second Malliavin derivative and chaos tail]
+  \label{lem:malliavin-second-tail}
+  Let $F\in\mathbb D^{2,2}(\gamma_n)$ have Hermite expansion
+  $F=\sum_{r\geq0}P_rF$.  Then
+  \begin{equation}\label{eq:second-malliavin-chaos}
+    \E\norm{D^2F}_{\HS}^2
+    =
+    \sum_{r\geq2}r(r-1)\norm{P_rF}_2^2.
+  \end{equation}
+  In particular, for every $R\geq2$,
+  \begin{equation}\label{eq:tail-from-hessian}
+    \sum_{r>R}\norm{P_rF}_2^2
+    \leq
+    \frac{1}{R(R-1)}
+    \E\norm{D^2F}_{\HS}^2.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  It is enough to check the identity for a finite Hermite polynomial and then
+  pass to the limit by monotone convergence of the chaos-side and closability of
+  the Malliavin derivative.  For a multi-index $\alpha$,
+  \begin{equation}\label{eq:second-derivative-Hermite}
+    \partial_{g_I}\partial_{g_J}H_\alpha
+    =
+    \begin{cases}
+      \alpha_I\alpha_J
+      H_{\alpha-e_I-e_J}, & I\neq J, \\
+      \alpha_I(\alpha_I-1)H_{\alpha-2e_I}, & I=J.
+    \end{cases}
+  \end{equation}
+  Using $\E[H_\alpha^2]=\alpha!$ and summing over $I,J$, one gets, for
+  $|\alpha|=r$,
+  \begin{equation}\label{eq:Hessian-Halpha}
+    \E\norm{D^2H_\alpha}_{\HS}^2
+    =
+    r(r-1)\alpha!.
+  \end{equation}
+  Orthogonality of Hermite polynomials of different multi-index then gives
+  \eqref{eq:second-malliavin-chaos}.  Since $r(r-1)\geq R(R-1)$ for
+  $r>R$, \eqref{eq:tail-from-hessian} follows.
+\end{proof}
+
+\begin{proposition}[Two-marked susceptibility implies higher-chaos closure]
+  \label{prop:higher-from-two-marked}
+  Under Assumption~\ref{ass:two-marked-susceptibility}, for every compact
+  $K\subset(-\beta_{\rm sus},\beta_{\rm sus})$,
+  \begin{equation}\label{eq:higher-chaos-closure}
+    \sup_{\beta\in K}
+    \E\left[
+      \left|
+        n^{q/2-1}\sum_{r\geq3}P_rL_n(\beta)
+      \right|^2
+    \right]
+    \to0.
+  \end{equation}
+\end{proposition}
+
+\begin{proof}
+  Orthogonality of homogeneous chaoses gives
+  \begin{equation}\label{eq:higher-orthogonal-sum}
+    \E\left[
+      \left|
+        n^{q/2-1}\sum_{r\geq3}P_rL_n(\beta)
+      \right|^2
+    \right]
+    =
+    n^{q-2}\sum_{r\geq3}\norm{P_rL_n(\beta)}_2^2.
+  \end{equation}
+  Fix $R\geq3$.  Split the sum into $3\leq r\leq R$ and $r>R$.
+  Proposition~\ref{prop:finite-chaos-closure} gives
+  \begin{equation}\label{eq:finite-part-vanishes}
+    \sup_{\beta\in K}
+    n^{q-2}
+    \sum_{r=3}^R\norm{P_rL_n(\beta)}_2^2
+    \to0.
+  \end{equation}
+  For the tail, apply Lemma~\ref{lem:malliavin-second-tail} to
+  $F=L_n(\beta)-\E L_n(\beta)$.  Since $D^2F=D^2L_n(\beta)$,
+  Lemma~\ref{lem:kubo-hessian} gives
+  \begin{equation}\label{eq:tail-hessian-bound}
+    \sup_{\beta\in K}
+    n^{q-2}
+    \sum_{r>R}\norm{P_rL_n(\beta)}_2^2
+    \leq
+    \frac{C_{q,K}}{R(R-1)}.
+  \end{equation}
+  Taking $\limsup_{n\to\infty}$ and then $R\to\infty$ proves
+  \eqref{eq:higher-chaos-closure}.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main-clt}]
+  By Proposition~\ref{prop:exact-reduction},
+  \begin{equation}\label{eq:Xn-decomposition}
+    X_n(\beta)
+    =
+    n^{q/2-1}P_2L_n(\beta)
+    +
+    n^{q/2-1}R_n(\beta).
+  \end{equation}
+  Lemma~\ref{lem:p2-clt} gives the finite-dimensional convergence of the first
+  term.  Proposition~\ref{prop:higher-from-two-marked} shows that the second
+  term is negligible in $L^2$, uniformly on compact subintervals of
+  $(-\beta_*,\beta_*)$.  Slutsky's theorem proves the finite-dimensional CLT.
+\end{proof}
+
+\section{Fixed finite chaos estimates}
+
+This section proves the fixed finite chaos estimate used in the Hessian-tail
+argument.  Thus the only infinite-tail input needed for the CLT is the
+second-derivative estimate supplied by
+Assumption~\ref{ass:two-marked-susceptibility}.
+
+\begin{lemma}[Log-partition derivative bound]
+  \label{lem:log-partition-derivative-bound}
+  There is a universal constant $C<\infty$ such that the following holds.  Let
+  $K$ and $B_1,\ldots,B_r$ be Hermitian matrices.  Put
+  \begin{equation}\label{eq:logZ-general}
+    \Phi(x_1,\ldots,x_r)
+    =
+    \log\tr\exp\left(K+\sum_{j=1}^r x_jB_j\right).
+  \end{equation}
+  Then
+  \begin{equation}\label{eq:log-partition-derivative-bound}
+    \left|
+      \partial_{x_1}\cdots\partial_{x_r}\Phi(0)
+    \right|
+    \leq
+    C^r r!\prod_{j=1}^r\norm{B_j}.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  Let $\mathcal Z(x)=\tr\exp(K+\sum_jx_jB_j)$ and $Z_0=\mathcal Z(0)$.  The
+  Duhamel formula gives, for distinct variables $x_{i_1},\ldots,x_{i_m}$,
+  \begin{equation}\label{eq:DmZ}
+    \partial_{i_1}\cdots\partial_{i_m}\mathcal Z(0)
+    =
+    \sum_{\pi\in S_m}
+    \int_{\Delta_m}
+    \tr\left(
+      e^{t_0K}B_{i_{\pi(1)}}e^{t_1K}\cdots
+      B_{i_{\pi(m)}}e^{t_mK}
+    \right)\dd t.
+  \end{equation}
+  Here $\Delta_m=\{t_j\geq0:\sum_{j=0}^m t_j=1\}$.  By noncommutative Holder,
+  each trace in \eqref{eq:DmZ} is bounded in absolute value by
+  \begin{equation}\label{eq:holder-bound-DmZ}
+    Z_0\prod_{j=1}^m\norm{B_{i_j}}.
+  \end{equation}
+  Therefore
+  \begin{equation}\label{eq:DmZ-bound}
+    \left|
+      \frac{\partial_{i_1}\cdots\partial_{i_m}\mathcal Z(0)}{Z_0}
+    \right|
+    \leq
+    m!\prod_{j=1}^m\norm{B_{i_j}}.
+  \end{equation}
+  The derivative of $\log\mathcal Z$ is obtained from the usual moment-cumulant
+  formula over set partitions:
+  \begin{equation}\label{eq:partition-log-derivative}
+    \partial_1\cdots\partial_r\log\mathcal Z(0)
+    =
+    \sum_{\Pi\in\mathsf P([r])}
+    (-1)^{|\Pi|-1}(|\Pi|-1)!
+    \prod_{A\in\Pi}
+    \frac{\partial_A\mathcal Z(0)}{Z_0}.
+  \end{equation}
+  Applying \eqref{eq:DmZ-bound} to every block gives
+  \begin{equation}\label{eq:partition-bound}
+    \left|
+      \partial_1\cdots\partial_r\log\mathcal Z(0)
+    \right|
+    \leq
+    \left(
+      \sum_{\Pi\in\mathsf P([r])}(|\Pi|-1)!\prod_{A\in\Pi}|A|!
+    \right)
+    \prod_{j=1}^r\norm{B_j}.
+  \end{equation}
+  The combinatorial factor is at most $C^rr!$ for a universal $C$.  This proves
+  \eqref{eq:log-partition-derivative-bound}.  Repeated variables follow by
+  polarization or by the same formula with repeated labels.
+\end{proof}
+
+For a multi-index $\alpha$, call it even if
+\begin{equation}\label{eq:alpha-even-def}
+  \sum_{I\ni a}\alpha_I\equiv0\pmod2
+  \qquad\text{for all }a\in[n].
+\end{equation}
+Only even multi-indices survive by Lemma~\ref{lem:selection}.
+
+\begin{lemma}[Counting even marked hypergraphs at fixed order]
+  \label{lem:even-marked-count}
+  Fix an even integer $q$ and $R\geq1$.  Then there exists
+  $C_{q,R}<\infty$ such that, for every $1\leq r\leq R$ and every $n$,
+  \begin{equation}\label{eq:even-marked-count}
+    \sum_{\substack{|\alpha|=r\\ \alpha\text{ even}}}\frac1{\alpha!}
+    \leq
+    C_{q,R}n^{rq/2}.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  If $\alpha$ is even and $|\alpha|=r$, the total marked incidence degree is
+  $rq$ and every vertex touched by the marked hyperedges has degree at least
+  $2$.  Hence the union of the marked edges has size at most $rq/2$.  The number
+  of ordered $r$-tuples $(I_1,\ldots,I_r)$ with even incidence is bounded by
+  \begin{equation}\label{eq:ordered-even-count}
+    \sum_{v\leq rq/2}\binom{n}{v}\binom{v}{q}^r
+    \leq C_{q,R}n^{rq/2},
+    \qquad 1\leq r\leq R.
+  \end{equation}
+  A multi-index $\alpha$ with $|\alpha|=r$ corresponds to $r!/\alpha!$
+  ordered tuples.  Therefore
+  \begin{equation}\label{eq:multiindex-from-ordered-count}
+    \sum_{\substack{|\alpha|=r\\ \alpha\text{ even}}}\frac1{\alpha!}
+    =
+    \frac1{r!}
+    \#\{(I_1,\ldots,I_r):\text{ the induced incidence is even}\},
+  \end{equation}
+  and the preceding ordered-tuple bound proves the claim after enlarging
+  $C_{q,R}$.
+\end{proof}
+
+\begin{remark}[Why the fixed-order formulation is necessary]
+  The estimate in Lemma~\ref{lem:even-marked-count} is intentionally stated
+  with $R$ fixed.  A bound of the form $C_q^rn^{rq/2}/r!$, uniformly in $r$, is
+  false in general.  For instance, when $q=4$, take disjoint two-point blocks
+  $B_1,\ldots,B_r$ and set $I_j=B_j\cup B_{j+1}$, with $B_{r+1}=B_1$.  The
+  marked incidence is even, and such cyclic marked cores already have entropy
+  of order $n^{2r}$, with no compensating factor $1/r!$ available uniformly in
+  $r$.  This is why the finite-chaos argument below is valid only for fixed
+  $R$.  The present proof avoids any uniform all-orders marked-core counting by
+  using the Hessian estimate coming from
+  Assumption~\ref{ass:two-marked-susceptibility}.
+\end{remark}
+
+\begin{proposition}[Finite-chaos closure]\label{prop:finite-chaos-closure}
+  Fix $R\geq3$ and a compact $K\subset\R$.  Then
+  \begin{equation}\label{eq:finite-chaos-closure}
+    \sup_{\beta\in K}
+    \sum_{r=3}^R\norm{P_rL_n(\beta)}_2^2
+    =
+    o(n^{2-q}).
+  \end{equation}
+\end{proposition}
+
+\begin{proof}
+  For $|\alpha|=r$, write $\alpha=e_{I_1}+\cdots+e_{I_r}$ with repetitions.
+  Applying Lemma~\ref{lem:log-partition-derivative-bound} with
+  $B_j=\beta\sigma_n\psi_{I_j}$ gives, for $\beta\in K$ and $r\leq R$,
+  \begin{equation}\label{eq:fixed-alpha-bound}
+    \left|\E\partial^\alpha L_n(\beta)\right|
+    \leq C_{R,K,q}\sigma_n^r.
+  \end{equation}
+  By Lemma~\ref{lem:hermite-coeff} and orthogonality,
+  \begin{equation}\label{eq:Pr-norm-coeff}
+    \norm{P_rL_n(\beta)}_2^2
+    =
+    \sum_{|\alpha|=r}\frac1{\alpha!}
+    \left(\E\partial^\alpha L_n(\beta)\right)^2.
+  \end{equation}
+  Lemma~\ref{lem:selection} restricts the sum to even $\alpha$.  Hence, using
+  Lemma~\ref{lem:even-marked-count},
+  \begin{equation}\label{eq:Pr-fixed-bound}
+    \norm{P_rL_n(\beta)}_2^2
+    \leq
+    C_{R,K,q}\sigma_n^{2r}n^{rq/2}
+    \leq
+    C_{R,K,q}n^{r(1-q/2)}.
+  \end{equation}
+  For $q\geq4$ and $r\geq3$, $r(1-q/2)<2-q$.  Summing over fixed
+  $3\leq r\leq R$ proves the proposition.
+\end{proof}
+
+
+
+\section{Proof attempt for the two-marked susceptibility estimate}
+\label{sec:two-marked-proof-attempt}
+
+This section pushes the proof of
+Assumption~\ref{ass:two-marked-susceptibility} to a precise high-temperature
+cluster-expansion input.  The source-derivative identity, the finite-order Wick
+reductions, the Duhamel cumulant tree bound, and the connected parity counting
+lemma below are rigorous.  These results explain why the desired estimate has
+the correct power of $n$ and why the remaining small parameter should be
+$\beta^2$.  They do not, however, by themselves prove the needed summability:
+repeated hyperedges make a coefficientwise or occurrence-level tree summation
+too crude.  The only unproved input left in this section is therefore stated as
+a separate resummed two-replica $L^2$ cluster-expansion estimate,
+Assumption~\ref{ass:two-replica-cluster-expansion}.
+
+At $\beta=0$, the Kubo covariance is diagonal.  Indeed,
+Lemma~\ref{lem:trace-orth} below gives
+\begin{equation}\label{eq:kubo-beta-zero}
+  \mathcal C_{I,J}(0,g)
+  =
+  \tr(\psi_I\psi_J)
+  =
+  2^{-q}\ind_{I=J}.
+\end{equation}
+Hence
+\begin{equation}\label{eq:kubo-beta-zero-sum}
+  \sup_{I\in\calI_n}
+  \sum_{J\in\calI_n}
+  \left|\mathcal C_{I,J}(0,g)\right|^2
+  =
+  2^{-2q}.
+\end{equation}
+The target estimate says that this bounded row-susceptibility persists, in
+annealed $L^2$, for sufficiently small $|\beta|$.
+
+\subsection{Source derivatives and finite-order connected coefficients}
+
+For fixed $I,J\in\calI_n$ introduce source variables $u,v$ and set
+\begin{equation}\label{eq:source-log-partition}
+  \Lambda_{I,J}(u,v;\beta,g)
+  =
+  \log\tr\exp\left(\beta H_n(g)+u\psi_I+v\psi_J\right).
+\end{equation}
+
+\begin{lemma}[Kubo covariance as a source derivative]
+  \label{lem:kubo-source-derivative}
+  For every $I,J\in\calI_n$,
+  \begin{equation}\label{eq:kubo-source-derivative}
+    \mathcal C_{I,J}(\beta,g)
+    =
+    \partial_u\partial_v\Lambda_{I,J}(u,v;\beta,g)\big|_{u=v=0}.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  First differentiate \eqref{eq:source-log-partition} with respect to $u$.
+  By the Duhamel formula and cyclicity of trace,
+  \begin{equation}\label{eq:first-source-derivative}
+    \partial_u\Lambda_{I,J}(u,v;\beta,g)\big|_{u=v=0}
+    =
+    \langle\psi_I\rangle_{\beta,g}.
+  \end{equation}
+  Differentiating this identity with respect to $v$ and applying the Duhamel
+  formula once more gives
+  \begin{align}\label{eq:second-source-derivative-proof}
+    \partial_u\partial_v\Lambda_{I,J}(u,v;\beta,g)\big|_{u=v=0}
+    &=
+    \int_0^1
+    \left\{
+      \frac{
+        \tr\left(\psi_I e^{s\beta H_n(g)}
+        \psi_J e^{(1-s)\beta H_n(g)}\right)
+      }{Z_n(\beta)}
+      -
+      \langle\psi_I\rangle_{\beta,g}
+      \langle\psi_J\rangle_{\beta,g}
+    \right\}
+    \dd s.
+  \end{align}
+  This is exactly \eqref{eq:kubo-covariance}.
+\end{proof}
+
+For $m\geq0$ and $K_1,\ldots,K_m\in\calI_n$, define the connected Duhamel
+coefficient
+\begin{equation}\label{eq:connected-duhamel-coeff}
+  \kappa(I,J;K_1,
+  \ldots,K_m)
+  =
+  \partial_u\partial_v\partial_{t_1}\cdots\partial_{t_m}
+  \log\tr\exp\left(
+    u\psi_I+v\psi_J+
+    \sum_{a=1}^m t_a\psi_{K_a}
+  \right)\bigg|_{u=v=t_1=\cdots=t_m=0}.
+\end{equation}
+For $M\geq0$, let the $M$-th formal truncation be
+\begin{equation}\label{eq:truncated-connected-expansion}
+  \mathcal C^{[M]}_{I,J}(\beta,g)
+  =
+  \sum_{m=0}^M
+  \frac{(\beta\sigma_n)^m}{m!}
+  \sum_{K_1,
+  \ldots,K_m\in\calI_n}
+  g_{K_1}\cdots g_{K_m}
+  \kappa(I,J;K_1,
+  \ldots,K_m).
+\end{equation}
+
+\begin{remark}[Why only truncations are asserted here]
+  For fixed $n$ and $g$, the source log-partition function is real analytic near
+  the origin, but its complex Taylor radius need not be uniform in $n$ or $g$.
+  Therefore we do not claim, without an additional high-temperature expansion,
+  that the infinite series obtained by sending $M\to\infty$ in
+  \eqref{eq:truncated-connected-expansion} converges uniformly.  The needed
+  convergence is included explicitly in the resummed cluster-expansion input,
+  Assumption~\ref{ass:two-replica-cluster-expansion}, below.
+\end{remark}
+
+The word ``connected'' in \eqref{eq:connected-duhamel-coeff} is literal.  If the
+intersection hypergraph on the hyperedges $I,J,K_1,\ldots,K_m$ splits into two
+vertex-disjoint subfamilies separating $I$ from $J$, then
+\begin{equation}\label{eq:connected-vanishing}
+  \kappa(I,J;K_1,
+  \ldots,K_m)=0.
+\end{equation}
+Indeed, normalized trace factorizes over disjoint Majorana tensor factors, and
+the logarithm extracts connected components by the exponential formula.
+
+\subsection{Cumulant structure of the Duhamel coefficients}
+\label{subsec:duhamel-cumulant-structure}
+
+We next isolate what can be proved directly about the coefficients
+\eqref{eq:connected-duhamel-coeff}.  This is the useful replacement for an
+informal statement that ``the logarithm keeps only connected diagrams.''  In
+particular, the sharp dependency-graph tree bound for the zero-source
+Duhamel coefficients is proved below.
+
+Let $r\geq1$ and let $E_1,\ldots,E_r\in\calI_n$.  Put
+$A_a=\psi_{E_a}$.  For $S\subset[r]$, define the symmetrized trace moment
+\begin{equation}\label{eq:sym-trace-moment}
+  \mu_{\mathbf E}(S)
+  =
+  \partial_{(t_a)_{a\in S}}
+  \tr\exp\left(\sum_{a\in S}t_aA_a\right)\bigg|_{t=0}.
+\end{equation}
+Equivalently, if $S=\{a_1,\ldots,a_s\}$, then
+\begin{equation}\label{eq:sym-trace-moment-permutation}
+  \mu_{\mathbf E}(S)
+  =
+  \frac1{s!}
+  \sum_{\pi\in\mathfrak S_s}
+  \tr\left(A_{a_{\pi(1)}}\cdots A_{a_{\pi(s)}}\right),
+  \qquad
+  \mu_{\mathbf E}(\emptyset)=1.
+\end{equation}
+Let $G_{\mathbf E}$ be the intersection graph on $[r]$, where $a\sim b$ iff
+$E_a\cap E_b\neq\emptyset$.
+
+\begin{lemma}[Duhamel coefficient as an ordinary cumulant]
+  \label{lem:duhamel-as-cumulant}
+  For $E_1,\ldots,E_r\in\calI_n$,
+  \begin{equation}\label{eq:duhamel-as-cumulant}
+    \partial_{t_1}\cdots\partial_{t_r}
+    \log\tr\exp\left(\sum_{a=1}^r t_a\psi_{E_a}\right)\bigg|_{t=0}
+    =
+    \sum_{\pi\in\Pi_r}
+    (|\pi|-1)!(-1)^{|\pi|-1}
+    \prod_{B\in\pi}\mu_{\mathbf E}(B),
+  \end{equation}
+  where $\Pi_r$ denotes the set of set partitions of $[r]$.
+\end{lemma}
+
+\begin{proof}
+  Set
+  \begin{equation}\label{eq:moment-generating-function}
+    M(t_1,\ldots,t_r)
+    =
+    \tr\exp\left(\sum_{a=1}^r t_a\psi_{E_a}\right).
+  \end{equation}
+  Since $M(0)=1$, the Taylor coefficient of $\log M$ is obtained from the
+  standard formal identity
+  \begin{equation}\label{eq:log-moment-cumulant-formal}
+    \log M
+    =
+    \sum_{k\geq1}\frac{(-1)^{k-1}}{k}(M-1)^k.
+  \end{equation}
+  Taking the coefficient of $t_1\cdots t_r$ in
+  \eqref{eq:log-moment-cumulant-formal} gives the partition formula
+  \eqref{eq:duhamel-as-cumulant}.  The moments that enter are precisely
+  \eqref{eq:sym-trace-moment}, because differentiating the exponential at the
+  origin gives the symmetrized trace expression
+  \eqref{eq:sym-trace-moment-permutation}.
+\end{proof}
+
+\begin{lemma}[Factorization and parity]
+  \label{lem:moment-factorization-parity}
+  The moments $\mu_{\mathbf E}$ satisfy the following two properties.
+
+  First, if $S\subset[r]$ and $C_1,\ldots,C_\ell$ are the connected components
+  of $G_{\mathbf E}[S]$, then
+  \begin{equation}\label{eq:moment-factorization-components}
+    \mu_{\mathbf E}(S)
+    =
+    \prod_{a=1}^\ell \mu_{\mathbf E}(C_a).
+  \end{equation}
+  Second,
+  \begin{equation}\label{eq:moment-parity-selection}
+    \mu_{\mathbf E}(S)=0
+    \qquad\text{unless}\qquad
+    \triangle_{a\in S}E_a=\emptyset,
+  \end{equation}
+  where $\triangle$ denotes symmetric difference.
+  Consequently,
+  \begin{equation}\label{eq:duhamel-coeff-disconnected-or-odd-zero}
+    \partial_{t_1}\cdots\partial_{t_r}
+    \log\tr\exp\left(\sum_{a=1}^r t_a\psi_{E_a}\right)\bigg|_{t=0}=0
+  \end{equation}
+  whenever $G_{\mathbf E}$ is disconnected or
+  $\triangle_{a=1}^rE_a\neq\emptyset$.
+\end{lemma}
+
+\begin{proof}
+  If $C_1,\ldots,C_\ell$ are the connected components of $G_{\mathbf E}[S]$,
+  then the Majorana labels used by different $C_a$ are disjoint.  The Clifford
+  algebra representation decomposes as a tensor product over these disjoint
+  label sets, and the normalized trace factorizes.  Since monomials supported
+  on different components commute, the symmetrized product in
+  \eqref{eq:sym-trace-moment-permutation} factorizes as well.  This proves
+  \eqref{eq:moment-factorization-components}.
+
+  For the parity statement, suppose some Majorana label $b$ belongs to an odd
+  number of sets $E_a$, $a\in S$.  Flip the sign of $\psi_b$ and leave all other
+  Majorana generators fixed.  This is a Clifford automorphism and hence is
+  unitarily implemented.  Therefore normalized traces are invariant under this
+  operation.  On the other hand every product appearing in
+  \eqref{eq:sym-trace-moment-permutation} changes sign.  Hence
+  $\mu_{\mathbf E}(S)=-\mu_{\mathbf E}(S)$, proving
+  \eqref{eq:moment-parity-selection}.
+
+  Finally, if $G_{\mathbf E}$ is disconnected, then
+  \eqref{eq:moment-factorization-components} says that the moment functional
+  factorizes across a nontrivial partition of $[r]$.  The cumulant formula
+  \eqref{eq:duhamel-as-cumulant} then vanishes by the usual cancellation of
+  cumulants for a product moment functional.  If
+  $\triangle_{a=1}^rE_a\neq\emptyset$, then every block product in
+  \eqref{eq:duhamel-as-cumulant} has at least one block with odd total
+  incidence, so it vanishes by \eqref{eq:moment-parity-selection}.
+\end{proof}
+
+\begin{lemma}[A crude absolute cumulant bound]
+  \label{lem:crude-cumulant-bound}
+  There is a universal constant $C<\infty$ such that for all
+  $E_1,\ldots,E_r\in\calI_n$,
+  \begin{equation}\label{eq:crude-cumulant-bound}
+    \left|
+      \partial_{t_1}\cdots\partial_{t_r}
+      \log\tr\exp\left(\sum_{a=1}^r t_a\psi_{E_a}\right)\bigg|_{t=0}
+    \right|
+    \leq
+    C^r r!.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  Since $\norm{\psi_E}\leq1$ for every $E\in\calI_n$, each symmetrized trace
+  moment satisfies $|\mu_{\mathbf E}(S)|\leq1$.  Hence
+  \eqref{eq:duhamel-as-cumulant} gives
+  \begin{equation}\label{eq:cumulant-partition-sum-bound}
+    |\kappa_r|
+    \leq
+    \sum_{\pi\in\Pi_r}(|\pi|-1)!.
+  \end{equation}
+  The number of partitions of $[r]$ into $k$ blocks is at most $k^r/k!$.
+  Therefore
+  \begin{equation}\label{eq:cumulant-partition-sum-bound-2}
+    \sum_{\pi\in\Pi_r}(|\pi|-1)!
+    \leq
+    \sum_{k=1}^r \frac{k^r}{k!}(k-1)!
+    \leq
+    \sum_{k=1}^r k^{r-1}
+    \leq
+    r^r
+    \leq
+    e^r r!,
+  \end{equation}
+  where the last inequality follows from Stirling's lower bound.  This proves
+  \eqref{eq:crude-cumulant-bound}.
+\end{proof}
+
+The preceding lemmas are rigorous and show exactly what the connected Duhamel
+coefficient knows: it has a dependency graph, it vanishes off connected
+parity-even families, and it has at most factorial growth.  We now prove the
+sharper tree-graph estimate that was previously left as a hypothesis.
+
+\begin{lemma}[Chromatic derivative bound]
+  \label{lem:chromatic-derivative-bound}
+  Let $G$ be a finite graph.  If $G$ is connected, then
+  \begin{equation}\label{eq:chromatic-derivative-bound}
+    |\chi_G'(0)|
+    \leq
+    \tau(G),
+  \end{equation}
+  where $\chi_G$ is the chromatic polynomial and $\tau(G)$ is the number of
+  spanning trees of $G$.  If $G$ is disconnected, then $\chi_G'(0)=0$.
+\end{lemma}
+
+\begin{proof}
+  If $G$ is disconnected, then $\chi_G(z)$ is divisible by $z^2$, and hence
+  $\chi_G'(0)=0$.  Assume that $G$ is connected.  Fix an ordering of the edge
+  set.  Whitney's broken-circuit theorem writes the chromatic polynomial as
+  \begin{equation}\label{eq:whitney-broken-circuit}
+    \chi_G(z)
+    =
+    \sum_{A}(-1)^{|A|}z^{c(A)},
+  \end{equation}
+  where the sum is over edge subsets $A$ containing no broken circuit and
+  $c(A)$ is the number of connected components of the spanning subgraph
+  $([r],A)$.  The coefficient of $z$ therefore counts, up to sign, the
+  no-broken-circuit edge sets $A$ for which $([r],A)$ is connected.  Such an
+  $A$ is necessarily a spanning tree: if it were connected and contained a
+  cycle, the largest edge in that cycle would produce a broken circuit.  Hence
+  $|\chi_G'(0)|$ is bounded by the number of spanning trees of $G$.
+\end{proof}
+
+\begin{lemma}[Abstract dependency-graph cumulant tree bound]
+  \label{lem:abstract-dependency-tree-bound}
+  Let $G$ be a graph on $[r]$.  Let $\mu:2^{[r]}\to\C$ satisfy
+  $\mu(\emptyset)=1$, $|\mu(S)|\leq1$ for all $S\subset[r]$, and
+  \begin{equation}\label{eq:abstract-factorization}
+    \mu(S)
+    =
+    \prod_{C\in\Comp(G[S])}\mu(C)
+  \end{equation}
+  for every $S\subset[r]$.  Define
+  \begin{equation}\label{eq:abstract-cumulant}
+    \kappa_\mu([r])
+    =
+    \sum_{\pi\in\Pi_r}
+    (-1)^{|\pi|-1}(|\pi|-1)!
+    \prod_{B\in\pi}\mu(B).
+  \end{equation}
+  Then
+  \begin{equation}\label{eq:abstract-tree-bound}
+    |\kappa_\mu([r])|
+    \leq
+    2^{r-1}\tau(G),
+  \end{equation}
+  where $\tau(G)$ is the number of spanning trees of $G$, and $\tau(G)=0$ if
+  $G$ is disconnected.
+\end{lemma}
+
+\begin{proof}
+  For a partition $\pi$ of $[r]$, let $\pi^G$ be the partition obtained by
+  replacing each block $B\in\pi$ by the connected components of $G[B]$.
+  By \eqref{eq:abstract-factorization},
+  \begin{equation}\label{eq:regroup-factorization}
+    \prod_{B\in\pi}\mu(B)
+    =
+    \prod_{C\in\pi^G}\mu(C).
+  \end{equation}
+  Hence
+  \begin{equation}\label{eq:cumulant-regrouped}
+    \kappa_\mu([r])
+    =
+    \sum_{\rho}
+    a_G(\rho)
+    \prod_{C\in\rho}\mu(C),
+  \end{equation}
+  where the sum is over partitions $\rho$ whose blocks are connected in $G$, and
+  \begin{equation}\label{eq:aG-rho-def}
+    a_G(\rho)
+    =
+    \sum_{\pi:\pi^G=\rho}
+    (-1)^{|\pi|-1}(|\pi|-1)!.
+  \end{equation}
+
+  Let $\overline G_\rho$ be the simple quotient graph whose vertices are the
+  blocks of $\rho$, with an edge between two blocks if $G$ has at least one edge
+  between them.  A partition $\pi$ satisfying $\pi^G=\rho$ is the same as a
+  partition of the vertices of $\overline G_\rho$ into nonempty independent
+  sets.  If $S_{\overline G_\rho}(k)$ denotes the number of such partitions into
+  $k$ independent sets, then
+  \begin{equation}\label{eq:aG-rho-independent}
+    a_G(\rho)
+    =
+    \sum_{k\geq1}
+    (-1)^{k-1}(k-1)!S_{\overline G_\rho}(k).
+  \end{equation}
+  The chromatic polynomial has the falling-factorial expansion
+  \begin{equation}\label{eq:chromatic-falling-factorial}
+    \chi_{\overline G_\rho}(z)
+    =
+    \sum_{k\geq1}
+    S_{\overline G_\rho}(k)(z)_k,
+    \qquad
+    (z)_k=z(z-1)\cdots(z-k+1).
+  \end{equation}
+  Since $(z)_k'|_{z=0}=(-1)^{k-1}(k-1)!$, we get
+  \begin{equation}\label{eq:aG-rho-chromatic}
+    a_G(\rho)=\chi_{\overline G_\rho}'(0).
+  \end{equation}
+  By Lemma~\ref{lem:chromatic-derivative-bound},
+  \begin{equation}\label{eq:chromatic-derivative-tree}
+    |a_G(\rho)|
+    =
+    |\chi_{\overline G_\rho}'(0)|
+    \leq
+    \tau(\overline G_\rho),
+  \end{equation}
+  with the convention that $\tau(\overline G_\rho)=0$ when the quotient graph is
+  disconnected.
+
+  Since $|\mu(C)|\leq1$, \eqref{eq:cumulant-regrouped} and
+  \eqref{eq:chromatic-derivative-tree} give
+  \begin{equation}\label{eq:cumulant-tree-sum-rho}
+    |\kappa_\mu([r])|
+    \leq
+    \sum_{\rho}\tau(\overline G_\rho),
+  \end{equation}
+  where only $\rho$ with connected quotient contribute.
+  It remains to bound this sum by $2^{r-1}\tau(G)$.
+
+  For each connected subset $C\subset[r]$, fix once and for all a spanning tree
+  $T_C$ of $G[C]$.  For each pair of disjoint subsets $C,D$ with at least one
+  edge between them, fix one canonical edge of $G$ joining $C$ to $D$.
+  Given a partition $\rho$ with connected blocks and a spanning tree
+  $\overline T$ of $\overline G_\rho$, form a spanning tree of $G$ by taking the
+  union of all $T_C$, $C\in\rho$, and the canonical inter-block edges
+  corresponding to the edges of $\overline T$.  Mark the inter-block edges in
+  this tree.  This maps each pair $(\rho,\overline T)$ injectively into a pair
+  $(T,F)$, where $T$ is a spanning tree of $G$ and $F\subset E(T)$.  Indeed,
+  removing $F$ from $T$ recovers the blocks of $\rho$, and $F$ recovers
+  $\overline T$.  Therefore
+  \begin{equation}\label{eq:rho-tree-sum-bound}
+    \sum_\rho \tau(\overline G_\rho)
+    \leq
+    \#\{(T,F):T\in\mathsf{Tree}(G),\ F\subset E(T)\}
+    =
+    2^{r-1}\tau(G).
+  \end{equation}
+  Combining \eqref{eq:cumulant-tree-sum-rho} and
+  \eqref{eq:rho-tree-sum-bound} proves the lemma.
+\end{proof}
+
+\begin{proposition}[Duhamel cumulant tree-graph inequality]
+  \label{prop:duhamel-tree-graph}
+  There exists $A_q<\infty$ such that for every $r\geq2$ and every
+  $E_1,\ldots,E_r\in\calI_n$,
+  \begin{equation}\label{eq:duhamel-tree-graph}
+    \left|
+      \partial_{t_1}\cdots\partial_{t_r}
+      \log\tr\exp\left(\sum_{a=1}^r t_a\psi_{E_a}\right)\bigg|_{t=0}
+    \right|
+    \leq
+    A_q^r
+    \sum_{T\in\mathsf{Tree}([r])}
+    \prod_{\{a,b\}\in E(T)}
+    \ind_{E_a\cap E_b\neq\emptyset}.
+  \end{equation}
+\end{proposition}
+
+\begin{proof}
+  Let $G=G_{\mathbf E}$ be the intersection graph.  Since
+  $\norm{\psi_E}\leq1$, the symmetrized trace moments satisfy
+  $|\mu_{\mathbf E}(S)|\leq1$.  By
+  Lemma~\ref{lem:moment-factorization-parity}, they factorize over connected
+  components of $G[S]$.  Lemma~\ref{lem:duhamel-as-cumulant} identifies the
+  left-hand side of \eqref{eq:duhamel-tree-graph} with the ordinary cumulant of
+  this moment functional.  Lemma~\ref{lem:abstract-dependency-tree-bound}
+  therefore gives
+  \begin{equation}\label{eq:duhamel-tree-proof-final}
+    |\kappa_D(E_1,\ldots,E_r)|
+    \leq
+    2^{r-1}\tau(G).
+  \end{equation}
+  Finally,
+  \begin{equation}\label{eq:tau-expanded-tree-sum}
+    \tau(G)
+    =
+    \sum_{T\in\mathsf{Tree}([r])}
+    \prod_{\{a,b\}\in E(T)}
+    \ind_{E_a\cap E_b\neq\emptyset}.
+  \end{equation}
+  Thus \eqref{eq:duhamel-tree-graph} holds, for instance with $A_q=2$.
+\end{proof}
+
+\begin{remark}[What this proves and what it does not prove]
+  Proposition~\ref{prop:duhamel-tree-graph} closes the single-replica
+  Duhamel tree bound.  It does not, by itself, close the two-replica
+  susceptibility.  After Wick pairing, one has two Duhamel trees and a pairing
+  of their unmarked occurrences.  A naive summation over occurrence-level tree
+  pairs loses a superexponential factor because repeated hyperedges are counted
+  too many times.  The connected parity count below gives the correct power of
+  $n$, but the remaining summability must be proved by the resummed
+  two-replica cluster-expansion estimate isolated in
+  Assumption~\ref{ass:two-replica-cluster-expansion}.
+\end{remark}
+
+\subsection{The finite two-replica Wick reduction}
+
+Squaring \eqref{eq:truncated-connected-expansion} and taking Gaussian
+expectation produces two copies of the connected expansion.  The Gaussian
+expectation is computed by Wick pairing.  It is useful to package the result as
+diagrams.
+
+A two-replica diagram $\Gamma$ with marks $I,J$ consists of two ordered lists of
+unmarked hyperedges,
+\begin{equation}\label{eq:two-replica-lists}
+  \mathbf K=(K_1,
+  \ldots,K_m),
+  \qquad
+  \mathbf L=(L_1,
+  \ldots,L_{m'}),
+\end{equation}
+paired by a Wick pairing of the multiset
+$\{K_1,
+\ldots,K_m,L_1,
+\ldots,L_{m'}\}$.  In particular $m+m'=2p$ is even.  Its value is
+\begin{equation}\label{eq:diagram-value}
+  W(\Gamma)
+  =
+  \frac{
+    \kappa(I,J;K_1,
+    \ldots,K_m)
+    \kappa(I,J;L_1,
+    \ldots,L_{m'})
+  }{m!m'!}.
+\end{equation}
+Let $\mathfrak D_p^{[M]}(I,J)$ denote the set of such diagrams with
+$m,m'\leq M$ and with $p$ Wick pairs for which both connected Duhamel
+coefficients in \eqref{eq:diagram-value} are nonzero.
+
+\begin{lemma}[Finite annealed two-replica formula]
+  \label{lem:finite-two-replica-formula}
+  For fixed $M,n,I,J$ and $\beta\in\R$,
+  \begin{equation}\label{eq:finite-two-replica-formula}
+    \E\left[
+      \left|
+        \mathcal C^{[M]}_{I,J}(\beta,g)
+      \right|^2
+    \right]
+    =
+    \sum_{p=0}^M
+    (\beta\sigma_n)^{2p}
+    \sum_{\Gamma\in\mathfrak D_p^{[M]}(I,J)}
+    W(\Gamma).
+  \end{equation}
+  Consequently,
+  \begin{equation}\label{eq:absolute-finite-two-replica-formula}
+    \E\left[
+      \left|
+        \mathcal C^{[M]}_{I,J}(\beta,g)
+      \right|^2
+    \right]
+    \leq
+    \sum_{p=0}^M
+    |\beta|^{2p}\sigma_n^{2p}
+    \sum_{\Gamma\in\mathfrak D_p^{[M]}(I,J)}
+    |W(\Gamma)|.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  The coefficients $\kappa(I,J;K_1,\ldots,K_m)$ are real.  Indeed, they are
+  Taylor coefficients at the origin of the real analytic function
+  \begin{equation}\label{eq:kappa-real-valued}
+    (u,v,\lambda_1,\ldots,\lambda_m)
+    \mapsto
+    \log\tr\exp\left(
+      u\psi_I+v\psi_J+\sum_{a=1}^m\lambda_a\psi_{K_a}
+    \right)
+  \end{equation}
+  restricted to real sources.  Thus the square on the left-hand side is the
+  ordinary product of the two real finite expansions.
+
+  Insert \eqref{eq:truncated-connected-expansion} twice.  For two ordered lists
+  $\mathbf K$ and $\mathbf L$, the Gaussian expectation
+  \begin{equation}\label{eq:wick-expectation}
+    \E\left[g_{K_1}\cdots g_{K_m}g_{L_1}\cdots g_{L_{m'}}\right]
+  \end{equation}
+  is zero unless $m+m'$ is even.  If $m+m'=2p$, Wick's theorem writes
+  \eqref{eq:wick-expectation} as the sum over all pairings of the multiset of
+  labels.  Grouping each Wick pairing with the two ordered lists gives
+  $\mathfrak D_p^{[M]}(I,J)$ and the value \eqref{eq:diagram-value}.  This
+  proves \eqref{eq:finite-two-replica-formula}.  The absolute bound follows by
+  the triangle inequality.
+
+\end{proof}
+
+\subsection{Connected parity counting}
+
+The next lemma is the purely combinatorial count that explains why the parity
+constraint determining $J$ removes exactly one extra hyperedge degree of
+freedom.  It is useful in any attempt to prove the cluster-expansion estimate below.
+
+\begin{lemma}[Connected parity counting]
+  \label{lem:connected-parity-counting}
+  Fix $I\in\calI_n$, $p\geq0$, and $C\subset[p]$.  For
+  $H_1,\ldots,H_p\in\calI_n$, set
+  \begin{equation}\label{eq:J-from-cross-pairs-counting}
+    J
+    =
+    I\triangle\bigtriangleup_{a\in C}H_a.
+  \end{equation}
+  Let $N_p(I,C)$ be the number of ordered $p$-tuples
+  $(H_1,\ldots,H_p)$ such that $J\in\calI_n$ and the intersection graph on the
+  labelled hyperedges
+  \begin{equation}\label{eq:counting-labelled-hyperedges}
+    I,
+    \qquad
+    J,
+    \qquad
+    H_1,\ldots,H_p
+  \end{equation}
+  is connected.  Then there exists $D_q<\infty$, depending only on $q$, such
+  that
+  \begin{equation}\label{eq:connected-parity-counting}
+    N_p(I,C)
+    \leq
+    D_q^p p! n^{(q-1)p}.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  The case $p=0$ is immediate.  Assume $p\geq1$ and consider a tuple counted by
+  $N_p(I,C)$.
+  We first prove
+  \begin{equation}\label{eq:outside-union-bound-counting}
+    \left|
+      \left(\bigcup_{a=1}^p H_a\right)\setminus I
+    \right|
+    \leq
+    (q-1)p.
+  \end{equation}
+
+  Consider the intersection graph on the labelled hyperedges
+  $I,H_1,\ldots,H_p$, without $J$, and let its connected components be
+  $\mathcal D_1,\ldots,\mathcal D_\ell$.  A hyperedge in such a component is
+  called selected if it is either $I$ or $H_a$ with $a\in C$.  For a component
+  $\mathcal D$, let $e(\mathcal D)$ be the number of its hyperedges and let
+  $c(\mathcal D)$ be the number of its selected hyperedges.  Define
+  \begin{equation}\label{eq:R-D-def}
+    R(\mathcal D)
+    =
+    \bigtriangleup_{E\in\mathcal D,\ E\text{ selected}}E.
+  \end{equation}
+  Since distinct components have disjoint supports, the sets
+  $R(\mathcal D_j)$ are disjoint and
+  \begin{equation}\label{eq:J-disjoint-union-RD}
+    J
+    =
+    \bigsqcup_{j=1}^\ell R(\mathcal D_j).
+  \end{equation}
+  Hence
+  \begin{equation}\label{eq:sum-RD-q}
+    \sum_{j=1}^\ell |R(\mathcal D_j)|=|J|=q.
+  \end{equation}
+
+  Each component $\mathcal D_j$ contains at least one selected hyperedge.  If it
+  did not, then $R(\mathcal D_j)=\emptyset$, and the support of
+  $\mathcal D_j$ would be disjoint from $J$ and from all other components.
+  This would contradict the connectedness of the intersection graph on
+  $I,J,H_1,\ldots,H_p$.  Thus $c(\mathcal D_j)\geq1$ for all $j$.
+
+  Fix a component $\mathcal D$.  Let $U_{\rm sel}(\mathcal D)$ be the union of
+  its selected hyperedges.  Since the total selected incidence is
+  $q c(\mathcal D)$, every point in $R(\mathcal D)$ contributes at least one
+  incidence and every point in
+  $U_{\rm sel}(\mathcal D)\setminus R(\mathcal D)$ contributes at least two,
+  so
+  \begin{equation}\label{eq:selected-union-bound}
+    |U_{\rm sel}(\mathcal D)|
+    \leq
+    \frac{q c(\mathcal D)+|R(\mathcal D)|}{2}.
+  \end{equation}
+  The non-selected hyperedges in $\mathcal D$ can be ordered so that each new
+  one intersects the union of the previously exposed selected and non-selected
+  hyperedges.  Each such hyperedge adds at most $q-1$ new vertices.  Therefore
+  \begin{align}\label{eq:component-union-bound-counting}
+    \left|\bigcup_{E\in\mathcal D}E\right|
+    &\leq
+    \frac{q c(\mathcal D)+|R(\mathcal D)|}{2}
+    +(q-1)(e(\mathcal D)-c(\mathcal D)) \\
+    &=
+    (q-1)e(\mathcal D)
+    -\frac{q-2}{2}c(\mathcal D)
+    +\frac12|R(\mathcal D)|.
+  \end{align}
+  Summing over all components and using
+  $\sum_j e(\mathcal D_j)=p+1$, $\sum_j c(\mathcal D_j)=|C|+1$, and
+  \eqref{eq:sum-RD-q}, we obtain
+  \begin{align}\label{eq:total-union-bound-counting}
+    \left|I\cup\bigcup_{a=1}^pH_a\right|
+    &\leq
+    (q-1)(p+1)
+    -\frac{q-2}{2}(|C|+1)
+    +\frac q2 \\
+    &\leq
+    q+(q-1)p.
+  \end{align}
+  Since $|I|=q$, this proves \eqref{eq:outside-union-bound-counting}.
+
+  We now count.  Encode $(H_1,\ldots,H_p)$ by writing each $H_a$ in increasing
+  order, giving $pq$ positions.  By
+  \eqref{eq:outside-union-bound-counting}, at most $(q-1)p$ distinct labels
+  outside $I$ appear.  Choose one representative position for each such outside
+  label and, if necessary, add arbitrary positions until exactly $(q-1)p$
+  representative positions have been chosen.  The representative positions can
+  be chosen in at most
+  \begin{equation}\label{eq:representative-position-count}
+    \binom{pq}{(q-1)p}
+    =
+    \binom{pq}{p}
+    \leq
+    (eq)^p
+  \end{equation}
+  ways.  Their labels can be chosen in at most $n^{(q-1)p}$ ways.  Each of the
+  remaining $p$ positions is either one of the $q$ labels in $I$ or copies one
+  of the representative outside labels, hence has at most $q+(q-1)p\leq qp+q$
+  choices.  Thus
+  \begin{equation}\label{eq:counting-final-before-factorial}
+    N_p(I,C)
+    \leq
+    (eq)^p(qp+q)^p n^{(q-1)p}.
+  \end{equation}
+  Since $p^p\leq e^p p!$ for $p\geq1$, this is bounded by
+  $D_q^p p! n^{(q-1)p}$ after increasing $D_q$.
+\end{proof}
+
+\begin{remark}[Use and limitation of the parity count]
+  Lemma~\ref{lem:connected-parity-counting} gives the correct $n$-power for
+  Wick-paired diagrams: the cross-pair set $C$ determines
+  $J=I\triangle\bigtriangleup_{a\in C}H_a$, so summing over $J$ costs no extra
+  factor $n^{q-1}$.  This is exactly the power needed to cancel
+  $\sigma_n^{2p}=((q-1)!)^p n^{-(q-1)p}$.  However, the lemma counts only label
+  assignments.  It does not by itself control the entropy of two occurrence-level
+  Duhamel trees after Wick pairing.  That remaining entropy is exactly why the remaining input is stated as a
+  resummed cluster-expansion estimate below.
+\end{remark}
+
+The finite two-replica formula is exact for every finite truncation.  It is also
+useful as a diagnostic for what remains unproved.  If one bounds the two
+zero-source Duhamel cumulants by occurrence-level trees and then sums the trees
+absolutely after Wick pairing, repeated hyperedges create a superexponential
+entropy loss.  For example, a configuration in which all $2p$ unmarked
+occurrences are the same hyperedge has an occurrence-level complete graph and
+therefore about $(2p)^{2p}$ spanning trees, whereas the Duhamel and Wick
+factorials do not reduce this to a purely exponential factor.  This does not
+show that the two-marked susceptibility is false; it shows that the
+coefficientwise tree-counting strategy is too crude.  The remaining input must
+therefore be a resummed two-replica $L^2$ cluster expansion, where repeated
+hyperedges are treated before taking absolute values of the final cluster
+weights.
+
+
+\subsection{Why the remaining estimate is not proved by the naive expansions}
+\label{subsec:why-naive-cluster-fails}
+
+The preceding lemmas prove the two structural facts one expects from a
+high-temperature expansion: connectedness and the correct parity count.  It is
+natural to try to finish the proof by taking absolute values term by term in a
+single-replica expansion, or by applying the Duhamel tree bound coefficient by
+coefficient.  The following two observations explain why these two routes do
+not close.  They do not disprove the resummed cluster expansion; rather, they
+show why the last input must be a genuinely annealed two-replica estimate.
+
+\begin{lemma}[Single-replica absolute activities are too large]
+  \label{lem:single-replica-activity-fails}
+  Let
+  \begin{equation}\label{eq:single-activity-def}
+    \eta_K(g)=\exp\left(c|\beta|\sigma_n|g_K|\right)-1
+  \end{equation}
+  for a fixed constant $c>0$.  For every fixed $I\in\calI_n$ and every fixed
+  $\beta\neq0$,
+  \begin{equation}\label{eq:single-activity-diverges}
+    \sum_{K\in\calI_n:K\cap I\neq\emptyset}\E\eta_K(g)
+    \geq
+    c_{q,\beta} n^{(q-1)/2}
+  \end{equation}
+  for all large $n$.
+\end{lemma}
+
+\begin{proof}
+  Since $\sigma_n\to0$ and $\E|g_K|=\sqrt{2/\pi}$,
+  \begin{equation}\label{eq:eta-first-order}
+    \E\eta_K(g)
+    =
+    c|\beta|\sigma_n\E|g_K|+O(\sigma_n^2)
+    \geq
+    c_{\beta}\sigma_n
+  \end{equation}
+  for all large $n$.  On the other hand,
+  \begin{equation}\label{eq:number-touching-I}
+    \#\{K\in\calI_n:K\cap I\neq\emptyset\}
+    =
+    \binom nq-\binom{n-q}{q}
+    \asymp_q n^{q-1}.
+  \end{equation}
+  Using $\sigma_n\asymp_q n^{-(q-1)/2}$ gives
+  \eqref{eq:single-activity-diverges}.
+\end{proof}
+
+\begin{remark}
+  Lemma~\ref{lem:single-replica-activity-fails} rules out a standard
+  deterministic Kotecky--Preiss proof based on absolute single-edge activities.
+  The small parameter cannot be $\sigma_n$ itself.  It must be the Wick-paired
+  parameter $\sigma_n^2n^{q-1}=O_q(1)$ together with $\beta^2$.
+\end{remark}
+
+The next observation records the other failure mode.  Even after identifying
+connected Duhamel cumulants, expanding repeated hyperedges coefficient by
+coefficient is too fine a decomposition.
+
+\begin{lemma}[Coefficientwise distinct-support tree bounds are too strong]
+  \label{lem:coefficientwise-tree-fails}
+  Fix even $q\geq4$.  There is no constant $A_q<\infty$ with the following
+  property.  For every family of distinct $q$-sets $E_0,E_1,\ldots,E_s$ and
+  every multi-index $a=(a_1,\ldots,a_s)$, the coefficient
+  \begin{equation}\label{eq:bad-coefficient-def}
+    [z_1^{a_1}\cdots z_s^{a_s}]
+    \partial_u\partial_v
+    \log\tr\exp\left(
+      (u+v)\psi_{E_0}+\sum_{j=1}^s z_j\psi_{E_j}
+    \right)\bigg|_{u=v=0}
+  \end{equation}
+  is bounded in absolute value by
+  \begin{equation}\label{eq:false-coefficientwise-bound}
+    A_q^{|a|}\,\tau(G),
+  \end{equation}
+  where $G$ is the intersection graph on
+  $\{E_0,E_1,\ldots,E_s\}$ and $\tau(G)$ is its number of spanning trees.
+\end{lemma}
+
+\begin{proof}
+  Choose a fixed set $S\subset[n]$ with $|S|=q-1$ and distinct points
+  $x_0,x_1,\ldots,x_s\notin S$.  Set
+  \begin{equation}\label{eq:bad-family-Ej}
+    E_j=S\cup\{x_j\},
+    \qquad
+    A_j=\psi_{E_j}.
+  \end{equation}
+  Since $|E_i\cap E_j|=q-1$ is odd for $i\neq j$, the operators
+  $A_0,A_1,\ldots,A_s$ anticommute pairwise.  Also $A_j^2=2^{-q}\I$.
+  Therefore
+  \begin{equation}\label{eq:anticommuting-cosh}
+    \tr\exp\left(x_0A_0+\sum_{j=1}^s z_jA_j\right)
+    =
+    \cosh\left(
+      2^{-q/2}
+      \sqrt{x_0^2+\sum_{j=1}^s z_j^2}
+    \right).
+  \end{equation}
+  Writing
+  \begin{equation}\label{eq:hq-def}
+    h_q(w)=\log\cosh\left(2^{-q/2}\sqrt w\right),
+  \end{equation}
+  we get
+  \begin{equation}\label{eq:bad-source-derivative-hq}
+    \partial_u\partial_v
+    \log\tr\exp\left(
+      (u+v)A_0+\sum_{j=1}^s z_jA_j
+    \right)\bigg|_{u=v=0}
+    =
+    2h_q'\left(\sum_{j=1}^s z_j^2\right).
+  \end{equation}
+  The function $h_q'$ has its nearest singularity at a negative real point,
+  coming from the first zero of $\cosh$.  Hence, by elementary singularity
+  analysis, there are constants $b_q,c_q>0$ such that the coefficient $b_m$ of
+  $w^m$ in $h_q'(w)$ satisfies
+  \begin{equation}\label{eq:hq-coeff-lower}
+    |b_m|\geq b_q c_q^m
+  \end{equation}
+  for all sufficiently large $m$.
+  Take $a_1=\cdots=a_s=2k$ and $m=ks$.  The coefficient of
+  $z_1^{2k}\cdots z_s^{2k}$ in \eqref{eq:bad-source-derivative-hq} is
+  \begin{equation}\label{eq:multinomial-bad-coeff}
+    2b_{ks}\frac{(ks)!}{(k!)^s}.
+  \end{equation}
+  By Stirling's formula this is at least
+  \begin{equation}\label{eq:bad-coeff-growth}
+    (c_q')^{ks}s^{ks}
+  \end{equation}
+  up to subexponential factors in $k$ and $s$.  In the present example the
+  intersection graph is the complete graph on $s+1$ vertices, so
+  \begin{equation}\label{eq:complete-tree-count}
+    \tau(G)=(s+1)^{s-1}.
+  \end{equation}
+  For any fixed $A_q$, choose $s$ large enough and then $k$ large enough.  The
+  lower bound \eqref{eq:bad-coeff-growth} is then larger than
+  $A_q^{2ks}(s+1)^{s-1}$, contradicting
+  \eqref{eq:false-coefficientwise-bound}.
+\end{proof}
+
+\begin{remark}
+  Lemma~\ref{lem:coefficientwise-tree-fails} is the precise reason that the
+  final estimate below is stated after resummation.  The example is harmless
+  for the actual covariance: it is controlled by the closed form
+  \eqref{eq:anticommuting-cosh}.  It only becomes dangerous if one first
+  expands the repeated supports into individual Taylor coefficients and then
+  takes absolute values.
+\end{remark}
+
+\begin{assumption}[Resummed two-replica $L^2$ cluster expansion]
+  \label{ass:two-replica-cluster-expansion}
+  This is the unproved high-temperature input in the present CLT proof.
+  There exist constants $B_q<\infty$ and $\beta_{\rm ce}>0$, depending only on
+  $q$, such that the following statements hold for $|\beta|<\beta_{\rm ce}$.
+
+  First, for all $n$ and $I,J\in\calI_n$,
+  \begin{equation}\label{eq:cluster-convergence}
+    \mathcal C^{[M]}_{I,J}(\beta,g)
+    \to
+    \mathcal C_{I,J}(\beta,g)
+    \qquad
+    \text{in }L^2(\dd\gamma(g))
+    \text{ as }M\to\infty.
+  \end{equation}
+  Second, for each $M\geq0$ there is a decomposition in $L^2(\dd\gamma(g))$
+  of the finite high-temperature truncation into resummed two-marked cluster
+  layers,
+  \begin{equation}\label{eq:resummed-layer-decomposition}
+    \mathcal C^{[M]}_{I,J}(\beta,g)
+    =
+    \sum_{p=0}^M
+    \mathcal A^{[M]}_{p;I,J}(\beta,g),
+  \end{equation}
+  where $\mathcal A^{[M]}_{p;I,J}$ is the contribution of Wick-paired connected
+  parity clusters with $p$ Gaussian pairs after all repeated-hyperedge
+  multiplicities inside each connected cluster have been resummed.  More
+  formally, the decomposition is required to be compatible with the exact
+  finite Wick formula of Lemma~\ref{lem:finite-two-replica-formula}: the
+  $p$-th layer is obtained by collecting all terms with $p$ Wick pairs and by
+  summing, before taking absolute values, all diagrams which have the same
+  connected support and differ only by repeated occurrences of hyperedges
+  inside that support.  Thus $\mathcal A^{[M]}_{0;I,J}$ is the zero-disorder
+  covariance layer, supported on the diagonal mark $I=J$, while
+  $\mathcal A^{[M]}_{1;I,J}$ is the first annealed correction with one Gaussian
+  pair.  These examples are meant only to fix the interpretation of the layers;
+  the estimate below is the actual hypothesis.
+
+  The layers satisfy the row-wise $L^2$ estimate
+  \begin{equation}\label{eq:resummed-layer-bound}
+    \sup_{M\geq0}
+    \sup_{n\geq1}
+    \sup_{I\in\calI_n}
+    \sum_{J\in\calI_n}
+    \E\left[
+      \left|
+        \mathcal A^{[M]}_{p;I,J}(\beta,g)
+      \right|^2
+    \right]
+    \leq
+    B_q^p|\beta|^{2p}
+    \qquad
+    \text{for every }p\geq0.
+  \end{equation}
+\end{assumption}
+
+\begin{remark}[Meaning of the cluster-expansion assumption]
+  Assumption~\ref{ass:two-replica-cluster-expansion} is not a coefficientwise
+  tree bound.  Such a bound is too strong, because repeated hyperedges can
+  make individual Taylor coefficients very large before they are resummed.  The
+  assumption asks for the natural object instead: an $L^2$ estimate on the
+  resummed two-replica cluster layers.  This is plausible for small $|\beta|$
+  because each Wick pair contributes the factor
+  \begin{equation}\label{eq:sigma-pair-cancellation}
+    \sigma_n^2=(q-1)!n^{-(q-1)},
+  \end{equation}
+  while a new connected $q$-hyperedge has at most order $n^{q-1}$ choices once
+  it is required to touch the already exposed cluster.  Thus the $n$-powers
+  cancel pair by pair and the remaining expansion should be subcritical for
+  small $|\beta|$.  This is the two-marked $L^2$ analogue of the sparse
+  connected-component summability used in the high-temperature free-energy
+  expansion of \cite{GPSZ2026}.  The commutation-index estimates of
+  \cite{ACKK2025} are not strong enough by themselves to imply
+  \eqref{eq:resummed-layer-bound}; they control Lipschitz concentration,
+  whereas \eqref{eq:resummed-layer-bound} is a sharper annealed two-point
+  susceptibility estimate.
+\end{remark}
+
+\begin{proposition}[Cluster expansion implies two-marked susceptibility]
+  \label{prop:cluster-expansion-to-susceptibility}
+  Assumption~\ref{ass:two-replica-cluster-expansion} implies
+  Assumption~\ref{ass:two-marked-susceptibility}, with any
+  \begin{equation}\label{eq:beta-sus-from-ce}
+    \beta_{\rm sus}<\min\{\beta_{\rm ce},B_q^{-1/2}\}.
+  \end{equation}
+\end{proposition}
+
+\begin{proof}
+  Fix $|\beta|<\min\{\beta_{\rm ce},B_q^{-1/2}\}$.  For the finite truncation,
+  Minkowski's inequality
+  in the Hilbert space
+  $L^2(\dd\gamma(g);\ell^2(\calI_n))$ gives, uniformly in $M,n,I$,
+  \begin{align}\label{eq:cluster-to-susceptibility-proof}
+    \left(
+      \sum_{J\in\calI_n}
+      \E\left[
+        \left|
+          \mathcal C^{[M]}_{I,J}(\beta,g)
+        \right|^2
+      \right]
+    \right)^{1/2}
+    &\leq
+    \sum_{p=0}^M
+    \left(
+      \sum_{J\in\calI_n}
+      \E\left[
+        \left|
+          \mathcal A^{[M]}_{p;I,J}(\beta,g)
+        \right|^2
+      \right]
+    \right)^{1/2} \\
+    &\leq
+    \sum_{p=0}^M
+    (B_q^{1/2}|\beta|)^p.
+  \end{align}
+  The right-hand side is bounded uniformly in $M,n,I$.  Taking $M\to\infty$
+  and using \eqref{eq:cluster-convergence}, we obtain
+  \begin{equation}\label{eq:susceptibility-from-cluster-limit}
+    \sum_{J\in\calI_n}
+    \E\left[
+      \left|
+        \mathcal C_{I,J}(\beta,g)
+      \right|^2
+    \right]
+    \leq
+    \left(
+      \sum_{p\geq0}(B_q^{1/2}|\beta|)^p
+    \right)^2.
+  \end{equation}
+  Taking the supremum over $\beta\in K\subset(-\beta_{\rm sus},\beta_{\rm sus})$, with $\beta_{\rm sus}$ satisfying \eqref{eq:beta-sus-from-ce}, proves
+  \eqref{eq:two-marked-susceptibility}.
+\end{proof}
+
+\begin{remark}[What is proved and what remains]
+  The exact source-derivative representation, the finite connected Duhamel
+  coefficients, the dependency-graph Duhamel tree bound, the connected parity
+  counting lemma, and the finite Wick-paired two-replica formula are proved
+  above.  These results justify the structure and the expected $n$-scaling of
+  the remaining cluster expansion.  What is still not proved is
+  Assumption~\ref{ass:two-replica-cluster-expansion}: the construction of a
+  resummed two-replica expansion for the Kubo covariance and the uniform row-wise
+  $L^2$ estimate \eqref{eq:resummed-layer-bound}.  This is the genuinely new
+  high-temperature input needed to make the CLT unconditional.
+\end{remark}
+
+\section{\texorpdfstring{Small-$\beta$ consistency check}{Small-beta consistency check}}
+
+\begin{lemma}[Trace of a nontrivial Majorana monomial]\label{lem:trace-monomial-zero}
+  If $A\subset[n]$ is nonempty, then
+  \begin{equation}\label{eq:trace-monomial-zero}
+    \tr\left(\prod_{a\in A}\psi_a\right)=0.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  Choose $a\in A$.  By the sign-flip unitary used in
+  Lemma~\ref{lem:gauge-invariance}, there is a unitary $U$ such that
+  $U\psi_aU^*=-\psi_a$ and $U\psi_bU^*=\psi_b$ for $b\neq a$.  Hence the
+  monomial changes sign under conjugation by $U$.  Trace invariance gives the
+  claim.
+\end{proof}
+
+\begin{lemma}[Trace orthogonality]\label{lem:trace-orth}
+  For $I,J\in\calI_n$,
+  \begin{equation}\label{eq:trace-orth}
+    \tr(\psi_I\psi_J)=2^{-q}\ind_{I=J}.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  If $I=J$, then $\psi_I^2=2^{-q}\I$.  If $I\neq J$, the product
+  $\psi_I\psi_J$ is, up to a scalar, a nontrivial Majorana monomial supported
+  on $I\triangle J$, so Lemma~\ref{lem:trace-monomial-zero} applies.
+\end{proof}
+
+\begin{proposition}[Leading small-$\beta$ fluctuation]\label{prop:small-beta}
+  As $\beta\to0$ with $n$ and $g$ fixed,
+  \begin{equation}\label{eq:small-beta-expansion}
+    L_n(\beta)
+    =
+    \frac{\beta^2}{2}\tr(H_n^2)
+    +
+    O\left(\beta^3\norm{H_n}^3e^{|\beta|\norm{H_n}}\right),
+  \end{equation}
+  and
+  \begin{equation}\label{eq:tr-H2}
+    \tr(H_n^2)=2^{-q}\sigma_n^2\sum_{I\in\calI_n}g_I^2.
+  \end{equation}
+  Consequently the leading random term in $L_n(\beta)-\E L_n(\beta)$ is
+  \begin{equation}\label{eq:leading-random-term}
+    \frac{\beta^2}{2}2^{-q}\sigma_n^2
+    \sum_{I\in\calI_n}(g_I^2-1),
+  \end{equation}
+  and
+  \begin{equation}\label{eq:small-beta-variance}
+    \Var\left[
+      n^{q/2-1}
+      \frac{\beta^2}{2}2^{-q}\sigma_n^2
+      \sum_{I\in\calI_n}(g_I^2-1)
+    \right]
+    \to
+    \frac{((q-1)!)^2}{2^{2q+1}q!}\beta^4.
+  \end{equation}
+\end{proposition}
+
+\begin{proof}
+  Since $\tr(H_n)=0$ by Lemma~\ref{lem:trace-monomial-zero}, Taylor expansion of
+  $\log\tr e^{\beta H_n}$ gives \eqref{eq:small-beta-expansion}.  By
+  Lemma~\ref{lem:trace-orth},
+  \begin{equation}\label{eq:tr-H2-proof}
+    \tr(H_n^2)
+    =
+    \sigma_n^2\sum_{I,J\in\calI_n}g_Ig_J\tr(\psi_I\psi_J)
+    =
+    2^{-q}\sigma_n^2\sum_{I\in\calI_n}g_I^2.
+  \end{equation}
+  This proves \eqref{eq:tr-H2} and \eqref{eq:leading-random-term}.  Since
+  $\Var(g_I^2-1)=2$,
+  \begin{equation}\label{eq:small-beta-var-proof}
+    \Var\left[
+      n^{q/2-1}
+      \frac{\beta^2}{2}2^{-q}\sigma_n^2
+      \sum_I(g_I^2-1)
+    \right]
+    =
+    n^{q-2}\frac{\beta^4}{4}2^{-2q}\sigma_n^4 2N_n.
+  \end{equation}
+  Using $\sigma_n^2=(q-1)!n^{-(q-1)}$ and $N_n\sim n^q/q!$ gives
+  \eqref{eq:small-beta-variance}.
+\end{proof}
+
+\begin{remark}[Check against the covariance formula]
+  The leading small-$\beta$ free-energy density is
+  \begin{equation}\label{eq:ell-small-beta}
+    \ell_q(\beta)=\frac{\beta^2}{2^{q+1}q}+O(\beta^4),
+    \qquad
+    \ell_q'(\beta)=\frac{\beta}{2^q q}+O(\beta^3).
+  \end{equation}
+  Hence
+  \begin{equation}\label{eq:covariance-small-beta-match}
+    \frac{q!}{2}(\beta\ell_q'(\beta))^2
+    =
+    \frac{((q-1)!)^2}{2^{2q+1}q!}\beta^4+O(\beta^6),
+  \end{equation}
+  which matches \eqref{eq:small-beta-variance}.
+\end{remark}
+
+\section{Conclusion}
+
+The proof of Theorem~\ref{thm:main-clt} is complete from the locally uniform
+LLN and the two-marked susceptibility estimate.  The locally uniform LLN is the
+high-temperature free-energy input from the existing literature, and its
+$\beta$-derivative follows from convexity.  The second chaos is exact and gives
+the rank-one Gaussian limit.  Every fixed higher chaos is negligible by the
+parity count and the Duhamel derivative bound.  The infinite chaos tail is
+controlled by the Hilbert--Schmidt norm of the Hessian through the Malliavin
+identity.  Section~\ref{sec:two-marked-proof-attempt} proves the
+single-replica Duhamel cumulant tree bound and the connected parity counting
+lemma needed for the two-marked susceptibility.  The only remaining unclosed
+point is the resummed two-replica $L^2$ cluster-expansion estimate in
+Assumption~\ref{ass:two-replica-cluster-expansion}, which also includes
+convergence of the high-temperature truncations to the actual Kubo covariance.
+Subsection~\ref{subsec:why-naive-cluster-fails} records the two main failed
+coefficientwise approaches, so the remaining assumption should be read as a
+genuine resummed Wick-pair polymer estimate rather than as a hidden elementary
+counting lemma.
+
+\begin{thebibliography}{GPSZ26}
+
+\bibitem[GPSZ26]{GPSZ2026}
+David Gamarnik, Francisco Pernice, Alexander Schmidhuber, and Alexander
+Zlokapa.
+\newblock The free energy limit of the {SYK} model at high temperature.
+\newblock arXiv:2605.02768, 2026.
+
+\bibitem[ACKK25]{ACKK2025}
+Eric R. Anschuetz, Chi-Fang Chen, Bobak T. Kiani, and Robbie King.
+\newblock Strongly interacting fermions are non-trivial yet non-glassy.
+\newblock Physical Review Letters, 135(3):030602, 2025.
+
+\bibitem[Wil67]{Wilcox1967}
+R. M. Wilcox.
+\newblock Exponential operators and parameter differentiation in quantum physics.
+\newblock Journal of Mathematical Physics, 8(4):962--982, 1967.
+
+\end{thebibliography}
+
+\end{document}
