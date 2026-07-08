@@ -1,0 +1,44 @@
+
+\begin{lemma}[Convex convergence implies derivative convergence]
+  \label{lem:convex-derivative}
+  Let $I\subset\R$ be an open interval.  Let $f_n:I\to\R$ be differentiable
+  convex functions and assume that $f_n\to f$ locally uniformly on $I$, where
+  $f\in C^1(I)$.  Then, for every compact $K\subset I$,
+  \begin{equation}\label{eq:convex-derivative-conclusion}
+    \sup_{x\in K}|f_n'(x)-f'(x)|\to0.
+  \end{equation}
+\end{lemma}
+
+\begin{proof}
+  Fix a compact $K\subset I$.  Choose $h_0>0$ such that
+  $K+[-h_0,h_0]\subset I$.  For $0<h<h_0$ and $x\in K$, convexity gives
+  \begin{equation}\label{eq:convex-difference-squeeze}
+    \frac{f_n(x)-f_n(x-h)}{h}
+    \leq f_n'(x)
+    \leq
+    \frac{f_n(x+h)-f_n(x)}{h}.
+  \end{equation}
+  Put
+  \begin{equation}\label{eq:epsilon-nh}
+    \epsilon_n(h)=\sup_{y\in K+[-h,h]}|f_n(y)-f(y)|.
+  \end{equation}
+  Then $\epsilon_n(h)\to0$ for fixed $h$.  From
+  \eqref{eq:convex-difference-squeeze},
+  \begin{equation}\label{eq:upper-convex-derivative}
+    f_n'(x)-f'(x)
+    \leq
+    \frac{f(x+h)-f(x)}{h}-f'(x)
+    +\frac{2\epsilon_n(h)}{h},
+  \end{equation}
+  and
+  \begin{equation}\label{eq:lower-convex-derivative}
+    f_n'(x)-f'(x)
+    \geq
+    \frac{f(x)-f(x-h)}{h}-f'(x)
+    -\frac{2\epsilon_n(h)}{h}.
+  \end{equation}
+  Since $f'$ is uniformly continuous on $K+[-h_0,h_0]$, the deterministic
+  difference-quotient errors converge to zero uniformly on $K$ as $h\downarrow0$.
+  First choose $h$ and then choose $n$ to make $\epsilon_n(h)/h$ small.  This
+  proves the claim.
+\end{proof}
