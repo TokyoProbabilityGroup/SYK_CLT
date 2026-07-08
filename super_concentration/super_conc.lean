@@ -206,9 +206,9 @@ variable {N q : ℕ} {A : Type*}
 
 /-- A phase-corrected Majorana interaction observable. -/
 noncomputable def interactionOperator (s : InteractionIndex N q) : A :=
-  phase q • M.chiProduct s
+  phase q • M.psiProduct s
 
-theorem majorana_sq (i : Fin N) : M.χ i * M.χ i = 1 := by
+theorem majorana_sq (i : Fin N) : M.ψ i * M.ψ i = 1 := by
   have h := M.majorana_rel i i
   rw [if_pos rfl] at h
   rw [← one_add_one_eq_two] at h
@@ -218,8 +218,8 @@ theorem majorana_sq (i : Fin N) : M.χ i * M.χ i = 1 := by
 private theorem listProduct_mul_generator
     (i : Fin N) (l : List (Fin N))
     (hi : i ∉ l) :
-    (l.map M.χ).prod * M.χ i =
-      ((-1 : ℂ) ^ l.length) • (M.χ i * (l.map M.χ).prod) := by
+    (l.map M.ψ).prod * M.ψ i =
+      ((-1 : ℂ) ^ l.length) • (M.ψ i * (l.map M.ψ).prod) := by
   induction l with
   | nil => simp
   | cons j l ih =>
@@ -234,14 +234,14 @@ private theorem listProduct_mul_generator
       rw [mul_assoc, ih hil, Algebra.mul_smul_comm, ← mul_assoc,
         M.anticommute hij, neg_mul, mul_assoc]
       rw [show ((-1 : ℂ) ^ l.length) •
-          (-(M.χ i * (M.χ j * (l.map M.χ).prod))) =
+          (-(M.ψ i * (M.ψ j * (l.map M.ψ).prod))) =
           (((-1 : ℂ) ^ l.length) * (-1)) •
-            (M.χ i * (M.χ j * (l.map M.χ).prod)) by simp]
+            (M.ψ i * (M.ψ j * (l.map M.ψ).prod)) by simp]
       rw [pow_succ]
 
 private theorem listProduct_eq_smul_of_perm
     (l₁ l₂ : List (Fin N)) (h : l₁.Perm l₂) :
-    ∃ c : ℂ, (l₁.map M.χ).prod = c • (l₂.map M.χ).prod := by
+    ∃ c : ℂ, (l₁.map M.ψ).prod = c • (l₂.map M.ψ).prod := by
   induction h with
   | nil => exact ⟨1, by simp⟩
   | @cons i l₁ l₂ _ ih =>
@@ -256,11 +256,11 @@ private theorem listProduct_eq_smul_of_perm
       · refine ⟨-1, ?_⟩
         simp only [List.map_cons, List.prod_cons]
         calc
-          M.χ j * (M.χ i * (l.map M.χ).prod) =
-              (M.χ j * M.χ i) * (l.map M.χ).prod := by rw [mul_assoc]
-          _ = (-(M.χ i * M.χ j)) * (l.map M.χ).prod := by
+          M.ψ j * (M.ψ i * (l.map M.ψ).prod) =
+              (M.ψ j * M.ψ i) * (l.map M.ψ).prod := by rw [mul_assoc]
+          _ = (-(M.ψ i * M.ψ j)) * (l.map M.ψ).prod := by
             rw [M.anticommute (Ne.symm hij)]
-          _ = (-1 : ℂ) • (M.χ i * (M.χ j * (l.map M.χ).prod)) := by
+          _ = (-1 : ℂ) • (M.ψ i * (M.ψ j * (l.map M.ψ).prod)) := by
             simp [mul_assoc]
   | @trans l₁ l₂ l₃ _ _ ih₁ ih₂ =>
       rcases ih₁ with ⟨c₁, hc₁⟩
@@ -270,17 +270,17 @@ private theorem listProduct_eq_smul_of_perm
 
 private theorem star_listProduct_mul_self
     (l : List (Fin N)) (hl : l.Nodup) :
-    star ((l.map M.χ).prod) * (l.map M.χ).prod = 1 := by
+    star ((l.map M.ψ).prod) * (l.map M.ψ).prod = 1 := by
   induction l with
   | nil => simp
   | cons i l ih =>
       rw [List.nodup_cons] at hl
       simp only [List.map_cons, List.prod_cons, star_mul, M.self_adjoint]
-      rw [← mul_assoc, mul_assoc (star ((l.map M.χ).prod)),
+      rw [← mul_assoc, mul_assoc (star ((l.map M.ψ).prod)),
         M.majorana_sq, mul_one, ih hl.2]
 
-theorem chiProduct_star_mul_self (s : InteractionIndex N q) :
-    star (M.chiProduct s) * M.chiProduct s = 1 := by
+theorem psiProduct_star_mul_self (s : InteractionIndex N q) :
+    star (M.psiProduct s) * M.psiProduct s = 1 := by
   apply M.star_listProduct_mul_self
   simp [orderedIndices]
 
@@ -303,7 +303,7 @@ private theorem star_phase_mul_sign' (q : ℕ) :
 theorem interactionOperator_star
     (hq : Even q) (s : InteractionIndex N q) :
     star (M.interactionOperator s) = M.interactionOperator s := by
-  rw [interactionOperator, star_smul, M.star_chiProduct_of_even s hq,
+  rw [interactionOperator, star_smul, M.star_psiProduct_of_even s hq,
     smul_smul, star_phase_mul_sign']
 
 theorem interactionOperator_sq
@@ -315,10 +315,10 @@ theorem interactionOperator_sq
         star (M.interactionOperator s) * M.interactionOperator s := by
           rw [hstar]
     _ = (star (phase q) * phase q) •
-        (star (M.chiProduct s) * M.chiProduct s) := by
+        (star (M.psiProduct s) * M.psiProduct s) := by
           rw [interactionOperator, star_smul, smul_mul_smul_comm]
     _ = (star (phase q) * phase q) • (1 : A) := by
-          rw [M.chiProduct_star_mul_self]
+          rw [M.psiProduct_star_mul_self]
   have hp : star (phase q) * phase q = 1 := by
     change star (Complex.I ^ (q / 2)) * Complex.I ^ (q / 2) = 1
     rw [star_pow, ← mul_pow]
@@ -348,10 +348,10 @@ variable {A : Type*}
   [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
   (M : MajoranaSystem N A)
 
-private theorem chiProduct_extend_eq_smul
+private theorem psiProduct_extend_eq_smul
     (hq : 0 < q) (C : InteractionIndex N (q - 1)) (j : Outside C) :
-    ∃ c : ℂ, M.chiProduct (extendInteraction hq C j) =
-      c • (M.χ j.1 * M.chiProduct C) := by
+    ∃ c : ℂ, M.psiProduct (extendInteraction hq C j) =
+      c • (M.ψ j.1 * M.psiProduct C) := by
   have hperm : List.Perm
       (orderedIndices (extendInteraction hq C j))
       (j.1 :: orderedIndices C) := by
@@ -359,7 +359,7 @@ private theorem chiProduct_extend_eq_smul
       (by simp [orderedIndices, j.2])).2
     intro i
     simp [orderedIndices, extendInteraction]
-  simpa [chiProduct] using
+  simpa [psiProduct] using
     M.listProduct_eq_smul_of_perm _ _ hperm
 
 theorem extendInteraction_anticommute
@@ -370,9 +370,9 @@ theorem extendInteraction_anticommute
         M.interactionOperator (extendInteraction hq0 C k) =
       -(M.interactionOperator (extendInteraction hq0 C k) *
         M.interactionOperator (extendInteraction hq0 C j)) := by
-  rcases M.chiProduct_extend_eq_smul hq0 C j with ⟨cⱼ, hcⱼ⟩
-  rcases M.chiProduct_extend_eq_smul hq0 C k with ⟨cₖ, hcₖ⟩
-  let D : A := M.chiProduct C
+  rcases M.psiProduct_extend_eq_smul hq0 C j with ⟨cⱼ, hcⱼ⟩
+  rcases M.psiProduct_extend_eq_smul hq0 C k with ⟨cₖ, hcₖ⟩
+  let D : A := M.psiProduct C
   have hjmem : j.1 ∉ orderedIndices C := by
     simpa [orderedIndices] using j.2
   have hkmem : k.1 ∉ orderedIndices C := by
@@ -380,31 +380,31 @@ theorem extendInteraction_anticommute
   have hodd : Odd (q - 1) := by
     rcases hq with ⟨m, rfl⟩
     exact ⟨m - 1, by omega⟩
-  have hDⱼ : D * M.χ j.1 = -(M.χ j.1 * D) := by
+  have hDⱼ : D * M.ψ j.1 = -(M.ψ j.1 * D) := by
     have h := M.listProduct_mul_generator j.1 (orderedIndices C) hjmem
     rw [length_orderedIndices, hodd.neg_one_pow] at h
-    simpa [D, chiProduct] using h
-  have hDₖ : D * M.χ k.1 = -(M.χ k.1 * D) := by
+    simpa [D, psiProduct] using h
+  have hDₖ : D * M.ψ k.1 = -(M.ψ k.1 * D) := by
     have h := M.listProduct_mul_generator k.1 (orderedIndices C) hkmem
     rw [length_orderedIndices, hodd.neg_one_pow] at h
-    simpa [D, chiProduct] using h
+    simpa [D, psiProduct] using h
   have hjk' : j.1 ≠ k.1 := by
     intro h
     apply hjk
     exact Subtype.ext h
-  have hχ : M.χ j.1 * M.χ k.1 = -(M.χ k.1 * M.χ j.1) :=
+  have hψ : M.ψ j.1 * M.ψ k.1 = -(M.ψ k.1 * M.ψ j.1) :=
     M.anticommute hjk'
   have hbase :
-      (M.χ j.1 * D) * (M.χ k.1 * D) =
-        -((M.χ k.1 * D) * (M.χ j.1 * D)) := by
+      (M.ψ j.1 * D) * (M.ψ k.1 * D) =
+        -((M.ψ k.1 * D) * (M.ψ j.1 * D)) := by
     calc
-      (M.χ j.1 * D) * (M.χ k.1 * D) =
-          M.χ j.1 * (D * M.χ k.1) * D := by simp only [mul_assoc]
-      _ = M.χ j.1 * (-(M.χ k.1 * D)) * D := by rw [hDₖ]
-      _ = -((M.χ j.1 * M.χ k.1) * (D * D)) := by noncomm_ring
-      _ = (M.χ k.1 * M.χ j.1) * (D * D) := by rw [hχ]; simp
-      _ = -(M.χ k.1 * (D * M.χ j.1) * D) := by rw [hDⱼ]; noncomm_ring
-      _ = -((M.χ k.1 * D) * (M.χ j.1 * D)) := by simp only [mul_assoc]
+      (M.ψ j.1 * D) * (M.ψ k.1 * D) =
+          M.ψ j.1 * (D * M.ψ k.1) * D := by simp only [mul_assoc]
+      _ = M.ψ j.1 * (-(M.ψ k.1 * D)) * D := by rw [hDₖ]
+      _ = -((M.ψ j.1 * M.ψ k.1) * (D * D)) := by noncomm_ring
+      _ = (M.ψ k.1 * M.ψ j.1) * (D * D) := by rw [hψ]; simp
+      _ = -(M.ψ k.1 * (D * M.ψ j.1) * D) := by rw [hDⱼ]; noncomm_ring
+      _ = -((M.ψ k.1 * D) * (M.ψ j.1 * D)) := by simp only [mul_assoc]
   rw [interactionOperator, interactionOperator, hcⱼ, hcₖ,
     smul_smul, smul_smul, smul_mul_smul_comm, smul_mul_smul_comm, hbase]
   simp [D, mul_comm]
@@ -828,9 +828,9 @@ theorem normalizedHamiltonian_affine
   apply Finset.sum_congr rfl
   intro I _hI
   change (((couplingScale P 𝒥 * (J I + s * V I) : ℝ) : ℂ) * phase P.q) •
-      M.chiProduct I =
-    ((((couplingScale P 𝒥 * J I : ℝ) : ℂ) * phase P.q) • M.chiProduct I) +
-      s • ((((couplingScale P 𝒥 * V I : ℝ) : ℂ) * phase P.q) • M.chiProduct I)
+      M.psiProduct I =
+    ((((couplingScale P 𝒥 * J I : ℝ) : ℂ) * phase P.q) • M.psiProduct I) +
+      s • ((((couplingScale P 𝒥 * V I : ℝ) : ℂ) * phase P.q) • M.psiProduct I)
   rw [← smul_assoc, ← add_smul]
   congr 1
   rw [Complex.real_smul]
