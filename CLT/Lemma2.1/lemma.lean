@@ -1,6 +1,7 @@
 import Mathlib.Analysis.Convex.Deriv
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Topology.MetricSpace.Thickening
+import Mathlib.Topology.UniformSpace.HeineCantor
 import Mathlib.Topology.UniformSpace.LocallyUniformConvergence
 
 open Filter
@@ -40,6 +41,23 @@ theorem convex_convergence_deriv_tendstoUniformlyOn
   have hFderiv_uniform :
       UniformContinuousOn (fun x => deriv F x) (cthickening δ K) := by
     exact hδ_compact.uniformContinuousOn_of_continuous (hFderiv_cont.mono hδI)
+  have h_squeeze :
+      ∀ n x h, x ∈ K → 0 < h → h ≤ δ →
+        slope (f n) (x - h) x ≤ deriv (f n) x ∧
+          deriv (f n) x ≤ slope (f n) x (x + h) := by
+    intro n x h hxK hh hle
+    have hxI : x ∈ I := hKI hxK
+    have hxmhI : x - h ∈ I := by
+      apply hδI
+      exact mem_cthickening_of_dist_le (x - h) x δ K hxK (by
+        simpa [Real.dist_eq, abs_of_nonneg hh.le] using hle)
+    have hxphI : x + h ∈ I := by
+      apply hδI
+      exact mem_cthickening_of_dist_le (x + h) x δ K hxK (by
+        simpa [Real.dist_eq, abs_of_nonneg hh.le] using hle)
+    constructor
+    · exact (hconv n).slope_le_deriv hxmhI hxI (by linarith) (hfdiff n x hxI)
+    · exact (hconv n).deriv_le_slope hxI hxphI (by linarith) (hfdiff n x hxI)
   -- The remaining argument is the standard secant squeeze from convexity:
   -- for `x ∈ K` and small positive `h`, the derivative of `f n` at `x` lies
   -- between the left and right secant slopes.  Uniform convergence controls
