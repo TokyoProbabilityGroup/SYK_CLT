@@ -544,9 +544,13 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
   \end{equation}
   By Lemma~\ref{lem:selection}, the off-diagonal coefficients vanish.  The
   diagonal coefficient is independent of $I$ by permutation symmetry of the
-  Majorana labels and exchangeability of the disorder.  This gives
-  \eqref{eq:p2-exact}; write the common coefficient temporarily as
-  $\widetilde a_n(\beta)$.
+  Majorana labels and exchangeability of the disorder.  Thus
+  \begin{equation*}
+    P_2L_n(\beta)
+    =
+    \widetilde a_n(\beta)\sum_{I\in\calI_n}(g_I^2-1)
+  \end{equation*}
+  for the common diagonal coefficient $\widetilde a_n(\beta)$.
 
   By Lemma~\ref{lem:hermite-coeff},
   \begin{equation}\label{eq:an-second-derivative}
@@ -965,7 +969,7 @@ Only even multi-indices survive by Lemma~\ref{lem:selection}.
 
 \begin{lemma}[Counting even marked hypergraphs at fixed order]
   \label{lem:even-marked-count}
-  Fix an even integer $q$ and $R\geq1$, and set
+  Fix an even integer $q$ and an integer $R\geq1$, and set
   \begin{equation}\label{eq:even-count-constant}
     E_{q,R}
     =
@@ -1843,28 +1847,31 @@ show why the last input must be a genuinely annealed two-replica estimate.
   \begin{equation}\label{eq:single-activity-diverges}
     \sum_{K\in\calI_n:K\cap I\neq\emptyset}\E\eta_K(g)
     \geq
-    c_{q,\beta} n^{(q-1)/2}
+    \frac{cq|\beta|}{2}
+    \sqrt{\frac{2}{\pi(q-1)!}}\,
+    n^{(q-1)/2}
   \end{equation}
   for all large $n$.
 \end{lemma}
 
 \begin{proof}
-  Since $\sigma_n\to0$ and $\E|g_K|=\sqrt{2/\pi}$,
+  Since $e^x-1\geq x$ for $x\geq0$ and $\E|g_K|=\sqrt{2/\pi}$,
   \begin{equation}\label{eq:eta-first-order}
     \E\eta_K(g)
-    =
-    c|\beta|\sigma_n\E|g_K|+O(\sigma_n^2)
     \geq
-    c_{\beta}\sigma_n
+    c|\beta|\sigma_n\sqrt{\frac2\pi}.
   \end{equation}
-  for all large $n$.  On the other hand,
+  On the other hand,
   \begin{equation}\label{eq:number-touching-I}
     \#\{K\in\calI_n:K\cap I\neq\emptyset\}
     =
     \binom nq-\binom{n-q}{q}
-    \asymp_q n^{q-1}.
+    \geq
+    \frac{q}{2(q-1)!}n^{q-1}
   \end{equation}
-  Using $\sigma_n\asymp_q n^{-(q-1)/2}$ gives
+  for all large $n$, because the left-hand side is a polynomial in $n$ with
+  leading coefficient $q/(q-1)!$.  Using
+  $\sigma_n=((q-1)!)^{1/2}n^{-(q-1)/2}$ gives
   \eqref{eq:single-activity-diverges}.
 \end{proof}
 
@@ -2053,6 +2060,14 @@ coefficient is too fine a decomposition.
   \begin{equation}\label{eq:beta-sus-from-ce}
     \beta_{\rm sus}<\min\{\beta_{\rm ce},B_q^{-1/2}\}.
   \end{equation}
+  More precisely, if $K\subset(-\beta_{\rm sus},\beta_{\rm sus})$ is compact
+  and $\beta_K=\sup_{\beta\in K}|\beta|$, then the susceptibility constant in
+  \eqref{eq:two-marked-susceptibility} satisfies
+  \begin{equation}\label{eq:susceptibility-constant-from-cluster}
+    S_{q,K}
+    \leq
+    \left(1-B_q^{1/2}\beta_K\right)^{-2}.
+  \end{equation}
 \end{proposition}
 
 \begin{proof}
@@ -2097,8 +2112,11 @@ coefficient is too fine a decomposition.
       \sum_{p\geq0}(B_q^{1/2}|\beta|)^p
     \right)^2.
   \end{equation}
-  Taking the supremum over $\beta\in K\subset(-\beta_{\rm sus},\beta_{\rm sus})$, with $\beta_{\rm sus}$ satisfying \eqref{eq:beta-sus-from-ce}, proves
-  \eqref{eq:two-marked-susceptibility}.
+  Taking the supremum over
+  $\beta\in K\subset(-\beta_{\rm sus},\beta_{\rm sus})$, with
+  $\beta_{\rm sus}$ satisfying \eqref{eq:beta-sus-from-ce}, gives
+  \eqref{eq:susceptibility-constant-from-cluster} and proves
+  Assumption~\ref{ass:two-marked-susceptibility}.
 \end{proof}
 
 \begin{remark}[What is proved and what remains]
@@ -2150,7 +2168,11 @@ coefficient is too fine a decomposition.
     =
     \frac{\beta^2}{2}\tr(H_n^2)
     +
-    O\left(\beta^3\norm{H_n}^3e^{|\beta|\norm{H_n}}\right),
+    \mathcal R_n(\beta),
+    \qquad
+    |\mathcal R_n(\beta)|
+    \leq
+    8|\beta|^3\norm{H_n}^3,
   \end{equation}
   and
   \begin{equation}\label{eq:tr-H2}
@@ -2174,8 +2196,12 @@ coefficient is too fine a decomposition.
 \end{proposition}
 
 \begin{proof}
-  Since $\tr(H_n)=0$ by Lemma~\ref{lem:trace-monomial-zero}, Taylor expansion of
-  $\log\tr e^{\beta H_n}$ gives \eqref{eq:small-beta-expansion}.  By
+  Let $F(\beta)=\log\tr e^{\beta H_n}$.  Since $\tr(H_n)=0$ by
+  Lemma~\ref{lem:trace-monomial-zero}, we have $F(0)=F'(0)=0$ and
+  $F''(0)=\tr(H_n^2)$.  Lemma~\ref{lem:log-partition-derivative-bound}, applied
+  with $B_1=B_2=B_3=H_n$, gives
+  $|F'''(t)|\leq2^3 3!\norm{H_n}^3$ for all real $t$.  Taylor's formula gives
+  the remainder bound in \eqref{eq:small-beta-expansion}.  By
   Lemma~\ref{lem:trace-orth},
   \begin{equation}\label{eq:tr-H2-proof}
     \tr(H_n^2)

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2026.2.1)  9 JUL 2026 00:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2026.2.1)  9 JUL 2026 00:55
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -384,7 +384,7 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 \openout4 = `CLT_for_SYK_v3.toc'.
 
  [2] [3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13]
-LaTeX Font Info:    Trying to load font information for U+euf on input line 1222.
+LaTeX Font Info:    Trying to load font information for U+euf on input line 1226.
  (c:/texlive/2025/texmf-dist/tex/latex/amsfonts/ueuf.fd
 File: ueuf.fd 2013/01/14 v3.01 Euler Fraktur
 ) [14] [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] (./CLT_for_SYK_v3.aux)
@@ -396,18 +396,18 @@ Package rerunfilecheck Info: File `CLT_for_SYK_v3.out' has not changed.
 (rerunfilecheck)             Checksum: 8BA2D736C36E9F78C6DABAB742226CEB;3832.
  ) 
 Here is how much of TeX's memory you used:
- 11788 strings out of 467533
- 182011 string characters out of 5423669
- 620634 words of memory out of 5000000
- 40396 multiletter control sequences out of 15000+600000
+ 11793 strings out of 467533
+ 182169 string characters out of 5423669
+ 620714 words of memory out of 5000000
+ 40400 multiletter control sequences out of 15000+600000
  643898 words of font info for 101 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,12n,79p,592b,607s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,12n,79p,592b,603s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex8.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmti8.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eufm10.pfb><c:/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on CLT_for_SYK_v3.pdf (24 pages, 396545 bytes).
+Output written on CLT_for_SYK_v3.pdf (24 pages, 398313 bytes).
 PDF statistics:
- 634 PDF objects out of 1000 (max. 8388607)
- 542 compressed objects within 6 object streams
- 152 named destinations out of 1000 (max. 500000)
+ 637 PDF objects out of 1000 (max. 8388607)
+ 545 compressed objects within 6 object streams
+ 153 named destinations out of 1000 (max. 500000)
  129 words of extra memory for PDF output out of 10000 (max. 10000000)
 
