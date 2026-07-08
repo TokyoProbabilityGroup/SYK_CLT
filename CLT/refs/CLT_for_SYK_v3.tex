@@ -266,9 +266,11 @@ Assumption~\ref{ass:two-replica-cluster-expansion}.
 \begin{assumption}[Two-marked high-temperature susceptibility]
   \label{ass:two-marked-susceptibility}
   There exists $\beta_{\rm sus}=\beta_{\rm sus}(q)>0$ such that, for every
-  compact $K\subset(-\beta_{\rm sus},\beta_{\rm sus})$, there is
-  $C_{q,K}<\infty$ satisfying, for all $n$,
+  compact $K\subset(-\beta_{\rm sus},\beta_{\rm sus})$, the quantity
   \begin{equation}\label{eq:two-marked-susceptibility}
+    S_{q,K}
+    :=
+    \sup_{n\geq1}
     \sup_{\beta\in K}
     \sup_{I\in\calI_n}
     \sum_{J\in\calI_n}
@@ -277,8 +279,7 @@ Assumption~\ref{ass:two-replica-cluster-expansion}.
         \mathcal C_{I,J}(\beta,g)
       \right|^2
     \right]
-    \leq
-    C_{q,K}.
+    <\infty.
   \end{equation}
 \end{assumption}
 
@@ -371,8 +372,8 @@ Assumption~\ref{ass:two-replica-cluster-expansion}.
   $\beta\mapsto L_n(\beta)$ is convex, because $L_n''(\beta)$ is the thermal
   variance of $H_n(g)$.  Therefore $f_n$ is convex.  Differentiability follows
   by differentiating under the Gaussian expectation; this is justified by
-  $\norm{H_n(g)}\leq C_{q,n}\sum_I|g_I|$ and Gaussian exponential
-  integrability in finite dimension.  Assumption~\ref{ass:local-lln} gives
+  $\norm{H_n(g)}\leq 2^{-q/2}\sigma_n\sum_{I\in\calI_n}|g_I|$ and Gaussian
+  exponential integrability in finite dimension.  Assumption~\ref{ass:local-lln} gives
   locally uniform convergence of $f_n$ to the analytic, hence $C^1$, function
   $\ell_q$.  Lemma~\ref{lem:convex-derivative} gives
   \eqref{eq:derivative-lln}.
@@ -518,7 +519,11 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
 \end{proof}
 
 \begin{lemma}[Exact second chaos]\label{lem:second-chaos}
-  There exists a scalar $a_n(\beta)$ such that
+  Set
+  \begin{equation}\label{eq:an-explicit-def}
+    a_n(\beta)=\frac{\beta\partial_\beta\E L_n(\beta)}{2N_n}.
+  \end{equation}
+  Then
   \begin{equation}\label{eq:p2-exact}
     P_2L_n(\beta)=a_n(\beta)\sum_{I\in\calI_n}(g_I^2-1).
   \end{equation}
@@ -540,15 +545,16 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
   By Lemma~\ref{lem:selection}, the off-diagonal coefficients vanish.  The
   diagonal coefficient is independent of $I$ by permutation symmetry of the
   Majorana labels and exchangeability of the disorder.  This gives
-  \eqref{eq:p2-exact}; write the common coefficient as $a_n(\beta)$.
+  \eqref{eq:p2-exact}; write the common coefficient temporarily as
+  $\widetilde a_n(\beta)$.
 
   By Lemma~\ref{lem:hermite-coeff},
   \begin{equation}\label{eq:an-second-derivative}
-    a_n(\beta)=\frac12\E[\partial_{g_I}^2L_n(\beta)].
+    \widetilde a_n(\beta)=\frac12\E[\partial_{g_I}^2L_n(\beta)].
   \end{equation}
   Summing over $I$ and using Gaussian integration by parts,
   \begin{equation}\label{eq:gibp-second-chaos}
-    2N_na_n(\beta)
+    2N_n\widetilde a_n(\beta)
     =
     \sum_{I\in\calI_n}\E[\partial_{g_I}^2L_n(\beta)]
     =
@@ -562,7 +568,9 @@ For $s=(s_1,\ldots,s_n)\in\{\pm1\}^n$ define
     =
     \beta\partial_\beta L_n(\beta).
   \end{equation}
-  Taking expectation proves \eqref{eq:an-coeff}.
+  Taking expectation proves
+  $\widetilde a_n(\beta)=\beta\partial_\beta\E L_n(\beta)/(2N_n)$, hence
+  \eqref{eq:an-explicit-def} and \eqref{eq:an-coeff}.
 \end{proof}
 
 \begin{proposition}[Exact reduction to the diagonal second chaos]
@@ -678,7 +686,8 @@ assumption by a second-derivative estimate.
     \beta^2\sigma_n^2\mathcal C_{I,J}(\beta,g).
   \end{equation}
   Consequently, under Assumption~\ref{ass:two-marked-susceptibility}, for
-  every compact $K\subset(-\beta_{\rm sus},\beta_{\rm sus})$,
+  every compact $K\subset(-\beta_{\rm sus},\beta_{\rm sus})$, with
+  $\beta_K=\sup_{\beta\in K}|\beta|$,
   \begin{equation}\label{eq:hessian-hs-bound}
     \sup_{\beta\in K}
     \E
@@ -687,7 +696,7 @@ assumption by a second-derivative estimate.
       \partial_{g_I}\partial_{g_J}L_n(\beta)
     \right|^2
     \leq
-    C_{q,K}n^{2-q}.
+    \beta_K^4\frac{((q-1)!)^2}{q!}S_{q,K}n^{2-q}.
   \end{equation}
 \end{lemma}
 
@@ -730,21 +739,23 @@ assumption by a second-derivative estimate.
   This proves \eqref{eq:hessian-kubo}.  By
   Assumption~\ref{ass:two-marked-susceptibility},
   \begin{align}\label{eq:hessian-hs-bound-proof}
+    \sup_{\beta\in K}
     \E
     \sum_{I,J\in\calI_n}
     \left|
       \partial_{g_I}\partial_{g_J}L_n(\beta)
     \right|^2
     &\leq
-    \beta^4\sigma_n^4
+    \beta_K^4\sigma_n^4
     \sum_{I\in\calI_n}
-    C_{q,K} \\
+    S_{q,K} \\
     &\leq
-    C_{q,K}\sigma_n^4N_n
+    \beta_K^4S_{q,K}\sigma_n^4N_n
     \leq
-    C_{q,K}n^{2-q},
+    \beta_K^4\frac{((q-1)!)^2}{q!}S_{q,K}n^{2-q},
   \end{align}
-  because $\sigma_n^4N_n\asymp n^{-2(q-1)}n^q=n^{2-q}$.
+  because $N_n\leq n^q/q!$ and
+  $\sigma_n^4=((q-1)!)^2n^{-2(q-1)}$.
 \end{proof}
 
 \begin{lemma}[Second Malliavin derivative and chaos tail]
@@ -826,13 +837,14 @@ assumption by a second-derivative estimate.
   \end{equation}
   For the tail, apply Lemma~\ref{lem:malliavin-second-tail} to
   $F=L_n(\beta)-\E L_n(\beta)$.  Since $D^2F=D^2L_n(\beta)$,
-  Lemma~\ref{lem:kubo-hessian} gives
+  Lemma~\ref{lem:kubo-hessian} gives, with
+  $\beta_K=\sup_{\beta\in K}|\beta|$,
   \begin{equation}\label{eq:tail-hessian-bound}
     \sup_{\beta\in K}
     n^{q-2}
     \sum_{r>R}\norm{P_rL_n(\beta)}_2^2
     \leq
-    \frac{C_{q,K}}{R(R-1)}.
+    \frac{\beta_K^4((q-1)!)^2S_{q,K}}{q!R(R-1)}.
   \end{equation}
   Taking $\limsup_{n\to\infty}$ and then $R\to\infty$ proves
   \eqref{eq:higher-chaos-closure}.
@@ -862,8 +874,7 @@ Assumption~\ref{ass:two-marked-susceptibility}.
 
 \begin{lemma}[Log-partition derivative bound]
   \label{lem:log-partition-derivative-bound}
-  There is a universal constant $C<\infty$ such that the following holds.  Let
-  $K$ and $B_1,\ldots,B_r$ be Hermitian matrices.  Put
+  Let $K$ and $B_1,\ldots,B_r$ be Hermitian matrices.  Put
   \begin{equation}\label{eq:logZ-general}
     \Phi(x_1,\ldots,x_r)
     =
@@ -875,7 +886,7 @@ Assumption~\ref{ass:two-marked-susceptibility}.
       \partial_{x_1}\cdots\partial_{x_r}\Phi(0)
     \right|
     \leq
-    C^r r!\prod_{j=1}^r\norm{B_j}.
+    2^r r!\prod_{j=1}^r\norm{B_j}.
   \end{equation}
 \end{lemma}
 
@@ -926,9 +937,23 @@ Assumption~\ref{ass:two-marked-susceptibility}.
     \right)
     \prod_{j=1}^r\norm{B_j}.
   \end{equation}
-  The combinatorial factor is at most $C^rr!$ for a universal $C$.  This proves
-  \eqref{eq:log-partition-derivative-bound}.  Repeated variables follow by
-  polarization or by the same formula with repeated labels.
+  For partitions with $k$ blocks,
+  \begin{equation}\label{eq:block-factor-count}
+    \sum_{\substack{\Pi\in\mathsf P([r])\\ |\Pi|=k}}
+    \prod_{A\in\Pi}|A|!
+    =
+    \frac{r!}{k!}\binom{r-1}{k-1}.
+  \end{equation}
+  Hence the combinatorial factor is
+  \begin{equation}\label{eq:partition-factor-explicit}
+    r!\sum_{k=1}^r\frac1k\binom{r-1}{k-1}
+    =
+    r!\frac{2^r-1}{r}
+    \leq
+    2^rr!.
+  \end{equation}
+  This proves \eqref{eq:log-partition-derivative-bound}.  Repeated variables
+  follow by polarization or by the same formula with repeated labels.
 \end{proof}
 
 For a multi-index $\alpha$, call it even if
@@ -940,12 +965,18 @@ Only even multi-indices survive by Lemma~\ref{lem:selection}.
 
 \begin{lemma}[Counting even marked hypergraphs at fixed order]
   \label{lem:even-marked-count}
-  Fix an even integer $q$ and $R\geq1$.  Then there exists
-  $C_{q,R}<\infty$ such that, for every $1\leq r\leq R$ and every $n$,
+  Fix an even integer $q$ and $R\geq1$, and set
+  \begin{equation}\label{eq:even-count-constant}
+    E_{q,R}
+    =
+    \left(\left\lfloor\frac{Rq}{2}\right\rfloor+1\right)
+    \left(\frac{Rq}{2}\right)^{qR}.
+  \end{equation}
+  Then, for every $1\leq r\leq R$ and every $n$,
   \begin{equation}\label{eq:even-marked-count}
     \sum_{\substack{|\alpha|=r\\ \alpha\text{ even}}}\frac1{\alpha!}
     \leq
-    C_{q,R}n^{rq/2}.
+    E_{q,R}n^{rq/2}.
   \end{equation}
 \end{lemma}
 
@@ -956,7 +987,7 @@ Only even multi-indices survive by Lemma~\ref{lem:selection}.
   of ordered $r$-tuples $(I_1,\ldots,I_r)$ with even incidence is bounded by
   \begin{equation}\label{eq:ordered-even-count}
     \sum_{v\leq rq/2}\binom{n}{v}\binom{v}{q}^r
-    \leq C_{q,R}n^{rq/2},
+    \leq E_{q,R}n^{rq/2},
     \qquad 1\leq r\leq R.
   \end{equation}
   A multi-index $\alpha$ with $|\alpha|=r$ corresponds to $r!/\alpha!$
@@ -967,8 +998,7 @@ Only even multi-indices survive by Lemma~\ref{lem:selection}.
     \frac1{r!}
     \#\{(I_1,\ldots,I_r):\text{ the induced incidence is even}\},
   \end{equation}
-  and the preceding ordered-tuple bound proves the claim after enlarging
-  $C_{q,R}$.
+  and the preceding ordered-tuple bound proves the claim.
 \end{proof}
 
 \begin{remark}[Why the fixed-order formulation is necessary]
@@ -985,7 +1015,18 @@ Only even multi-indices survive by Lemma~\ref{lem:selection}.
 \end{remark}
 
 \begin{proposition}[Finite-chaos closure]\label{prop:finite-chaos-closure}
-  Fix $R\geq3$ and a compact $K\subset\R$.  Then
+  Fix an integer $R\geq3$ and a compact $K\subset\R$, and put
+  $\beta_K=\sup_{\beta\in K}|\beta|$.  Then
+  \begin{align}\label{eq:finite-chaos-explicit-bound}
+    \sup_{\beta\in K}
+    \sum_{r=3}^R\norm{P_rL_n(\beta)}_2^2
+    &\leq
+    E_{q,R}
+    \sum_{r=3}^R
+    (2^rr!)^2\beta_K^{2r}2^{-qr}((q-1)!)^r
+    n^{r(1-q/2)}.
+  \end{align}
+  In particular,
   \begin{equation}\label{eq:finite-chaos-closure}
     \sup_{\beta\in K}
     \sum_{r=3}^R\norm{P_rL_n(\beta)}_2^2
@@ -1000,7 +1041,8 @@ Only even multi-indices survive by Lemma~\ref{lem:selection}.
   $B_j=\beta\sigma_n\psi_{I_j}$ gives, for $\beta\in K$ and $r\leq R$,
   \begin{equation}\label{eq:fixed-alpha-bound}
     \left|\E\partial^\alpha L_n(\beta)\right|
-    \leq C_{R,K,q}\sigma_n^r.
+    \leq
+    2^rr!\beta_K^r\sigma_n^r2^{-qr/2}.
   \end{equation}
   By Lemma~\ref{lem:hermite-coeff} and orthogonality,
   \begin{equation}\label{eq:Pr-norm-coeff}
@@ -1014,12 +1056,16 @@ Only even multi-indices survive by Lemma~\ref{lem:selection}.
   \begin{equation}\label{eq:Pr-fixed-bound}
     \norm{P_rL_n(\beta)}_2^2
     \leq
-    C_{R,K,q}\sigma_n^{2r}n^{rq/2}
-    \leq
-    C_{R,K,q}n^{r(1-q/2)}.
+    E_{q,R}(2^rr!)^2\beta_K^{2r}2^{-qr}
+    \sigma_n^{2r}n^{rq/2}
+    =
+    E_{q,R}(2^rr!)^2\beta_K^{2r}2^{-qr}((q-1)!)^r
+    n^{r(1-q/2)}.
   \end{equation}
-  For $q\geq4$ and $r\geq3$, $r(1-q/2)<2-q$.  Summing over fixed
-  $3\leq r\leq R$ proves the proposition.
+  Summing \eqref{eq:Pr-fixed-bound} gives
+  \eqref{eq:finite-chaos-explicit-bound}.  For $q\geq4$ and $r\geq3$,
+  $r(1-q/2)<2-q$, so the explicit bound implies
+  \eqref{eq:finite-chaos-closure}.
 \end{proof}
 
 
@@ -1274,15 +1320,14 @@ $E_a\cap E_b\neq\emptyset$.
 
 \begin{lemma}[A crude absolute cumulant bound]
   \label{lem:crude-cumulant-bound}
-  There is a universal constant $C<\infty$ such that for all
-  $E_1,\ldots,E_r\in\calI_n$,
+  For all $E_1,\ldots,E_r\in\calI_n$,
   \begin{equation}\label{eq:crude-cumulant-bound}
     \left|
       \partial_{t_1}\cdots\partial_{t_r}
       \log\tr\exp\left(\sum_{a=1}^r t_a\psi_{E_a}\right)\bigg|_{t=0}
     \right|
     \leq
-    C^r r!.
+    e^r r!.
   \end{equation}
 \end{lemma}
 
@@ -1469,15 +1514,14 @@ sharper tree-graph estimate that was previously left as a hypothesis.
 
 \begin{proposition}[Duhamel cumulant tree-graph inequality]
   \label{prop:duhamel-tree-graph}
-  There exists $A_q<\infty$ such that for every $r\geq2$ and every
-  $E_1,\ldots,E_r\in\calI_n$,
+  For every $r\geq2$ and every $E_1,\ldots,E_r\in\calI_n$,
   \begin{equation}\label{eq:duhamel-tree-graph}
     \left|
       \partial_{t_1}\cdots\partial_{t_r}
       \log\tr\exp\left(\sum_{a=1}^r t_a\psi_{E_a}\right)\bigg|_{t=0}
     \right|
     \leq
-    A_q^r
+    2^{r-1}
     \sum_{T\in\mathsf{Tree}([r])}
     \prod_{\{a,b\}\in E(T)}
     \ind_{E_a\cap E_b\neq\emptyset}.
@@ -1506,7 +1550,7 @@ sharper tree-graph estimate that was previously left as a hypothesis.
     \prod_{\{a,b\}\in E(T)}
     \ind_{E_a\cap E_b\neq\emptyset}.
   \end{equation}
-  Thus \eqref{eq:duhamel-tree-graph} holds, for instance with $A_q=2$.
+  Thus \eqref{eq:duhamel-tree-graph} holds.
 \end{proof}
 
 \begin{remark}[What this proves and what it does not prove]
@@ -1637,12 +1681,11 @@ freedom.  It is useful in any attempt to prove the cluster-expansion estimate be
     \qquad
     H_1,\ldots,H_p
   \end{equation}
-  is connected.  Then there exists $D_q<\infty$, depending only on $q$, such
-  that
+  is connected.  Then
   \begin{equation}\label{eq:connected-parity-counting}
     N_p(I,C)
     \leq
-    D_q^p p! n^{(q-1)p}.
+    (2e^2q^2)^p p! n^{(q-1)p}.
   \end{equation}
 \end{lemma}
 
@@ -1748,8 +1791,8 @@ freedom.  It is useful in any attempt to prove the cluster-expansion estimate be
     \leq
     (eq)^p(qp+q)^p n^{(q-1)p}.
   \end{equation}
-  Since $p^p\leq e^p p!$ for $p\geq1$, this is bounded by
-  $D_q^p p! n^{(q-1)p}$ after increasing $D_q$.
+  Since $p+1\leq2p$ and $p^p\leq e^p p!$ for $p\geq1$, this is bounded by
+  $(2e^2q^2)^p p! n^{(q-1)p}$.
 \end{proof}
 
 \begin{remark}[Use and limitation of the parity count]

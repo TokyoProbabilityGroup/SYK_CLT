@@ -1,0 +1,17 @@
+\contentsline {paragraph}{Status.}{1}{section*.1}%
+\contentsline {section}{Reader's guide and dependency of assumptions}{3}{section*.3}%
+\contentsline {section}{\numberline {1}Model and main theorem}{4}{section.1}%
+\contentsline {section}{\numberline {2}Derivative LLN from convexity}{5}{section.2}%
+\contentsline {section}{\numberline {3}Hermite decomposition and gauge selection}{6}{section.3}%
+\contentsline {section}{\numberline {4}Exact second chaos}{7}{section.4}%
+\contentsline {section}{\numberline {5}The second-chaos CLT}{8}{section.5}%
+\contentsline {section}{\numberline {6}Higher-chaos closure from two-marked susceptibility}{9}{section.6}%
+\contentsline {section}{\numberline {7}Fixed finite chaos estimates}{10}{section.7}%
+\contentsline {section}{\numberline {8}Proof attempt for the two-marked susceptibility estimate}{13}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Source derivatives and finite-order connected coefficients}{13}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Cumulant structure of the Duhamel coefficients}{14}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}The finite two-replica Wick reduction}{17}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.4}Connected parity counting}{18}{subsection.8.4}%
+\contentsline {subsection}{\numberline {8.5}Why the remaining estimate is not proved by the naive expansions}{20}{subsection.8.5}%
+\contentsline {section}{\numberline {9}Small-$\beta $ consistency check}{23}{section.9}%
+\contentsline {section}{\numberline {10}Conclusion}{24}{section.10}%
