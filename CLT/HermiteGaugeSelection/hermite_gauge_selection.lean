@@ -9,7 +9,8 @@ namespace SYK
 namespace CLT
 
 /-!
-Section 3 stubs from `CLT_for_SYK_v3.tex`.
+Hermite decomposition and gauge selection from Section 2 of
+`CLT_for_SYK_v3.tex`.
 
 The analytic facts are recorded as theorem statements with `sorry`.  The
 projection operator is a placeholder until the Gaussian chaos formalization is

@@ -53,10 +53,10 @@ lemma abs_slope_sub_deriv_lt {F : ℝ → ℝ} {S : Set ℝ} {a b p d ε : ℝ}
 /--
 Convex convergence implies derivative convergence.
 
-This is Lemma 2.1 from the blueprint.  The open interval is represented by an
-open set `I`; convexity of `I` is included in each `ConvexOn` hypothesis.  The
-assumption that the limit is $C^1$ is encoded as differentiability on `I` and
-continuity of `deriv F` on `I`.
+This is the lemma labelled `lem:convex-derivative` in `CLT_for_SYK_v3.tex`.
+The open interval is represented by an open set `I`; convexity of `I` is
+included in each `ConvexOn` hypothesis.  The assumption that the limit is $C^1$
+is encoded as differentiability on `I` and continuity of `deriv F` on `I`.
 -/
 theorem convex_convergence_deriv_tendstoUniformlyOn
     {I K : Set ℝ} {f : ℕ → ℝ → ℝ} {F : ℝ → ℝ}
