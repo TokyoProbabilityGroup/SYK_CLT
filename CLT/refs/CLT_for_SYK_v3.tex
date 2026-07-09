@@ -2111,11 +2111,7 @@ coefficient is too fine a decomposition.
 \subsection{Final conjecture}
 
 The following is a self-contained conjectural form of
-Assumption~\ref{ass:two-replica-cluster-expansion}.
-
-\begin{conjecture}[Self-contained two-replica cluster expansion]
-  \label{conj:self-contained-two-replica-cluster}
-  Fix an even integer $q\geq4$.  For each $N$, let
+Assumption~\ref{ass:two-replica-cluster-expansion}.  Fix an even integer $q\geq4$.  For each $N$, let
   $\psi_1,\ldots,\psi_N$ be Majorana generators on the normalized trace space,
   and for $I=\{i_1<\cdots<i_q\}\subset[N]$ put
   $\psi_I=\psi_{i_1}\cdots\psi_{i_q}$ with the standard phase convention for
@@ -2160,46 +2156,45 @@ Assumption~\ref{ass:two-replica-cluster-expansion}.
   \begin{equation}\label{eq:final-conj-truncation}
     \mathcal C^{[M]}_{I,J}(\beta,g)
     =
-    \sum_{m=0}^M
-    \frac{(-\beta\sigma_N)^m}{m!}
+    \sum_{m=0}^M   \mathcal A_{p;I,J}(\beta,g),
+    \end{equation}
+    where
+    \[
+ \mathcal A_{p;I,J}(\beta,g)=     \frac{(-\beta\sigma_N)^m}{m!}
     \sum_{K_1,\ldots,K_m\in\calI_N}
     g_{K_1}\cdots g_{K_m}
     \kappa(I,J;K_1,\ldots,K_m).
-  \end{equation}
-  There exist constants $B_q<\infty$ and $\beta_{\rm ce}>0$, depending only on
-  $q$, such that for every $|\beta|<\beta_{\rm ce}$ the following hold,
-  uniformly in $N$ and in $I,J\in\calI_N$.
+  \]
 
-  The truncations converge to the Kubo covariance in Gaussian $L^2$:
+\begin{conjecture}[Self-contained two-replica cluster expansion]
+  \label{conj:self-contained-two-replica-cluster}
+  There exist constants $B_q<\infty$ and $\beta_{q}>0$, depending only on
+  $q$, such that for every $|\beta|<\beta_{q}$ the following hold:
   \begin{equation}\label{eq:final-conj-convergence}
-    \mathcal C^{[M]}_{I,J}(\beta,g)
-    \to
-    \mathcal C_{I,J}(\beta,g)
-    \qquad
-    \text{in }L^2(\dd\gamma(g))
-    \text{ as }M\to\infty.
-  \end{equation}
-  For each $M\geq0$, there are random variables
-  $\mathcal A^{[M]}_{p;I,J}(\beta,g)$, $0\leq p\leq M$, such that
-  \begin{equation}\label{eq:final-conj-layer-decomposition}
-    \mathcal C^{[M]}_{I,J}(\beta,g)
+    \lim_{M\to\infty} \sup_{N,I,J\in\calI_N}
+    \E\left[
+      \left(
+        \mathcal C^{[M]}_{I,J}(\beta,g)
+        -
+        \mathcal C_{I,J}(\beta,g)
+      \right)^2
+    \right]
     =
-    \sum_{p=0}^M
-    \mathcal A^{[M]}_{p;I,J}(\beta,g).
+    0.
   \end{equation}
-  The $p$-th layer is obtained from the exact finite two-replica Wick expansion
-  by collecting all terms with $p$ Wick pairs and, before taking absolute
-  values, summing all diagrams with the same connected support that differ only
-  by repeated appearances of hyperedges inside that support.  These layers
-  satisfy the row-wise annealed estimate
-  \begin{equation}\label{eq:final-conj-layer-bound}
+  \end{conjecture}
+  \begin{conjecture}[Self-contained two-replica cluster expansion]
+  \label{conj:self-contained-two-replica-cluster2}
+  There exist constants $B_q<\infty$ and $\beta_{q}>0$, depending only on
+  $q$, such that for every $|\beta|<\beta_{q}$ the following hold,
+  uniformly in $N$: \begin{equation}\label{eq:final-conj-layer-bound}
     \sup_{M\geq0}
     \sup_{N\geq1}
     \sup_{I\in\calI_N}
     \sum_{J\in\calI_N}
     \E\left[
       \left|
-        \mathcal A^{[M]}_{p;I,J}(\beta,g)
+        \mathcal A_{p;I,J}(\beta,g)
       \right|^2
     \right]
     \leq
