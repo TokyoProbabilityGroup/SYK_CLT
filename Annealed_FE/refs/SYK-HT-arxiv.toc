@@ -1,0 +1,10 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
+\contentsline {section}{\numberline {2}Main result. Free energy limit}{7}{section.2}%
+\contentsline {section}{\numberline {3}Proof of the main result Theorem~\ref {theorem:main-result}}{11}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Power series expansion of the free energy}{11}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Contribution from trees}{14}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Contribution from non-trees}{16}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Proof completion}{19}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Proof of upper bound.}{19}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}Proof of lower bound.}{20}{subsubsection.3.4.2}%
+\contentsline {section}{\numberline {4}Loose ends. Proof of Propositions~\ref {prop:existsCCG},\ref {prop:CCG-graph-theoretically},\ref {prop:t-star-2}}{22}{section.4}%
