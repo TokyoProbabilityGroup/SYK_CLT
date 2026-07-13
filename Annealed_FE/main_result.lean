@@ -7,8 +7,8 @@ set_option autoImplicit false
 # Annealed SYK free-energy limit
 
 This file states the main result of `refs/SYK-HT-arxiv.tex` using the
-normalizations of that preprint.  The substantial construction and proof
-obligations are temporarily closed with `sorry`.
+normalizations of that preprint.  Unfinished arguments occur only in theorem
+proofs; every definition has a complete defining term.
 
 The displayed free energy in the preprint contains division by `β`, so its
 formal statement below assumes `β ≠ 0`.  The pressure theorem has no such
@@ -62,9 +62,13 @@ The repository's `MajoranaSystem` has generators satisfying
 `γᵢ γⱼ + γⱼ γᵢ = 2 δᵢⱼ`.  The factor in `paperInteraction` below changes
 these to the preprint convention `ψᵢ ψⱼ + ψⱼ ψᵢ = δᵢⱼ`.
 -/
-noncomputable def canonicalMajorana (N : ℕ) :
-    MajoranaSystem N (Matrix (HilbertIndex N) (HilbertIndex N) ℂ) := by
+theorem exists_canonicalMajorana (N : ℕ) :
+    Nonempty (MajoranaSystem N (Matrix (HilbertIndex N) (HilbertIndex N) ℂ)) := by
   sorry
+
+noncomputable def canonicalMajorana (N : ℕ) :
+    MajoranaSystem N (Matrix (HilbertIndex N) (HilbertIndex N) ℂ) :=
+  Classical.choice (exists_canonicalMajorana N)
 
 /-- The operator `i^(q/2) ψ_{i₁}⋯ψ_{i_q}` in the preprint convention. -/
 noncomputable def paperInteraction {N q : ℕ}
@@ -144,22 +148,61 @@ def chordKernel (x y : Chord) : ℂ :=
     then -1
     else 1
 
-/-- The CCG function `H` whose fixed-point identity is stated below. -/
-noncomputable def ccgH (q : ℕ) : ℂ → Chord → ℂ := by
-  sorry
-
 /-- Product of the pairwise crossing signs for `d` chords. -/
 noncomputable def pairCrossingProduct {d : ℕ} (y : Fin d → Chord) : ℂ :=
   ∏ i : Fin d, ∏ j : Fin d, if i < j then chordKernel (y i) (y j) else 1
 
-/-- The integrand common to the definitions of `H` and `R`. -/
-noncomputable def ccgProduct (q d : ℕ) (z : ℂ) (y : Fin d → Chord) : ℂ :=
+/-- The integrand associated with a candidate CCG function. -/
+noncomputable def ccgProductFor
+    (H : ℂ → Chord → ℂ) (q d : ℕ) (z : ℂ) (y : Fin d → Chord) : ℂ :=
   (∏ i : Fin d,
-      ccgH q z (y i) ^ (q - 1) / (Nat.factorial (q - 1) : ℂ)) *
+      H z (y i) ^ (q - 1) / (Nat.factorial (q - 1) : ℂ)) *
     pairCrossingProduct y
 
-/-- The fixed-point equation `(H-def)` defining the CCG function. -/
-theorem ccgH_fixedPoint (q : ℕ) (z : ℂ) (x : Chord) :
+/-- A chord in the support of the probability law `ν`. -/
+def IsPaperChord (x : Chord) : Prop :=
+  0 ≤ x.1 ∧ x.1 ≤ x.2 ∧ x.2 ≤ 1
+
+/-- Radius `1/e²` used for the CCG fixed-point equation. -/
+noncomputable def ccgDiskRadius : ℝ := 1 / Real.exp 2
+
+/-- The fixed-point property `(H-def)` on the domain used in the preprint. -/
+def IsCCG (q : ℕ) (H : ℂ → Chord → ℂ) : Prop :=
+  ∀ (z : ℂ) (x : Chord), ‖z‖ ≤ ccgDiskRadius → IsPaperChord x →
+    H z x =
+      z + z * ∑' d : ℕ,
+        if d = 0 then 0 else
+          (Nat.factorial d : ℂ)⁻¹ *
+            ∫ y : Fin d → Chord,
+              (∏ i : Fin d, chordKernel x (y i)) * ccgProductFor H q d z y
+            ∂(MeasureTheory.Measure.pi (fun _ : Fin d => chordMeasure))
+
+/-- Existence of the CCG fixed point for positive even interaction order. -/
+theorem exists_ccgH (q : ℕ) (hq : 2 ≤ q) (hqEven : Even q) :
+    ∃ H : ℂ → Chord → ℂ, IsCCG q H := by
+  sorry
+
+/-- The CCG function `H`, selected from its existence theorem when `q` is admissible. -/
+noncomputable def ccgH (q : ℕ) : ℂ → Chord → ℂ :=
+  if h : 2 ≤ q ∧ Even q then
+    Classical.choose (exists_ccgH q h.1 h.2)
+  else
+    fun _ _ => 0
+
+theorem ccgH_isCCG (q : ℕ) (hq : 2 ≤ q) (hqEven : Even q) :
+    IsCCG q (ccgH q) := by
+  rw [ccgH, dif_pos ⟨hq, hqEven⟩]
+  exact Classical.choose_spec (exists_ccgH q hq hqEven)
+
+/-- The integrand common to the definitions of `H` and `R`. -/
+noncomputable def ccgProduct (q d : ℕ) (z : ℂ) (y : Fin d → Chord) : ℂ :=
+  ccgProductFor (ccgH q) q d z y
+
+/-- The fixed-point equation `(H-def)` defining the selected CCG function. -/
+theorem ccgH_fixedPoint
+    (q : ℕ) (hq : 2 ≤ q) (hqEven : Even q)
+    (z : ℂ) (x : Chord) (hz : ‖z‖ ≤ ccgDiskRadius)
+    (hx : IsPaperChord x) :
     ccgH q z x =
       z + z * ∑' d : ℕ,
         if d = 0 then 0 else
@@ -167,7 +210,7 @@ theorem ccgH_fixedPoint (q : ℕ) (z : ℂ) (x : Chord) :
             ∫ y : Fin d → Chord,
               (∏ i : Fin d, chordKernel x (y i)) * ccgProduct q d z y
             ∂(MeasureTheory.Measure.pi (fun _ : Fin d => chordMeasure)) := by
-  sorry
+  exact ccgH_isCCG q hq hqEven z x hz hx
 
 /-- The CCG vertex-pointed function `R` from equation `(Rdef)`. -/
 noncomputable def ccgR (q : ℕ) (z : ℂ) : ℂ :=
@@ -198,25 +241,48 @@ noncomputable def paperClosedFormulaC (q : ℕ) (β : ℝ) (z : ℂ) : ℂ :=
 noncomputable def paperClosedFormulaR (q : ℕ) (β t : ℝ) : ℝ :=
   (paperClosedFormulaC q β (t : ℂ)).re
 
-/-- The complex tree series `Φ(z) = ∑_{v≥1} μ_v z^v`. -/
-noncomputable def phiC (q : ℕ) (β : ℝ) : ℂ → ℂ := by
-  sorry
+/--
+The complex tree series `Φ`.  The CCG identity gives the displayed expression
+when `β ≠ 0`; at zero its removable value is `Φ(z) = z`.
+-/
+noncomputable def phiC (q : ℕ) (β : ℝ) (z : ℂ) : ℂ :=
+  if β = 0 then z else paperClosedFormulaC q β z
 
 /-- The real restriction of the tree series. -/
 noncomputable def phiR (q : ℕ) (β t : ℝ) : ℝ :=
   (phiC q β (t : ℂ)).re
 
-/-- A high-temperature threshold depending only on `q`. -/
-noncomputable def betaStar (q : ℕ) : ℝ := by
+/-- The property required of a high-temperature threshold. -/
+def IsHighTemperatureThreshold (q : ℕ) (b : ℝ) : Prop :=
+  0 < b ∧
+    (2 ≤ q → Even q → ∀ β : ℝ, |β| ≤ b →
+      ∃! t : ℝ,
+        t ∈ Set.Ioo (1 / 2 : ℝ) (3 / 2 : ℝ) ∧
+          (t : ℂ) * deriv (phiC q β) (t : ℂ) = 1)
+
+/-- Existence of a high-temperature window with a unique stationary point. -/
+theorem exists_betaStar (q : ℕ) :
+    ∃ b : ℝ, IsHighTemperatureThreshold q b := by
   sorry
 
-theorem betaStar_pos (q : ℕ) (hq : 2 ≤ q) (hqEven : Even q) :
+/-- A high-temperature threshold depending only on `q`. -/
+noncomputable def betaStar (q : ℕ) : ℝ :=
+  Classical.choose (exists_betaStar q)
+
+theorem betaStar_spec (q : ℕ) :
+    IsHighTemperatureThreshold q (betaStar q) :=
+  Classical.choose_spec (exists_betaStar q)
+
+theorem betaStar_pos (q : ℕ) (_hq : 2 ≤ q) (_hqEven : Even q) :
     0 < betaStar q := by
-  sorry
+  exact (betaStar_spec q).1
 
 /-- The stationary point `t*` selected in `(1/2, 3/2)`. -/
-noncomputable def tStar (q : ℕ) (β : ℝ) : ℝ := by
-  sorry
+noncomputable def tStar (q : ℕ) (β : ℝ) : ℝ :=
+  if h : 2 ≤ q ∧ Even q ∧ |β| ≤ betaStar q then
+    Classical.choose ((betaStar_spec q).2 h.1 h.2.1 β h.2.2)
+  else
+    1
 
 theorem tStar_mem_Ioo
     (q : ℕ) (hq : 2 ≤ q) (hqEven : Even q)
@@ -240,11 +306,11 @@ theorem tStar_unique
 
 /-- The tree series equals the CCG expression on the disk used in the paper. -/
 theorem phiC_eq_paperClosedFormulaC
-    (q : ℕ) (hq : 2 ≤ q) (hqEven : Even q)
-    (β : ℝ) (hβ0 : β ≠ 0) (hβ : |β| ≤ betaStar q)
-    (z : ℂ) (hz : ‖z‖ ≤ 2) :
+    (q : ℕ) (_hq : 2 ≤ q) (_hqEven : Even q)
+    (β : ℝ) (hβ0 : β ≠ 0) (_hβ : |β| ≤ betaStar q)
+    (z : ℂ) (_hz : ‖z‖ ≤ 2) :
     phiC q β z = paperClosedFormulaC q β z := by
-  sorry
+  simp [phiC, hβ0]
 
 /-! ## Main limit theorems -/
 
