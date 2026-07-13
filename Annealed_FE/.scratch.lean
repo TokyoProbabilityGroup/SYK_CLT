@@ -1,0 +1,21 @@
+import Mathlib
+
+#check Measure.pi
+#check Measure.map
+#check Measure.prod
+#check MeasureTheory.Measure.pi
+#check MeasureTheory.Measure.prod
+#check MeasureTheory.integral_finset_product_measure
+#check MeasureTheory.Measure.restrict
+#check MeasureTheory.MeasurePreserving
+#check MeasureTheory.volume
+#check MeasureTheory.Measure.prod_apply
+#check Finset.univ
+#check Relation.ReflTransGen
+#check NormedSpace.exp
+#check Matrix.trace
+#check deriv
+#check HasDerivAt
+#check Real.rpow
+#check Complex.cpow
+#check tsum
