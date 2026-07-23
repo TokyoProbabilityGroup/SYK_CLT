@@ -40,10 +40,11 @@ $M_N^{-1}\sum_I(g_I^2-1)$ by subtracting a multiple of $x^2$.  For the
 $N$-dependent test function representing the partition function, we replace
 that asymptotic subtraction by an exact second-Wiener-chaos projection.  The
 remaining chaoses are controlled in two ranges: an FTW-type parity count up to
-order $A\log N$, and analytic suppression above $A\log N$.  The only external
-model-specific inputs are a published complex second-moment estimate and the
-published high-temperature annealed free-energy limit; every deduction from
-those two inputs is included below.
+order $A\log N$, and analytic suppression above $A\log N$.  The proof uses two
+external input packages: recent complex second-moment and zero-free estimates,
+and the high-temperature annealed free-energy limit together with its
+Gaussian--Rademacher transfer.  Every further deduction from these packages is
+included below.
 \end{abstract}
 
 \section{Statement, normalization, and external inputs}
@@ -73,6 +74,7 @@ Thus $\psi_I$ is Hermitian, $\psi_I^2=\I$, and $\norm{\psi_I}=1$.  Put
 \]
 Here $\tr=2^{-N/2}\operatorname{Tr}$ is the normalized trace, so
 $Z_N(0)=F_N(0)=1$.
+Throughout, all limits are taken as $N\to\infty$ through even integers.
 
 It is useful to record the normalization used by Feng--Tian--Wei.  Define
 \begin{equation}\label{eq:FTW-normalization}
@@ -94,10 +96,10 @@ $\widehat L_N(f)=\tr f(\widehat H_N)$, then
 
 \subsection{External input I: a complex second-moment estimate}
 
-We use the following published high-temperature input.  It is Theorems 3 and
-4 of \cite{Zlokapa2026}, with the deterministic change of inverse-temperature
-coming from the Majorana normalization.  In particular, the constants below
-depend only on $q$.
+We use the following recent high-temperature preprint result.  It is Theorems
+3 and 4 of \cite{Zlokapa2026}, with the deterministic change of
+inverse-temperature coming from the Majorana normalization.  In particular,
+the constants below depend only on $q$.
 
 \begin{proposition}[Complex second-moment input]\label{prop:complex-input}
 There are constants $R_q>0$, $C_q<\infty$, and $N_q<\infty$ such that, for
@@ -145,6 +147,21 @@ Let $P_r$ denote the orthogonal projection in complex
 $L^2(\gamma_N)$ onto the $r$-th homogeneous Gaussian chaos, where $\gamma_N$
 denotes standard Gaussian measure on $\mathbb R^{M_N}$.  We write
 $\norm{X}_2^2=\E|X|^2$.
+We use the probabilists' Hermite polynomials
+\[
+  H_\alpha(g)=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
+  \qquad
+  \E[H_\alpha H_\eta]
+  =\alpha!\,\mathbf 1_{\{\alpha=\eta\}},
+\]
+where $\alpha!=\prod_I\alpha_I!$.  For every sufficiently regular random
+variable $X$,
+\begin{equation}\label{eq:Hermite-coefficient-formula}
+  \norm{P_rX}_2^2
+  =
+  \sum_{|\alpha|=r}
+  \frac{|\E\,\partial_g^\alpha X|^2}{\alpha!}.
+\end{equation}
 
 \begin{lemma}[$L^2$-valued analyticity]\label{lem:L2-analyticity}
 For each fixed $N$, the map $z\mapsto Z_N(z;\,\cdot)$ is entire with values
@@ -225,20 +242,113 @@ and
   \sum_{I\in\calI_N}(g_I^2-1).
 \end{equation}
 Equivalently, since
-$\tr H_N^2=\sigma_N^2\sum_Ig_I^2$, the second chaos is the
+Clifford trace orthogonality gives
+\[
+  \tr(\psi_I\psi_J)=\mathbf 1_{\{I=J\}},
+  \qquad
+  \tr H_N^2=\sigma_N^2\sum_Ig_I^2.
+\]
+Thus the second chaos is the
 $L^2$ projection of $Y_N-1$ onto the centered radial statistic
 $\tr H_N^2-\E\tr H_N^2$.
 \end{lemma}
 
 \begin{proof}
 For $s=(s_1,\ldots,s_N)\in\{\pm1\}^N$, define
-$\chi_s(I)=\prod_{x\in I}s_x$.  The Clifford sign-flip automorphism is
-unitarily implemented, and hence
+$\chi_s(I)=\prod_{x\in I}s_x$.  We first prove in detail that
+\begin{equation}\label{eq:sign-gauge-invariance}
+  Z_N(\beta;g)=Z_N\bigl(\beta;(\chi_s(I)g_I)_I\bigr).
+\end{equation}
+To make the Clifford symmetry explicit, let
 \[
-  Z_N(\beta;g)=Z_N(\beta;(\chi_s(I)g_I)_I).
+  \Gamma
+  \quad\text{be a unitary phase multiple of}\quad
+  \psi_1\cdots\psi_N.
 \]
-The corresponding parity rule for Hermite coefficients kills the first chaos
-and every off-diagonal second-chaos monomial $g_Ig_J$, $I\neq J$.
+Since $N$ is even, moving $\psi_j$ through the other $N-1$ Majorana
+generators produces the sign $(-1)^{N-1}=-1$.  Hence
+\[
+  \Gamma\psi_j\Gamma^*=-\psi_j
+  \qquad (j\in[N]).
+\]
+For each $x\in[N]$, put $U_x=\Gamma\psi_x$.  This is unitary, and conjugation
+by $U_x$ is the composition of conjugation by $\psi_x$ and conjugation by
+$\Gamma$.  The Clifford relations give
+\[
+  \psi_x\psi_j\psi_x
+  =
+  \begin{cases}
+    \psi_x,&j=x,\\
+    -\psi_j,&j\neq x.
+  \end{cases}
+\]
+Combining the last two displays, we obtain
+\[
+  U_x\psi_jU_x^*
+  =
+  \begin{cases}
+    -\psi_x,&j=x,\\
+    \psi_j,&j\neq x.
+  \end{cases}
+\]
+Thus conjugation by $U_x$ changes the sign of precisely the generator
+$\psi_x$.
+
+Let $S_s=\{x\in[N]:s_x=-1\}$ and let $U_s$ be the product of the unitaries
+$U_x$ over $x\in S_s$, in any fixed order.  Successively applying the
+preceding conjugation rule yields
+\[
+  U_s\psi_jU_s^*=s_j\psi_j
+  \qquad (j\in[N]).
+\]
+If $I=\{i_1<\cdots<i_q\}$, then conjugation is multiplicative, so the
+definition $\psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}$ gives
+\begin{align*}
+  U_s\psi_IU_s^*
+  &=
+  \mathrm i^{q/2}
+  (U_s\psi_{i_1}U_s^*)\cdots
+  (U_s\psi_{i_q}U_s^*)\\
+  &=
+  \left(\prod_{x\in I}s_x\right)\psi_I
+  =\chi_s(I)\psi_I.
+\end{align*}
+Writing $g^{(s)}=(\chi_s(I)g_I)_I$, we therefore have
+\begin{align*}
+  H_N(g^{(s)})
+  &=\sigma_N\sum_{I\in\calI_N}\chi_s(I)g_I\psi_I\\
+  &=\sigma_N\sum_{I\in\calI_N}g_IU_s\psi_IU_s^*
+    =U_sH_N(g)U_s^*.
+\end{align*}
+The power-series definition of the exponential then implies
+\[
+  e^{-\beta H_N(g^{(s)})}
+  =U_se^{-\beta H_N(g)}U_s^*.
+\]
+Finally, the normalized trace is invariant under unitary conjugation.
+Consequently
+\[
+  Z_N(\beta;g^{(s)})
+  =\tr\!\left(U_se^{-\beta H_N(g)}U_s^*\right)
+  =\tr e^{-\beta H_N(g)}
+  =Z_N(\beta;g),
+\]
+which proves \eqref{eq:sign-gauge-invariance}.
+
+More precisely,
+\[
+  H_\alpha((\chi_s(I)g_I)_I)
+  =
+  \left(
+    \prod_{x=1}^N
+    s_x^{\sum_{I\ni x}\alpha_I}
+  \right)H_\alpha(g).
+\]
+Averaging the Hermite coefficient against all $s$ shows that it vanishes
+unless $\sum_{I\ni x}\alpha_I$ is even for every $x$.  This parity rule kills
+the first chaos.  In the second chaos it also kills every off-diagonal
+monomial $g_Ig_J$, since the parity condition for such a monomial forces
+$I=J$.
 Permutation symmetry shows that the remaining diagonal coefficients agree.
 Consequently
 \[
@@ -246,7 +356,26 @@ Consequently
 \]
 for a deterministic scalar $b_N$.
 
-The Hermite coefficient formula and Gaussian integration by parts give
+We now justify the coefficient calculation.  For each fixed $I$, the
+probabilists' second Hermite polynomial is $g_I^2-1$, with
+\[
+  \E(g_I^2-1)^2=2.
+\]
+Since $P_2$ is an orthogonal projection and the variables $g_I$ are
+independent, taking the inner product of the preceding formula for $P_2Z_N$
+with $g_I^2-1$ gives
+\[
+  2b_N(\beta)
+  =\E\bigl[Z_N(\beta)(g_I^2-1)\bigr].
+\]
+Applying Gaussian integration by parts twice, conditionally on all
+coordinates other than $g_I$, yields
+\[
+  \E\bigl[Z_N(\beta)(g_I^2-1)\bigr]
+  =\E\,\partial_{g_I}^2Z_N(\beta).
+\]
+Summing over the $M_N$ choices of $I$ therefore gives the first equality
+below.  A further conditional Gaussian integration by parts gives the second:
 \begin{align*}
   2M_Nb_N(\beta)
   &=\sum_I\E\,\partial_{g_I}^2Z_N(\beta)
@@ -254,7 +383,37 @@ The Hermite coefficient formula and Gaussian integration by parts give
   &=\beta\,\partial_\beta\E Z_N(\beta)
     =\beta F_N'(\beta).
 \end{align*}
-Here the third equality is Euler's identity, since $H_N$ is linear in $g$.
+
+For completeness, the third equality follows pointwise from the exact scaling
+identity
+\[
+  Z_N(\beta;tg)
+  =\tr e^{-\beta H_N(tg)}
+  =\tr e^{-t\beta H_N(g)}
+  =Z_N(t\beta;g),
+\]
+where we used $H_N(tg)=tH_N(g)$.  Differentiating at $t=1$ gives
+\[
+  \sum_Ig_I\partial_{g_I}Z_N(\beta;g)
+  =\beta\,\partial_\beta Z_N(\beta;g).
+\]
+Finally,
+\[
+  \partial_\beta Z_N(\beta;g)
+  =-\tr\!\left(H_N(g)e^{-\beta H_N(g)}\right),
+  \qquad
+  \left|\partial_\beta Z_N(\beta;g)\right|
+  \leq \norm{H_N(g)}e^{|\beta|\norm{H_N(g)}}.
+\]
+Together with
+\[
+  \norm{H_N(g)}\leq\sigma_N\sum_I|g_I|,
+\]
+the right-hand side has every exponential moment under the finite dimensional
+Gaussian law.  It gives a locally uniform dominating function in $\beta$.
+The same type of bound justifies the preceding Gaussian integrations by
+parts.  Thus differentiation passes through the expectation and
+$\partial_\beta\E Z_N(\beta)=F_N'(\beta)$.
 Dividing by the deterministic quantity $F_N(\beta)$ proves
 \eqref{eq:P2Y-exact}.
 \end{proof}
@@ -295,6 +454,15 @@ Parseval's identity in the angular variable gives
   =\sum_{k\geq r}R^{2k}\norm{v_{r,k}}_{\mathcal H}^2.
 \]
 With $t=|w|/R<1$, Cauchy--Schwarz yields
+\[
+  \norm{G_r(w)}_{\mathcal H}
+  \leq
+  \left(\sum_{k\geq r}t^{2k}\right)^{1/2}
+  \left(
+    \sum_{k\geq r}R^{2k}\norm{v_{r,k}}_{\mathcal H}^2
+  \right)^{1/2}.
+\]
+Consequently,
 \[
   \norm{G_r(w)}_{\mathcal H}^2
   \leq
@@ -357,8 +525,22 @@ Every integrand, apart from the factor $(|\beta|\sigma_N)^r$, has the form
     \psi_{I_{\pi(r)}}e^{-t_r\beta H_N}
   \right).
 \]
-Noncommutative H\"older, with Schatten exponents $1/t_j$, and
-$\norm{\psi_I}=1$, bounds its absolute value by
+Here and below the Schatten norms are defined using the normalized trace:
+\[
+  \norm{A}_p=(\tr|A|^p)^{1/p},
+  \qquad
+  \norm{A}_\infty=\norm{A}.
+\]
+For $t_j>0$,
+\[
+  \norm{e^{-t_j\beta H_N}}_{1/t_j}
+  =
+  \bigl(\tr e^{-\beta H_N}\bigr)^{t_j},
+\]
+with the usual $p=\infty$ interpretation when $t_j=0$.  Noncommutative
+H\"older, with Schatten exponents $1/t_j$, and
+$\norm{\psi_I}_\infty=1$, therefore bounds the absolute value of the
+integrand by
 \[
   \prod_{j=0}^r
   \left(\tr e^{-\beta H_N}\right)^{t_j}
@@ -410,7 +592,9 @@ $F_N(\beta)>0$ give
 An even ordered $r$-tuple of $q$-sets has total incidence $qr$, and every
 vertex in its union has incidence at least two.  Its union therefore has at
 most $qr/2$ vertices.  Since a multi-index $\alpha$ corresponds to
-$r!/\alpha!$ ordered tuples,
+$r!/\alpha!$ ordered tuples, we may first choose a $v$-set containing the
+union and then choose the ordered tuple.  This can count a tuple more than
+once, which is harmless for the upper bound.  Thus
 \begin{align*}
   \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}\frac1{\alpha!}
   &\leq
@@ -468,8 +652,9 @@ Adding the two estimates proves the claim.
 
 The remainder has now been controlled.  To identify the deterministic
 coefficient $A_N(\beta)$ in \eqref{eq:finite-N-FTW-coefficient}, we use the
-published annealed free-energy limit.  The derivative convergence needed below
-is not taken as an additional input; it follows from convexity.
+recent preprint result on the annealed free-energy limit.  The derivative
+convergence needed below is not taken as an additional input; it follows from
+convexity.
 
 \begin{lemma}[Convex convergence and derivatives]
 \label{lem:convex-derivatives}
@@ -520,11 +705,25 @@ Moreover,
 
 \begin{proof}
 The pointwise convergence in \eqref{eq:annealed-free-energy-limit} is Theorem
-5 of \cite{GPSZ2026}, with the Gaussian--Rademacher universality result
-\cite{AGK2025} used there, after the following normalization conversion.
-The Majoranas of \cite{GPSZ2026} satisfy $\psi_i^2=\I/2$, so
-$H_N^{\rm GPSZ}=2^{-q/2}H_N$.  If $u=2^{q/2}\beta$, then symmetry of the
-Gaussian disorder removes the sign difference and
+5 of \cite{GPSZ2026}, together with the Gaussian extension stated there.  That
+extension invokes the Gaussian--Rademacher universality result
+\cite{AGK2025}; we use it as part of the free-energy input package.
+
+We now separate the normalization conversion from this transfer.  The
+Majoranas of \cite{GPSZ2026} satisfy
+\[
+  \psi_i^{\rm GPSZ}=2^{-1/2}\psi_i,
+  \qquad
+  H_N^{\rm GPSZ}=2^{-q/2}H_N.
+\]
+Set $u=2^{q/2}\beta$.  Gaussian symmetry gives
+\[
+  \E\tr e^{-\beta H_N}
+  =
+  \E\tr e^{+\beta H_N},
+\]
+and $uH_N^{\rm GPSZ}=\beta H_N$.  Thus the sign and normalization conventions
+of \cite{GPSZ2026} give
 \begin{equation}\label{eq:GPSZ-conversion}
   \frac1N\log F_N(\beta)=\frac{u}{N}f_{N,q}^{\rm GPSZ}(u),
 \end{equation}
@@ -544,8 +743,29 @@ $v=1+(q-1)s$ vertices and its coefficient contains
   \qquad
   \rho(u)^{q-1}=\frac{(q-1)!u^2}{2^{q+1}}.
 \]
-The normal-convergence bounds in Proposition 3 of \cite{GPSZ2026} therefore
-show that $\Phi_u(z)$ is analytic jointly in $(u^2,z)$ near $(0,1)$.  At
+More explicitly, $\mathcal T_v^{\rm sim}$ is empty unless
+$v=1+(q-1)s$ for some $s\geq0$.  For $s\geq1$ we may therefore write
+\[
+  \mu_{1+(q-1)s}(u)=c_{q,s}u^{2s},
+\]
+where
+\[
+  c_{q,s}
+  =
+  \frac1{(1+(q-1)s)!}
+  \left(\frac{(q-1)!}{2^{q+1}}\right)^s
+  \sum_{T\in\mathcal T_{1+(q-1)s}^{\rm sim}}b_T.
+\]
+The bounds used in the proof of Proposition 3 of \cite{GPSZ2026} give
+$|c_{q,s}|\leq C_q^s$.  Hence
+\[
+  \Phi_u(z)
+  =
+  z+\sum_{s\geq1}
+  c_{q,s}u^{2s}z^{1+(q-1)s}
+\]
+converges normally for $(u^2,z)$ in a neighborhood of $(0,1)$.  Thus
+$\Phi_u(z)$ is jointly analytic in $(u^2,z)$ there.  At
 $u=0$, $\Phi_0(z)=z$ and $t_*(0)=1$; the derivative with respect to $t$ of
 $t\partial_z\Phi_u(t)-1$ is $1$ at $(u,t)=(0,1)$.  The analytic implicit
 function theorem makes $t_*$, and hence the limiting right-hand side, analytic
@@ -622,7 +842,8 @@ Let
 \[
   S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\calI_N}(g_I^2-1).
 \]
-The classical Lindeberg theorem gives $S_N\Rightarrow\xi\sim\N(0,1)$.
+The ordinary i.i.d.\ central limit theorem gives
+$S_N\Rightarrow\xi\sim\N(0,1)$.
 By Lemma~\ref{lem:exact-second-chaos},
 \begin{equation}\label{eq:Y-decomposition-final}
   Y_N(\beta)-1
@@ -679,12 +900,12 @@ R.~Feng, G.~Tian, and D.~Wei,
 A.~Zlokapa,
 \newblock A rigorous quasipolynomial-time classical algorithm for SYK thermal
 expectations,
-\newblock arXiv:2604.21089, 2026.
+\newblock arXiv:2604.21089v1, 22 April 2026.
 
 \bibitem{GPSZ2026}
 D.~Gamarnik, F.~Pernice, A.~Schmidhuber, and A.~Zlokapa,
 \newblock The free energy limit of the SYK model at high temperature,
-\newblock arXiv:2605.02768, 2026.
+\newblock arXiv:2605.02768v1, 4 May 2026.
 
 \bibitem{AGK2025}
 E.~R. Anschuetz, D.~Gamarnik, and B.~T. Kiani,
