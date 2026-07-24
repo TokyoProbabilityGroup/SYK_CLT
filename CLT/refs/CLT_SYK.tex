@@ -47,6 +47,46 @@ Gaussian--Rademacher transfer.  Every further deduction from these packages is
 included below.
 \end{abstract}
 
+\paragraph{Outline of the proof.}
+Set $a=q/2-1$ and normalize the partition function by
+$Y_N=Z_N/F_N$.  Clifford sign-gauge symmetry eliminates the first Gaussian
+chaos and identifies the second chaos exactly:
+\[
+  Y_N(\beta)-1
+  =
+  A_N(\beta)Q_N+\mathcal R_N(\beta),
+  \qquad
+  A_N(\beta)=\frac{\beta}{2}\partial_\beta\log F_N(\beta),
+  \qquad
+  Q_N=\frac1{M_N}\sum_I(g_I^2-1).
+\]
+Thus the leading random term is a normalized sum of independent centered
+$\chi_1^2$ variables.  The main task is to prove
+\[
+  \norm{\mathcal R_N(\beta)}_2^2=o(N^{-2a}).
+\]
+
+For this purpose, split the chaos expansion at
+$m_N=\lceil A\log N\rceil$.  Up to order $m_N$, a Duhamel derivative bound
+and the sign-gauge parity rule reduce the estimate to counting even tuples of
+$q$-sets.  Such a tuple of length $r$ uses at most $qr/2$ vertices, which
+makes the sum of chaoses of orders $3,\ldots,m_N$ equal to $o(N^{-2a})$.
+Above $m_N$, the $r$-th chaos vanishes to order at least $r$ at
+$\beta=0$.  Applying an $L^2$-valued analytic estimate on a zero-free disk,
+together with the complex second-moment input, gives a geometric factor
+$(|\beta|/R)^{2m_N}$.  Choosing $A$ sufficiently large yields the same
+$o(N^{-2a})$ bound for the remaining chaoses.
+
+The annealed free-energy input and convexity imply
+\[
+  \frac{A_N(\beta)}N
+  \longrightarrow \frac{\beta}{2}\ell_q'(\beta).
+\]
+Since $M_N\sim N^q/q!$, the ordinary central limit theorem for $Q_N$, the
+remainder estimate, and Slutsky's theorem give the claimed limit for
+$N^a(Y_N-1)$.  Orthogonality of distinct Gaussian chaoses gives the matching
+variance asymptotic and hence the standardized central limit theorem.
+
 \section{Statement, normalization, and external inputs}
 
 \subsection{The SYK model}
