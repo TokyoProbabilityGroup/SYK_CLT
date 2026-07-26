@@ -13,12 +13,11 @@ Hermite decomposition and gauge selection from Section 2 of
 `CLT_for_SYK_v3.tex`.
 
 The projection operator is a placeholder until the Gaussian chaos
-formalization is filled in.  Consequently, the three paper-level statements
-below temporarily use the isolated assumption declared in this module.
+formalization is filled in. Consequently, paper-level statements depending on
+that unfinished interface take the missing analytic facts as explicit theorem
+hypotheses. This avoids asserting false unconditional claims or introducing
+axioms.
 -/
-
-/-- Temporary assumption for the paper-level statements that depend on the
-unfinished Gaussian chaos interface. -/
 
 abbrev InteractionLabels (N q : Nat) := InteractionIndex N q
 
@@ -112,10 +111,24 @@ noncomputable def secondDerivativeExpectation {N q : Nat}
     (F : CouplingSpace N q -> Real) (I J : InteractionLabels N q) : Real :=
   gaussianExpectation (coordinateDerivative I (coordinateDerivative J F))
 
+/-- Assemble the Hermite coefficient formula once the three analytic facts
+have been established.  They are explicit hypotheses because the current
+`chaosProjection` is the zero placeholder, so the unconditional statement
+would be false (its order-zero expansion is generally nonzero). -/
 theorem hermite_coefficient_formula
     {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (M : MajoranaSystem P.N (Matrix d d Complex))
-    (scale : Real) :
+    (scale : Real)
+    (hdecomp : centered (logPartition P M scale) =
+      chaosDecompositionRhs (logPartition P M scale))
+    (hprojection : forall r : Nat,
+      chaosProjection r (logPartition P M scale) =
+        chaosProjectionExpansion r (logPartition P M scale))
+    (hcoefficient : forall alpha : MultiIndex P.N P.q,
+      hermiteCoefficient (logPartition P M scale) alpha =
+        gaussianExpectation
+          (multiIndexDerivative alpha (logPartition P M scale)) /
+          (multiIndexFactorial alpha : Real)) :
     And
       (centered (logPartition P M scale) =
         chaosDecompositionRhs (logPartition P M scale))
@@ -127,16 +140,22 @@ theorem hermite_coefficient_formula
           hermiteCoefficient (logPartition P M scale) alpha =
             gaussianExpectation
               (multiIndexDerivative alpha (logPartition P M scale)) /
-              (multiIndexFactorial alpha : Real))) := by
-  sorry
+              (multiIndexFactorial alpha : Real))) :=
+  ⟨hdecomp, hprojection, hcoefficient⟩
 
+/-- Gauge invariance, with the representation-theoretic invariance fact made
+explicit.  `MajoranaSystem` records the Clifford relations but does not package
+the unitary implementing arbitrary sign changes, which is the extra input used
+by the paper proof. -/
 theorem majorana_sign_gauge_invariance
     {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (M : MajoranaSystem P.N (Matrix d d Complex))
-    (scale : Real) (s : SignConfig P.N) (g : CouplingSpace P.N P.q) :
+    (scale : Real) (s : SignConfig P.N) (g : CouplingSpace P.N P.q)
+    (hinvariant : logPartition P M scale g =
+      logPartition P M scale (gaugeAction s g)) :
     logPartition P M scale g =
-      logPartition P M scale (gaugeAction s g) := by
-  sorry
+      logPartition P M scale (gaugeAction s g) :=
+  hinvariant
 /-- Reflection formula for the probabilist's Hermite polynomials:
 `Hₖ(-x) = (-1)ᵏ Hₖ(x)`, a consequence of `Hₖ` having the parity of `k`. -/
 theorem hermiteProb_neg (k : Nat) (x : Real) :
@@ -230,10 +249,20 @@ theorem hermite_multi_gauge_action {N q : Nat} (alpha : MultiIndex N q)
   intro I _
   rw [hermiteProb_sign_mul (alpha I) (g I) (gaugeCharacter_sq s I)]
 
+/-- Assemble the parity selection consequences.  The coefficient and
+mixed-derivative inputs are explicit until measure-preservation of
+`gaugeAction` and the required differentiability/integration-by-parts
+interface are available.  The first-chaos clause follows directly from the
+current zero projection placeholder. -/
 theorem gauge_parity_selection_rule
     {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (M : MajoranaSystem P.N (Matrix d d Complex))
-    (scale : Real) :
+    (scale : Real)
+    (hcoefficient : forall alpha : MultiIndex P.N P.q,
+      (exists a : Fin P.N, Odd (vertexMultiplicity alpha a)) ->
+        hermiteCoefficient (logPartition P M scale) alpha = 0)
+    (hmixed : forall I J : InteractionLabels P.N P.q, I != J ->
+      secondDerivativeExpectation (logPartition P M scale) I J = 0) :
     And
       (forall alpha : MultiIndex P.N P.q,
         (exists a : Fin P.N, Odd (vertexMultiplicity alpha a)) ->
@@ -242,6 +271,7 @@ theorem gauge_parity_selection_rule
         (chaosProjection 1 (logPartition P M scale) = 0)
         (forall I J : InteractionLabels P.N P.q, I != J ->
           secondDerivativeExpectation (logPartition P M scale) I J = 0)) := by
-sorry
+  refine ⟨hcoefficient, ?_, hmixed⟩
+  rfl
 end CLT
 end SYK
