@@ -59,7 +59,13 @@ theorem radialCoefficient_asymptotic (P : FixedParameters) :
           (fun k => radialCoefficient P k β / systemSize P k)
           atTop
           (𝓝 (β / 2 * limitingPressureDerivative P β)) := by
-  sorry
+  obtain ⟨β₀, hβ₀, _, _, _, hderiv, _⟩ :=
+    annealed_pressure_and_derivative_limit P
+  refine ⟨β₀, hβ₀, fun β hβ => ?_⟩
+  have h := hderiv β hβ
+  simpa only [radialCoefficient, div_eq_mul_inv, mul_assoc] using
+    ((tendsto_const_nhds :
+      Tendsto (fun _ : ℕ => β / 2) atTop (𝓝 (β / 2))).mul h)
 
 end CLT
 end SYK

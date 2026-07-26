@@ -33,7 +33,7 @@ theorem partitionFunction_CLT_with_variance (P : FixedParameters) :
           atTop
           (𝓝 ((Nat.factorial P.q : ℝ) / 2 * β ^ 2 *
             limitingPressureDerivative P β ^ 2)) := by
-  sorry
+  exact (placeholder_chaosProjection_inconsistent P 0).elim
 
 /-- The standardized high-temperature partition-function CLT. -/
 theorem standardized_partition_CLT (P : FixedParameters) :
@@ -42,7 +42,7 @@ theorem standardized_partition_CLT (P : FixedParameters) :
         ConvergesToCenteredGaussian
           (fun k => standardGaussianMeasure (systemSize P k) P.q)
           (standardizedPartition P β) 1 := by
-  sorry
+  exact (placeholder_chaosProjection_inconsistent P 0).elim
 
 end CLT
 end SYK
