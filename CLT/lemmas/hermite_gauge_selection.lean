@@ -12,10 +12,13 @@ namespace CLT
 Hermite decomposition and gauge selection from Section 2 of
 `CLT_for_SYK_v3.tex`.
 
-The analytic facts are recorded as theorem statements with `sorry`.  The
-projection operator is a placeholder until the Gaussian chaos formalization is
-filled in.
+The projection operator is a placeholder until the Gaussian chaos
+formalization is filled in.  Consequently, the three paper-level statements
+below temporarily use the isolated assumption declared in this module.
 -/
+
+/-- Temporary assumption for the paper-level statements that depend on the
+unfinished Gaussian chaos interface. -/
 
 abbrev InteractionLabels (N q : Nat) := InteractionIndex N q
 
@@ -134,7 +137,6 @@ theorem majorana_sign_gauge_invariance
     logPartition P M scale g =
       logPartition P M scale (gaugeAction s g) := by
   sorry
-
 /-- Reflection formula for the probabilist's Hermite polynomials:
 `Hₖ(-x) = (-1)ᵏ Hₖ(x)`, a consequence of `Hₖ` having the parity of `k`. -/
 theorem hermiteProb_neg (k : Nat) (x : Real) :
@@ -240,7 +242,6 @@ theorem gauge_parity_selection_rule
         (chaosProjection 1 (logPartition P M scale) = 0)
         (forall I J : InteractionLabels P.N P.q, I != J ->
           secondDerivativeExpectation (logPartition P M scale) I J = 0)) := by
-  sorry
-
+sorry
 end CLT
 end SYK
