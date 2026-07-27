@@ -7,6 +7,7 @@
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{remark}[theorem]{Remark}
 
 \newcommand{\E}{\mathbb E}
@@ -111,6 +112,95 @@ and hence
   \Longrightarrow\N(0,1).
 \end{equation}
 \end{theorem}
+
+\begin{corollary}[Free-energy CLT]
+\label{cor:free-energy-clt}
+Under the assumptions of Theorem~\ref{thm:partition-clt},
+\[
+  N^{q/2-1}\left(
+    \log Z_N(\beta)-\E\log Z_N(\beta)
+  \right)
+  \Longrightarrow
+  \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
+  \qquad \xi\sim\N(0,1).
+\]
+\end{corollary}
+
+\begin{proof}
+Put
+\[
+  a=\frac q2-1,\qquad
+  X_N=\frac{Z_N(\beta)-\E Z_N(\beta)}{\E Z_N(\beta)},
+  \qquad
+  W_N=\log\frac{Z_N(\beta)}{\E Z_N(\beta)}.
+\]
+Thus $W_N=\log(1+X_N)$, and Theorem~\ref{thm:partition-clt} gives
+\[
+  N^aX_N
+  \Longrightarrow
+  \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
+  \qquad
+  \delta_N^2:=\E X_N^2=O(N^{-2a}).
+\]
+We first record the estimate needed to replace the deterministic centering.
+The function $g\mapsto W_N(g)$ is Lipschitz, uniformly in $N$.  Indeed,
+\[
+  \partial_{g_I}W_N
+  =-\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
+\]
+For each $(q-1)$-set $S$, the operators
+$(\psi_{S\cup\{i\}})_{i\notin S}$ are pairwise anticommuting Hermitian
+involutions.  The usual anticommuting-observable estimate, summed over $S$,
+therefore gives
+\[
+  \sum_{I\in\calI_N}|\langle\psi_I\rangle_{\beta,g}|^2
+  \leq \frac1q\binom N{q-1}.
+\]
+Consequently,
+\[
+  \|\nabla_gW_N\|_2^2
+  \leq
+  \frac{\beta^2\sigma_N^2}{q}\binom N{q-1}
+  \leq\frac{\beta^2}{q}.
+\]
+Gaussian concentration now shows that $W_N-\E W_N$ is sub-Gaussian with a
+constant depending only on $q$ and $\beta$.
+
+For completeness, this concentration bound and $\E e^{W_N}=1$ imply
+\[
+  -\frac{\beta^2}{2q}\leq \E W_N\leq0.
+\]
+Moreover, with $h(w)=e^w-1-w$, one has
+$h(w)\leq C(e^w-1)^2$ for $w\geq-1$ and $h(w)\leq|w|$ for $w<-1$.
+Chebyshev's inequality gives
+\[
+  \mathbb P(W_N<-t)
+  \leq \frac{\delta_N^2}{(1-e^{-t})^2}
+  \leq C\delta_N^2,\qquad t\geq1,
+\]
+whereas Gaussian concentration gives a Gaussian upper bound for the same
+probability when $t$ is large.  Integrating the minimum of these two bounds
+yields
+\[
+  0\leq-\E W_N=\E h(W_N)
+  \leq C\delta_N^2\sqrt{\log(1/\delta_N)}
+  =O\!\left(N^{2-q}\sqrt{\log N}\right)
+  =o(N^{-a}).
+\]
+
+Finally, $N^aX_N$ is tight and $X_N\to0$ in probability.  Hence the Taylor
+estimate $|\log(1+x)-x|\leq Cx^2$ for $|x|\leq1/2$ gives
+\[
+  N^a\bigl(W_N-X_N\bigr)\longrightarrow0
+  \qquad\text{in probability}.
+\]
+Since
+\[
+  \log Z_N-\E\log Z_N=W_N-\E W_N,
+\]
+the claimed convergence follows from Theorem~\ref{thm:partition-clt} and
+Slutsky's theorem.
+\end{proof}
 
 \subsection{Outline of the proof}
 
