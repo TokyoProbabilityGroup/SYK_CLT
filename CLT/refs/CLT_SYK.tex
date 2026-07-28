@@ -35,17 +35,6 @@ all sufficiently small fixed real $\beta\neq0$,
        {\sqrt{\Var Z_N(\beta)}}
   \Longrightarrow \N(0,1).
 \]
-The proof is a high-temperature modification of the argument of
-Feng--Tian--Wei.  Their fixed-test-function proof isolates the radial statistic
-$M_N^{-1}\sum_I(g_I^2-1)$ by subtracting a multiple of $x^2$.  For the
-$N$-dependent test function representing the partition function, we replace
-that asymptotic subtraction by an exact second-Wiener-chaos projection.  The
-remaining chaoses are controlled in two ranges: an FTW-type parity count up to
-order $A\log N$, and analytic suppression above $A\log N$.  The proof uses two
-external input packages: recent complex second-moment and zero-free estimates,
-and the high-temperature annealed free-energy limit together with its
-Gaussian--Rademacher transfer.  Every further deduction from these packages is
-included below.
 \end{abstract}
 
 
@@ -201,7 +190,8 @@ Since
 the claimed convergence follows from Theorem~\ref{thm:partition-clt} and
 Slutsky's theorem.
 \end{proof}
-
+\subsection{Previous research}
+Feng--Tian--Wei.\footnote{Explain why our setting does not fall onto this paper} 
 \subsection{Outline of the proof}
 
 It is useful to record the normalization used by Feng--Tian--Wei.  Define
@@ -230,13 +220,15 @@ chaos and identifies the second chaos exactly:
   Y_N(\beta)-1
   =
   A_N(\beta)Q_N+\mathcal R_N(\beta),
-  \qquad
+  \]
+  where we set
+  \[
   A_N(\beta)=\frac{\beta}{2}\partial_\beta\log F_N(\beta),
   \qquad
   Q_N=\frac1{M_N}\sum_I(g_I^2-1).
 \]
-Thus the leading random term is a normalized sum of independent centered
-$\chi_1^2$ variables.  The main task is to prove
+Here, $\mathcal R_N$ stands for third and higher order chaos. Thus the leading random term is a normalized sum of independent centered
+$M_N$ variables.  The main task is to prove
 \[
   \norm{\mathcal R_N(\beta)}_2^2=o(N^{-2a}).
 \]
@@ -332,7 +324,7 @@ variable $X$,
   \frac{|\E\,\partial_g^\alpha X|^2}{\alpha!}.
 \end{equation}
 
-\begin{lemma}[$L^2$-valued analyticity]\label{lem:L2-analyticity}
+\begin{lemma}\label{lem:L2-analyticity}
 For each fixed $N$, the map $z\mapsto Z_N(z;\,\cdot)$ is entire with values
 in $L^2(\gamma_N)$.  Hence $z\mapsto Y_N(z;\,\cdot)$ is
 $L^2(\gamma_N)$-valued analytic on every zero-free domain of $F_N$.
@@ -551,7 +543,7 @@ FTW, is
 Sections~\ref{sec:analytic-tail}--\ref{sec:FTW-remainder} prove precisely
 \eqref{eq:target-FTW-remainder}.
 
-\section{Exact finite-N FTW projection}
+\subsection{Exact finite-N FTW projection}
 
 \begin{lemma}[First and second chaoses]\label{lem:exact-second-chaos}
 For every real $\beta$,
