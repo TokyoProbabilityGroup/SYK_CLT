@@ -2,12 +2,15 @@
 
 \usepackage[a4paper,margin=24mm]{geometry}
 \usepackage{amsmath,amssymb,amsthm,mathtools}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{microtype}
+\usepackage[pdfusetitle,colorlinks=true,linkcolor=blue,citecolor=blue,
+urlcolor=blue]{hyperref}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 
 \newcommand{\E}{\mathbb E}
@@ -18,8 +21,8 @@
 \newcommand{\calI}{\mathcal I}
 \newcommand{\norm}[1]{\left\lVert #1\right\rVert}
 
-\title{A CLT
- for the high-temperature SYK partition function}
+\title{A Central Limit Theorem for the High-Temperature SYK
+Model}
 \author{}
 \date{}
 
@@ -27,22 +30,52 @@
 \maketitle
 
 \begin{abstract}
-Fix an even interaction order $q\geq4$ and let $Z_N(\beta)$ be the  partition function of the Gaussian SYK model.  We prove, for
-all sufficiently small fixed real $\beta\neq0$,
+Fix an even interaction order $q\geq4$, and let $Z_N(\beta)$ denote the
+partition function of the Gaussian Sachdev--Ye--Kitaev model with $N$
+Majorana fermions.  For every sufficiently small fixed inverse temperature
+$\beta\neq0$, we prove that
 \[
   \frac{Z_N(\beta)-\E Z_N(\beta)}
        {\sqrt{\Var Z_N(\beta)}}
   \Longrightarrow \N(0,1).
 \]
+We also identify the limiting variance of the relative partition function
+and obtain the corresponding central limit theorem for the free energy.  The
+leading fluctuation is the radial component of the second Gaussian chaos.
+The higher chaoses are controlled by combining a sign-gauge parity rule at
+logarithmic chaos order with analytic suppression of the remaining tail.
 \end{abstract}
 
+\noindent\emph{Keywords:} Sachdev--Ye--Kitaev model,
+free energy, central limit theorem, Gaussian chaos.
 
+\medskip
+\noindent\emph{Mathematics Subject Classification (2020):}
+60F05, 60B20, 82B44.
 
-\section{Model and main results}
+\section{Introduction and main results}
+\label{sec:introduction}
+
+The Sachdev--Ye--Kitaev (SYK) model is a mean-field model of randomly
+interacting fermions originating in the work of Sachdev and Ye
+\cite{SachdevYe1993} and its Majorana formulation by Kitaev.  Its combination
+of solvability, strong interactions, and chaotic behavior has made it a
+central model in quantum statistical mechanics and holography; see, for
+example, \cite{MaldacenaStanford2016}.  At positive temperature, the
+partition function contains both the thermodynamic information and the
+sample-to-sample fluctuations of the disorder.
+
+Rigorous results have recently identified the high-temperature annealed and
+quenched free-energy limits \cite{GPSZ2026} and established complex
+zero-freeness and second-moment estimates \cite{Zlokapa2026}.  The purpose of
+this paper is to determine the leading distributional fluctuations in the
+same high-temperature regime.  We show that the partition function and its
+logarithm have Gaussian fluctuations at scale $N^{1-q/2}$ relative to the
+annealed partition function and identify their limiting variance.
 
 \subsection{The SYK model}
 
-Fix an even integer $q\geq4$, and let $N$ be even.  Let
+Fix an even integer $q\geq4$, and let $N$ be even.  Write
 \[
   \calI_N=\{I\subset[N]:|I|=q\},\qquad
   M_N=\binom Nq,\qquad
@@ -53,9 +86,9 @@ variables.  Let $\psi_1,\ldots,\psi_N$ be Majorana matrices satisfying
 $\{\psi_i,\psi_j\}=2\delta_{ij}\I$.  For
 $I=\{i_1<\cdots<i_q\}$ set
 \[
-  \psi_I=i^{q/2}\psi_{i_1}\cdots\psi_{i_q}.
+  \psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}.
 \]
-Thus $\psi_I$ is Hermitian, $\psi_I^2=\I$, and $\norm{\psi_I}=1$.  Put
+Then $\psi_I$ is Hermitian, $\psi_I^2=\I$, and $\norm{\psi_I}=1$.  Define
 \[
   H_N(g)=\sigma_N\sum_{I\in\calI_N}g_I\psi_I,
   \qquad
@@ -63,15 +96,20 @@ Thus $\psi_I$ is Hermitian, $\psi_I^2=\I$, and $\norm{\psi_I}=1$.  Put
   \qquad
   F_N(z)=\E Z_N(z;g).
 \]
-Here $\tr=2^{-N/2}\operatorname{Tr}$ is the normalized trace, so
-$Z_N(0)=F_N(0)=1$.
+Here $\tr=2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
+particular, $Z_N(0)=F_N(0)=1$.  This normalization does not affect the
+relative fluctuations studied below.
 Throughout, all limits are taken as $N\to\infty$ through even integers.
 
 \subsection{Main results}
 
 \begin{theorem}[Partition-function CLT]
 \label{thm:partition-clt}
-Fix a real $\beta$ satisfying
+Let $R_q$ and $\beta_{\rm FE}$ be the constants in
+Propositions~\ref{prop:complex-input} and
+\ref{prop:annealed-free-energy}, respectively, and let $\ell_q$ be the
+limiting annealed free energy in Proposition~\ref{prop:annealed-free-energy}.
+If $\beta\in\mathbb R$ satisfies
 \[
   0<|\beta|<\min\{\beta_{\rm FE},R_q\},
   \qquad
@@ -101,7 +139,7 @@ and hence
 \end{equation}
 \end{theorem}
 
-\begin{corollary}
+\begin{corollary}[Log-partition-function CLT]
 \label{cor:free-energy-clt}
 Under the assumptions of Theorem~\ref{thm:partition-clt},
 \[
@@ -112,21 +150,46 @@ Under the assumptions of Theorem~\ref{thm:partition-clt},
   \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
   \qquad \xi\sim\N(0,1).
 \]
+Equivalently, if
+$\mathcal G_N(\beta)=-\beta^{-1}\log Z_N(\beta)$ is the random free energy,
+then
+\[
+  N^{q/2-1}\left(
+    \mathcal G_N(\beta)-\E\mathcal G_N(\beta)
+  \right)
+  \Longrightarrow
+  -\sqrt{\frac{q!}{2}}\,\ell_q'(\beta)\,\xi.
+\]
 \end{corollary}
 
-\subsection{Previous research}
-Feng--Tian--Wei.\footnote{Explain why our setting does not fall onto this paper}  The complex second-moment estimate alone is only $O(N^{1-q/2})$ and is too
-weak for the CLT scale $N^{2-q}$.  The gain comes from using it only for
-chaos orders above $A\log N$.  Analyticity supplies the factor
-$(|\beta|/R)^{2A\log N}$ there, while the sign-gauge counting estimate is
-strong enough uniformly up to order $A\log N$.  This is exactly the extra
-uniformity that the $N$-dependent test function $f_{N,\beta}$ requires beyond
-the fixed-test-function theorem of \cite{FTW2018}.  No CLT for $\log Z_N$ and
-no fluctuation-level assumption about the free energy is used.
+\subsection{Relation to earlier work}
+
+Feng, Tian, and Wei \cite{FTW2018} proved a central limit theorem for linear
+eigenvalue statistics of the Gaussian SYK Hamiltonian.  Their theorem treats
+a fixed test function $f$ under regularity assumptions on $f$ and $f'$.
+In the normalization used in that paper, however, the partition function
+corresponds to
+\[
+  f_{N,\beta}(x)=e^{-\beta\tau_Nx},
+  \qquad \tau_N\asymp\sqrt N,
+\]
+so both the test function and its derivative vary with $N$.  The
+fixed-test-function theorem therefore does not apply directly to
+$Z_N(\beta)$.
+
+Our argument retains the radial-fluctuation mechanism identified in
+\cite{FTW2018}, but establishes the uniform remainder estimate needed for
+this $N$-dependent sequence.  A complex second-moment bound alone is of order
+$N^{1-q/2}$, whereas the central-limit scale requires an error
+$o(N^{2-q})$.  We bridge this gap by splitting the Gaussian-chaos expansion
+at order $A\log N$.  A sign-gauge counting argument controls all lower
+orders uniformly, while analyticity produces a geometric factor for the
+higher-order tail.  The proof uses only annealed free-energy convergence and
+does not assume any fluctuation theorem for either $Z_N$ or $\log Z_N$.
 
 \subsection{Outline of the proof}
 
-It is useful to record the normalization used by Feng--Tian--Wei.  Define
+We first relate our normalization to that of Feng, Tian, and Wei.  Define
 \begin{equation}\label{eq:FTW-normalization}
   \widehat H_N(g)=M_N^{-1/2}\sum_{I\in\calI_N}g_I\psi_I,
   \qquad
@@ -136,7 +199,7 @@ Then $H_N=\tau_N\widehat H_N$ and
 \begin{equation}\label{eq:tau-asymptotic}
   \tau_N^2=\sigma_N^2M_N=\frac Nq\bigl(1+O_q(N^{-1})\bigr).
 \end{equation}
-Consequently, if
+Consequently, for
 $\widehat L_N(f)=\tr f(\widehat H_N)$, then
 \begin{equation}\label{eq:partition-as-linear-statistic}
   Z_N(\beta)=\widehat L_N(f_{N,\beta}),
@@ -145,33 +208,34 @@ $\widehat L_N(f)=\tr f(\widehat H_N)$, then
 \end{equation}
 
 
-Set $a=q/2-1$ and normalize the partition function by
-$Y_N=Z_N/F_N$.  Clifford sign-gauge symmetry eliminates the first Gaussian
-chaos and identifies the second chaos exactly:
+Set $a=q/2-1$ and normalize the partition function by $Y_N=Z_N/F_N$.
+Clifford sign-gauge symmetry eliminates the first Gaussian chaos and
+identifies the second chaos exactly:
 \[
   Y_N(\beta)-1
   =
   A_N(\beta)Q_N+\mathcal R_N(\beta),
   \]
-  where we set
+  where
   \[
-  A_N(\beta)=\frac{\beta}{2}\partial_\beta\log F_N(\beta),
-  \qquad
-  Q_N=\frac1{M_N}\sum_I(g_I^2-1).
-\]
-Here, $\mathcal R_N$ stands for third and higher order chaos. Thus the leading random term is a normalized sum of independent centered
-$M_N$ variables.  The main task is to prove
+    A_N(\beta)=\frac{\beta}{2}\partial_\beta\log F_N(\beta),
+    \qquad
+    Q_N=\frac1{M_N}\sum_I(g_I^2-1).
+  \]
+Here $\mathcal R_N$ is the sum of the Gaussian chaoses of orders at least
+three.  Thus the leading random term is a normalized sum of $M_N$
+independent centered variables.  The main task is to prove
 \[
   \norm{\mathcal R_N(\beta)}_2^2=o(N^{-2a}).
 \]
 
-For this purpose, split the chaos expansion at
-$m_N=\lceil A\log N\rceil$.  Up to order $m_N$, a Duhamel derivative bound
+We split the chaos expansion at $m_N=\lceil A\log N\rceil$.  Up to order
+$m_N$, a Duhamel derivative bound
 and the sign-gauge parity rule reduce the estimate to counting even tuples of
 $q$-sets.  Such a tuple of length $r$ uses at most $qr/2$ vertices, which
-makes the sum of chaoses of orders $3,\ldots,m_N$ equal to $o(N^{-2a})$.
+makes the sum of chaoses of orders $3,\ldots,m_N$ of order $o(N^{-2a})$.
 Above $m_N$, the $r$-th chaos vanishes to order at least $r$ at
-$\beta=0$.  Applying an $L^2$-valued analytic estimate on a zero-free disk,
+$\beta=0$.  An $L^2$-valued analytic estimate on a zero-free disk,
 together with the complex second-moment input, gives a geometric factor
 $(|\beta|/R)^{2m_N}$.  Choosing $A$ sufficiently large yields the same
 $o(N^{-2a})$ bound for the remaining chaoses.
@@ -181,18 +245,20 @@ The annealed free-energy input and convexity imply
   \frac{A_N(\beta)}N
   \longrightarrow \frac{\beta}{2}\ell_q'(\beta).
 \]
-Since $M_N\sim N^q/q!$, the ordinary central limit theorem for $Q_N$, the
+Since $M_N\sim N^q/q!$, the classical central limit theorem for $Q_N$, the
 remainder estimate, and Slutsky's theorem give the claimed limit for
 $N^a(Y_N-1)$.  Orthogonality of distinct Gaussian chaoses gives the matching
 variance asymptotic and hence the standardized central limit theorem.
 
-\section{Preliminaries}
+\section{Analytic and free-energy inputs}
+\label{sec:inputs}
+
 \subsection{A complex second-moment estimate}
 
-We use the following recent high-temperature preprint result.  It is Theorems
-3 and 4 of \cite{Zlokapa2026}, with the deterministic change of
-inverse-temperature coming from the Majorana normalization.  In particular,
-the constants below depend only on $q$.
+We use the following high-temperature estimates, which follow from
+Theorems~3 and 4 of \cite{Zlokapa2026} after adjusting the inverse
+temperature to our Majorana normalization.  All constants in the statement
+depend only on $q$.
 
 \begin{proposition}[Complex second-moment input]\label{prop:complex-input}
 There are constants $R_q>0$, $C_q<\infty$, and $N_q<\infty$ such that, for
@@ -211,9 +277,9 @@ and
 \end{proposition}
 
 \begin{proof}
-This is Theorems 3 and 4 of \cite{Zlokapa2026}, specialized to the
-unperturbed model, followed only by a deterministic normalization change.
-That paper uses Majoranas satisfying
+The claim follows from Theorems~3 and 4 of \cite{Zlokapa2026}, specialized
+to the unperturbed model, after a deterministic normalization change.  That
+paper uses Majoranas satisfying
 $\{\psi_i^{\rm Zlo},\psi_j^{\rm Zlo}\}=\delta_{ij}\I$.  Thus
 $\psi_i^{\rm Zlo}=2^{-1/2}\psi_i$,
 $H_N^{\rm Zlo}=2^{-q/2}H_N$, and
@@ -278,13 +344,12 @@ in $L^2$ on every compact disk.  Division by the nonvanishing deterministic
 analytic function $F_N$ proves the second assertion.
 \end{proof}
 
-\subsection{Deterministic FTW coefficient}
+\subsection{Annealed free energy and coefficient asymptotics}
 
-The remainder has now been controlled.  To identify the deterministic
-coefficient $A_N(\beta)$ in \eqref{eq:finite-N-FTW-coefficient}, we use the
-recent preprint result on the annealed free-energy limit.  The derivative
-convergence needed below is not taken as an additional input; it follows from
-convexity.
+To identify the deterministic coefficient $A_N(\beta)$ in
+\eqref{eq:finite-N-FTW-coefficient}, we use the annealed free-energy limit
+from \cite{GPSZ2026}.  The required convergence of derivatives follows from
+convexity and is not an additional input.
 
 \begin{lemma}[Convex convergence and derivatives]
 \label{lem:convex-derivatives}
@@ -294,11 +359,12 @@ $h\in C^1(I)$.  Then $h_N\to h$ and $h_N'\to h'$ locally uniformly on $I$.
 \end{lemma}
 
 \begin{proof}
-Fix a compact closed interval $[a,b]\subset I$ and choose $u<a<b<v$ in $I$.  Monotonicity of secant
-slopes bounds every secant slope of $h_N$ on $[a,b]$ between quantities formed
-from $h_N(u),h_N(a),h_N(b),h_N(v)$.  These endpoint values converge, so the
-$h_N$ are equi-Lipschitz on $[a,b]$.  Pointwise convergence on a finite mesh,
-followed by mesh refinement, gives uniform convergence there.
+Fix a compact interval $[a,b]\subset I$ and choose $u<a<b<v$ in $I$.
+Monotonicity of secant slopes bounds every secant slope of $h_N$ on $[a,b]$
+between quantities formed from $h_N(u),h_N(a),h_N(b),h_N(v)$.  These
+endpoint values converge, so the functions $h_N$ are equi-Lipschitz on
+$[a,b]$.  Pointwise convergence on a finite mesh, followed by mesh
+refinement, gives uniform convergence there.
 
 For $x\in I$ and sufficiently small $s>0$, convexity gives
 \[
@@ -337,9 +403,9 @@ Moreover,
 The pointwise convergence in \eqref{eq:annealed-free-energy-limit} is Theorem
 5 of \cite{GPSZ2026}, together with the Gaussian extension stated there.  That
 extension invokes the Gaussian--Rademacher universality result
-\cite{AGK2025}; we use it as part of the free-energy input package.
+\cite{AGK2025}.
 
-We now separate the normalization conversion from this transfer.  The
+We first record the normalization conversion.  The
 Majoranas of \cite{GPSZ2026} satisfy
 \[
   \psi_i^{\rm GPSZ}=2^{-1/2}\psi_i,
@@ -359,8 +425,8 @@ of \cite{GPSZ2026} give
 \end{equation}
 where $f_{N,q}^{\rm GPSZ}(u)=u^{-1}\log\E Z_N^{\rm GPSZ}(u)$.
 
-For completeness, we also extract the regularity and the first coefficient
-from the explicit formula in that theorem.  In its notation,
+We next extract the regularity and the first coefficient from the explicit
+formula in that theorem.  In its notation,
 \[
   \Phi_u(z)=\sum_{v\geq1}\mu_v(u)z^v,
   \qquad
@@ -433,7 +499,8 @@ By \eqref{eq:finite-N-FTW-coefficient} and
   \frac\beta2\ell_q'(\beta).
 \end{equation}
 
-\section{Proof of the main result}
+\section{Gaussian-chaos decomposition}
+\label{sec:chaos-decomposition}
 
 For a fixed test function $f$, Feng--Tian--Wei \cite{FTW2018} prove the
 Gaussian SYK linear-statistics CLT by isolating
@@ -445,7 +512,8 @@ In the fixed-$q$ regime, their coefficient is
 \[
   A(f)=\int_{\mathbb R}\frac{x f'(x)}2\,\rho_\infty(\mathrm dx),
 \]
-and their proof amounts to showing that the centered statistic for
+where $\rho_\infty$ is the limiting spectral measure.
+Their proof shows that the centered statistic associated with
 $f-A(f)x^2$ has variance $o(M_N^{-1})$.  Since
 $\sqrt{M_N}Q_N\Rightarrow\N(0,2)$, the radial term gives their limit.
 
@@ -454,28 +522,28 @@ directly into that theorem.  First, $f_{N,\beta}$ depends on $N$ through
 $\tau_N\asymp\sqrt N$.  Second, neither the fixed-function polynomial
 approximation nor the bounded-derivative estimate in \cite{FTW2018} is uniform
 for this sequence.  In particular, the theorem as stated in
-\cite{FTW2018} does \emph{not} imply a CLT for $Z_N(\beta)$.
+\cite{FTW2018} does not imply a CLT for $Z_N(\beta)$.
 
-The modification is to work with the relative partition function $Y_N$ and
-to replace the limiting coefficient $A(f)$ by the exact finite-$N$ coefficient
+We instead work with the relative partition function $Y_N$ and replace the
+limiting coefficient $A(f)$ by the exact finite-$N$ coefficient
 \begin{equation}\label{eq:finite-N-FTW-coefficient}
   A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log F_N(\beta).
 \end{equation}
-Indeed, the next lemma proves the exact FTW decomposition
+The next lemma proves the exact radial decomposition
 \begin{equation}\label{eq:exact-FTW-decomposition-preview}
   Y_N(\beta)-1=A_N(\beta)Q_N+\mathcal R_N(\beta),
   \qquad
   \mathcal R_N=\sum_{r\geq3}P_rY_N.
 \end{equation}
-The new estimate, replacing the fixed-test-function variance computation of
-FTW, is
+The estimate replacing the fixed-test-function variance computation of
+\cite{FTW2018} is
 \begin{equation}\label{eq:target-FTW-remainder}
   \E|\mathcal R_N(\beta)|^2=o(N^2/M_N)=o(N^{2-q}).
 \end{equation}
 Sections~\ref{sec:analytic-tail}--\ref{sec:FTW-remainder} prove precisely
 \eqref{eq:target-FTW-remainder}.
 
-\subsection{Exact finite-N FTW projection}
+\subsection{Exact finite-size radial projection}
 
 \begin{lemma}[First and second chaoses]\label{lem:exact-second-chaos}
 For every real $\beta$,
@@ -489,15 +557,14 @@ and
   \frac{\beta\,\partial_\beta\log F_N(\beta)}{2M_N}
   \sum_{I\in\calI_N}(g_I^2-1).
 \end{equation}
-Equivalently, since
-Clifford trace orthogonality gives
+Equivalently, Clifford trace orthogonality gives
 \[
   \tr(\psi_I\psi_J)=\mathbf 1_{\{I=J\}},
   \qquad
   \tr H_N^2=\sigma_N^2\sum_Ig_I^2.
 \]
-Thus the second chaos is the
-$L^2$ projection of $Y_N-1$ onto the centered radial statistic
+so the second chaos is the $L^2$ projection of $Y_N-1$ onto the centered
+radial statistic
 $\tr H_N^2-\E\tr H_N^2$.
 \end{lemma}
 
@@ -604,7 +671,7 @@ Consequently
 \]
 for a deterministic scalar $b_N$.
 
-We now justify the coefficient calculation.  For each fixed $I$, the
+It remains to compute the coefficient.  For each fixed $I$, the
 probabilists' second Hermite polynomial is $g_I^2-1$, with
 \[
   \E(g_I^2-1)^2=2.
@@ -632,8 +699,7 @@ below.  A further conditional Gaussian integration by parts gives the second:
     =\beta F_N'(\beta).
 \end{align*}
 
-For completeness, the third equality follows pointwise from the exact scaling
-identity
+The last equality follows pointwise from the exact scaling identity
 \[
   Z_N(\beta;tg)
   =\tr e^{-\beta H_N(tg)}
@@ -669,7 +735,7 @@ Dividing by the deterministic quantity $F_N(\beta)$ proves
 \subsection{Analytic control of the high-order remainder}
 \label{sec:analytic-tail}
 
-The next lemma is the step which upgrades the polynomially weak estimate
+The next lemma upgrades the polynomially weak estimate
 \eqref{eq:weak-complex-second-moment} to the precision required for the CLT.
 
 \begin{lemma}[Analytic suppression of high chaoses]
@@ -866,7 +932,7 @@ Summing from $r=3$ to $m_N$ gives
 $O(N^{-9a/4})=o(N^{-2a})$.
 \end{proof}
 
-\subsection{Completion of the modified FTW remainder estimate}
+\subsection{Completion of the higher-chaos estimate}
 \label{sec:FTW-remainder}
 
 \begin{proposition}[Higher-chaos closure]
@@ -896,24 +962,22 @@ controls $3\leq r\leq m_N$.  For the remaining chaoses,
 Adding the two estimates proves the claim.
 \end{proof}
 
-
-
-\begin{proof}
+\begin{proof}[Proof of Theorem~\ref{thm:partition-clt}]
 Let
 \[
   S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\calI_N}(g_I^2-1).
 \]
-The ordinary i.i.d.\ central limit theorem gives
+The classical i.i.d.\ central limit theorem gives
 $S_N\Rightarrow\xi\sim\N(0,1)$.
 By Lemma~\ref{lem:exact-second-chaos},
 \begin{equation}\label{eq:Y-decomposition-final}
   Y_N(\beta)-1
-  =c_N(\beta)S_N+R_N(\beta),
+  =c_N(\beta)S_N+\mathcal R_N(\beta),
   \qquad
   c_N(\beta)
   =\frac{\beta\,\partial_\beta\log F_N(\beta)}{\sqrt{2M_N}},
 \end{equation}
-where $R_N=\sum_{r\geq3}P_rY_N$ is orthogonal to $S_N$.
+where $\mathcal R_N=\sum_{r\geq3}P_rY_N$ is orthogonal to $S_N$.
 Since $M_N\sim N^q/q!$, \eqref{eq:annealed-derivative-limit} gives
 \[
   N^{q/2-1}c_N(\beta)
@@ -921,11 +985,11 @@ Since $M_N\sim N^q/q!$, \eqref{eq:annealed-derivative-limit} gives
   \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta).
 \]
 Proposition~\ref{prop:higher-chaos-closure} gives
-$N^{q/2-1}R_N\to0$ in $L^2$.  Slutsky's theorem proves
+$N^{q/2-1}\mathcal R_N\to0$ in $L^2$.  Slutsky's theorem proves
 \eqref{eq:scaled-relative-clt}.  Orthogonality in
 \eqref{eq:Y-decomposition-final} also gives
 \[
-  \Var(Y_N)=c_N(\beta)^2+\norm{R_N(\beta)}_2^2,
+  \Var(Y_N)=c_N(\beta)^2+\norm{\mathcal R_N(\beta)}_2^2,
 \]
 which proves \eqref{eq:variance-asymptotic}.  Finally,
 $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and the assumed nonvanishing of the limiting
@@ -947,66 +1011,134 @@ Thus $W_N=\log(1+X_N)$, and Theorem~\ref{thm:partition-clt} gives
   \Longrightarrow
   \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
   \qquad
-  \delta_N^2:=\E X_N^2=O(N^{-2a}).
+  \delta_N^2:=\E X_N^2\asymp N^{-2a}.
 \]
-We first record the estimate needed to replace the deterministic centering.
-The function $g\mapsto W_N(g)$ is Lipschitz, uniformly in $N$.  Indeed,
+We claim that
+\begin{equation}\label{eq:log-centering-negligible}
+  \E W_N=o(N^{-a}).
+\end{equation}
+To prove this, we first establish an $N$-independent Lipschitz bound for
+$g\mapsto W_N(g)$.  Differentiation gives
 \[
   \partial_{g_I}W_N
   =-\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
 \]
 For each $(q-1)$-set $S$, the operators
 $(\psi_{S\cup\{i\}})_{i\notin S}$ are pairwise anticommuting Hermitian
-involutions.  The usual anticommuting-observable estimate, summed over $S$,
-therefore gives
+involutions.  If $A_1,\ldots,A_m$ are any such operators and
+$a_j=\langle A_j\rangle$ in a state, set $B=\sum_j a_jA_j$ and
+$s=\sum_j a_j^2$.  Pairwise anticommutation gives
+\[
+  B^2=s\I,
+  \qquad
+  s=\langle B\rangle\leq\norm{B}=\sqrt{s},
+\]
+and hence $s\leq1$.  Applying this observation for each $S$ and noting that
+every $I\in\calI_N$ is counted exactly $q$ times yields
 \[
   \sum_{I\in\calI_N}|\langle\psi_I\rangle_{\beta,g}|^2
   \leq \frac1q\binom N{q-1}.
 \]
 Consequently,
 \[
-  \|\nabla_gW_N\|_2^2
+  \sum_{I\in\calI_N}|\partial_{g_I}W_N|^2
   \leq
   \frac{\beta^2\sigma_N^2}{q}\binom N{q-1}
   \leq\frac{\beta^2}{q}.
 \]
-Gaussian concentration now shows that $W_N-\E W_N$ is sub-Gaussian with a
-constant depending only on $q$ and $\beta$.
-
-For completeness, this concentration bound and $\E e^{W_N}=1$ imply
+Writing $\mu_N=\E W_N$, the Gaussian concentration inequality therefore
+implies, for every $\lambda\in\mathbb R$,
+\begin{equation}\label{eq:WN-subgaussian}
+  \E e^{\lambda(W_N-\mu_N)}
+  \leq \exp\left(\frac{\lambda^2\beta^2}{2q}\right).
+\end{equation}
+Jensen's inequality and the identity $\E e^{W_N}=1$ give
 \[
   -\frac{\beta^2}{2q}\leq \E W_N\leq0.
 \]
-Moreover, with $h(w)=e^w-1-w$, one has
-$h(w)\leq C(e^w-1)^2$ for $w\geq-1$ and $h(w)\leq|w|$ for $w<-1$.
-Chebyshev's inequality gives
+Indeed, the upper bound follows from Jensen, while
+\eqref{eq:WN-subgaussian} with $\lambda=1$ gives the lower bound.
+
+Let $K_\beta=\beta^2/(2q)$.  Since $e^{W_N}-1=X_N$, Chebyshev's inequality
+gives, for $t\geq1$,
 \[
   \mathbb P(W_N<-t)
   \leq \frac{\delta_N^2}{(1-e^{-t})^2}
-  \leq C\delta_N^2,\qquad t\geq1,
+  \leq C\delta_N^2.
 \]
-whereas Gaussian concentration gives a Gaussian upper bound for the same
-probability when $t$ is large.  Integrating the minimum of these two bounds
-yields
+On the other hand, $\mu_N\geq-K_\beta$, so
+\eqref{eq:WN-subgaussian} and the Chernoff bound imply
 \[
-  0\leq-\E W_N=\E h(W_N)
-  \leq C\delta_N^2\sqrt{\log(1/\delta_N)}
+  \mathbb P(W_N<-t)
+  \leq
+  \exp\left(-\frac{q(t-K_\beta)^2}{2\beta^2}\right),
+  \qquad t>K_\beta.
+\]
+Set
+\[
+  T_N=\max\left\{
+    1,\,
+    K_\beta+\frac{2|\beta|}{\sqrt q}
+    \sqrt{\log(e/\delta_N)}
+  \right\}.
+\]
+Indeed, the layer-cake formula gives
+\[
+  \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
+  =
+  \mathbb P(W_N<-1)+
+  \int_1^\infty\mathbb P(W_N<-t)\,\mathrm dt.
+\]
+The interval $[1,T_N]$ contributes at most $C\delta_N^2T_N$, while
+integration of the Gaussian bound over $[T_N,\infty)$ contributes at most
+$C\delta_N^2$.  Consequently,
+\begin{equation}\label{eq:WN-negative-tail}
+  \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
+  \leq C\delta_N^2\sqrt{\log(e/\delta_N)}.
+\end{equation}
+
+Now set $h(w)=e^w-1-w$.  There is an absolute constant $C$ such that
+\[
+  h(w)\leq C(e^w-1)^2\quad (w\geq-1),
+  \qquad
+  h(w)\leq |w|\quad (w<-1).
+\]
+Since $\E e^{W_N}=1$, \eqref{eq:WN-negative-tail} yields
+\[
+  0\leq-\mu_N=\E h(W_N)
+  \leq C\delta_N^2\sqrt{\log(e/\delta_N)}
   =O\!\left(N^{2-q}\sqrt{\log N}\right)
   =o(N^{-a}).
 \]
+This proves \eqref{eq:log-centering-negligible}.
 
-Finally, $N^aX_N$ is tight and $X_N\to0$ in probability.  Hence the Taylor
-estimate $|\log(1+x)-x|\leq Cx^2$ for $|x|\leq1/2$ gives
+It remains to compare the random parts.  The sequence $N^aX_N$ is tight and
+$X_N\to0$ in probability.  On the event $\{|X_N|\leq1/2\}$, the Taylor
+bound $|\log(1+x)-x|\leq Cx^2$ gives
+\[
+  N^a|W_N-X_N|
+  \leq C\bigl(N^a|X_N|\bigr)|X_N|.
+\]
+The right-hand side converges to zero in probability, while
+$\mathbb P(|X_N|>1/2)\to0$.  Therefore
 \[
   N^a\bigl(W_N-X_N\bigr)\longrightarrow0
   \qquad\text{in probability}.
 \]
-Since
+Together with \eqref{eq:log-centering-negligible}, this shows that
+\[
+  N^a\bigl((W_N-\E W_N)-X_N\bigr)
+  \longrightarrow0
+  \qquad\text{in probability}.
+\]
+Finally,
 \[
   \log Z_N-\E\log Z_N=W_N-\E W_N,
 \]
-the claimed convergence follows from Theorem~\ref{thm:partition-clt} and
-Slutsky's theorem.
+so the claimed convergence follows from
+\eqref{eq:scaled-relative-clt} and Slutsky's theorem.
+The assertion for $\mathcal G_N$ follows by multiplication by
+$-\beta^{-1}$.
 \end{proof}
 \begin{remark}
 Since $\ell_q'(\beta)=\beta/q+O(\beta^3)$ at the origin, the nondegeneracy
@@ -1017,26 +1149,47 @@ small real $\beta\neq0$.
 
 \begin{thebibliography}{99}
 
+\bibitem{SachdevYe1993}
+S.~Sachdev and J.~Ye,
+\newblock Gapless spin-fluid ground state in a random quantum Heisenberg
+magnet,
+\newblock \emph{Phys. Rev. Lett.} 70 (1993), 3339--3342.
+\newblock \href{https://doi.org/10.1103/PhysRevLett.70.3339}
+{doi:10.1103/PhysRevLett.70.3339}.
+
+\bibitem{MaldacenaStanford2016}
+J.~Maldacena and D.~Stanford,
+\newblock Remarks on the Sachdev--Ye--Kitaev model,
+\newblock \emph{Phys. Rev. D} 94 (2016), 106002.
+\newblock \href{https://doi.org/10.1103/PhysRevD.94.106002}
+{doi:10.1103/PhysRevD.94.106002}.
+
 \bibitem{FTW2018}
 R.~Feng, G.~Tian, and D.~Wei,
-\newblock Spectrum of SYK model II: central limit theorem,
-\newblock arXiv:1806.05714, 2018.
+\newblock Spectrum of SYK model II: Central limit theorem,
+\newblock \emph{Random Matrices Theory Appl.} 10 (2021), no.~4, 2150037.
+\newblock \href{https://doi.org/10.1142/S2010326321500374}
+{doi:10.1142/S2010326321500374}.
 
 \bibitem{Zlokapa2026}
 A.~Zlokapa,
 \newblock A rigorous quasipolynomial-time classical algorithm for SYK thermal
 expectations,
-\newblock arXiv:2604.21089v1, 22 April 2026.
+\newblock \href{https://arxiv.org/abs/2604.21089}
+{arXiv:2604.21089v1}, 2026.
 
 \bibitem{GPSZ2026}
 D.~Gamarnik, F.~Pernice, A.~Schmidhuber, and A.~Zlokapa,
 \newblock The free energy limit of the SYK model at high temperature,
-\newblock arXiv:2605.02768v1, 4 May 2026.
+\newblock \href{https://arxiv.org/abs/2605.02768}
+{arXiv:2605.02768v1}, 2026.
 
 \bibitem{AGK2025}
 E.~R. Anschuetz, D.~Gamarnik, and B.~T. Kiani,
 \newblock Bounds on the ground state energy of quantum $p$-spin Hamiltonians,
-\newblock Communications in Mathematical Physics 406 (2025), article 232.
+\newblock \emph{Commun. Math. Phys.} 406 (2025), article 232.
+\newblock \href{https://doi.org/10.1007/s00220-025-05412-4}
+{doi:10.1007/s00220-025-05412-4}.
 
 \end{thebibliography}
 
