@@ -150,16 +150,6 @@ Under the assumptions of Theorem~\ref{thm:partition-clt},
   \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
   \qquad \xi\sim\N(0,1).
 \]
-Equivalently, if
-$\mathcal G_N(\beta)=-\beta^{-1}\log Z_N(\beta)$ is the random free energy,
-then
-\[
-  N^{q/2-1}\left(
-    \mathcal G_N(\beta)-\E\mathcal G_N(\beta)
-  \right)
-  \Longrightarrow
-  -\sqrt{\frac{q!}{2}}\,\ell_q'(\beta)\,\xi.
-\]
 \end{corollary}
 
 \subsection{Relation to earlier work}
@@ -189,26 +179,7 @@ does not assume any fluctuation theorem for either $Z_N$ or $\log Z_N$.
 
 \subsection{Outline of the proof}
 
-We first relate our normalization to that of Feng, Tian, and Wei.  Define
-\begin{equation}\label{eq:FTW-normalization}
-  \widehat H_N(g)=M_N^{-1/2}\sum_{I\in\calI_N}g_I\psi_I,
-  \qquad
-  \tau_N=\sigma_N\sqrt{M_N}.
-\end{equation}
-Then $H_N=\tau_N\widehat H_N$ and
-\begin{equation}\label{eq:tau-asymptotic}
-  \tau_N^2=\sigma_N^2M_N=\frac Nq\bigl(1+O_q(N^{-1})\bigr).
-\end{equation}
-Consequently, for
-$\widehat L_N(f)=\tr f(\widehat H_N)$, then
-\begin{equation}\label{eq:partition-as-linear-statistic}
-  Z_N(\beta)=\widehat L_N(f_{N,\beta}),
-  \qquad
-  f_{N,\beta}(x)=e^{-\beta\tau_Nx}.
-\end{equation}
 
-
-Set $a=q/2-1$ and normalize the partition function by $Y_N=Z_N/F_N$.
 Clifford sign-gauge symmetry eliminates the first Gaussian chaos and
 identifies the second chaos exactly:
 \[
@@ -226,19 +197,19 @@ Here $\mathcal R_N$ is the sum of the Gaussian chaoses of orders at least
 three.  Thus the leading random term is a normalized sum of $M_N$
 independent centered variables.  The main task is to prove
 \[
-  \norm{\mathcal R_N(\beta)}_2^2=o(N^{-2a}).
+  \norm{\mathcal R_N(\beta)}_2^2=o(N^{-(q-2)}).
 \]
 
 We split the chaos expansion at $m_N=\lceil A\log N\rceil$.  Up to order
 $m_N$, a Duhamel derivative bound
 and the sign-gauge parity rule reduce the estimate to counting even tuples of
 $q$-sets.  Such a tuple of length $r$ uses at most $qr/2$ vertices, which
-makes the sum of chaoses of orders $3,\ldots,m_N$ of order $o(N^{-2a})$.
+makes the sum of chaoses of orders $3,\ldots,m_N$ of order $o(N^{-(q-2)})$.
 Above $m_N$, the $r$-th chaos vanishes to order at least $r$ at
 $\beta=0$.  An $L^2$-valued analytic estimate on a zero-free disk,
 together with the complex second-moment input, gives a geometric factor
 $(|\beta|/R)^{2m_N}$.  Choosing $A$ sufficiently large yields the same
-$o(N^{-2a})$ bound for the remaining chaoses.
+$o(N^{-(q-2)})$ bound for the remaining chaoses.
 
 The annealed free-energy input and convexity imply
 \[
@@ -246,7 +217,7 @@ The annealed free-energy input and convexity imply
   \longrightarrow \frac{\beta}{2}\ell_q'(\beta).
 \]
 Since $M_N\sim N^q/q!$, the classical central limit theorem for $Q_N$, the
-remainder estimate, and Slutsky's theorem give the claimed limit for
+remainder estimate  gives the claimed limit for
 $N^a(Y_N-1)$.  Orthogonality of distinct Gaussian chaoses gives the matching
 variance asymptotic and hence the standardized central limit theorem.
 
@@ -301,7 +272,7 @@ Set
   Y_N(z;g)=\frac{Z_N(z;g)}{F_N(z)}.
 \]
 Thus $\E Y_N(z)=1$, and the right-hand side of
-\eqref{eq:weak-complex-second-moment} is $C_qN^{-a}$.
+\eqref{eq:weak-complex-second-moment} is $C_qN^{-(q/2-1)}$.
 Let $P_r$ denote the orthogonal projection in complex
 $L^2(\gamma_N)$ onto the $r$-th homogeneous Gaussian chaos, where $\gamma_N$
 denotes standard Gaussian measure on $\mathbb R^{M_N}$.  We write
@@ -501,6 +472,23 @@ By \eqref{eq:finite-N-FTW-coefficient} and
 
 \section{Gaussian-chaos decomposition}
 \label{sec:chaos-decomposition}
+We first relate our normalization to that of Feng, Tian, and Wei.  Define
+\begin{equation}\label{eq:FTW-normalization}
+  \widehat H_N(g)=M_N^{-1/2}\sum_{I\in\calI_N}g_I\psi_I,
+  \qquad
+  \tau_N=\sigma_N\sqrt{M_N}.
+\end{equation}
+Then $H_N=\tau_N\widehat H_N$ and
+\begin{equation}\label{eq:tau-asymptotic}
+  \tau_N^2=\sigma_N^2M_N=\frac Nq\bigl(1+O_q(N^{-1})\bigr).
+\end{equation}
+Consequently, for
+$\widehat L_N(f)=\tr f(\widehat H_N)$, then
+\begin{equation}\label{eq:partition-as-linear-statistic}
+  Z_N(\beta)=\widehat L_N(f_{N,\beta}),
+  \qquad
+  f_{N,\beta}(x)=e^{-\beta\tau_Nx}.
+\end{equation}
 
 For a fixed test function $f$, Feng--Tian--Wei \cite{FTW2018} prove the
 Gaussian SYK linear-statistics CLT by isolating
@@ -513,7 +501,7 @@ In the fixed-$q$ regime, their coefficient is
   A(f)=\int_{\mathbb R}\frac{x f'(x)}2\,\rho_\infty(\mathrm dx),
 \]
 where $\rho_\infty$ is the limiting spectral measure.
-Their proof shows that the centered statistic associated with
+They show that the centered statistic associated with
 $f-A(f)x^2$ has variance $o(M_N^{-1})$.  Since
 $\sqrt{M_N}Q_N\Rightarrow\N(0,2)$, the radial term gives their limit.
 
@@ -813,7 +801,7 @@ $0<|\beta|<R<R_q$ and every $m\geq0$ we obtain
   \sum_{r>m}\norm{P_rY_N(\beta)}_2^2
   \leq
   \frac{C_q}{1-(|\beta|/R)^2}
-  N^{-a}\left(\frac{|\beta|}{R}\right)^{2(m+1)}.
+  N^{-(q/2-1)}\left(\frac{|\beta|}{R}\right)^{2(m+1)}.
 \end{equation}
 
 \subsection{Uniform control of chaoses up to logarithmic order}
@@ -886,7 +874,7 @@ Consequently, for every fixed $A<\infty$,
 \begin{equation}\label{eq:low-chaos-negligible}
   \sum_{r=3}^{\lceil A\log N\rceil}
   \norm{P_rY_N(\beta)}_2^2
-  =o(N^{-2a}).
+  =o(N^{-(q-2)}).
 \end{equation}
 \end{lemma}
 
@@ -929,7 +917,7 @@ $D\log(r+1)=o(\log N)$.  Hence, for all sufficiently large $N$,
   \leq N^{-3ar/4}.
 \]
 Summing from $r=3$ to $m_N$ gives
-$O(N^{-9a/4})=o(N^{-2a})$.
+$O(N^{-9a/4})=o(N^{-(q-2)})$.
 \end{proof}
 
 \subsection{Completion of the higher-chaos estimate}
@@ -940,7 +928,7 @@ $O(N^{-9a/4})=o(N^{-2a})$.
 For every fixed real $\beta$ satisfying $0<|\beta|<R_q$,
 \begin{equation}\label{eq:higher-chaos-closure}
   \sum_{r\geq3}\norm{P_rY_N(\beta)}_2^2
-  =o(N^{2-q})=o(N^{-2a}).
+  =o(N^{2-q})=o(N^{-(q-2)}).
 \end{equation}
 \end{proposition}
 
@@ -956,12 +944,12 @@ controls $3\leq r\leq m_N$.  For the remaining chaoses,
 \[
   \sum_{r>m_N}\norm{P_rY_N(\beta)}_2^2
   \leq
-  \frac{C_q}{1-t^2}N^{-a}t^{2(m_N+1)}
-  =o(N^{-2a}).
+  \frac{C_q}{1-t^2}N^{-(q/2-1)}t^{2(m_N+1)}
+  =o(N^{-(q-2)}).
 \]
 Adding the two estimates proves the claim.
 \end{proof}
-
+\section{Proof of the main results}
 \begin{proof}[Proof of Theorem~\ref{thm:partition-clt}]
 Let
 \[
@@ -985,7 +973,7 @@ Since $M_N\sim N^q/q!$, \eqref{eq:annealed-derivative-limit} gives
   \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta).
 \]
 Proposition~\ref{prop:higher-chaos-closure} gives
-$N^{q/2-1}\mathcal R_N\to0$ in $L^2$.  Slutsky's theorem proves
+$N^{q/2-1}\mathcal R_N\to0$ in $L^2$.  This proves
 \eqref{eq:scaled-relative-clt}.  Orthogonality in
 \eqref{eq:Y-decomposition-final} also gives
 \[
@@ -993,7 +981,7 @@ $N^{q/2-1}\mathcal R_N\to0$ in $L^2$.  Slutsky's theorem proves
 \]
 which proves \eqref{eq:variance-asymptotic}.  Finally,
 $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and the assumed nonvanishing of the limiting
-coefficient allows one more application of Slutsky, proving
+coefficient give 
 \eqref{eq:standardized-clt}.
 \end{proof}
 
@@ -1011,11 +999,11 @@ Thus $W_N=\log(1+X_N)$, and Theorem~\ref{thm:partition-clt} gives
   \Longrightarrow
   \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
   \qquad
-  \delta_N^2:=\E X_N^2\asymp N^{-2a}.
+  \delta_N^2:=\E X_N^2\asymp N^{-(q-2)}.
 \]
 We claim that
 \begin{equation}\label{eq:log-centering-negligible}
-  \E W_N=o(N^{-a}).
+  \E W_N=o(N^{-(q/2-1)}).
 \end{equation}
 To prove this, we first establish an $N$-independent Lipschitz bound for
 $g\mapsto W_N(g)$.  Differentiation gives
@@ -1108,7 +1096,7 @@ Since $\E e^{W_N}=1$, \eqref{eq:WN-negative-tail} yields
   0\leq-\mu_N=\E h(W_N)
   \leq C\delta_N^2\sqrt{\log(e/\delta_N)}
   =O\!\left(N^{2-q}\sqrt{\log N}\right)
-  =o(N^{-a}).
+  =o(N^{-(q/2-1)}).
 \]
 This proves \eqref{eq:log-centering-negligible}.
 
@@ -1136,7 +1124,7 @@ Finally,
   \log Z_N-\E\log Z_N=W_N-\E W_N,
 \]
 so the claimed convergence follows from
-\eqref{eq:scaled-relative-clt} and Slutsky's theorem.
+\eqref{eq:scaled-relative-clt}.
 The assertion for $\mathcal G_N$ follows by multiplication by
 $-\beta^{-1}$.
 \end{proof}
