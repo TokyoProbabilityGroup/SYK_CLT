@@ -14,7 +14,7 @@ namespace SYK.CLT
 
 The component estimates are kept separate from the final probabilistic
 assembly so their formalization status is visible in one place. -/
-structure ConditionalPartitionCLTInputs (C : CLTContext) : Prop where
+structure ConditionalPartitionCLTInputs (C : FixedParameters) : Prop where
   high_temperature : HighTemperatureInputs C
   exact_second_chaos : ExactSecondChaosStatement C
   radial_clt : RadialCLTStatement C
@@ -22,13 +22,13 @@ structure ConditionalPartitionCLTInputs (C : CLTContext) : Prop where
   conclusions : PartitionFunctionCLTInputs C
 
 /-- Conditional scaled partition-function CLT with variance convergence. -/
-theorem partitionFunction_clt_of_inputs (C : CLTContext)
+theorem partitionFunction_clt_of_inputs (C : FixedParameters)
     (hCLT : ConditionalPartitionCLTInputs C) :
     PartitionFunctionCLTStatement C :=
   hCLT.conclusions.scaled_clt_and_variance
 
 /-- Conditional standardized partition-function CLT. -/
-theorem standardizedPartitionFunction_clt_of_inputs (C : CLTContext)
+theorem standardizedPartitionFunction_clt_of_inputs (C : FixedParameters)
     (hCLT : ConditionalPartitionCLTInputs C) :
     StandardizedPartitionCLTStatement C :=
   hCLT.conclusions.standardized_clt

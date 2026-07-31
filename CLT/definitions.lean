@@ -29,9 +29,6 @@ structure FixedParameters where
   q_even : Even q
   four_le_q : 4 ≤ q
 
-/-- Parameters fixed throughout the partition-function CLT. -/
-abbrev CLTContext := FixedParameters
-
 /-- System sizes tend to infinity through even integers, starting at `q`. -/
 def systemSize (P : FixedParameters) (k : ℕ) : ℕ :=
   P.q + 2 * k

@@ -9,7 +9,7 @@ open Topology
 namespace SYK.CLT
 
 /-- The deterministic radial-coefficient limit derived from the annealed input. -/
-theorem radialCoefficient_limit (C : CLTContext)
+theorem radialCoefficient_limit (C : FixedParameters)
     (hHT : HighTemperatureInputs C) :
     ∃ β₀ : ℝ, 0 < β₀ ∧
       ∀ β ∈ Set.Ioo (-β₀) β₀,

@@ -1,4 +1,6 @@
 import SYK.CLT.definitions
+import Mathlib.Analysis.Analytic.Basic
+import Mathlib.Analysis.Calculus.Deriv.Basic
 
 set_option autoImplicit false
 
@@ -18,7 +20,7 @@ open Filter MeasureTheory Topology
 namespace SYK.CLT
 
 /-- Zero-freeness and the complex second-moment estimate on a fixed disk. -/
-def ComplexSecondMomentStatement (C : CLTContext) : Prop :=
+def ComplexSecondMomentStatement (C : FixedParameters) : Prop :=
   ∃ R K : ℝ, ∃ k₀ : ℕ,
     0 < R ∧ 0 ≤ K ∧
     ∀ k ≥ k₀, ∀ z : ℂ, ‖z‖ ≤ R →
@@ -29,7 +31,7 @@ def ComplexSecondMomentStatement (C : CLTContext) : Prop :=
         K / (systemSize C k : ℝ) ^ fluctuationExponent C
 
 /-- Annealed pressure convergence and its derivative limit. -/
-def AnnealedLimitStatement (C : CLTContext) : Prop :=
+def AnnealedLimitStatement (C : FixedParameters) : Prop :=
   ∃ β₀ : ℝ, 0 < β₀ ∧
     AnalyticOnNhd ℝ (limitingAnnealedPressure C) (Set.Ioo (-β₀) β₀) ∧
     (∀ β ∈ Set.Ioo (-β₀) β₀,
@@ -48,7 +50,7 @@ def AnnealedLimitStatement (C : CLTContext) : Prop :=
       (𝓝[≠] 0) (𝓝 ((C.q : ℝ)⁻¹))
 
 /-- Results imported from the high-temperature analysis. -/
-structure HighTemperatureInputs (C : CLTContext) : Prop where
+structure HighTemperatureInputs (C : FixedParameters) : Prop where
   complex_second_moment : ComplexSecondMomentStatement C
   annealed_limit : AnnealedLimitStatement C
 

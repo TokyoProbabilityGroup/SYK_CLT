@@ -15,7 +15,7 @@ namespace SYK
 namespace CLT
 
 /-- The conditional standardized partition-function CLT. -/
-theorem main_result (C : CLTContext)
+theorem main_result (C : FixedParameters)
     (hCLT : ConditionalPartitionCLTInputs C) :
     StandardizedPartitionCLTStatement C :=
   standardizedPartitionFunction_clt_of_inputs C hCLT
