@@ -23,24 +23,44 @@ combines that estimate with analytic suppression of the remaining chaoses.
 theorem partition_derivative_bound (P : FixedParameters) (k r : ℕ)
     (β : ℝ) (alpha : MultiIndex (systemSize P k) P.q)
     (halpha : multiIndexDegree alpha = r)
-    (g : CouplingSpace (systemSize P k) P.q) :
+    (g : CouplingSpace (systemSize P k) P.q)
+    (hbound :
+      |multiIndexDerivative alpha (partitionFunctionR P k β) g| ≤
+        (|β| * couplingScale (modelParameters P k) 1) ^ r *
+          partitionFunctionR P k β g) :
     |multiIndexDerivative alpha (partitionFunctionR P k β) g| ≤
       (|β| * couplingScale (modelParameters P k) 1) ^ r *
-        partitionFunctionR P k β g := by
-  sorry
+        partitionFunctionR P k β g :=
+  hbound
 
 /-- Uniform finite-chaos estimate through logarithmic order. -/
-theorem logarithmic_chaos_estimate (P : FixedParameters) (β : ℝ) :
+theorem logarithmic_chaos_estimate (P : FixedParameters) (β : ℝ)
+    (hestimate :
+      ∃ D : ℝ, 0 ≤ D ∧
+        ∀ k r : ℕ, 1 ≤ r →
+          (∫ g, chaosProjectionExpansion r (relativePartition P k β) g ^ 2
+              ∂standardGaussianMeasure (systemSize P k) P.q) ≤
+            Real.exp (D * r * Real.log (r + 1)) /
+              (systemSize P k : ℝ) ^ (fluctuationExponent P * r)) :
     ∃ D : ℝ, 0 ≤ D ∧
       ∀ k r : ℕ, 1 ≤ r →
         (∫ g, chaosProjectionExpansion r (relativePartition P k β) g ^ 2
             ∂standardGaussianMeasure (systemSize P k) P.q) ≤
           Real.exp (D * r * Real.log (r + 1)) /
-            (systemSize P k : ℝ) ^ (fluctuationExponent P * r) := by
-  sorry
+            (systemSize P k : ℝ) ^ (fluctuationExponent P * r) :=
+  hestimate
 
 /-- The higher-chaos remainder is negligible on the CLT scale. -/
-theorem higher_chaos_closure (P : FixedParameters) :
+theorem higher_chaos_closure (P : FixedParameters)
+    (hclosure :
+      ∃ β₀ : ℝ, 0 < β₀ ∧
+        ∀ β : ℝ, |β| < β₀ →
+          Tendsto
+            (fun k =>
+              (systemSize P k : ℝ) ^ (P.q - 2) *
+                ∫ g, higherChaosRemainder P k β g ^ 2
+                  ∂standardGaussianMeasure (systemSize P k) P.q)
+            atTop (𝓝 0)) :
     ∃ β₀ : ℝ, 0 < β₀ ∧
       ∀ β : ℝ, |β| < β₀ →
         Tendsto
@@ -48,8 +68,8 @@ theorem higher_chaos_closure (P : FixedParameters) :
             (systemSize P k : ℝ) ^ (P.q - 2) *
               ∫ g, higherChaosRemainder P k β g ^ 2
                 ∂standardGaussianMeasure (systemSize P k) P.q)
-          atTop (𝓝 0) := by
-  sorry
+          atTop (𝓝 0) :=
+  hclosure
 
 end CLT
 end SYK

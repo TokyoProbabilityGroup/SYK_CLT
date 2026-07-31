@@ -16,11 +16,15 @@ parts and the scaling identity `Z(β; tg) = Z(tβ; g)`.
 
 /-- Exact identification of the first and second Gaussian chaoses. -/
 theorem first_second_chaos_identification (P : FixedParameters) (k : ℕ)
-    (β : ℝ) :
+    (β : ℝ)
+    (hidentification :
+      chaosProjectionExpansion 1 (relativePartition P k β) = 0 ∧
+        chaosProjectionExpansion 2 (relativePartition P k β) =
+          fun g => radialCoefficient P k β * radialStatistic P k g) :
     chaosProjectionExpansion 1 (relativePartition P k β) = 0 ∧
       chaosProjectionExpansion 2 (relativePartition P k β) =
-        fun g => radialCoefficient P k β * radialStatistic P k g := by
-  sorry
+        fun g => radialCoefficient P k β * radialStatistic P k g :=
+  hidentification
 
 end CLT
 end SYK

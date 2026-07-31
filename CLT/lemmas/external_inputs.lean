@@ -11,15 +11,49 @@ namespace SYK
 namespace CLT
 
 /-!
-These two statements are interfaces to results formalized elsewhere.
-
-The complex second-moment estimate will come from `SYK/Second_moment`.  The
-annealed pressure limit will come from `SYK/Annealed_FE`.  Their literature
-proofs are intentionally not reproduced in the CLT directory.
+Explicit interfaces for the two results imported by the paper.  Keeping these
+facts in a structure makes every dependency visible to Lean and avoids hidden
+axioms while their source proofs are formalized elsewhere.
 -/
 
 /-- Zero-freeness and the complex second-moment estimate on a fixed disk. -/
-theorem complex_secondMoment_input (P : FixedParameters) :
+def ComplexSecondMomentStatement (P : FixedParameters) : Prop :=
+  ∃ R C : ℝ, ∃ k₀ : ℕ,
+    0 < R ∧ 0 ≤ C ∧
+    ∀ k ≥ k₀, ∀ z : ℂ, ‖z‖ ≤ R →
+      annealedPartitionC P k z ≠ 0 ∧
+      (∫ g,
+          ‖partitionFunctionC P k z g / annealedPartitionC P k z - 1‖ ^ 2
+            ∂standardGaussianMeasure (systemSize P k) P.q) ≤
+        C / (systemSize P k : ℝ) ^ fluctuationExponent P
+
+/-- Annealed pressure convergence and its convexity-derived derivative limit. -/
+def AnnealedLimitStatement (P : FixedParameters) : Prop :=
+  ∃ β₀ : ℝ, 0 < β₀ ∧
+    AnalyticOnNhd ℝ (limitingAnnealedPressure P) (Set.Ioo (-β₀) β₀) ∧
+    (∀ β ∈ Set.Ioo (-β₀) β₀,
+      limitingAnnealedPressure P (-β) = limitingAnnealedPressure P β) ∧
+    (∀ β ∈ Set.Ioo (-β₀) β₀,
+      Tendsto (fun k => annealedPressure P k β) atTop
+        (𝓝 (limitingAnnealedPressure P β))) ∧
+    (∀ β ∈ Set.Ioo (-β₀) β₀,
+      Tendsto
+        (fun k =>
+          deriv (fun t => Real.log (annealedPartitionR P k t)) β /
+            systemSize P k)
+        atTop (𝓝 (limitingPressureDerivative P β))) ∧
+    Tendsto
+      (fun β => limitingPressureDerivative P β / β)
+      (𝓝[≠] 0) (𝓝 ((P.q : ℝ)⁻¹))
+
+/-- The external high-temperature results used by the conditional CLT. -/
+structure HighTemperatureInputs (P : FixedParameters) : Prop where
+  complex_second_moment : ComplexSecondMomentStatement P
+  annealed_limit : AnnealedLimitStatement P
+
+/-- Zero-freeness and the complex second-moment estimate on a fixed disk. -/
+theorem complex_secondMoment_input (P : FixedParameters)
+    (hHT : HighTemperatureInputs P) :
     ∃ R C : ℝ, ∃ k₀ : ℕ,
       0 < R ∧ 0 ≤ C ∧
       ∀ k ≥ k₀, ∀ z : ℂ, ‖z‖ ≤ R →
@@ -27,12 +61,13 @@ theorem complex_secondMoment_input (P : FixedParameters) :
         (∫ g,
             ‖partitionFunctionC P k z g / annealedPartitionC P k z - 1‖ ^ 2
               ∂standardGaussianMeasure (systemSize P k) P.q) ≤
-          C / (systemSize P k : ℝ) ^ fluctuationExponent P := by
-  sorry
+          C / (systemSize P k : ℝ) ^ fluctuationExponent P :=
+  hHT.complex_second_moment
 
 /-- Annealed pressure convergence and the derivative convergence obtained
 from convexity. -/
-theorem annealed_pressure_and_derivative_limit (P : FixedParameters) :
+theorem annealed_pressure_and_derivative_limit (P : FixedParameters)
+    (hHT : HighTemperatureInputs P) :
     ∃ β₀ : ℝ, 0 < β₀ ∧
       AnalyticOnNhd ℝ (limitingAnnealedPressure P) (Set.Ioo (-β₀) β₀) ∧
       (∀ β ∈ Set.Ioo (-β₀) β₀,
@@ -48,11 +83,12 @@ theorem annealed_pressure_and_derivative_limit (P : FixedParameters) :
           atTop (𝓝 (limitingPressureDerivative P β))) ∧
       Tendsto
         (fun β => limitingPressureDerivative P β / β)
-        (𝓝[≠] 0) (𝓝 ((P.q : ℝ)⁻¹)) := by
-  sorry
+        (𝓝[≠] 0) (𝓝 ((P.q : ℝ)⁻¹)) :=
+  hHT.annealed_limit
 
 /-- Asymptotics of the exact radial coefficient. -/
-theorem radialCoefficient_asymptotic (P : FixedParameters) :
+theorem radialCoefficient_asymptotic (P : FixedParameters)
+    (hHT : HighTemperatureInputs P) :
     ∃ β₀ : ℝ, 0 < β₀ ∧
       ∀ β ∈ Set.Ioo (-β₀) β₀,
         Tendsto
@@ -60,7 +96,7 @@ theorem radialCoefficient_asymptotic (P : FixedParameters) :
           atTop
           (𝓝 (β / 2 * limitingPressureDerivative P β)) := by
   obtain ⟨β₀, hβ₀, _, _, _, hderiv, _⟩ :=
-    annealed_pressure_and_derivative_limit P
+    annealed_pressure_and_derivative_limit P hHT
   refine ⟨β₀, hβ₀, fun β hβ => ?_⟩
   have h := hderiv β hβ
   simpa only [radialCoefficient, div_eq_mul_inv, mul_assoc] using
