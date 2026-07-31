@@ -1,4 +1,4 @@
-import SYK.CLT.definitions
+import SYK.CLT.main_result
 import SYK.CLT.lemmas.hermite_gauge_selection
 
 set_option autoImplicit false

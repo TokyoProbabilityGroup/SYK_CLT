@@ -1,4 +1,4 @@
-import SYK.CLT.definitions
+import SYK.CLT.main_result
 
 set_option autoImplicit false
 

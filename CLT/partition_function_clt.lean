@@ -2,7 +2,6 @@ import SYK.CLT.coefficient_limit
 import SYK.CLT.gaussian.radial_clt
 import SYK.CLT.lemmas.exact_second_chaos
 import SYK.CLT.lemmas.chaos_estimates
-import SYK.CLT.lemmas.partition_clt
 
 set_option autoImplicit false
 

@@ -1,4 +1,4 @@
-import SYK.CLT.definitions
+import SYK.CLT.main_result
 import Mathlib.Analysis.Analytic.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
 
