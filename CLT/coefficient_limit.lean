@@ -16,7 +16,12 @@ theorem radialCoefficient_limit (C : CLTContext)
         Filter.Tendsto
           (fun k => radialCoefficient C k β / systemSize C k)
           Filter.atTop
-          (𝓝 (β / 2 * limitingPressureDerivative C β)) :=
-  radialCoefficient_asymptotic C hHT
+          (𝓝 (β / 2 * limitingPressureDerivative C β)) := by
+  obtain ⟨β₀, hβ₀, _, _, _, hderiv, _⟩ := hHT.annealed_limit
+  refine ⟨β₀, hβ₀, fun β hβ => ?_⟩
+  have h := hderiv β hβ
+  simpa only [radialCoefficient, div_eq_mul_inv, mul_assoc] using
+    ((tendsto_const_nhds :
+      Filter.Tendsto (fun _ : ℕ => β / 2) Filter.atTop (𝓝 (β / 2))).mul h)
 
 end SYK.CLT

@@ -1,5 +1,4 @@
 import SYK.CLT.partition_function_clt
-import SYK.CLT.log_partition_function_clt
 
 set_option autoImplicit false
 
@@ -15,16 +14,11 @@ noncomputable section
 namespace SYK
 namespace CLT
 
-/-- Compatibility alias for the conditional standardized theorem. -/
+/-- The conditional standardized partition-function CLT. -/
 theorem main_result (C : CLTContext)
-    (hHT : HighTemperatureInputs C)
-    (hCLT : ConditionalPartitionCLTInputs C hHT) :
+    (hCLT : ConditionalPartitionCLTInputs C) :
     StandardizedPartitionCLTStatement C :=
-  standardizedPartitionFunction_clt_of_inputs C hHT hCLT
-
-#print axioms partitionFunction_clt_of_inputs
-#print axioms standardizedPartitionFunction_clt_of_inputs
-#print axioms logPartitionFunction_clt_of_inputs
+  standardizedPartitionFunction_clt_of_inputs C hCLT
 
 end CLT
 end SYK

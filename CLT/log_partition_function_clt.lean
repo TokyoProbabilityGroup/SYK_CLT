@@ -23,13 +23,11 @@ def LogPartitionFunctionCLTStatement (C : CLTContext) : Prop :=
           limitingPressureDerivative C β ^ 2)
 
 /-- The concentration and logarithmic-comparison input, kept explicit. -/
-structure LogPartitionFunctionCLTInputs (C : CLTContext)
-    (_hHT : HighTemperatureInputs C) : Prop where
+structure LogPartitionFunctionCLTInputs (C : CLTContext) : Prop where
   log_clt : LogPartitionFunctionCLTStatement C
 
 theorem logPartitionFunction_clt_of_inputs (C : CLTContext)
-    (hHT : HighTemperatureInputs C)
-    (hLog : LogPartitionFunctionCLTInputs C hHT) :
+    (hLog : LogPartitionFunctionCLTInputs C) :
     LogPartitionFunctionCLTStatement C :=
   hLog.log_clt
 

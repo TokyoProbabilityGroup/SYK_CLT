@@ -14,17 +14,12 @@ to be radial.  The coefficient is then obtained by Gaussian integration by
 parts and the scaling identity `Z(β; tg) = Z(tβ; g)`.
 -/
 
-/-- Exact identification of the first and second Gaussian chaoses. -/
-theorem first_second_chaos_identification (P : FixedParameters) (k : ℕ)
-    (β : ℝ)
-    (hidentification :
-      chaosProjectionExpansion 1 (relativePartition P k β) = 0 ∧
-        chaosProjectionExpansion 2 (relativePartition P k β) =
-          fun g => radialCoefficient P k β * radialStatistic P k g) :
+/-- Exact finite-size identification of the first and second Gaussian chaoses. -/
+def ExactSecondChaosStatement (P : FixedParameters) : Prop :=
+  ∀ k : ℕ, ∀ β : ℝ,
     chaosProjectionExpansion 1 (relativePartition P k β) = 0 ∧
       chaosProjectionExpansion 2 (relativePartition P k β) =
-        fun g => radialCoefficient P k β * radialStatistic P k g :=
-  hidentification
+        fun g => radialCoefficient P k β * radialStatistic P k g
 
 end CLT
 end SYK
