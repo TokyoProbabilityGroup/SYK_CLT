@@ -7,6 +7,7 @@ The source tree is grouped by role:
 - `coefficient_limit.lean` derives the radial coefficient limit from those inputs.
 - `gaussian/radial_clt.lean` states the radial Gaussian limit.
 - `lemmas/` contains reusable proofs and the remaining named internal estimates.
-- `partition_function_clt.lean` and `log_partition_function_clt.lean` expose the conditional conclusions.
+- `partition_function_clt.lean` exposes the partition-function and log-partition conditional conclusions.
+- `log_partition_function_clt.lean` is a compatibility import for the combined file.
 
 Import `SYK.CLT.main_result` for the core definitions and standardized conclusion.
