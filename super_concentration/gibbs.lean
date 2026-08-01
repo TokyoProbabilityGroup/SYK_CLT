@@ -150,8 +150,8 @@ private theorem hasDerivAt_trace_exp_term
   letI : NormedSpace ℝ (Matrix d d ℂ →L[ℝ] ℂ) :=
     ContinuousLinearMap.toNormedSpace
   have hpath : HasDerivAt (fun s : ℝ ↦ A + s • B) B t := by
-    simpa only [Pi.add_apply, id_eq, zero_add, one_smul] using
-      (hasDerivAt_const t A).add ((hasDerivAt_id t).smul_const B)
+    convert (hasDerivAt_const t A).add ((hasDerivAt_id t).smul_const B) using 1 <;>
+      first | rfl | simp
   have hpow := hpath.fun_pow' (n + 1)
   have hscaled := hpow.const_smul (((n + 1).factorial : ℝ)⁻¹)
   have htrace : HasDerivAt
@@ -162,8 +162,8 @@ private theorem hasDerivAt_trace_exp_term
           ∑ i ∈ Finset.range (n + 1),
             (A + t • B) ^ ((n + 1).pred - i) * B *
               (A + t • B) ^ i)) t := by
-    simpa only [Pi.smul_apply, ContinuousLinearMap.zero_apply, zero_add] using
-      (hasDerivAt_const t (matrixTraceCLM (d := d))).clm_apply hscaled
+    convert (matrixTraceCLM (d := d)).hasFDerivAt.comp_hasDerivAt t hscaled using 1 <;>
+      rfl
   have hterm (i : ℕ) (hi : i ∈ Finset.range (n + 1)) :
       Matrix.trace
           ((A + t • B) ^ ((n + 1).pred - i) * B *
@@ -196,7 +196,7 @@ private theorem hasDerivAt_trace_exp_term
     push_cast
     ring
   rw [← hderiv]
-  exact htrace
+  convert htrace using 1
 
 theorem hasDerivAt_trace_exp_affine [Nonempty d]
     (A B : Matrix d d ℂ) (t : ℝ) :
