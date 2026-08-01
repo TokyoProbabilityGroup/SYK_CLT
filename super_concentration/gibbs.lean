@@ -136,6 +136,7 @@ private theorem trace_pow_mul_cycle (A B : Matrix d d ℂ)
     _ = Matrix.trace (B * A ^ n) := Matrix.trace_mul_comm _ _
 
 private theorem hasDerivAt_trace_exp_term
+    [Nonempty d]
     (A B : Matrix d d ℂ) (n : ℕ) (t : ℝ) :
     HasDerivAt
       (fun s : ℝ ↦ matrixTraceCLM
@@ -144,15 +145,25 @@ private theorem hasDerivAt_trace_exp_term
       (matrixTraceCLM
         ((((n.factorial : ℝ))⁻¹) •
           (B * (A + t • B) ^ n))) t := by
+  letI : NormedAddCommGroup (Matrix d d ℂ →L[ℝ] ℂ) :=
+    ContinuousLinearMap.toNormedAddCommGroup
+  letI : NormedSpace ℝ (Matrix d d ℂ →L[ℝ] ℂ) :=
+    ContinuousLinearMap.toNormedSpace
   have hpath : HasDerivAt (fun s : ℝ ↦ A + s • B) B t := by
-    convert (hasDerivAt_const t A).add ((hasDerivAt_id t).smul_const B) using 1
-    simp
+    simpa only [Pi.add_apply, id_eq, zero_add, one_smul] using
+      (hasDerivAt_const t A).add ((hasDerivAt_id t).smul_const B)
   have hpow := hpath.fun_pow' (n + 1)
   have hscaled := hpow.const_smul (((n + 1).factorial : ℝ)⁻¹)
-  have htrace := (hasDerivAt_const t (matrixTraceCLM (d := d))).clm_apply hscaled
-  convert htrace using 1
-  simp only [ContinuousLinearMap.zero_apply, zero_add, matrixTraceCLM_apply,
-    map_smul, Matrix.trace_sum]
+  have htrace : HasDerivAt
+      (fun s : ℝ ↦ matrixTraceCLM
+        (((n + 1).factorial : ℝ)⁻¹ • (A + s • B) ^ (n + 1)))
+      (matrixTraceCLM
+        (((n + 1).factorial : ℝ)⁻¹ •
+          ∑ i ∈ Finset.range (n + 1),
+            (A + t • B) ^ ((n + 1).pred - i) * B *
+              (A + t • B) ^ i)) t := by
+    simpa only [Pi.smul_apply, ContinuousLinearMap.zero_apply, zero_add] using
+      (hasDerivAt_const t (matrixTraceCLM (d := d))).clm_apply hscaled
   have hterm (i : ℕ) (hi : i ∈ Finset.range (n + 1)) :
       Matrix.trace
           ((A + t • B) ^ ((n + 1).pred - i) * B *
@@ -167,20 +178,35 @@ private theorem hasDerivAt_trace_exp_term
         ∑ _i ∈ Finset.range (n + 1),
           Matrix.trace (B * (A + t • B) ^ n) := by
     exact Finset.sum_congr rfl fun i hi ↦ hterm i hi
-  rw [hsum]
-  rw [Finset.sum_const, Finset.card_range]
-  rw [Nat.factorial_succ]
-  rw [← Nat.cast_smul_eq_nsmul ℝ, smul_smul]
-  congr 1
-  field_simp
-  push_cast
-  ring
+  have hderiv :
+      matrixTraceCLM
+          (((n + 1).factorial : ℝ)⁻¹ •
+            ∑ i ∈ Finset.range (n + 1),
+              (A + t • B) ^ ((n + 1).pred - i) * B *
+                (A + t • B) ^ i) =
+        matrixTraceCLM
+          ((n.factorial : ℝ)⁻¹ • (B * (A + t • B) ^ n)) := by
+    simp only [matrixTraceCLM_apply, map_smul, Matrix.trace_sum]
+    rw [hsum]
+    rw [Finset.sum_const, Finset.card_range]
+    rw [Nat.factorial_succ]
+    rw [← Nat.cast_smul_eq_nsmul ℝ, smul_smul]
+    congr 1
+    field_simp
+    push_cast
+    ring
+  rw [← hderiv]
+  exact htrace
 
 theorem hasDerivAt_trace_exp_affine [Nonempty d]
     (A B : Matrix d d ℂ) (t : ℝ) :
     HasDerivAt
       (fun s : ℝ ↦ Matrix.trace (NormedSpace.exp (A + s • B)))
       (Matrix.trace (B * NormedSpace.exp (A + t • B))) t := by
+  letI : NormedAddCommGroup (Matrix d d ℂ →L[ℝ] ℂ) :=
+    ContinuousLinearMap.toNormedAddCommGroup
+  letI : NormedSpace ℝ (Matrix d d ℂ →L[ℝ] ℂ) :=
+    ContinuousLinearMap.toNormedSpace
   let C : ℝ → Matrix d d ℂ := fun s ↦ A + s • B
   let g : ℕ → ℝ → ℂ := fun n s ↦ matrixTraceCLM
     ((((n + 1).factorial : ℝ)⁻¹) • C s ^ (n + 1))
@@ -293,12 +319,15 @@ theorem hasDerivAt_trace_exp_affine [Nonempty d]
         rfl
   have hsum := (hasDerivAt_const t (Matrix.trace (1 : Matrix d d ℂ))).add htailDeriv
   rw [hderiv] at hsum
-  convert hsum using 1
-  · funext s
-    exact hfun s
-  · simp [C]
+  have hsum' : HasDerivAt
+      ((fun _s : ℝ ↦ Matrix.trace (1 : Matrix d d ℂ)) +
+        fun s ↦ ∑' n, g n s)
+      (Matrix.trace (B * NormedSpace.exp (C t))) t := by
+    simpa only [zero_add] using hsum
+  refine hsum'.congr_of_eventuallyEq ?_
+  filter_upwards with s
+  simpa [C] using hfun s
 
 end TraceExponentialDerivative
 
 end SYK
-
