@@ -12,10 +12,7 @@ Majorana interaction algebra, and the exact finite-volume SYK estimate.
 -/
 
 open scoped BigOperators ComplexOrder ENNReal NNReal
-open scoped MatrixOrder
 open scoped Matrix.Norms.Operator
-open MeasureTheory
-open ProbabilityTheory
 
 namespace SYK
 
@@ -513,4 +510,3 @@ theorem syk_sum_sq_expectation_le
 end ExactSYKBound
 
 end SYK
-

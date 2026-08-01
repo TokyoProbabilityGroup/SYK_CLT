@@ -303,5 +303,3 @@ theorem logPartition_two_sided_tail_standardGaussian
   · exact logPartition_two_sided_tail P M 𝒥 h𝒥 hβ
       (logPartition_lipschitz P M 𝒥 h𝒥.le) t ht
 end SYK
-
-
