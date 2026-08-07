@@ -136,9 +136,7 @@ lemma gradient_exp_smul {ι : Type*} [Fintype ι]
   have hexp : HasFDerivAt (fun y => Real.exp (s * F y))
       ((s * Real.exp (s * F x)) • fderiv ℝ F x) x := by
     have h1 : HasFDerivAt (fun y => s * F y) (s • fderiv ℝ F x) x := hd.const_mul s
-    have h2 := h1.exp
-    convert h2 using 1
-    ext v; simp only [ContinuousLinearMap.smul_apply, smul_eq_mul]; ring
+    simpa only [smul_smul, mul_comm] using h1.exp
   rw [gradient, gradient, hexp.fderiv, map_smul]
 
 /-- Projecting the rotation-invariant product Gaussian onto its first coordinate returns the
@@ -185,9 +183,22 @@ Gradient of `F` composed with the affine map `z ↦ c • x - d • z`.
 lemma gradient_affine_comp (F : EuclideanSpace ℝ ι → ℝ) (hF : Differentiable ℝ F)
     (c d : ℝ) (x y : EuclideanSpace ℝ ι) :
     gradient (fun z => F (c • x - d • z)) y = (-d) • gradient F (c • x - d • y) := by
-  refine' HasGradientAt.gradient _;
-  convert HasFDerivAt.hasGradientAt ( HasFDerivAt.comp y ( hF.differentiableAt.hasFDerivAt ) ( HasFDerivAt.sub ( hasFDerivAt_const _ _ ) ( HasFDerivAt.const_smul ( hasFDerivAt_id y ) d ) ) ) using 1;
-  simp +decide [ gradient ]
+  have haff : HasFDerivAt (fun z : EuclideanSpace ℝ ι => c • x - d • z)
+      (0 - d • ContinuousLinearMap.id ℝ (EuclideanSpace ℝ ι)) y :=
+    (hasFDerivAt_const (c • x) y).sub ((hasFDerivAt_id y).const_smul d)
+  have hcomp := hF.differentiableAt.hasFDerivAt.comp y haff
+  have hmap :
+      fderiv ℝ F (c • x - d • y) ∘L
+          (0 - d • ContinuousLinearMap.id ℝ (EuclideanSpace ℝ ι)) =
+        (-d) • fderiv ℝ F (c • x - d • y) := by
+    ext v
+    simp
+  have hcomp' : HasFDerivAt (fun z => F (c • x - d • z))
+      ((-d) • fderiv ℝ F (c • x - d • y)) y := by
+    simpa only [Function.comp_def, hmap] using hcomp
+  apply HasGradientAt.gradient
+  rw [hasGradientAt_iff_hasFDerivAt, map_smul, toDual_gradient]
+  exact hcomp'
 
 /-
 The covariance rewritten as a double integral over the product measure.
@@ -229,12 +240,33 @@ lemma gaussian_path_ftc (g : EuclideanSpace ℝ ι → ℝ) (hg : ContDiff ℝ 1
     rw [ intervalIntegral.integral_deriv_eq_sub ];
     · simp +decide;
     · exact fun x hx => DifferentiableAt.comp x ( hg.contDiffAt.differentiableAt ( by norm_num ) ) ( DifferentiableAt.add ( DifferentiableAt.smul ( Real.differentiableAt_cos ) ( differentiableAt_const _ ) ) ( DifferentiableAt.smul ( Real.differentiableAt_sin ) ( differentiableAt_const _ ) ) );
-    · exact ( Continuous.intervalIntegrable ( by simpa using ContDiff.continuous_deriv ( hg.comp ( ContDiff.add ( ContDiff.smul ( Real.contDiff_cos ) contDiff_const ) ( ContDiff.smul ( Real.contDiff_sin ) contDiff_const ) ) ) ) _ _ );
+    · apply Continuous.intervalIntegrable
+      have hcurve : ContDiff ℝ 1
+          (fun θ : ℝ => g (Real.cos θ • a + Real.sin θ • b)) := by
+        apply hg.comp
+        exact (Real.contDiff_cos.smul contDiff_const).add
+          (Real.contDiff_sin.smul contDiff_const)
+      exact hcurve.continuous_deriv (by norm_num)
   -- By definition of the gradient, we know that the derivative of $g$ along the path is given by the inner product of the gradient and the direction vector.
   have h_grad : ∀ θ, deriv (fun θ => g (Real.cos θ • a + Real.sin θ • b)) θ = ⟪gradient g (Real.cos θ • a + Real.sin θ • b), (-Real.sin θ) • a + (Real.cos θ) • b⟫_ℝ := by
-    intro θ;
-    convert HasDerivAt.deriv ( HasFDerivAt.hasDerivAt ( HasFDerivAt.comp θ ( hg.contDiffAt.differentiableAt ( by norm_num ) |> DifferentiableAt.hasFDerivAt ) ( HasDerivAt.add ( HasDerivAt.smul ( Real.hasDerivAt_cos θ ) ( hasDerivAt_const _ _ ) ) ( HasDerivAt.smul ( Real.hasDerivAt_sin θ ) ( hasDerivAt_const _ _ ) ) ) ) ) using 1;
-    simp +decide [ gradient ];
+    intro θ
+    have hpath : HasDerivAt (fun t : ℝ => Real.cos t • a + Real.sin t • b)
+        ((-Real.sin θ) • a + Real.cos θ • b) θ :=
+      (Real.hasDerivAt_cos θ).smul_const a |>.add
+        ((Real.hasDerivAt_sin θ).smul_const b)
+    have hcomp := hg.differentiable (by norm_num) |>.differentiableAt.hasFDerivAt.comp θ
+      hpath.hasFDerivAt
+    have hcomp' : HasFDerivAt
+        (fun t => g (Real.cos t • a + Real.sin t • b))
+        (fderiv ℝ g (Real.cos θ • a + Real.sin θ • b) ∘L
+          ContinuousLinearMap.toSpanSingleton ℝ
+            ((-Real.sin θ) • a + Real.cos θ • b)) θ := by
+      simpa only [Function.comp_def] using hcomp
+    have hderiv := hcomp'.hasDerivAt.deriv
+    rw [← toDual_gradient] at hderiv
+    simpa only [ContinuousLinearMap.comp_apply,
+      ContinuousLinearMap.toSpanSingleton_apply, one_smul,
+      InnerProductSpace.toDual_apply_apply] using hderiv
   aesop
 
 /-
@@ -281,7 +313,7 @@ lemma integrable_cov_psi (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 �
       nlinarith [ show 0 ≤ |s| * L * Real.exp ( |s| * |F 0| ) * Real.exp ( |s| * L * ‖p.1‖ ) * ‖p.2‖ by positivity, show 0 ≤ |s| * L * Real.exp ( |s| * |F 0| ) * Real.exp ( |s| * L * ‖p.1‖ ) * ‖p.2‖ ^ 2 by positivity, show 0 ≤ |F 0| * ‖p.2‖ by positivity, show 0 ≤ L * ‖p.1‖ * ‖p.2‖ by positivity, show 0 ≤ L * ‖p.2‖ ^ 2 by positivity ];
   · refine' Measurable.aestronglyMeasurable _;
     refine' Measurable.mul _ _;
-    · exact hF.continuous.measurable.comp ( Measurable.sub ( measurable_const.smul measurable_fst ) ( measurable_const.smul measurable_snd ) );
+    · exact hF.continuous.measurable.comp (by fun_prop)
     · -- The gradient of a continuously differentiable function is continuous, hence measurable.
       have h_grad_cont : Continuous (fun x => gradient (fun z => Real.exp (s * F z)) x) := by
         refine' Continuous.comp ( LinearIsometryEquiv.continuous _ ) _;
@@ -322,16 +354,27 @@ lemma integrable_cov_Phi (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 �
         inner ℝ (gradient (fun z => Real.exp (s * F z)) p.1) p.2)
       ((standardGaussianMeasureOnEuclidean ι).prod (standardGaussianMeasureOnEuclidean ι)) := by
         apply_rules [ integrable_cov_psi ];
-  have h_rotation : MeasurePreserving (ContinuousLinearMap.rotation θ) ((standardGaussianMeasureOnEuclidean ι).prod (standardGaussianMeasureOnEuclidean ι)) ((standardGaussianMeasureOnEuclidean ι).prod (standardGaussianMeasureOnEuclidean ι)) := by
-    convert rotation_measurePreserving θ using 1;
-  have h_rotation : MeasurePreserving (fun p : EuclideanSpace ℝ ι × EuclideanSpace ℝ ι => (Real.cos θ • p.1 + Real.sin θ • p.2, -Real.sin θ • p.1 + Real.cos θ • p.2)) ((standardGaussianMeasureOnEuclidean ι).prod (standardGaussianMeasureOnEuclidean ι)) ((standardGaussianMeasureOnEuclidean ι).prod (standardGaussianMeasureOnEuclidean ι)) := by
-    convert h_rotation using 1;
-  have h_rotation : MeasureTheory.Integrable (fun p : EuclideanSpace ℝ ι × EuclideanSpace ℝ ι => F (Real.cos θ • p.1 - Real.sin θ • p.2) * ⟪gradient (fun z => Real.exp (s * F z)) p.1, p.2⟫_ℝ) ((Measure.prod (standardGaussianMeasureOnEuclidean ι) (standardGaussianMeasureOnEuclidean ι)).map (fun p => (Real.cos θ • p.1 + Real.sin θ • p.2, -Real.sin θ • p.1 + Real.cos θ • p.2))) := by
-    rw [ h_rotation.map_eq ] ; exact h_integrable;
-  convert h_rotation.comp_measurable ( show Measurable ( fun p : EuclideanSpace ℝ ι × EuclideanSpace ℝ ι => ( Real.cos θ • p.1 + Real.sin θ • p.2, -Real.sin θ • p.1 + Real.cos θ • p.2 ) ) from ?_ ) using 1;
-  · ext ⟨x, y⟩; simp [Function.comp];
-    exact Or.inl ( congr_arg F ( by ext i; simpa using by ring_nf; rw [ Real.sin_sq, Real.cos_sq ] ; ring ) );
-  · fun_prop
+  have h_rotation : MeasurePreserving (ContinuousLinearMap.rotation θ)
+      ((standardGaussianMeasureOnEuclidean ι).prod (standardGaussianMeasureOnEuclidean ι))
+      ((standardGaussianMeasureOnEuclidean ι).prod (standardGaussianMeasureOnEuclidean ι)) :=
+    rotation_measurePreserving θ
+  have h_integrable_map : MeasureTheory.Integrable (fun p : EuclideanSpace ℝ ι × EuclideanSpace ℝ ι => F (Real.cos θ • p.1 - Real.sin θ • p.2) * ⟪gradient (fun z => Real.exp (s * F z)) p.1, p.2⟫_ℝ) ((Measure.prod (standardGaussianMeasureOnEuclidean ι) (standardGaussianMeasureOnEuclidean ι)).map (ContinuousLinearMap.rotation θ)) := by
+    rw [h_rotation.map_eq]
+    exact h_integrable
+  convert h_integrable_map.comp_measurable
+      (ContinuousLinearMap.rotation θ).continuous.measurable using 1;
+  · ext ⟨x, y⟩
+    simp only [Function.comp_apply, ContinuousLinearMap.rotation_apply]
+    congr 1
+    apply congr_arg F
+    ext i
+    simp only [PiLp.add_apply, PiLp.sub_apply, PiLp.smul_apply, smul_eq_mul]
+    calc
+      x.ofLp i = (Real.sin θ ^ 2 + Real.cos θ ^ 2) * x.ofLp i := by
+        rw [Real.sin_sq_add_cos_sq]
+        ring
+      _ = Real.cos θ * (Real.cos θ * x.ofLp i + Real.sin θ * y.ofLp i) -
+          Real.sin θ * (-Real.sin θ * x.ofLp i + Real.cos θ * y.ofLp i) := by ring
 
 /-
 Change of variables by the rotation on the product Gaussian measure: rewriting the
@@ -448,7 +491,13 @@ lemma integrable_cov_joint (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0
               linarith [ Real.add_one_le_exp ‖p‖, norm_nonneg p ];
             exact le_trans ( Real.rpow_le_rpow ( by positivity ) h_bound ( by positivity ) ) ( by rw [ Real.mul_rpow ( by positivity ) ( by positivity ), ← Real.exp_mul ] ; ring_nf; norm_num );
           rw [ Real.norm_of_nonneg ( by positivity ) ];
-          convert mul_le_mul_of_nonneg_right h_bound ( Real.exp_nonneg ( b * ‖p‖ ) ) using 1 ; rw [ add_mul, Real.exp_add ] ; ring;
+          calc
+            (1 + ‖p‖) ^ a * Real.exp (b * ‖p‖)
+                ≤ (2 ^ a * Real.exp (a * ‖p‖)) * Real.exp (b * ‖p‖) :=
+              mul_le_mul_of_nonneg_right h_bound (Real.exp_nonneg _)
+            _ = Real.exp ((a + b) * ‖p‖) * 2 ^ a := by
+              rw [add_mul, Real.exp_add]
+              ring
       have h_integrable : MeasureTheory.Integrable (fun (p : EuclideanSpace ℝ ι) => (|F 0| + L * ‖p‖) * Real.exp (|s| * L * ‖p‖) * (1 + ‖p‖)) (standardGaussianMeasureOnEuclidean ι) := by
         have h_integrable : MeasureTheory.Integrable (fun (p : EuclideanSpace ℝ ι) => (1 + ‖p‖) ^ 2 * Real.exp (|s| * L * ‖p‖)) (standardGaussianMeasureOnEuclidean ι) := by
           exact_mod_cast h_integrable 2 ( |s| * L ) ( by norm_num ) ( by positivity );
@@ -459,13 +508,13 @@ lemma integrable_cov_joint (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0
         convert ‹∀ a b : ℝ, 0 ≤ a → 0 ≤ b → Integrable ( fun p : EuclideanSpace ℝ ι => ( 1 + ‖p‖ ) ^ a * Real.exp ( b * ‖p‖ ) ) ( standardGaussianMeasureOnEuclidean ι ) › 1 ( |s| * L ) zero_le_one ( mul_nonneg ( abs_nonneg s ) hL ) using 1 ; norm_num;
       convert MeasureTheory.Integrable.mul_prod ‹Integrable ( fun p : EuclideanSpace ℝ ι => ( |F 0| + L * ‖p‖ ) * Real.exp ( |s| * L * ‖p‖ ) * ( 1 + ‖p‖ ) ) ( standardGaussianMeasureOnEuclidean ι ) › ‹Integrable ( fun p : EuclideanSpace ℝ ι => ( 1 + ‖p‖ ) * Real.exp ( |s| * L * ‖p‖ ) ) ( standardGaussianMeasureOnEuclidean ι ) › using 1;
     convert h_integrable.const_mul ( |s| * L * Real.exp ( |s| * |F 0| ) ) |> MeasureTheory.Integrable.comp_fst <| MeasureTheory.Measure.restrict ( MeasureTheory.MeasureSpace.volume ) ( Set.Ioc 0 ( Real.pi / 2 ) ) using 1 ; ext ; ring!;
-  · have h_measurable : Continuous (fun q : EuclideanSpace ℝ ι × EuclideanSpace ℝ ι × ℝ => F q.1 * ⟪gradient (fun z => Real.exp (s * F z)) (Real.cos q.2.2 • q.1 + Real.sin q.2.2 • q.2.1), -Real.sin q.2.2 • q.1 + Real.cos q.2.2 • q.2.1⟫_ℝ) := by
-      refine' Continuous.mul ( hF.continuous.comp continuous_fst ) _;
+  · have h_measurable : Continuous (fun q : (EuclideanSpace ℝ ι × EuclideanSpace ℝ ι) × ℝ => F q.1.1 * ⟪gradient (fun z => Real.exp (s * F z)) (Real.cos q.2 • q.1.1 + Real.sin q.2 • q.1.2), -Real.sin q.2 • q.1.1 + Real.cos q.2 • q.1.2⟫_ℝ) := by
+      refine' Continuous.mul ( hF.continuous.comp continuous_fst.fst ) _;
       have h_cont : Continuous (fun q : EuclideanSpace ℝ ι => gradient (fun z => Real.exp (s * F z)) q) := by
         refine' Continuous.comp ( LinearIsometryEquiv.continuous _ ) _;
         fun_prop;
       fun_prop;
-    convert h_measurable.aestronglyMeasurable.comp_measurable ( measurable_fst.fst.prodMk ( measurable_fst.snd.prodMk measurable_snd ) ) using 1;
+    exact h_measurable.aestronglyMeasurable
   · refine' Filter.Eventually.of_forall _;
     intro q
     have h_bound : ‖gradient (fun z => Real.exp (s * F z)) (Real.cos q.2 • q.1.1 + Real.sin q.2 • q.1.2)‖ ≤ |s| * L * Real.exp (|s| * |F 0|) * Real.exp (|s| * L * ‖q.1.1‖) * Real.exp (|s| * L * ‖q.1.2‖) := by
@@ -489,11 +538,26 @@ lemma integrable_cov_joint (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0
       refine' le_trans ( norm_add_le _ _ ) _;
       norm_num [ norm_smul ];
       nlinarith [ abs_nonneg ( Real.sin q.2 ), abs_nonneg ( Real.cos q.2 ), Real.abs_sin_le_one q.2, Real.abs_cos_le_one q.2, norm_nonneg q.1.1, norm_nonneg q.1.2 ];
-    simp_all +decide [ mul_assoc, mul_comm, mul_left_comm ];
-    refine' le_trans ( mul_le_mul_of_nonneg_left ( abs_real_inner_le_norm _ _ ) ( abs_nonneg _ ) ) _;
-    refine' le_trans ( mul_le_mul_of_nonneg_left ( mul_le_mul ‹_› ‹_› ( by positivity ) ( by positivity ) ) ( by positivity ) ) _;
-    convert mul_le_mul_of_nonneg_right ‹|F q.1.1| ≤ |F 0| + L * ‖q.1.1‖› ( show 0 ≤ L * ( |s| * ( Real.exp ( L * ( |s| * ‖q.1.1‖ ) ) * ( Real.exp ( L * ( |s| * ‖q.1.2‖ ) ) * Real.exp ( |s| * |F 0| ) ) ) * ( ( 1 + ‖q.1.1‖ ) * ( 1 + ‖q.1.2‖ ) ) ) by positivity ) using 1 ; ring;
-    ring
+    rw [Real.norm_eq_abs, abs_mul]
+    calc
+      |F q.1.1| * |⟪gradient (fun z => Real.exp (s * F z))
+          (Real.cos q.2 • q.1.1 + Real.sin q.2 • q.1.2),
+          -Real.sin q.2 • q.1.1 + Real.cos q.2 • q.1.2⟫_ℝ|
+          ≤ |F q.1.1| *
+              (‖gradient (fun z => Real.exp (s * F z))
+                  (Real.cos q.2 • q.1.1 + Real.sin q.2 • q.1.2)‖ *
+                ‖-Real.sin q.2 • q.1.1 + Real.cos q.2 • q.1.2‖) :=
+            mul_le_mul_of_nonneg_left (abs_real_inner_le_norm _ _) (abs_nonneg _)
+      _ ≤ (|F 0| + L * ‖q.1.1‖) *
+            ((|s| * L * Real.exp (|s| * |F 0|) *
+                Real.exp (|s| * L * ‖q.1.1‖) *
+                Real.exp (|s| * L * ‖q.1.2‖)) *
+              ((1 + ‖q.1.1‖) * (1 + ‖q.1.2‖))) := by
+            gcongr
+      _ = (|s| * L * Real.exp (|s| * |F 0|)) *
+            ((|F 0| + L * ‖q.1.1‖) * Real.exp (|s| * L * ‖q.1.1‖) *
+              (1 + ‖q.1.1‖)) *
+            ((1 + ‖q.1.2‖) * Real.exp (|s| * L * ‖q.1.2‖)) := by ring
 
 lemma gaussian_cov_fubini_swap (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s : ℝ) :
@@ -640,7 +704,7 @@ lemma gaussian_cov_sinH_intervalIntegrable (F : EuclideanSpace ℝ ι → ℝ) (
   rw [ intervalIntegrable_iff_integrableOn_Ioc_of_le Real.pi_div_two_pos.le ] at *;
   refine' MeasureTheory.Integrable.congr _ _;
   refine' fun θ => ∫ p : ( EuclideanSpace ℝ ι × EuclideanSpace ℝ ι ), - ( F p.1 * inner ℝ ( gradient ( fun z => Real.exp ( s * F z ) ) ( Real.cos θ • p.1 + Real.sin θ • p.2 ) ) ( -Real.sin θ • p.1 + Real.cos θ • p.2 ) ) ∂ ( standardGaussianMeasureOnEuclidean ι |> Measure.prod <| standardGaussianMeasureOnEuclidean ι );
-  · convert ( integrable_cov_joint F L hL hF hgrad s ).neg.integral_prod_right using 1;
+  · exact (integrable_cov_joint F L hL hF hgrad s).neg.integral_prod_right
   · filter_upwards [ MeasureTheory.ae_restrict_mem measurableSet_Ioc ] with θ hθ;
     have := gaussian_cov_per_theta F L hL hF hgrad s θ;
     rw [ MeasureTheory.integral_neg, MeasureTheory.integral_prod ];
