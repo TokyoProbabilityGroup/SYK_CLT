@@ -33,20 +33,12 @@ Model}
 \begin{abstract}
 Fix an even interaction order $q\geq4$, and let $Z_N(\beta)$ denote the
 partition function of the Gaussian Sachdev--Ye--Kitaev model with $N$
-Majorana fermions.  For every sufficiently small fixed inverse temperature
-$\beta\neq0$, we prove that
+Majorana fermions.  We prove that for all sufficiently small inverse temperatures
+$\beta > 0$, there exists $\rho=\rho(\beta)>0$ such that   
 \[
-  \frac{Z_N(\beta)-\E Z_N(\beta)}
-       {\sqrt{\Var Z_N(\beta)}}
-  \Longrightarrow \N(0,1).
-\]
-We also identify the limiting variance of the relative partition function
-and obtain the corresponding central limit theorem for the free energy.  The
-leading fluctuation is the radial component of the second Gaussian chaos.
-{
-The higher chaoses are controlled directly by encoding the sign-gauge parity
-rule in the moments of an auxiliary Rademacher chaos.
-}
+N^{q/2 -1}(\log Z_N(\beta)-\E \log Z_N(\beta))
+  \Longrightarrow \N(0,\rho^2).
+\]  
 \end{abstract}
 
 \noindent\emph{Keywords:} Sachdev--Ye--Kitaev model,
@@ -105,7 +97,7 @@ relative fluctuations studied below. We sometime write $Z_N(\beta) = Z_N(\beta;G
 Throughout, all limits are taken as $N\to\infty$ through even integers.
 
 \subsection{Main results}
-It is studied the limiting behavior of the logarithmic partition function:
+It is studied the limiting behavior of the logarithmic partition function in high-temperature regime:
 \begin{theorem}
 There exists $\tilde{\beta}_q>0$ such that for any $\beta\in [-\tilde{\beta}_q,\tilde{\beta}_q]$, there exists  $\ell_q(\beta)$ such that
 \begin{align*}
@@ -113,6 +105,7 @@ There exists $\tilde{\beta}_q>0$ such that for any $\beta\in [-\tilde{\beta}_q,\
 \end{align*}
 Moreover, $\ell_p(\beta)$ is differentiable over $(-\tilde{\beta}_q,\tilde{\beta}_q)$. 
 \end{theorem}
+Our main result is the following fluctuation resutls:
 \begin{theorem}
 \label{thm:partition-clt}
 {
@@ -160,18 +153,6 @@ so both the test function and its derivative vary with $N$.  The
 fixed-test-function theorem therefore does not apply directly to
 $Z_N(\beta)$.
 
-{
-Our argument retains the radial-fluctuation mechanism identified in
-\cite{FTW2018}, but establishes the uniform remainder estimate needed for
-this $N$-dependent sequence.  The sign-gauge rule says that a Hermite
-coefficient can be nonzero only when every vertex has even total incidence.
-Introducing one independent Rademacher sign per vertex turns the sum over
-such multi-indices into the exponential generating function of a single
-degree-$q$ Rademacher chaos.  A uniform small-parameter exponential-moment
-bound then controls all Gaussian chaoses of order at least three at once.
-The proof uses only annealed free-energy convergence and does not assume any
-fluctuation theorem for either $Z_N$ or $\log Z_N$.
-}
 
 \subsection{Outline of the proof}
 
@@ -185,7 +166,7 @@ identifies the second chaos exactly, we have the following:
   \]
   where
   \[
-    A_N(\beta)=\frac{\beta}{2}\partial_\beta F_N(\beta),
+    A_N(\beta)=\frac{\beta}{2}F'_N(\beta),
     \qquad
     Q_N=\frac1{M_N}\sum_I(g_I^2-1).
   \]
@@ -197,44 +178,27 @@ independent centered variables.  The main task is to prove
 \]
 
 {
-For the higher-order part, a Duhamel derivative bound and the sign-gauge
+Indeed, a Duhamel derivative bound and the sign-gauge
 parity rule give
 \begin{equation}
-  \sum_{r\geq3}\lVert P_rY_N(\beta)\rVert_2^2
+  \sum_{r\geq3}\lVert P_r Z_N(\beta)\rVert_2^2
   \leq
-  \sum_{r\geq3}t_N^r
+  \sum_{r\geq3}(\beta\sigma_N)^{2r}
   \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
-  \frac{1}{\alpha!},
-  \qquad
-  t_N=\beta^2\sigma_N^2.
+  \frac{1}{\alpha!}.
 \end{equation}
-If $(\varepsilon_x)_{x=1}^N$ are independent Rademacher variables and
-$S_{N,q}=\sum_I\prod_{x\in I}\varepsilon_x$, then the inner sum is exactly
-$\E_\varepsilon[S_{N,q}^r]/r!$.  Newton's identities give
-$|S_{N,q}|\leq C_q(N^{q/2}+|\sum_x\varepsilon_x|^q)$, from which a
-sub-Gaussian estimate yields
-\begin{equation}
-  \E_\varepsilon\!\left[
-    |S_{N,q}|^3e^{t_N|S_{N,q}|}
-  \right]
-  \leq C_qN^{3q/2}
-\end{equation}
-for sufficiently small fixed $|\beta|$.  The entire higher-order sum is
-therefore $O(N^{-3(q/2-1)})=o(N^{-(q-2)})$.
+Using a combinatorial argument, we have that the entire higher-order sum is
+bounded by  $O(N^{-3(q/2-1)})=o(N^{-(q-2)})$.
 }
 
-The annealed free-energy input and convexity imply
+Moreover, the annealed free-energy input and convexity imply
 \[
-  \frac{A_N(\beta)}N
+  \frac{A_N(\beta)}{N \mathbb E Z_N(\beta)}
   \longrightarrow \frac{\beta}{2}\ell_q'(\beta).
 \]
 Since $M_N\sim N^q/q!$, the classical central limit theorem for $Q_N$, the
 remainder estimate  gives the claimed limit for
-$N^a(Y_N-1)$.  Orthogonality of distinct Gaussian chaoses gives the matching
-variance asymptotic and hence the standardized central limit theorem.
-
-
-
+$Z_N/\mathbb E Z_N$.  
 
 \section{Gaussian-chaos decomposition}
 \label{sec:chaos-decomposition}
@@ -263,65 +227,21 @@ variable $X$,
   \frac{|\E\,\partial_g^\alpha X|^2}{\alpha!}.
 \end{equation}
 
-We first relate our normalization to that of Feng, Tian, and Wei.  Define
-\begin{equation}\label{eq:FTW-normalization}
-  \widehat H_N(G)=M_N^{-1/2}\sum_{I\in\calI_N}g_I\psi_I,
-  \qquad
-  \tau_N=\sigma_N\sqrt{M_N}.
-\end{equation}
-Then $H_N=\tau_N\widehat H_N$ and
-\begin{equation}\label{eq:tau-asymptotic}
-  \tau_N^2=\sigma_N^2M_N=\frac Nq\bigl(1+O_q(N^{-1})\bigr).
-\end{equation}
-Consequently, for
-$\widehat L_N(f)=\tr f(\widehat H_N)$, then
-\begin{equation}\label{eq:partition-as-linear-statistic}
-  Z_N(\beta)=\widehat L_N(f_{N,\beta}),
-  \qquad
-  f_{N,\beta}(x)=e^{-\beta\tau_Nx}.
-\end{equation}
 
-For a fixed test function $f$, Feng--Tian--Wei \cite{FTW2018} prove the
-Gaussian SYK linear-statistics CLT by isolating
-\begin{equation}\label{eq:FTW-radial-statistic}
-  Q_N:=\tr\widehat H_N^2-\E\tr\widehat H_N^2
-      =\frac1{M_N}\sum_{I\in\calI_N}(g_I^2-1).
-\end{equation}
-In the fixed-$q$ regime, their coefficient is
-\[
-  A(f)=\int_{\mathbb R}\frac{x f'(x)}2\,\rho_\infty(\mathrm dx),
-\]
-where $\rho_\infty$ is the limiting spectral measure.
-They show that the centered statistic associated with
-$f-A(f)x^2$ has variance $o(M_N^{-1})$.  Since
-$\sqrt{M_N}Q_N\Rightarrow\N(0,2)$, the radial term gives their limit.
-
-There are two obstructions to substituting \eqref{eq:partition-as-linear-statistic}
-directly into that theorem.  First, $f_{N,\beta}$ depends on $N$ through
-$\tau_N\asymp\sqrt N$.  Second, neither the fixed-function polynomial
-approximation nor the bounded-derivative estimate in \cite{FTW2018} is uniform
-for this sequence.  In particular, the theorem as stated in
-\cite{FTW2018} does not imply a CLT for $Z_N(\beta)$.
-
-We instead work with the relative partition function $Y_N$ and replace the
-limiting coefficient $A(f)$ by the exact finite-$N$ coefficient
-\begin{equation}\label{eq:finite-N-FTW-coefficient}
-  A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log F_N(\beta).
+We define \begin{equation}\label{eq:finite-N-FTW-coefficient}
+  A_N(\beta):=\frac{\beta}{2}\,F'_N(\beta).
 \end{equation}
 The next lemma proves the exact radial decomposition
 \begin{equation}\label{eq:exact-FTW-decomposition-preview}
-  Y_N(\beta)-1=A_N(\beta)Q_N+\mathcal R_N(\beta),
+  Z_N(\beta)=\mathbb E Z_N(\beta)+ A_N(\beta)Q_N+\mathcal R_N(\beta),
   \qquad
-  \mathcal R_N=\sum_{r\geq3}P_rY_N.
+  \mathcal R_N=\sum_{r\geq3}P_r Z_N.
 \end{equation}
-The estimate replacing the fixed-test-function variance computation of
-\cite{FTW2018} is
+Subsection~\ref{sec:Rademacher-remainder} proves
 \begin{equation}\label{eq:target-FTW-remainder}
-  \E|\mathcal R_N(\beta)|^2=o(N^2/M_N)=o(N^{2-q}).
+  \E|\mathcal R_N(\beta)|^2=o(\mathbb E[Z_N]\,N^{2-q}).
 \end{equation}
 {
-Subsection~\ref{sec:Rademacher-remainder} proves
-\eqref{eq:target-FTW-remainder} directly.
 }
 
 \subsection{Exact finite-size radial projection}
@@ -329,13 +249,13 @@ Subsection~\ref{sec:Rademacher-remainder} proves
 \begin{lemma}[First and second chaoses]\label{lem:exact-second-chaos}
 For every real $\beta$,
 \[
-  P_1Y_N(\beta)=0
+  P_1Z_N(\beta)=0
 \]
 and
 \begin{equation}\label{eq:P2Y-exact}
-  P_2Y_N(\beta)
+  P_2 Z_N(\beta)
   =
-  \frac{\beta\,\partial_\beta\log F_N(\beta)}{2M_N}
+  \frac{\beta\,F'_N(\beta)}{2M_N}
   \sum_{I\in\calI_N}(g_I^2-1).
 \end{equation}
 Equivalently, Clifford trace orthogonality gives
@@ -491,24 +411,7 @@ where we used $H_N(tG)=tH_N(G)$.  Differentiating at $t=1$ gives
   \sum_Ig_I\partial_{g_I}Z_N(\beta;G)
   =\beta\,\partial_\beta Z_N(\beta;G).
 \]
-Finally,
-\[
-  \partial_\beta Z_N(\beta;G)
-  =-\tr\!\left(H_N(G)e^{-\beta H_N(G)}\right),
-  \qquad
-  \left|\partial_\beta Z_N(\beta;G)\right|
-  \leq \norm{H_N(G)}e^{|\beta|\norm{H_N(G)}}.
-\]
-Together with
-\[
-  \norm{H_N(G)}\leq\sigma_N\sum_I|g_I|,
-\]
-the right-hand side has every exponential moment under the finite dimensional
-Gaussian law.  It gives a locally uniform dominating function in $\beta$.
-The same type of bound justifies the preceding Gaussian integrations by
-parts.  Thus differentiation passes through the expectation and
-$\partial_\beta\E Z_N(\beta)=F_N'(\beta)$.
-Dividing by the deterministic quantity $F_N(\beta)$ proves
+This  proves
 \eqref{eq:P2Y-exact}.
 \end{proof}
 
@@ -737,7 +640,7 @@ which proves \eqref{eq:Rademacher-exponential-moment}.
 There exists $\beta_{\rm Rad}=\beta_{\rm Rad}(q)>0$ such that, for every
 fixed real $\beta$ with $|\beta|<\beta_{\rm Rad}$,
 \begin{equation}\label{eq:higher-chaos-closure}
-  \sum_{r\geq3}\norm{P_rY_N(\beta)}_2^2
+  \sum_{r\geq3}\norm{P_r Z_N(\beta)}_2^2
   =O\!\left(N^{-3(q/2-1)}\right)
   =o(N^{2-q}).
 \end{equation}
@@ -752,7 +655,7 @@ Put
 The Hermite coefficient formula, Lemma~\ref{lem:Z-derivative-bound}, and
 $F_N(\beta)>0$ give
 \begin{align}
-  \norm{P_rY_N(\beta)}_2^2
+  \norm{P_r Z_N(\beta)}_2^2
   &=\frac1{F_N(\beta)^2}
     \sum_{|\alpha|=r}\frac1{\alpha!}
     \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \\
@@ -765,7 +668,7 @@ Here the sum may be restricted to even $\alpha$ by the sign-gauge symmetry.
 By \eqref{eq:even-sum-Rademacher-moment}, summing
 \eqref{eq:Hermite-Rademacher-bound} over all $r\geq3$ yields
 \begin{align}
-  \sum_{r\geq3}\norm{P_rY_N(\beta)}_2^2
+  \sum_{r\geq3}\norm{P_r Z_N(\beta)}_2^2
   &\leq
   \sum_{r\geq3}\frac{t_N^r}{r!}
   \E_\varepsilon\!\left[S_{N,q}^r\right] \\
@@ -791,7 +694,7 @@ $t_N\leq c_qN^{-(q-1)}$.  Therefore
 \eqref{eq:Rademacher-exponential-moment} and
 \eqref{eq:all-higher-chaoses-at-once} imply
 \begin{align}
-  \sum_{r\geq3}\norm{P_rY_N(\beta)}_2^2
+  \sum_{r\geq3}\norm{P_r Z_N(\beta)}_2^2
   &\leq C_{q,\beta}
   N^{-3(q-1)}N^{3q/2} \\
   &=C_{q,\beta}N^{-3(q/2-1)}.
@@ -845,7 +748,7 @@ uniformly on this interval,
 \begin{align}
   \frac1N\log F_N(\beta)&\longrightarrow\ell_q(\beta),
   \label{eq:annealed-free-energy-limit}\\
-  \frac1N\partial_\beta\log F_N(\beta)&\longrightarrow\ell_q'(\beta).
+  \frac1NF'_N(\beta)&\longrightarrow\ell_q'(\beta).
   \label{eq:annealed-derivative-limit}
 \end{align}
 Moreover,
@@ -971,9 +874,9 @@ By Lemma~\ref{lem:exact-second-chaos},
   =c_N(\beta)S_N+\mathcal R_N(\beta),
   \qquad
   c_N(\beta)
-  =\frac{\beta\,\partial_\beta\log F_N(\beta)}{\sqrt{2M_N}},
+  =\frac{\beta\,F'_N(\beta)}{\sqrt{2M_N}},
 \end{equation}
-where $\mathcal R_N=\sum_{r\geq3}P_rY_N$ is orthogonal to $S_N$.
+where $\mathcal R_N=\sum_{r\geq3}P_r Z_N$ is orthogonal to $S_N$.
 Since $M_N\sim N^q/q!$, \eqref{eq:annealed-derivative-limit} gives
 \[
   N^{q/2-1}c_N(\beta)
