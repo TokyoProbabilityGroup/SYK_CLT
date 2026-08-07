@@ -84,7 +84,7 @@ Fix an even integer $q\geq4$, and let $N$ be even.  Write
   M_N=\binom Nq,\qquad
   \sigma_N^2=\frac{(q-1)!}{N^{q-1}},
 \]
-and let $(g_I)_{I\in\calI_N}$ be independent standard Gaussian random
+and let $G= (g_I)_{I\in\calI_N}$ be independent standard Gaussian random
 variables.  Let $\psi_1,\ldots,\psi_N$ be Majorana matrices satisfying
 $\{\psi_i,\psi_j\}=2\delta_{ij}\I$.  For
 $I=\{i_1<\cdots<i_q\}$ set
@@ -93,52 +93,39 @@ $I=\{i_1<\cdots<i_q\}$ set
 \]
 Then $\psi_I$ is Hermitian, $\psi_I^2=\I$, and $\norm{\psi_I}=1$.  Define
 \[
-  H_N(g)=\sigma_N\sum_{I\in\calI_N}g_I\psi_I,
+  H_N(G)=\sigma_N\sum_{I\in\calI_N}g_I\psi_I,
   \qquad
-  Z_N(z;g)=\tr e^{-zH_N(g)},
+  Z_N(z;G)=\tr e^{-zH_N(G)},
   \qquad
-  F_N(z)=\E Z_N(z;g).
+  F_N(z)=\E Z_N(z;G).
 \]
 Here $\tr=2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
-particular, $Z_N(0)=F_N(0)=1$.  This normalization does not affect the
-relative fluctuations studied below.
+particular, $Z_N(0;G)=F_N(0)=1$.  This normalization does not affect the
+relative fluctuations studied below. We sometime write $Z_N(\beta) = Z_N(\beta;G)$ for brevity. 
 Throughout, all limits are taken as $N\to\infty$ through even integers.
 
 \subsection{Main results}
-
-\begin{theorem}[Partition-function CLT]
+It is studied the limiting behavior of the logarithmic partition function:
+\begin{theorem}
+There exists $\tilde{\beta}_q>0$ such that for any $\beta\in [-\tilde{\beta}_q,\tilde{\beta}_q]$, there exists  $\ell_q(\beta)$ such that
+\begin{align*}
+    \lim_{N\to \infty} N^{-1} \log Z_N=     \lim_{N\to \infty} N^{-1} \log \mathbb E[Z_N] =\ell_p(\beta)\qquad \text{ a.s.}
+\end{align*}
+Moreover, $\ell_p(\beta)$ is differentiable over $(-\tilde{\beta}_q,\tilde{\beta}_q)$. 
+\end{theorem}
+\begin{theorem}
 \label{thm:partition-clt}
 {
-Let $\beta_{\rm Rad}$ be the constant in
-Proposition~\ref{prop:higher-chaos-closure}, let $\beta_{\rm FE}$ be the
-constant in Proposition~\ref{prop:annealed-free-energy}, and let $\ell_q$ be
-the limiting annealed free energy in that proposition.
 }
-If $\beta\in\mathbb R$ satisfies
-\begin{equation}
-  {
-  0<|\beta|<\min\{\beta_{\rm FE},\beta_{\rm Rad}\},
-  \qquad
-  \beta\ell_q'(\beta)\neq0.
-  }
-\end{equation}
-Then
-\begin{equation}\label{eq:scaled-relative-clt}
+There exists $\beta_q\in (0,\tilde{\beta}_q]$ such that for any $\beta\in (-\beta_q,\beta_q)$,
+ \begin{equation}\label{eq:scaled-relative-clt}
   N^{q/2-1}\left(
     \frac{Z_N(\beta)}{\E Z_N(\beta)}-1
   \right)
   \Longrightarrow
-  \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
-  \qquad \xi\sim\N(0,1).
+  \,\N\left(0,\frac{q!}{2}\beta^2(\ell_q'(\beta))^2\right).
 \end{equation}
 Moreover,
-\begin{equation}\label{eq:variance-asymptotic}
-  N^{q-2}
-  \frac{\Var Z_N(\beta)}{(\E Z_N(\beta))^2}
-  \longrightarrow
-  \frac{q!}{2}\,\beta^2\ell_q'(\beta)^2,
-\end{equation}
-and hence
 \begin{equation}\label{eq:standardized-clt}
   \frac{Z_N(\beta)-\E Z_N(\beta)}
   {\sqrt{\Var Z_N(\beta)}}
@@ -154,8 +141,7 @@ Under the assumptions of Theorem~\ref{thm:partition-clt},
     \log Z_N(\beta)-\E\log Z_N(\beta)
   \right)
   \Longrightarrow
-  \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
-  \qquad \xi\sim\N(0,1).
+  \,\N\left(0,\frac{q!}{2}\,\beta^2(\ell_q'(\beta))^2\right).
 \]
 \end{corollary}
 
@@ -190,16 +176,16 @@ fluctuation theorem for either $Z_N$ or $\log Z_N$.
 \subsection{Outline of the proof}
 
 
-Clifford sign-gauge symmetry eliminates the first Gaussian chaos and
-identifies the second chaos exactly:
+By applying the chaos expansion, since Clifford sign-gauge symmetry eliminates the first Gaussian chaos and
+identifies the second chaos exactly, we have the following:
 \[
-  Y_N(\beta)-1
-  =
+  Z_N(\beta)=  \mathbb E Z_N(\beta)
+  + 
   A_N(\beta)Q_N+\mathcal R_N(\beta),
   \]
   where
   \[
-    A_N(\beta)=\frac{\beta}{2}\partial_\beta\log F_N(\beta),
+    A_N(\beta)=\frac{\beta}{2}\partial_\beta F_N(\beta),
     \qquad
     Q_N=\frac1{M_N}\sum_I(g_I^2-1).
   \]
@@ -247,167 +233,8 @@ remainder estimate  gives the claimed limit for
 $N^a(Y_N-1)$.  Orthogonality of distinct Gaussian chaoses gives the matching
 variance asymptotic and hence the standardized central limit theorem.
 
-{
-\section{Free-energy input}
-\label{sec:inputs}
-}
 
-\subsection{Annealed free energy and coefficient asymptotics}
 
-To identify the deterministic coefficient $A_N(\beta)$ in
-\eqref{eq:finite-N-FTW-coefficient}, we use the annealed free-energy limit
-from \cite{GPSZ2026}.  The required convergence of derivatives follows from
-convexity and is not an additional input.
-
-\begin{lemma}[Convex convergence and derivatives]
-\label{lem:convex-derivatives}
-Let $I\subset\mathbb R$ be open.  Suppose that $h_N:I\to\mathbb R$ are finite,
-differentiable, convex functions and $h_N(x)\to h(x)$ pointwise, where
-$h\in C^1(I)$.  Then $h_N\to h$ and $h_N'\to h'$ locally uniformly on $I$.
-\end{lemma}
-
-\begin{proof}
-Fix a compact interval $[a,b]\subset I$ and choose $u<a<b<v$ in $I$.
-Monotonicity of secant slopes bounds every secant slope of $h_N$ on $[a,b]$
-between quantities formed from $h_N(u),h_N(a),h_N(b),h_N(v)$.  These
-endpoint values converge, so the functions $h_N$ are equi-Lipschitz on
-$[a,b]$.  Pointwise convergence on a finite mesh, followed by mesh
-refinement, gives uniform convergence there.
-
-For $x\in I$ and sufficiently small $s>0$, convexity gives
-\[
-  \frac{h_N(x)-h_N(x-s)}s
-  \leq h_N'(x)\leq
-  \frac{h_N(x+s)-h_N(x)}s.
-\]
-First let $N\to\infty$ and then $s\downarrow0$ to obtain
-$h_N'(x)\to h'(x)$.  Finally, $h_N'$ are nondecreasing.  On a fine partition
-of $[a,b]$, monotonicity traps $h_N'(x)$ between its values at adjacent mesh
-points, while uniform continuity traps $h'(x)$ between the corresponding
-values of $h'$.  Pointwise convergence at the finitely many mesh points then
-gives uniform convergence of the derivatives.
-\end{proof}
-
-\begin{proposition}[High-temperature annealed free energy]
-\label{prop:annealed-free-energy}
-There are $\beta_{\rm FE}=\beta_{\rm FE}(q)>0$ and an even real-analytic
-function $\ell_q$ on $(-\beta_{\rm FE},\beta_{\rm FE})$ such that, locally
-uniformly on this interval,
-\begin{align}
-  \frac1N\log F_N(\beta)&\longrightarrow\ell_q(\beta),
-  \label{eq:annealed-free-energy-limit}\\
-  \frac1N\partial_\beta\log F_N(\beta)&\longrightarrow\ell_q'(\beta).
-  \label{eq:annealed-derivative-limit}
-\end{align}
-Moreover,
-\begin{equation}\label{eq:ell-small-beta}
-  \ell_q(\beta)=\frac{\beta^2}{2q}+O(\beta^4),
-  \qquad
-  \ell_q'(\beta)=\frac\beta q+O(\beta^3).
-\end{equation}
-\end{proposition}
-
-\begin{proof}
-The pointwise convergence in \eqref{eq:annealed-free-energy-limit} is Theorem
-5 of \cite{GPSZ2026}, together with the Gaussian extension stated there.  That
-extension invokes the Gaussian--Rademacher universality result
-\cite{AGK2025}.
-
-We first record the normalization conversion.  The
-Majoranas of \cite{GPSZ2026} satisfy
-\[
-  \psi_i^{\rm GPSZ}=2^{-1/2}\psi_i,
-  \qquad
-  H_N^{\rm GPSZ}=2^{-q/2}H_N.
-\]
-Set $u=2^{q/2}\beta$.  Gaussian symmetry gives
-\[
-  \E\tr e^{-\beta H_N}
-  =
-  \E\tr e^{+\beta H_N},
-\]
-and $uH_N^{\rm GPSZ}=\beta H_N$.  Thus the sign and normalization conventions
-of \cite{GPSZ2026} give
-\begin{equation}\label{eq:GPSZ-conversion}
-  \frac1N\log F_N(\beta)=\frac{u}{N}f_{N,q}^{\rm GPSZ}(u),
-\end{equation}
-where $f_{N,q}^{\rm GPSZ}(u)=u^{-1}\log\E Z_N^{\rm GPSZ}(u)$.
-
-We next extract the regularity and the first coefficient from the explicit
-formula in that theorem.  In its notation,
-\[
-  \Phi_u(z)=\sum_{v\geq1}\mu_v(u)z^v,
-  \qquad
-  u f_q^{\rm GPSZ}(u)=\Phi_u(t_*(u))-1-\log t_*(u),
-\]
-where $t_*\partial_z\Phi_u(t_*)=1$.  A contributing hypertree has
-$v=1+(q-1)s$ vertices and its coefficient contains
-\[
-  \rho(u)^{v-1},
-  \qquad
-  \rho(u)^{q-1}=\frac{(q-1)!u^2}{2^{q+1}}.
-\]
-More explicitly, $\mathcal T_v^{\rm sim}$ is empty unless
-$v=1+(q-1)s$ for some $s\geq0$.  For $s\geq1$ we may therefore write
-\[
-  \mu_{1+(q-1)s}(u)=c_{q,s}u^{2s},
-\]
-where
-\[
-  c_{q,s}
-  =
-  \frac1{(1+(q-1)s)!}
-  \left(\frac{(q-1)!}{2^{q+1}}\right)^s
-  \sum_{T\in\mathcal T_{1+(q-1)s}^{\rm sim}}b_T.
-\]
-The bounds used in the proof of Proposition 3 of \cite{GPSZ2026} give
-$|c_{q,s}|\leq C_q^s$.  Hence
-\[
-  \Phi_u(z)
-  =
-  z+\sum_{s\geq1}
-  c_{q,s}u^{2s}z^{1+(q-1)s}
-\]
-converges normally for $(u^2,z)$ in a neighborhood of $(0,1)$.  Thus
-$\Phi_u(z)$ is jointly analytic in $(u^2,z)$ there.  At
-$u=0$, $\Phi_0(z)=z$ and $t_*(0)=1$; the derivative with respect to $t$ of
-$t\partial_z\Phi_u(t)-1$ is $1$ at $(u,t)=(0,1)$.  The analytic implicit
-function theorem makes $t_*$, and hence the limiting right-hand side, analytic
-in $u^2$.
-
-The first nontrivial term is the unique one-edge hypertree on $q$ vertices:
-\[
-  \Phi_u(z)=z+\frac{u^2}{q2^{q+1}}z^q+O(u^4).
-\]
-It follows successively that
-\[
-  t_*(u)=1-\frac{u^2}{2^{q+1}}+O(u^4),
-  \qquad
-  u f_q^{\rm GPSZ}(u)=\frac{u^2}{q2^{q+1}}+O(u^4).
-\]
-Using $u=2^{q/2}\beta$ in \eqref{eq:GPSZ-conversion} gives
-\eqref{eq:ell-small-beta}.
-
-It remains only to justify the two local-uniform assertions.  Let
-$h_N=N^{-1}\log F_N$.  If
-\[
-  \overline\nu_N(B)=\E\,\tr\mathbf1_{\{H_N\in B\}},
-\]
-then $F_N(\beta)=\int e^{-\beta x}\overline\nu_N(\mathrm dx)$; hence $h_N$
-is finite, differentiable, and convex.  {Differentiation is
-justified by
-$\norm{H_N(g)}\leq\sigma_N\sum_{I\in\calI_N}|g_I|$ and Gaussian
-exponential integrability.}
-The limiting function just obtained is $C^1$.  Lemma
-\ref{lem:convex-derivatives} now proves both local-uniform convergences.
-\end{proof}
-
-By \eqref{eq:finite-N-FTW-coefficient} and
-\eqref{eq:annealed-derivative-limit},
-\begin{equation}\label{eq:AN-asymptotic}
-  \frac{A_N(\beta)}N\longrightarrow
-  \frac\beta2\ell_q'(\beta).
-\end{equation}
 
 \section{Gaussian-chaos decomposition}
 \label{sec:chaos-decomposition}
@@ -415,14 +242,14 @@ Set
 \begin{equation}
   a=\frac q2-1>0,
   \qquad
-  Y_N(\beta;g)=\frac{Z_N(\beta;g)}{F_N(\beta)}.
+  Y_N(\beta;G)=\frac{Z_N(\beta;G)}{F_N(\beta)}.
 \end{equation}
 Thus $\E Y_N(\beta)=1$.  Let $P_r$ denote the orthogonal projection in
 $L^2(\gamma_N)$ onto the $r$-th homogeneous Gaussian chaos, where $\gamma_N$
 denotes standard Gaussian measure on $\mathbb R^{M_N}$.  We write
 $\norm{X}_2^2=\E|X|^2$.  We use the probabilists' Hermite polynomials
 \begin{equation}
-  H_\alpha(g)=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
+  H_\alpha(G)=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
   \qquad
   \E[H_\alpha H_\eta]
   =\alpha!\,\mathbf 1_{\{\alpha=\eta\}},
@@ -438,7 +265,7 @@ variable $X$,
 
 We first relate our normalization to that of Feng, Tian, and Wei.  Define
 \begin{equation}\label{eq:FTW-normalization}
-  \widehat H_N(g)=M_N^{-1/2}\sum_{I\in\calI_N}g_I\psi_I,
+  \widehat H_N(G)=M_N^{-1/2}\sum_{I\in\calI_N}g_I\psi_I,
   \qquad
   \tau_N=\sigma_N\sqrt{M_N}.
 \end{equation}
@@ -526,7 +353,7 @@ $\tr H_N^2-\E\tr H_N^2$.
 For $s=(s_1,\ldots,s_N)\in\{\pm1\}^N$, define
 $\chi_s(I)=\prod_{x\in I}s_x$.  We first prove in detail that
 \begin{equation}\label{eq:sign-gauge-invariance}
-  Z_N(\beta;g)=Z_N\bigl(\beta;(\chi_s(I)g_I)_I\bigr).
+  Z_N(\beta;G)=Z_N\bigl(\beta;(\chi_s(I)g_I)_I\bigr).
 \end{equation}
 To make the Clifford symmetry explicit, let
 \[
@@ -587,20 +414,20 @@ Writing $g^{(s)}=(\chi_s(I)g_I)_I$, we therefore have
   H_N(g^{(s)})
   &=\sigma_N\sum_{I\in\calI_N}\chi_s(I)g_I\psi_I\\
   &=\sigma_N\sum_{I\in\calI_N}g_IU_s\psi_IU_s^*
-    =U_sH_N(g)U_s^*.
+    =U_sH_N(G)U_s^*.
 \end{align*}
 The power-series definition of the exponential then implies
 \[
   e^{-\beta H_N(g^{(s)})}
-  =U_se^{-\beta H_N(g)}U_s^*.
+  =U_se^{-\beta H_N(G)}U_s^*.
 \]
 Finally, the normalized trace is invariant under unitary conjugation.
 Consequently
 \[
   Z_N(\beta;g^{(s)})
-  =\tr\!\left(U_se^{-\beta H_N(g)}U_s^*\right)
-  =\tr e^{-\beta H_N(g)}
-  =Z_N(\beta;g),
+  =\tr\!\left(U_se^{-\beta H_N(G)}U_s^*\right)
+  =\tr e^{-\beta H_N(G)}
+  =Z_N(\beta;G),
 \]
 which proves \eqref{eq:sign-gauge-invariance}.
 
@@ -611,7 +438,7 @@ More precisely,
   \left(
     \prod_{x=1}^N
     s_x^{\sum_{I\ni x}\alpha_I}
-  \right)H_\alpha(g).
+  \right)H_\alpha(G).
 \]
 Averaging the Hermite coefficient against all $s$ shows that it vanishes
 unless $\sum_{I\ni x}\alpha_I$ is even for every $x$.  This parity rule kills
@@ -641,41 +468,40 @@ Applying Gaussian integration by parts twice, conditionally on all
 coordinates other than $g_I$, yields
 \[
   \E\bigl[Z_N(\beta)(g_I^2-1)\bigr]
-  =\E\,\partial_{g_I}^2Z_N(\beta).
+  =\E\,g_I \partial_{g_I} Z_N(\beta).
 \]
 Summing over the $M_N$ choices of $I$ therefore gives the first equality
 below.  A further conditional Gaussian integration by parts gives the second:
 \begin{align*}
   2M_Nb_N(\beta)
-  &=\sum_I\E\,\partial_{g_I}^2Z_N(\beta)
-    =\sum_I\E\bigl[g_I\partial_{g_I}Z_N(\beta)\bigr]\\
+  & =\sum_I\E\bigl[g_I\partial_{g_I}Z_N(\beta)\bigr]\\
   &=\beta\,\partial_\beta\E Z_N(\beta)
     =\beta F_N'(\beta).
 \end{align*}
 
 The last equality follows pointwise from the exact scaling identity
 \[
-  Z_N(\beta;tg)
-  =\tr e^{-\beta H_N(tg)}
-  =\tr e^{-t\beta H_N(g)}
-  =Z_N(t\beta;g),
+  Z_N(\beta;tG)
+  =\tr e^{-\beta H_N(tG)}
+  =\tr e^{-t\beta H_N(G)}
+  =Z_N(t\beta;G),
 \]
-where we used $H_N(tg)=tH_N(g)$.  Differentiating at $t=1$ gives
+where we used $H_N(tG)=tH_N(G)$.  Differentiating at $t=1$ gives
 \[
-  \sum_Ig_I\partial_{g_I}Z_N(\beta;g)
-  =\beta\,\partial_\beta Z_N(\beta;g).
+  \sum_Ig_I\partial_{g_I}Z_N(\beta;G)
+  =\beta\,\partial_\beta Z_N(\beta;G).
 \]
 Finally,
 \[
-  \partial_\beta Z_N(\beta;g)
-  =-\tr\!\left(H_N(g)e^{-\beta H_N(g)}\right),
+  \partial_\beta Z_N(\beta;G)
+  =-\tr\!\left(H_N(G)e^{-\beta H_N(G)}\right),
   \qquad
-  \left|\partial_\beta Z_N(\beta;g)\right|
-  \leq \norm{H_N(g)}e^{|\beta|\norm{H_N(g)}}.
+  \left|\partial_\beta Z_N(\beta;G)\right|
+  \leq \norm{H_N(G)}e^{|\beta|\norm{H_N(G)}}.
 \]
 Together with
 \[
-  \norm{H_N(g)}\leq\sigma_N\sum_I|g_I|,
+  \norm{H_N(G)}\leq\sigma_N\sum_I|g_I|,
 \]
 the right-hand side has every exponential moment under the finite dimensional
 Gaussian law.  It gives a locally uniform dominating function in $\beta$.
@@ -691,12 +517,12 @@ Dividing by the deterministic quantity $F_N(\beta)$ proves
 \label{sec:Rademacher-remainder}
 }
 
-\begin{lemma}[Real-temperature derivative bound]
+\begin{lemma}
 \label{lem:Z-derivative-bound}
 For real $\beta$, every multi-index $\alpha$ of total order $r$ satisfies
 \begin{equation}\label{eq:Z-derivative-bound}
-  \left|\partial_g^\alpha Z_N(\beta;g)\right|
-  \leq (|\beta|\sigma_N)^r Z_N(\beta;g).
+  \left|\partial_g^\alpha Z_N(\beta;G)\right|
+  \leq (|\beta|\sigma_N)^r Z_N(\beta;G).
 \end{equation}
 \end{lemma}
 
@@ -731,7 +557,7 @@ integrand by
 \[
   \prod_{j=0}^r
   \left(\tr e^{-\beta H_N}\right)^{t_j}
-  =Z_N(\beta;g).
+  =Z_N(\beta;G).
 \]
 The permutation count cancels the simplex volume, proving
 \eqref{eq:Z-derivative-bound}.  The same labeled formula covers repeated
@@ -763,7 +589,7 @@ this space.  Set
 Thus $S_{N,q}$ is the degree-$q$ elementary symmetric polynomial in the
 Rademacher signs.
 
-\begin{lemma}[Rademacher encoding and exponential moment]
+\begin{lemma}
 \label{lem:Rademacher-encoding}
 For every integer $r\geq0$,
 \begin{equation}\label{eq:even-sum-Rademacher-moment}
@@ -975,6 +801,163 @@ Since $q\geq4$, we have $3(q/2-1)>q-2$, which completes the proof.
 
 \endgroup
 \section{Proof of the main results}
+
+\subsection{Annealed free energy and coefficient asymptotics}
+
+To identify the deterministic coefficient $A_N(\beta)$ in
+\eqref{eq:finite-N-FTW-coefficient}, we use the annealed free-energy limit
+from \cite{GPSZ2026}.  The required convergence of derivatives follows from
+convexity and is not an additional input.
+
+\begin{lemma} \label{lem:convex-derivatives}
+Let $I\subset\mathbb R$ be open.  Suppose that $h_N:I\to\mathbb R$ are finite,
+differentiable, convex functions and $h_N(x)\to h(x)$ pointwise, where
+$h\in C^1(I)$.  Then $h_N\to h$ and $h_N'\to h'$ locally uniformly on $I$.
+\end{lemma}
+
+\begin{proof}
+Fix a compact interval $[a,b]\subset I$ and choose $u<a<b<v$ in $I$.
+Monotonicity of secant slopes bounds every secant slope of $h_N$ on $[a,b]$
+between quantities formed from $h_N(u),h_N(a),h_N(b),h_N(v)$.  These
+endpoint values converge, so the functions $h_N$ are equi-Lipschitz on
+$[a,b]$.  Pointwise convergence on a finite mesh, followed by mesh
+refinement, gives uniform convergence there.
+
+For $x\in I$ and sufficiently small $s>0$, convexity gives
+\[
+  \frac{h_N(x)-h_N(x-s)}s
+  \leq h_N'(x)\leq
+  \frac{h_N(x+s)-h_N(x)}s.
+\]
+First let $N\to\infty$ and then $s\downarrow0$ to obtain
+$h_N'(x)\to h'(x)$.  Finally, $h_N'$ are nondecreasing.  On a fine partition
+of $[a,b]$, monotonicity traps $h_N'(x)$ between its values at adjacent mesh
+points, while uniform continuity traps $h'(x)$ between the corresponding
+values of $h'$.  Pointwise convergence at the finitely many mesh points then
+gives uniform convergence of the derivatives.
+\end{proof}
+
+\begin{proposition}
+\label{prop:annealed-free-energy}
+There are $\beta_{\rm FE}=\beta_{\rm FE}(q)>0$ and an even real-analytic
+function $\ell_q$ on $(-\beta_{\rm FE},\beta_{\rm FE})$ such that, locally
+uniformly on this interval,
+\begin{align}
+  \frac1N\log F_N(\beta)&\longrightarrow\ell_q(\beta),
+  \label{eq:annealed-free-energy-limit}\\
+  \frac1N\partial_\beta\log F_N(\beta)&\longrightarrow\ell_q'(\beta).
+  \label{eq:annealed-derivative-limit}
+\end{align}
+Moreover,
+\begin{equation}\label{eq:ell-small-beta}
+  \ell_q(\beta)=\frac{\beta^2}{2q}+O(\beta^4),
+  \qquad
+  \ell_q'(\beta)=\frac\beta q+O(\beta^3).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The pointwise convergence in \eqref{eq:annealed-free-energy-limit} is Theorem
+5 of \cite{GPSZ2026}, together with the Gaussian extension stated there.  That
+extension invokes the Gaussian--Rademacher universality result
+\cite{AGK2025}.
+
+We first record the normalization conversion.  The
+Majoranas of \cite{GPSZ2026} satisfy
+\[
+  \psi_i^{\rm GPSZ}=2^{-1/2}\psi_i,
+  \qquad
+  H_N^{\rm GPSZ}=2^{-q/2}H_N.
+\]
+Set $u=2^{q/2}\beta$.  Gaussian symmetry gives
+\[
+  \E\tr e^{-\beta H_N}
+  =
+  \E\tr e^{+\beta H_N},
+\]
+and $uH_N^{\rm GPSZ}=\beta H_N$.  Thus the sign and normalization conventions
+of \cite{GPSZ2026} give
+\begin{equation}\label{eq:GPSZ-conversion}
+  \frac1N\log F_N(\beta)=\frac{u}{N}f_{N,q}^{\rm GPSZ}(u),
+\end{equation}
+where $f_{N,q}^{\rm GPSZ}(u)=u^{-1}\log\E Z_N^{\rm GPSZ}(u)$.
+
+We next extract the regularity and the first coefficient from the explicit
+formula in that theorem.  In its notation,
+\[
+  \Phi_u(z)=\sum_{v\geq1}\mu_v(u)z^v,
+  \qquad
+  u f_q^{\rm GPSZ}(u)=\Phi_u(t_*(u))-1-\log t_*(u),
+\]
+where $t_*\partial_z\Phi_u(t_*)=1$.  A contributing hypertree has
+$v=1+(q-1)s$ vertices and its coefficient contains
+\[
+  \rho(u)^{v-1},
+  \qquad
+  \rho(u)^{q-1}=\frac{(q-1)!u^2}{2^{q+1}}.
+\]
+More explicitly, $\mathcal T_v^{\rm sim}$ is empty unless
+$v=1+(q-1)s$ for some $s\geq0$.  For $s\geq1$ we may therefore write
+\[
+  \mu_{1+(q-1)s}(u)=c_{q,s}u^{2s},
+\]
+where
+\[
+  c_{q,s}
+  =
+  \frac1{(1+(q-1)s)!}
+  \left(\frac{(q-1)!}{2^{q+1}}\right)^s
+  \sum_{T\in\mathcal T_{1+(q-1)s}^{\rm sim}}b_T.
+\]
+The bounds used in the proof of Proposition 3 of \cite{GPSZ2026} give
+$|c_{q,s}|\leq C_q^s$.  Hence
+\[
+  \Phi_u(z)
+  =
+  z+\sum_{s\geq1}
+  c_{q,s}u^{2s}z^{1+(q-1)s}
+\]
+converges normally for $(u^2,z)$ in a neighborhood of $(0,1)$.  Thus
+$\Phi_u(z)$ is jointly analytic in $(u^2,z)$ there.  At
+$u=0$, $\Phi_0(z)=z$ and $t_*(0)=1$; the derivative with respect to $t$ of
+$t\partial_z\Phi_u(t)-1$ is $1$ at $(u,t)=(0,1)$.  The analytic implicit
+function theorem makes $t_*$, and hence the limiting right-hand side, analytic
+in $u^2$.
+
+The first nontrivial term is the unique one-edge hypertree on $q$ vertices:
+\[
+  \Phi_u(z)=z+\frac{u^2}{q2^{q+1}}z^q+O(u^4).
+\]
+It follows successively that
+\[
+  t_*(u)=1-\frac{u^2}{2^{q+1}}+O(u^4),
+  \qquad
+  u f_q^{\rm GPSZ}(u)=\frac{u^2}{q2^{q+1}}+O(u^4).
+\]
+Using $u=2^{q/2}\beta$ in \eqref{eq:GPSZ-conversion} gives
+\eqref{eq:ell-small-beta}.
+
+It remains only to justify the two local-uniform assertions.  Let
+$h_N=N^{-1}\log F_N$.  If
+\[
+  \overline\nu_N(B)=\E\,\tr\mathbf1_{\{H_N\in B\}},
+\]
+then $F_N(\beta)=\int e^{-\beta x}\overline\nu_N(\mathrm dx)$; hence $h_N$
+is finite, differentiable, and convex.  {Differentiation is
+justified by
+$\norm{H_N(G)}\leq\sigma_N\sum_{I\in\calI_N}|g_I|$ and Gaussian
+exponential integrability.}
+The limiting function just obtained is $C^1$.  Lemma
+\ref{lem:convex-derivatives} now proves both local-uniform convergences.
+\end{proof}
+
+By \eqref{eq:finite-N-FTW-coefficient} and
+\eqref{eq:annealed-derivative-limit},
+\begin{equation}\label{eq:AN-asymptotic}
+  \frac{A_N(\beta)}N\longrightarrow
+  \frac\beta2\ell_q'(\beta).
+\end{equation}
+
 \begin{proof}[Proof of Theorem~\ref{thm:partition-clt}]
 Let
 \[
@@ -1031,7 +1014,7 @@ We claim that
   \E W_N=o(N^{-(q/2-1)}).
 \end{equation}
 To prove this, we first establish an $N$-independent Lipschitz bound for
-$g\mapsto W_N(g)$.  Differentiation gives
+$g\mapsto W_N(G)$.  Differentiation gives
 \[
   \partial_{g_I}W_N
   =-\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
