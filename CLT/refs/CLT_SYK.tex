@@ -51,22 +51,7 @@ free energy, central limit theorem, Gaussian chaos.
 \section{Introduction and main results}
 \label{sec:introduction}
 
-The Sachdev--Ye--Kitaev (SYK) model is a mean-field model of randomly
-interacting fermions originating in the work of Sachdev and Ye
-\cite{SachdevYe1993} and its Majorana formulation by Kitaev.  Its combination
-of solvability, strong interactions, and chaotic behavior has made it a
-central model in quantum statistical mechanics and holography; see, for
-example, \cite{MaldacenaStanford2016}.  At positive temperature, the
-partition function contains both the thermodynamic information and the
-sample-to-sample fluctuations of the disorder.
 
-Rigorous results have recently identified the high-temperature annealed and
-quenched free-energy limits \cite{GPSZ2026} and established complex
-zero-freeness and second-moment estimates \cite{Zlokapa2026}.  The purpose of
-this paper is to determine the leading distributional fluctuations in the
-same high-temperature regime.  We show that the partition function and its
-logarithm have Gaussian fluctuations at scale $N^{1-q/2}$ relative to the
-annealed partition function and identify their limiting variance.
 
 \subsection{The SYK model}
 
@@ -136,7 +121,22 @@ Under the assumptions of Theorem~\ref{thm:partition-clt},
 \]
 \end{corollary}
 
-\subsection{Relation to earlier work}
+\subsection{A brief background and relation to earlier work}
+The Sachdev--Ye--Kitaev (SYK) model is a mean-field model of randomly
+interacting fermions originating in the work of Sachdev and Ye
+\cite{SachdevYe1993} and its Majorana formulation by Kitaev.  Its combination
+of solvability, strong interactions, and chaotic behavior has made it a
+central model in quantum statistical mechanics and holography; see, for
+example, \cite{MaldacenaStanford2016}.  At positive temperature, the
+partition function contains both the thermodynamic information and the
+sample-to-sample fluctuations of the disorder.
+
+Rigorous results have recently identified the high-temperature annealed and
+quenched free-energy limits \cite{GPSZ2026} and established complex
+zero-freeness and second-moment estimates \cite{Zlokapa2026}.  The purpose of
+this paper is to determine the leading distributional fluctuations in the
+same high-temperature regime. 
+
 
 Feng, Tian, and Wei \cite{FTW2018} proved a central limit theorem for linear
 eigenvalue statistics of the Gaussian SYK Hamiltonian.  Their theorem treats
@@ -200,13 +200,7 @@ $Z_N/\mathbb E Z_N$.
 
 \section{Gaussian-chaos decomposition}
 \label{sec:chaos-decomposition}
-Set
-\begin{equation}
-  a=\frac q2-1>0,
-  \qquad
-  Y_N(\beta;G)=\frac{Z_N(\beta;G)}{F_N(\beta)}.
-\end{equation}
-Thus $\E Y_N(\beta)=1$.   We use the probabilists' Hermite polynomials
+  We use the probabilists' Hermite polynomials
 \begin{equation}
   H_\alpha(G)=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
   \qquad
@@ -367,20 +361,11 @@ and
   \frac{\beta\,F'_N(\beta)}{2M_N}
   \sum_{I\in\calI_N}(g_I^2-1).
 \end{equation}
-Equivalently, Clifford trace orthogonality gives
-\[
-  \tr(\psi_I\psi_J)=\mathbf 1_{\{I=J\}},
-  \qquad
-  \tr H_N^2=\sigma_N^2\sum_Ig_I^2.
-\]
-so the second chaos is the $L^2$ projection of $Y_N-1$ onto the centered
-radial statistic
-$\tr H_N^2-\E\tr H_N^2$.
 \end{lemma}
 
 \begin{proof}
-  This parity rule kills
-the first chaos.  In the second chaos it also kills every off-diagonal
+  This parity rule above kills
+ the first chaos.  In the second chaos it also kills every off-diagonal
 monomial $g_Ig_J$, since the parity condition for such a monomial forces
 $I=J$.
 Permutation symmetry shows that the remaining diagonal coefficients agree.
@@ -767,13 +752,17 @@ Moreover,
   \qquad
   \ell_q'(\beta)=\frac\beta q+O(\beta^3).
 \end{equation}
+In paritcular, $\ell'(\beta)>0$, for every sufficiently
+small real $\beta\neq0$.
+
 \end{proposition}
+
 
 \begin{proof}
 The pointwise convergence in \eqref{eq:annealed-free-energy-limit} is Theorem
 5 of \cite{GPSZ2026}, together with the Gaussian extension stated there.  That
 extension invokes the Gaussian--Rademacher universality result
-\cite{AGK2025}. {\color{red} CHECK $\ell'(\beta)\neq 0$}
+\cite{AGK2025}. 
 
 We first record the normalization conversion.  The
 Majoranas of \cite{GPSZ2026} satisfy
@@ -874,7 +863,7 @@ By \eqref{eq:finite-N-FTW-coefficient} and
 \begin{proof}[Proof of Theorem~\ref{thm:partition-clt}]
 Let
 \[
-  S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\calI_N}(g_I^2-1).
+  Y_N(\beta;G)=\frac{Z_N(\beta;G)}{F_N(\beta)},\qquad   S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\calI_N}(g_I^2-1).
 \]
 The classical i.i.d.\ central limit theorem gives
 $S_N\Rightarrow\xi\sim\N(0,1)$.
@@ -1049,11 +1038,7 @@ so the claimed convergence follows from
 The assertion for $\mathcal G_N$ follows by multiplication by
 $-\beta^{-1}$.
 \end{proof}
-\begin{remark}
-Since $\ell_q'(\beta)=\beta/q+O(\beta^3)$ at the origin, the nondegeneracy
-condition in Theorem~\ref{thm:partition-clt} holds for every sufficiently
-small real $\beta\neq0$.
-\end{remark}
+
 
 
 \begin{thebibliography}{99}
