@@ -1,4 +1,4 @@
-﻿﻿import Mathlib
+import Mathlib
 import SYK.SYK_model.model
 
 set_option autoImplicit false
