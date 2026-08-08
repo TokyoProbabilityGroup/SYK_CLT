@@ -1,0 +1,33 @@
+name: LaTeX Action CI
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'maintenance-codes'
+    paths:
+      - '**.tex'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v6
+      - name: Compile LaTeX documents
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: |
+            CLT/refs/CLT_SYK.tex
+      - name: Upload PDF files
+        uses: actions/upload-artifact@v6
+        with:
+          name: PDF
+          path: |
+            CLT_SYK.pdf
