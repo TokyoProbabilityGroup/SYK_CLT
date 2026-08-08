@@ -73,7 +73,6 @@ annealed partition function and identify their limiting variance.
 Fix an even integer $q\geq4$, and let $N$ be even.  Write
 \[
   \calI_N=\{I\subset[N]:|I|=q\},\qquad
-  M_N=\binom Nq,\qquad
   \sigma_N^2=\frac{(q-1)!}{N^{q-1}},
 \]
 and let $G= (g_I)_{I\in\calI_N}$ be independent standard Gaussian random
@@ -126,8 +125,7 @@ Moreover,
 \end{equation}
 \end{theorem}
 
-\begin{corollary}[Log-partition-function CLT]
-\label{cor:free-energy-clt}
+\begin{corollary}\label{cor:free-energy-clt}
 Under the assumptions of Theorem~\ref{thm:partition-clt},
 \[
   N^{q/2-1}\left(
@@ -165,13 +163,13 @@ identifies the second chaos exactly, we have the following:
   A_N(\beta)Q_N+\mathcal R_N(\beta),
   \]
   where
-  \[
-    A_N(\beta)=\frac{\beta}{2}F'_N(\beta),
+  \begin{equation}\label{eq:finite-N-FTW-coefficient}
+          A_N(\beta)=\frac{\beta}{2}F'_N(\beta),
     \qquad
-    Q_N=\frac1{M_N}\sum_I(g_I^2-1).
-  \]
+    Q_N=\frac1{|\mathcal I_N|}\sum_I(g_I^2-1).
+    \end{equation}
 Here $\mathcal R_N$ is the sum of the Gaussian chaoses of orders at least
-three.  Thus the leading random term is a normalized sum of $M_N$
+three.  Thus the leading random term is a normalized sum of $\mathcal I_N$
 independent centered variables.  The main task is to prove
 \[
   \norm{\mathcal R_N(\beta)}_2^2=o(N^{-(q-2)}).
@@ -208,73 +206,62 @@ Set
   \qquad
   Y_N(\beta;G)=\frac{Z_N(\beta;G)}{F_N(\beta)}.
 \end{equation}
-Thus $\E Y_N(\beta)=1$.  Let $P_r$ denote the orthogonal projection in
-$L^2(\gamma_N)$ onto the $r$-th homogeneous Gaussian chaos, where $\gamma_N$
-denotes standard Gaussian measure on $\mathbb R^{M_N}$.  We write
-$\norm{X}_2^2=\E|X|^2$.  We use the probabilists' Hermite polynomials
+Thus $\E Y_N(\beta)=1$.   We use the probabilists' Hermite polynomials
 \begin{equation}
   H_\alpha(G)=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
   \qquad
   \E[H_\alpha H_\eta]
   =\alpha!\,\mathbf 1_{\{\alpha=\eta\}},
 \end{equation}
-where $\alpha!=\prod_I\alpha_I!$.  For every sufficiently regular random
+where $\alpha!=\prod_I\alpha_I!$.  Since $H_\alpha$ consists of complete orthonormal basis in $L^2(\gamma_{|\mathcal I_N|})$ where $\gamma_{|\mathcal I_N|}$
+denotes standard Gaussian measure on $\mathbb R^{|\mathcal I_N|}$, we have
+\begin{align}\label{eq: chaos}
+Z_N(\beta:G) = \sum_{k=0}^\infty \sum_{\alpha:~|\alpha|=k} \frac{\mathbb E[Z_N(\beta:G')H_\alpha(G')]}{\alpha!} H_\alpha(G),    
+\end{align}
+where the second sum runs over all multi-index $\alpha$ such that $\sum_{I} \alpha_I = k$, and the expectation is taken over $G'$ independent copy of $G.$  Let $P_r$ denote the orthogonal projection in
+$L^2(\gamma_{|\mathcal I_N|})$ onto the $r$-th homogeneous Gaussian chaos:
+ Then, we can write 
+$$P_r Z_N(G) =  \sum_{\alpha:~|\alpha|=k} \frac{\mathbb E[Z_N(\beta:G')H_\alpha(G')]}{\alpha!} H_\alpha(G). $$
+
+
+For every sufficiently regular random
 variable $X$,
 \begin{equation}\label{eq:Hermite-coefficient-formula}
-  \norm{P_rX}_2^2
+  \mathbb E[(P_rX_2)^2]
   =
   \sum_{|\alpha|=r}
   \frac{|\E\,\partial_g^\alpha X|^2}{\alpha!}.
 \end{equation}
 
 
-We define \begin{equation}\label{eq:finite-N-FTW-coefficient}
-  A_N(\beta):=\frac{\beta}{2}\,F'_N(\beta).
-\end{equation}
-The next lemma proves the exact radial decomposition
+Recall $A_N(\beta):=\frac{\beta}{2}\,F'_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
+ The next lemma proves the exact radial decomposition
 \begin{equation}\label{eq:exact-FTW-decomposition-preview}
   Z_N(\beta)=\mathbb E Z_N(\beta)+ A_N(\beta)Q_N+\mathcal R_N(\beta),
   \qquad
   \mathcal R_N=\sum_{r\geq3}P_r Z_N.
 \end{equation}
-Subsection~\ref{sec:Rademacher-remainder} proves
-\begin{equation}\label{eq:target-FTW-remainder}
-  \E|\mathcal R_N(\beta)|^2=o(\mathbb E[Z_N]\,N^{2-q}).
-\end{equation}
-{
-}
+
 
 \subsection{Exact finite-size radial projection}
 
-\begin{lemma}[First and second chaoses]\label{lem:exact-second-chaos}
-For every real $\beta$,
-\[
-  P_1Z_N(\beta)=0
-\]
-and
-\begin{equation}\label{eq:P2Y-exact}
-  P_2 Z_N(\beta)
-  =
-  \frac{\beta\,F'_N(\beta)}{2M_N}
-  \sum_{I\in\calI_N}(g_I^2-1).
+Call a multi-index $\alpha$ \emph{even} if
+\begin{equation}\label{eq:even-multi-index}
+  \sum_{I\ni x}\alpha_I\equiv0\pmod2
+  \qquad\text{for every }x\in[N].
 \end{equation}
-Equivalently, Clifford trace orthogonality gives
-\[
-  \tr(\psi_I\psi_J)=\mathbf 1_{\{I=J\}},
-  \qquad
-  \tr H_N^2=\sigma_N^2\sum_Ig_I^2.
-\]
-so the second chaos is the $L^2$ projection of $Y_N-1$ onto the centered
-radial statistic
-$\tr H_N^2-\E\tr H_N^2$.
-\end{lemma}
-
-\begin{proof}
-For $s=(s_1,\ldots,s_N)\in\{\pm1\}^N$, define
-$\chi_s(I)=\prod_{x\in I}s_x$.  We first prove in detail that
+Otherwise, we call $\alpha$ odd. 
+\begin{lemma}\label{lem: parity rule lemma}
+    For $s=(s_1,\ldots,s_N)\in\{\pm1\}^N$, define
+$\chi_s(I)=\prod_{x\in I}s_x$.  We have 
 \begin{equation}\label{eq:sign-gauge-invariance}
   Z_N(\beta;G)=Z_N\bigl(\beta;(\chi_s(I)g_I)_I\bigr).
 \end{equation}
+
+    In particular, if $\alpha$ is odd, then
+    $$\mathbb E[Z_N(\beta:G')H_\alpha(G')=0.$$
+\end{lemma}
+\begin{proof}
 To make the Clifford symmetry explicit, let
 \[
   \Gamma
@@ -351,17 +338,48 @@ Consequently
 \]
 which proves \eqref{eq:sign-gauge-invariance}.
 
-More precisely,
-\[
+Assume that $\alpha$ is odd, i.e. we can take $x$ such that $\sum_{I: x\in I}\alpha_I$
+ is odd. We take $s$  such that $s_y=1$ for $y\neq x$ and $s_x=1$. Then, 
+ \[
   H_\alpha((\chi_s(I)g_I)_I)
   =
   \left(
     \prod_{x=1}^N
     s_x^{\sum_{I\ni x}\alpha_I}
-  \right)H_\alpha(G).
+  \right)H_\alpha(G) = -H_\alpha(G).
 \]
-Averaging the Hermite coefficient against all $s$ shows that it vanishes
-unless $\sum_{I\ni x}\alpha_I$ is even for every $x$.  This parity rule kills
+Hence, we have 
+\begin{align*}
+    \mathbb E[Z_N(G') H_\alpha(G')] =     \mathbb E[Z_N(\chi_s G') H_\alpha(\chi_s G')] = -
+    \mathbb E[Z_N(G') H_\alpha(G')], 
+\end{align*}
+which gives the second claim. 
+\end{proof}
+\begin{lemma}[First and second chaoses]\label{lem:exact-second-chaos}
+For every real $\beta$,
+\[
+  P_1Z_N(\beta)=0
+\]
+and
+\begin{equation}\label{eq:P2Y-exact}
+  P_2 Z_N(\beta)
+  =
+  \frac{\beta\,F'_N(\beta)}{2M_N}
+  \sum_{I\in\calI_N}(g_I^2-1).
+\end{equation}
+Equivalently, Clifford trace orthogonality gives
+\[
+  \tr(\psi_I\psi_J)=\mathbf 1_{\{I=J\}},
+  \qquad
+  \tr H_N^2=\sigma_N^2\sum_Ig_I^2.
+\]
+so the second chaos is the $L^2$ projection of $Y_N-1$ onto the centered
+radial statistic
+$\tr H_N^2-\E\tr H_N^2$.
+\end{lemma}
+
+\begin{proof}
+  This parity rule kills
 the first chaos.  In the second chaos it also kills every off-diagonal
 monomial $g_Ig_J$, since the parity condition for such a monomial forces
 $I=J$.
@@ -390,7 +408,7 @@ coordinates other than $g_I$, yields
   \E\bigl[Z_N(\beta)(g_I^2-1)\bigr]
   =\E\,g_I \partial_{g_I} Z_N(\beta).
 \]
-Summing over the $M_N$ choices of $I$ therefore gives the first equality
+Summing over the $\mathcal I_N$ choices of $I$ therefore gives the first equality
 below.  A further conditional Gaussian integration by parts gives the second:
 \begin{align*}
   2M_Nb_N(\beta)
@@ -469,13 +487,7 @@ coordinates.
 
 \begingroup
 
-
-Call a multi-index $\alpha$ \emph{even} if
-\begin{equation}\label{eq:even-multi-index}
-  \sum_{I\ni x}\alpha_I\equiv0\pmod2
-  \qquad\text{for every }x\in[N].
-\end{equation}
-The sign-gauge symmetry used in Lemma~\ref{lem:exact-second-chaos} shows that
+Recall that Lemma~\ref{lem: parity rule lemma} shows that
 only even multi-indices have nonzero Hermite coefficients.
 
 Let $(\varepsilon_x)_{x=1}^N$ be independent Rademacher variables on an
@@ -635,8 +647,7 @@ Finally, \eqref{eq:Rademacher-chaos-deterministic-bound},
 which proves \eqref{eq:Rademacher-exponential-moment}.
 \end{proof}
 
-\begin{proposition}[Higher-chaos closure]
-\label{prop:higher-chaos-closure}
+\begin{proposition} \label{prop:higher-chaos-closure}
 There exists $\beta_{\rm Rad}=\beta_{\rm Rad}(q)>0$ such that, for every
 fixed real $\beta$ with $|\beta|<\beta_{\rm Rad}$,
 \begin{equation}\label{eq:higher-chaos-closure}
@@ -658,8 +669,7 @@ $F_N(\beta)>0$ give
   \norm{P_r Z_N(\beta)}_2^2
   &=\frac1{F_N(\beta)^2}
     \sum_{|\alpha|=r}\frac1{\alpha!}
-    \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \\
-  &\leq t_N^r
+    \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \leq t_N^r
     \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
     \frac1{\alpha!}.
   \label{eq:Hermite-Rademacher-bound}
@@ -763,7 +773,7 @@ Moreover,
 The pointwise convergence in \eqref{eq:annealed-free-energy-limit} is Theorem
 5 of \cite{GPSZ2026}, together with the Gaussian extension stated there.  That
 extension invokes the Gaussian--Rademacher universality result
-\cite{AGK2025}.
+\cite{AGK2025}. {\color{red} CHECK $\ell'(\beta)\neq 0$}
 
 We first record the normalization conversion.  The
 Majoranas of \cite{GPSZ2026} satisfy
@@ -888,9 +898,9 @@ $N^{q/2-1}\mathcal R_N\to0$ in $L^2$.  This proves
 \eqref{eq:scaled-relative-clt}.  Orthogonality in
 \eqref{eq:Y-decomposition-final} also gives
 \[
-  \Var(Y_N)=c_N(\beta)^2+\norm{\mathcal R_N(\beta)}_2^2,
+  \Var(Y_N)=c_N(\beta)^2+\norm{\mathcal R_N(\beta)}_2^2.
 \]
-which proves \eqref{eq:variance-asymptotic}.  Finally,
+  Finally,
 $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and the assumed nonvanishing of the limiting
 coefficient give 
 \eqref{eq:standardized-clt}.
