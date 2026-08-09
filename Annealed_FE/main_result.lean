@@ -1,5 +1,8 @@
-﻿﻿import Mathlib
 import SYK.SYK_model.model
+import Mathlib.Analysis.CStarAlgebra.Classes
+import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.MeasureTheory.Measure.Haar.OfBasis
 
 set_option autoImplicit false
 
@@ -261,8 +264,11 @@ noncomputable def rho (q : ℕ) (β : ℝ) : ℝ :=
 
 /-- The hypertree coefficient `μ_v` from equation `(mu-0)`. -/
 noncomputable def treeMu (q : ℕ) (β : ℝ) (v : ℕ) : ℂ :=
-  ((rho q β : ℂ) ^ (v - 1) / (Nat.factorial v : ℂ)) *
-    ∑ T : SimpleHypertree v q, bSimple T
+  by
+    classical
+    exact
+      ((rho q β : ℂ) ^ (v - 1) / (Nat.factorial v : ℂ)) *
+        ∑ T : SimpleHypertree v q, bSimple T
 
 /-- The independent hypertree series `Φ(z) = ∑ μ_v z^v`. -/
 noncomputable def phiC (q : ℕ) (β : ℝ) (z : ℂ) : ℂ :=
