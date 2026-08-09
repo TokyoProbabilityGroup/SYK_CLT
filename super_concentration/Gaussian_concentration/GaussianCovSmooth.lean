@@ -711,4 +711,31 @@ lemma gaussian_cov_sinH_intervalIntegrable (F : EuclideanSpace ℝ ι → ℝ) (
     · linarith;
     · convert integrable_cov_Phi F L hL hF hgrad s θ using 1
 
+/-- The sharp Gaussian covariance bound for a `C¹` function with globally bounded
+gradient. -/
+lemma gaussian_cov_bound_smooth (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
+    (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s : ℝ) :
+    |(∫ x, F x * Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)
+        - (∫ x, F x ∂standardGaussianMeasureOnEuclidean ι)
+          * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)|
+      ≤ L ^ 2 * |s| * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι) := by
+  rw [gaussian_cov_repr F L hL hF hgrad s]
+  rw [intervalIntegral.integral_of_le Real.pi_div_two_pos.le]
+  refine' le_trans (MeasureTheory.norm_integral_le_integral_norm (_ : ℝ → ℝ))
+    (le_trans (MeasureTheory.integral_mono_of_nonneg _ _ _) _)
+  refine' fun θ => |Real.sin θ| *
+    (|s| * L ^ 2 * ∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)
+  · exact Filter.Eventually.of_forall fun _ => norm_nonneg _
+  · exact Continuous.integrableOn_Ioc (by continuity)
+  · filter_upwards [MeasureTheory.ae_restrict_mem measurableSet_Ioc] with θ hθ
+    simpa only [norm_mul, Real.norm_eq_abs] using mul_le_mul_of_nonneg_left
+      (gaussian_cov_H_bound F L hL hF hgrad s θ) (abs_nonneg _)
+  · rw [MeasureTheory.setIntegral_congr_fun measurableSet_Ioc fun θ hθ => by
+      rw [abs_of_nonneg (Real.sin_nonneg_of_nonneg_of_le_pi hθ.1.le
+        (by linarith [Real.pi_pos, hθ.2]))],
+      ← intervalIntegral.integral_of_le Real.pi_div_two_pos.le]
+    norm_num
+    ring_nf
+    norm_num
+
 end SYK

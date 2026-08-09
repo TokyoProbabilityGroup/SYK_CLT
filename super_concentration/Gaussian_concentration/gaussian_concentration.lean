@@ -1,5 +1,3 @@
-import SYK.super_concentration.Gaussian_concentration.GaussianConcentrationAux
-import SYK.super_concentration.Gaussian_concentration.GaussianCovSmooth
 import SYK.super_concentration.Gaussian_concentration.GaussianCovMollify
 import Mathlib.Probability.Moments.SubGaussian
 
@@ -9,60 +7,11 @@ open ProbabilityTheory
 
 namespace SYK
 
-/-
-The sharp Gaussian covariance bound for a `C¹` function with globally bounded gradient
-(the smooth case, proved via rotation invariance of `μ.prod μ` and Gaussian integration by
-parts).  The general Lipschitz case follows by mollification.
--/
-lemma gaussian_cov_bound_smooth {ι : Type*} [Fintype ι]
-    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
-    (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s : ℝ) :
-    |(∫ x, F x * Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)
-        - (∫ x, F x ∂standardGaussianMeasureOnEuclidean ι)
-          * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)|
-      ≤ L ^ 2 * |s| * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι) := by
-  rw [ gaussian_cov_repr F L hL hF hgrad s ];
-  rw [ intervalIntegral.integral_of_le Real.pi_div_two_pos.le ];
-  refine' le_trans ( MeasureTheory.norm_integral_le_integral_norm ( _ : ℝ → ℝ ) ) ( le_trans ( MeasureTheory.integral_mono_of_nonneg _ _ _ ) _ );
-  refine' fun θ => |Real.sin θ| * ( |s| * L ^ 2 * ∫ x, Real.exp ( s * F x ) ∂standardGaussianMeasureOnEuclidean ι );
-  · exact Filter.Eventually.of_forall fun x => norm_nonneg _;
-  · exact Continuous.integrableOn_Ioc ( by continuity );
-  · filter_upwards [ MeasureTheory.ae_restrict_mem measurableSet_Ioc ] with θ hθ;
-    simpa only [ norm_mul, Real.norm_eq_abs ] using mul_le_mul_of_nonneg_left ( gaussian_cov_H_bound F L hL hF hgrad s θ ) ( abs_nonneg _ );
-  · rw [ MeasureTheory.setIntegral_congr_fun measurableSet_Ioc fun x hx => by rw [ abs_of_nonneg ( Real.sin_nonneg_of_nonneg_of_le_pi hx.1.le ( by linarith [ Real.pi_pos, hx.2 ] ) ) ], ← intervalIntegral.integral_of_le Real.pi_div_two_pos.le ] ; norm_num ; ring_nf ; norm_num
-
-/-
-**The sharp Gaussian covariance bound** for an `L`-Lipschitz `F`:
-`|Cov(F, e^{sF})| ≤ L² |s| ∫ e^{sF}` against the standard Gaussian.  This is the last
-remaining analytic input to `product_standardGaussian_mgf_le`.  It reduces to the smooth
-case `gaussian_cov_bound_smooth` (proved via rotation invariance of `μ.prod μ` and the
-Gaussian integration-by-parts lemma `gaussian_ibp`) by mollifying `F` into a sequence of
-`C¹` functions with the same Lipschitz constant and passing to the limit by dominated
-convergence.  The supporting infrastructure (`gaussian_ibp`, `map_rotation_fst`,
-`gradient_exp_smul`, `contDiff_abs_le_of_gradient_le`, the mean-zero and integrability
-lemmas) is fully proved; the smooth-case assembly and the mollification limit remain.
--/
-lemma gaussian_cov_bound {ι : Type*} [Fintype ι]
-    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 < L)
-    (hLip : LipschitzWith L.toNNReal F) (s : ℝ) :
-    |(∫ x, F x * Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)
-        - (∫ x, F x ∂standardGaussianMeasureOnEuclidean ι)
-          * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)|
-      ≤ L ^ 2 * |s| * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι) := by
-  obtain ⟨Fn, hCD, hgr, hbd, htd⟩ := SYK.exists_smooth_lipschitz_approx F L hL.le hLip;
-  obtain ⟨t1, t2, t3⟩ := SYK.tendsto_integrals_of_approx F Fn (|F 0| + L) L (by positivity) hL.le (fun n => (hCD n).continuous) hbd htd s;
-  convert le_of_tendsto_of_tendsto' ( Filter.Tendsto.abs ( t3.sub ( t1.mul t2 ) ) ) ( t2.const_mul ( L ^ 2 * |s| ) ) _ using 1;
-  exact fun n => gaussian_cov_bound_smooth _ _ hL.le ( hCD n ) ( hgr n ) s
-
 /-- The centered Lipschitz function of a standard Gaussian vector has a sub-Gaussian
 moment-generating function with parameter `L ^ 2`.  This is Herbst's conclusion from the
 Gaussian logarithmic Sobolev inequality: for every `t`,
 `𝔼[exp (t (F - 𝔼 F))] ≤ exp (L² t² / 2)`.
-
-This is the analytic heart of Gaussian concentration and is not currently available in
-Mathlib; a full proof requires the Gaussian log-Sobolev inequality (or the equivalent
-Ornstein–Uhlenbeck semigroup interpolation) together with Rademacher's theorem
-(`LipschitzWith.ae_differentiableAt`) giving `‖∇F‖ ≤ L` almost everywhere. -/
+It follows from the covariance estimate `gaussian_cov_bound` through Herbst's argument. -/
 theorem product_standardGaussian_mgf_le
     {ι : Type*} [Fintype ι]
     (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 < L)

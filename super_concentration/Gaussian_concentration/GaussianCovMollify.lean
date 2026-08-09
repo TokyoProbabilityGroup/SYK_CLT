@@ -1,4 +1,4 @@
-import SYK.super_concentration.Gaussian_concentration.GaussianConcentrationAux
+import SYK.super_concentration.Gaussian_concentration.GaussianCovSmooth
 import Mathlib.Analysis.Calculus.BumpFunction.Convolution
 
 /-!
@@ -158,5 +158,24 @@ lemma tendsto_integrals_of_approx {ι : Type*} [Fintype ι]
       simp [hbound];
       filter_upwards [ ] with x using mul_le_mul ( hbound n x ) ( Real.exp_le_exp.mpr ( by cases abs_cases s <;> nlinarith [ abs_le.mp ( hbound n x ) ] ) ) ( by positivity ) ( by positivity );
     · exact Filter.Eventually.of_forall fun x => Filter.Tendsto.mul ( htend x ) ( Real.continuous_exp.continuousAt.tendsto.comp ( tendsto_const_nhds.mul ( htend x ) ) )
+
+/-- The sharp Gaussian covariance bound for an `L`-Lipschitz function, obtained from the
+smooth bound by mollification and dominated convergence. -/
+lemma gaussian_cov_bound {ι : Type*} [Fintype ι]
+    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 < L)
+    (hLip : LipschitzWith L.toNNReal F) (s : ℝ) :
+    |(∫ x, F x * Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)
+        - (∫ x, F x ∂standardGaussianMeasureOnEuclidean ι)
+          * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)|
+      ≤ L ^ 2 * |s| * (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι) := by
+  obtain ⟨Fn, hCD, hgrad, hbound, htend⟩ :=
+    exists_smooth_lipschitz_approx F L hL.le hLip
+  obtain ⟨hmean, hexp, hweighted⟩ := tendsto_integrals_of_approx
+    F Fn (|F 0| + L) L (by positivity) hL.le
+    (fun n => (hCD n).continuous) hbound htend s
+  convert le_of_tendsto_of_tendsto'
+    (Filter.Tendsto.abs (hweighted.sub (hmean.mul hexp)))
+    (hexp.const_mul (L ^ 2 * |s|)) _ using 1
+  exact fun n => gaussian_cov_bound_smooth _ _ hL.le (hCD n) (hgrad n) s
 
 end SYK
