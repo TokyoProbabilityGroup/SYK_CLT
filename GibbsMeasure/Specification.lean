@@ -1,10 +1,10 @@
-import GibbsMeasure.Mathlib.MeasureTheory.Measure.GiryMonad
-import GibbsMeasure.KolmogorovExtension4.ProductMeasure
-import GibbsMeasure.Prereqs.CylinderEvents
-import GibbsMeasure.Prereqs.Filtration.Consistent
-import GibbsMeasure.Prereqs.Juxt
-import GibbsMeasure.Prereqs.Kernel.CondExp
-import GibbsMeasure.Prereqs.Kernel.Proper
+import SYK.GibbsMeasure.Mathlib.MeasureTheory.Measure.GiryMonad
+import SYK.GibbsMeasure.KolmogorovExtension4.ProductMeasure
+import SYK.GibbsMeasure.Prereqs.CylinderEvents
+import SYK.GibbsMeasure.Prereqs.Filtration.Consistent
+import SYK.GibbsMeasure.Prereqs.Juxt
+import SYK.GibbsMeasure.Prereqs.Kernel.CondExp
+import SYK.GibbsMeasure.Prereqs.Kernel.Proper
 
 
 /-!
@@ -63,7 +63,7 @@ instance instDFunLike :
     DFunLike (Specification S E) (Finset S) fun Λ ↦ Kernel[cylinderEvents Λᶜ] (S → E) (S → E)
     where
   coe := toFun
-  coe_injective' γ₁ γ₂ h := by cases γ₁; cases γ₂; congr
+  coe_injective γ₁ γ₂ h := by cases γ₁; cases γ₂; congr
 
 /-- The boundary condition kernels of a specification are consistent. -/
 lemma isConsistent (γ : Specification S E) : IsConsistent γ := γ.isConsistent'
@@ -800,7 +800,8 @@ protected lemma IsProper.isssd : (isssd (S := S) ν).IsProper := by
       MeasurableSet[
           MeasurableSpace.comap (Set.restrict (π := fun _ : S ↦ E) Δ)
             (inferInstance : MeasurableSpace (Δ → E))] B := by
-    simpa [Δ, MeasureTheory.cylinderEvents_eq_comap_restrict (S := S) (E := E) (Δ := Δ)] using hB
+    rw [MeasureTheory.cylinderEvents_eq_comap_restrict (S := S) (E := E) (Δ := Δ)] at hB
+    exact hB
   rcases hBcomap with ⟨C, hC, rfl⟩
   have hB_pi : MeasurableSet ((Set.restrict (π := fun _ : S ↦ E) Δ) ⁻¹' C) :=
     hC.preimage hmeas_restrict
@@ -1128,7 +1129,8 @@ noncomputable def premodifierNorm (ρ : Finset S → (S → E) → ℝ≥0∞) (
 lemma premodifierNorm_measurable (hρ : IsPremodifier ρ) :
     ∀ Λ, Measurable (premodifierNorm (S := S) (E := E) ν ρ Λ) := by
   intro Λ
-  simpa [premodifierNorm, premodifierZ] using (hρ.measurable_div_isssd (S := S) (E := E) (ρ := ρ) ν Λ)
+  change Measurable (fun σ : S → E ↦ ρ Λ σ / ∫⁻ x, ρ Λ x ∂(isssd ν Λ σ))
+  exact hρ.measurable_div_isssd (S := S) (E := E) (ρ := ρ) ν Λ
 
 private lemma premodifierZ_congr_of_eqOn_compl
     {Λ : Finset S} (hρΛ : Measurable (ρ Λ)) {η₁ η₂ : S → E} (h : ∀ s ∉ Λ, η₁ s = η₂ s) :
@@ -1162,8 +1164,10 @@ lemma IsPremodifier.isModifier_premodifierNorm (hρ : IsPremodifier ρ)
   let ρ' : Finset S → (S → E) → ℝ≥0∞ := premodifierNorm (S := S) (E := E) ν ρ
   have hZmeas : ∀ Λ : Finset S, Measurable[cylinderEvents (Λ : Set S)ᶜ] (Z Λ) := by
     intro Λ
-    simpa [Z, premodifierZ] using
-      (Measurable.lintegral_kernel (κ := (isssd (S := S) (E := E) ν Λ)) (f := ρ Λ) (hρ.measurable Λ))
+    change Measurable[cylinderEvents (Λ : Set S)ᶜ]
+      (fun η : S → E => ∫⁻ x, ρ Λ x ∂(isssd (S := S) (E := E) ν Λ η))
+    exact Measurable.lintegral_kernel (κ := (isssd (S := S) (E := E) ν Λ))
+      (f := ρ Λ) (hρ.measurable Λ)
   have hρ'meas : ∀ Λ, Measurable (ρ' Λ) := premodifierNorm_measurable (S := S) (E := E) (ρ := ρ) ν hρ
   have hLHS :
       (((fun x : S → E => ((isssd (S := S) (E := E) ν Λ₁ x).withDensity (ρ' Λ₁))) ∘ₘ
@@ -1561,7 +1565,9 @@ lemma IsPremodifier.isModifier_premodifierNorm (hρ : IsPremodifier ρ)
             = ∫⁻ x, (Z Λ x)⁻¹ * ρ Λ x ∂(γ Λ ξ) := by
                 simp [ρ', premodifierNorm, Z, div_eq_mul_inv, mul_comm]
         _ = (Z Λ ξ)⁻¹ * ∫⁻ x, ρ Λ x ∂(γ Λ ξ) := by
-              simpa [mul_assoc, mul_left_comm, mul_comm] using hpull
+              change (∫⁻ x, (Z Λ x)⁻¹ * ρ Λ x ∂((isssd (S := S) (E := E) ν Λ) ξ)) =
+                (Z Λ ξ)⁻¹ * ∫⁻ x, ρ Λ x ∂((isssd (S := S) (E := E) ν Λ) ξ)
+              simpa only [mul_assoc, mul_left_comm, mul_comm] using hpull
         _ = (Z Λ ξ)⁻¹ * Z Λ ξ := by simp [Z, premodifierZ, γ]
         _ = 1 := ENNReal.inv_mul_cancel hZξ.1 hZξ.2
     have h_boundary :
@@ -1583,7 +1589,12 @@ lemma IsPremodifier.isModifier_premodifierNorm (hρ : IsPremodifier ρ)
                     (isssd (S := S) (E := E) ν Λ₂)) η) := by
                   rw [hcons_eta]
         _ = ∫⁻ x, ∫⁻ ξ, ρ' Λ₁ ξ * H ξ ∂((isssd (S := S) (E := E) ν Λ₁) x) ∂(γ Λ₂ η) := by
-              simpa [Kernel.comap_apply, measurable_id''] using
+              change (∫⁻ ξ, ρ' Λ₁ ξ * H ξ
+                  ∂(((isssd (S := S) (E := E) ν Λ₁).comap id cylinderEvents_le_pi ∘ₖ
+                    (isssd (S := S) (E := E) ν Λ₂)) η)) =
+                ∫⁻ x, ∫⁻ ξ, ρ' Λ₁ ξ * H ξ ∂((isssd (S := S) (E := E) ν Λ₁) x)
+                  ∂((isssd (S := S) (E := E) ν Λ₂) η)
+              simpa only [Kernel.comap_apply, measurable_id'', id_eq] using
                 (Kernel.lintegral_comp ((isssd (S := S) (E := E) ν Λ₁).comap id cylinderEvents_le_pi)
                   (isssd (S := S) (E := E) ν Λ₂) η hmeas_prod)
         _ = ∫⁻ x, H x ∂(γ Λ₂ η) := by
@@ -1631,7 +1642,11 @@ lemma IsPremodifier.isModifier_premodifierNorm (hρ : IsPremodifier ρ)
                   simp [H, γ, gA, lintegral_indicator hA]
         _ = ∫⁻ ζ, gA ζ ∂(((isssd (S := S) (E := E) ν Λ₁).comap id cylinderEvents_le_pi ∘ₖ
               (isssd (S := S) (E := E) ν Λ₂)) η) := by
-              simpa [Kernel.comap_apply, measurable_id''] using
+              change (∫⁻ x, ∫⁻ ζ, gA ζ ∂((isssd (S := S) (E := E) ν Λ₁) x)
+                  ∂((isssd (S := S) (E := E) ν Λ₂) η)) =
+                ∫⁻ ζ, gA ζ ∂(((isssd (S := S) (E := E) ν Λ₁).comap id cylinderEvents_le_pi ∘ₖ
+                  (isssd (S := S) (E := E) ν Λ₂)) η)
+              simpa only [Kernel.comap_apply, measurable_id'', id_eq] using
                 (Kernel.lintegral_comp ((isssd (S := S) (E := E) ν Λ₁).comap id cylinderEvents_le_pi)
                   (isssd (S := S) (E := E) ν Λ₂) η hgA).symm
         _ = ∫⁻ ζ, gA ζ ∂(γ Λ₂ η) := by
@@ -1697,7 +1712,7 @@ lemma IsPremodifier.isModifier_premodifierNorm (hρ : IsPremodifier ρ)
                 cylinderEvents_le_pi x) A
               ∂(modificationKer (γ := (isssd (S := S) (E := E) ν)) (ρ := ρ') (hρ := hρ'meas) Λ₂ η) := hcomp
       _ = ∫⁻ x, kA x ∂((modificationKer (γ := (isssd (S := S) (E := E) ν)) (ρ := ρ') (hρ := hρ'meas) Λ₂) η) := by
-            simp; grind
+            rw [h_integrand]
       _ = ∫⁻ ξ, ρ' Λ₂ ξ * kA ξ ∂(γ Λ₂ η) := hpush
   have hRHS_eval :
       (modificationKer (γ := (isssd (S := S) (E := E) ν)) (ρ := ρ') (hρ := hρ'meas) Λ₂ η) A

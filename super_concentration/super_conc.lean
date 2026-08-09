@@ -115,7 +115,19 @@ theorem hasDerivAt_logPartition_line
     rw [hexp s]
     simp [B, smul_smul, smul_neg]
 
-/-- The Lipschitz constant obtained from the SYK sum-of-squares estimate. -/
+/--
+The square of the exact finite-volume Lipschitz constant supplied by the
+SYK sum-of-squares estimate.
+-/
+noncomputable def exactLipschitzSq (P : Params) (𝒥 : ℝ) : ℝ :=
+  (P.β * couplingScale P 𝒥) ^ 2 *
+    ((Nat.choose P.N (P.q - 1) : ℝ) / (P.q : ℝ))
+
+theorem exactLipschitzSq_nonneg (P : Params) (𝒥 : ℝ) :
+    0 ≤ exactLipschitzSq P 𝒥 := by
+  exact mul_nonneg (sq_nonneg _) (div_nonneg (Nat.cast_nonneg _) (Nat.cast_nonneg _))
+
+/-- The simplified Lipschitz constant obtained from the finite-volume bound. -/
 noncomputable def simpleLipschitzConstant (P : Params) (𝒥 : ℝ) : ℝ≥0 :=
   Real.toNNReal (|P.β| * 𝒥 / Real.sqrt (P.q : ℝ))
 
@@ -184,8 +196,95 @@ theorem couplingScale_mul_sqrt_choose_le
   rw_mod_cast [ ← Nat.descFactorial_eq_factorial_mul_choose ] ; exact Nat.descFactorial_le_pow _ _;
 
 /--
+The exact finite-volume squared directional estimate, before simplifying the
+binomial coefficient and normalization.
+-/
+theorem abs_beta_expectation_normHam_sq_le_exact
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ)
+    (ρ : Matrix d d ℂ) (hρ : IsDensityMatrix ρ)
+    (V : CouplingSpace P.N P.q) :
+    |P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re| ^ 2
+      ≤ exactLipschitzSq P 𝒥 * ‖V‖ ^ 2 := by
+  set c := couplingScale P 𝒥
+  set S := ∑ I : InteractionIndex P.N P.q,
+    V I * (expectation ρ (M.interactionOperator I)).re
+  set Q := (Nat.choose P.N (P.q - 1) : ℝ) / (P.q : ℝ)
+  have hlinear' :
+      (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re =
+        c * ∑ I : InteractionIndex P.N P.q,
+          V I * (expectation ρ (M.interactionOperator I)).re := by
+    unfold normalizedHamiltonian expectation
+    simp +decide [hamiltonian, mul_assoc, mul_left_comm, Finset.mul_sum _ _ _]
+    simp +decide [phase, MajoranaSystem.interactionOperator]
+    exact Finset.sum_congr rfl fun _ _ => by ring
+  have hlinear :
+      (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re = c * S := by
+    simpa only [S] using hlinear'
+  have hcs : S ^ 2 ≤
+      (∑ I : InteractionIndex P.N P.q, V I ^ 2) *
+        (∑ I : InteractionIndex P.N P.q,
+          (expectation ρ (M.interactionOperator I)).re ^ 2) := by
+    exact Finset.sum_mul_sq_le_sq_mul_sq Finset.univ _ _
+  have hexpect :
+      (∑ I : InteractionIndex P.N P.q,
+          (expectation ρ (M.interactionOperator I)).re ^ 2) ≤ Q := by
+    have h := syk_sum_sq_expectation_le P.q_pos P.q_even M ρ hρ
+    refine le_trans ?_ h
+    exact Finset.sum_le_sum fun i _ => by
+      simp +decide [Complex.normSq, Complex.sq_norm]
+      nlinarith only
+  have hdot : S ^ 2 ≤ ‖V‖ ^ 2 * Q := by
+    have hsum_nonneg : 0 ≤ ∑ I : InteractionIndex P.N P.q, V I ^ 2 :=
+      Finset.sum_nonneg fun _ _ => sq_nonneg _
+    have hmul := mul_le_mul_of_nonneg_left hexpect hsum_nonneg
+    rw [EuclideanSpace.norm_eq]
+    simp only [Real.norm_eq_abs, sq_abs]
+    rw [Real.sq_sqrt hsum_nonneg]
+    exact le_trans hcs hmul
+  have hscaled := mul_le_mul_of_nonneg_left hdot (sq_nonneg (P.β * c))
+  rw [hlinear]
+  rw [sq_abs]
+  change (P.β * (c * S)) ^ 2 ≤ (P.β * c) ^ 2 * Q * ‖V‖ ^ 2
+  nlinarith only [hscaled]
+
+/-- The exact finite-volume directional bound in unsquared form. -/
+theorem abs_beta_expectation_normHam_le_exact
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ)
+    (ρ : Matrix d d ℂ) (hρ : IsDensityMatrix ρ)
+    (V : CouplingSpace P.N P.q) :
+    |P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re|
+      ≤ Real.sqrt (exactLipschitzSq P 𝒥) * ‖V‖ := by
+  have hsq := abs_beta_expectation_normHam_sq_le_exact P M 𝒥 ρ hρ V
+  calc
+    |P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re| =
+        Real.sqrt
+          (|P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re| ^ 2) := by
+            rw [Real.sqrt_sq (abs_nonneg _)]
+    _ ≤ Real.sqrt (exactLipschitzSq P 𝒥 * ‖V‖ ^ 2) :=
+      Real.sqrt_le_sqrt hsq
+    _ = Real.sqrt (exactLipschitzSq P 𝒥) * ‖V‖ := by
+      rw [Real.sqrt_mul (exactLipschitzSq_nonneg P 𝒥), Real.sqrt_sq_eq_abs,
+        abs_of_nonneg (norm_nonneg V)]
+
+theorem sqrt_exactLipschitzSq
+    (P : Params) (𝒥 : ℝ) (h𝒥 : 0 ≤ 𝒥) :
+    Real.sqrt (exactLipschitzSq P 𝒥) =
+      |P.β| * couplingScale P 𝒥 *
+        Real.sqrt ((Nat.choose P.N (P.q - 1) : ℝ) / (P.q : ℝ)) := by
+  have hc : 0 ≤ couplingScale P 𝒥 := by
+    unfold couplingScale
+    exact mul_nonneg h𝒥 (Real.sqrt_nonneg _)
+  rw [exactLipschitzSq, Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq_eq_abs,
+    abs_mul]
+  rw [abs_of_nonneg hc]
+
+/--
 Cauchy–Schwarz combined with the SYK sum-of-squares bound controls the
-directional gradient of the (normalized) SYK energy in any density matrix.
+directional gradient of the normalized SYK energy by the simplified constant.
 -/
 theorem abs_beta_expectation_normHam_le
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -195,30 +294,12 @@ theorem abs_beta_expectation_normHam_le
     (V : CouplingSpace P.N P.q) :
     |P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re|
       ≤ (|P.β| * 𝒥 / Real.sqrt (P.q : ℝ)) * ‖V‖ := by
-  -- By definition of $c$, we have $c = couplingScale P 𝒥$.
-  set c := couplingScale P 𝒥;
-  -- By linearity of expectation, we have:
-  have h_exp_linear : (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re = c * ∑ I : InteractionIndex P.N P.q, V I * (expectation ρ (M.interactionOperator I)).re := by
-    unfold normalizedHamiltonian expectation;
-    simp +decide [ hamiltonian, mul_assoc, mul_left_comm, Finset.mul_sum _ _ _ ];
-    simp +decide [ phase, MajoranaSystem.interactionOperator ];
-    exact Finset.sum_congr rfl fun _ _ => by ring;
-  -- By the properties of the expectation and the definition of $c$, we have:
-  have h_exp_bound : |∑ I : InteractionIndex P.N P.q, V I * (expectation ρ (M.interactionOperator I)).re| ≤ ‖V‖ * Real.sqrt ((Nat.choose P.N (P.q - 1) : ℝ) / P.q) := by
-    have h_exp_bound : (∑ I : InteractionIndex P.N P.q, V I * (expectation ρ (M.interactionOperator I)).re) ^ 2 ≤ (∑ I : InteractionIndex P.N P.q, V I ^ 2) * (∑ I : InteractionIndex P.N P.q, (expectation ρ (M.interactionOperator I)).re ^ 2) := by
-      exact Finset.sum_mul_sq_le_sq_mul_sq Finset.univ _ _;
-    have h_exp_bound : (∑ I : InteractionIndex P.N P.q, (expectation ρ (M.interactionOperator I)).re ^ 2) ≤ (Nat.choose P.N (P.q - 1) : ℝ) / P.q := by
-      have := syk_sum_sq_expectation_le P.q_pos P.q_even M ρ hρ;
-      refine' le_trans _ this;
-      exact Finset.sum_le_sum fun i _ => by simp +decide [ Complex.normSq, Complex.sq_norm ] ; nlinarith only;
-    rw [ ← Real.sqrt_sq_eq_abs, EuclideanSpace.norm_eq ];
-    rw [ ← Real.sqrt_mul ( Finset.sum_nonneg fun _ _ => sq_nonneg _ ) ] ; exact Real.sqrt_le_sqrt <| by simpa using le_trans ‹_› <| mul_le_mul_of_nonneg_left h_exp_bound <| Finset.sum_nonneg fun _ _ => sq_nonneg _;
-  -- By combining the results from h_exp_linear and h_exp_bound, we get:
-  have h_combined : |P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re| ≤ |P.β| * c * ‖V‖ * Real.sqrt ((Nat.choose P.N (P.q - 1) : ℝ) / P.q) := by
-    rw [ h_exp_linear, abs_mul, abs_mul, abs_of_nonneg ( show 0 ≤ c by exact mul_nonneg h𝒥 ( Real.sqrt_nonneg _ ) ) ] ; nlinarith [ abs_nonneg P.β, show 0 ≤ |P.β| * c by exact mul_nonneg ( abs_nonneg _ ) ( mul_nonneg h𝒥 ( Real.sqrt_nonneg _ ) ) ];
-  refine le_trans h_combined ?_;
-  convert mul_le_mul_of_nonneg_right ( mul_le_mul_of_nonneg_left ( couplingScale_mul_sqrt_choose_le P 𝒥 h𝒥 ) ( abs_nonneg P.β ) ) ( norm_nonneg V ) using 1 ; ring;
-  ring
+  refine le_trans (abs_beta_expectation_normHam_le_exact P M 𝒥 ρ hρ V) ?_
+  rw [sqrt_exactLipschitzSq P 𝒥 h𝒥]
+  have hscale := mul_le_mul_of_nonneg_left
+    (couplingScale_mul_sqrt_choose_le P 𝒥 h𝒥) (abs_nonneg P.β)
+  have := mul_le_mul_of_nonneg_right hscale (norm_nonneg V)
+  convert this using 1 <;> ring
 
 /--
 The directional derivative of `logPartition` along `V`, expressed as a
@@ -270,6 +351,44 @@ theorem logPartition_eq_zero_of_isEmpty
     (𝒥 : ℝ) (J : CouplingSpace P.N P.q) :
     logPartition P M 𝒥 J = 0 := by
   unfold logPartition; simp +decide [ partitionFunction ] ;
+
+/-- At zero inverse temperature the log-partition function is constant. -/
+theorem logPartition_eq_log_card_of_beta_zero
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ) (hβ : P.β = 0) (J : CouplingSpace P.N P.q) :
+    logPartition P M 𝒥 J = Real.log (Fintype.card d : ℝ) := by
+  have hinv : P.inverseTemperature = 0 := by
+    apply NNReal.eq
+    simpa [P.coe_inverseTemperature, hβ]
+  simp [logPartition, hinv]
+
+/-- At zero inverse temperature every positive-deviation tail event is empty. -/
+theorem logPartition_tail_of_beta_zero
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ) (hβ : P.β = 0) (t : ℝ) (ht : 0 < t) :
+    standardGaussianMeasure P.N P.q
+        {J | |logPartition P M 𝒥 J -
+          ∫ K, logPartition P M 𝒥 K
+            ∂standardGaussianMeasure P.N P.q| > t} = 0 := by
+  let a : ℝ := Real.log (Fintype.card d : ℝ)
+  have hconst : ∀ J : CouplingSpace P.N P.q, logPartition P M 𝒥 J = a :=
+    fun J => logPartition_eq_log_card_of_beta_zero P M 𝒥 hβ J
+  have hintegral :
+      ∫ K, logPartition P M 𝒥 K ∂standardGaussianMeasure P.N P.q = a := by
+    simp only [hconst]
+    simp
+  have hset :
+      {J : CouplingSpace P.N P.q | |logPartition P M 𝒥 J -
+          ∫ K, logPartition P M 𝒥 K
+            ∂standardGaussianMeasure P.N P.q| > t} = ∅ := by
+    ext J
+    simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_lt]
+    rw [hconst J, hintegral]
+    simpa using ht.le
+  rw [hset]
+  simp
 
 /-- The same estimate for the product standard Gaussian coupling measure. -/
 theorem logPartition_two_sided_tail_standardGaussian

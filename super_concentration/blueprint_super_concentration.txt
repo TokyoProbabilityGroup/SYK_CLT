@@ -1,722 +1,245 @@
-# Lean blueprint for concentration of the SYK log partition function
+# Blueprint: the sharp centered MGF bound
+
+This file describes only the implementation of
+
+```text
+E exp(t (X_N - E X_N)) ≤ exp(t² ε_N / 2),    t ∈ ℝ.
+```
+
+Tail estimates, variance bounds, the relative partition function, Wiener chaos,
+and the partition-function CLT are outside the scope of this blueprint.
 
 ## Target
 
-Let the couplings $J_I$ be independent standard real Gaussians and set
-
-$
-a_{N,q}=\mathcal J\sqrt{\frac{(q-1)!}{N^{q-1}}},
-\qquad
-H(J)=a_{N,q}\sum_{|I|=q}J_I\Gamma_I,
-$
-
-$
-X(J)=\log\operatorname{Tr}(e^{-\beta H(J)}).
-$
-
-The final formal target is the two-sided concentration estimate
-
-$
-\mathbb P\left(|X-\mathbb E X|>t\right)
-\leq
-2\exp\left(-\frac{q t^2}{2\beta^2\mathcal J^2}\right)
-$
-
-for $t>0$, $\beta\neq0$, and $\mathcal J>0$. When $\beta=0$, $X$ is
-constant and the probability is zero.
-
-The key input already developed in this blueprint is the exact
-finite-dimensional inequality
-
-$
-\sum_{|I|=q}\left|\operatorname{Tr}(\rho\Gamma_I)\right|^2
-\le \frac{1}{q}\binom{N}{q-1},
-$
-
-where $q>0$ is even, $\rho$ is a density matrix, and
-$\Gamma_I=i^{q/2}\prod_{j\in I}\chi_j$ is the Hermitian Majorana monomial
-already represented by `phase` and `MajoranaSystem.chiProduct` in
-`SYK/SYK_model/model.lean`.
-
-It changes the squared Lipschitz bound for $X$ from order $N$ to order $1$.
-The asymptotic statement $O(N^{q-1})$ is only an intermediate corollary.
-
-The algebraic theorem does not depend on the Hamiltonian, inverse temperature,
-or probability. Prove it for an arbitrary density matrix before connecting it
-to `gibbsOperator`.
-
-## Corrections and representation decisions
-
-- Use the Gibbs sign from `model.lean`: $\rho=e^{-\beta H}/Z$.
-- Use `phase q = Complex.I ^ (q / 2)`. For even $q$, this equals the alternate
-  phase $i^{q(q-1)/2}$.
-- Work with `Matrix d d ℂ` for the density-matrix part. The current abstract
-  `MajoranaSystem` does not contain positivity or a trace.
-- State squared absolute values as real numbers with
-  `‖expectation ρ A‖ ^ 2`.
-- Keep the Gaussian concentration theorem separate. The local mathlib version
-  has Gaussian distribution APIs, but no immediately reusable theorem giving
-  the required concentration inequality for every Euclidean Lipschitz map.
-- Use the Euclidean norm on the coupling space. The ordinary function-space
-  norm on `InteractionIndex N q → ℝ` is a supremum norm and is not suitable for
-  the gradient calculation.
-
-## Project setup
-
-To import the existing model by module name, add a library entry to
-`lakefile.lean`:
-
-```lean
-lean_lib SYK where
-  srcDir := "."
-  globs := #[.submodules `SYK]
-```
-
-Then start `SYK/super_concentration/super_conc.lean` with imports close to:
-
-```lean
-import SYK.SYK_model.model
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.Matrix.PosDef
-import Mathlib.Analysis.Calculus.MeanValue
-import Mathlib.Data.Fintype.Powerset
-import Mathlib.Data.Nat.Choose.Bounds
-import Mathlib.MeasureTheory.Constructions.Pi
-import Mathlib.Probability.Distributions.Gaussian.Real
-```
-
-`Mathlib.Analysis.Matrix.PosDef` supplies the analytic positive-semidefinite
-matrix API. `Fintype.card_finset_len` gives the number of fixed-cardinality
-finsets, and `Nat.choose_le_pow` or `Nat.choose_le_pow_div` gives the final
-polynomial bound.
-
-The signatures below are intended as stable targets. Small changes in explicit
-coercions or namespaces may be needed while compiling.
-
-## Density matrices and expectations
-
-Introduce a small interface in the matrix section:
-
-```lean
-namespace SYK
-
-open scoped BigOperators ComplexConjugate
-
-section DensityMatrix
-
-variable {d : Type*} [Fintype d] [DecidableEq d]
-
-def IsDensityMatrix (ρ : Matrix d d ℂ) : Prop :=
-  ρ.PosSemidef ∧ Matrix.trace ρ = 1
-
-def expectation (ρ A : Matrix d d ℂ) : ℂ :=
-  Matrix.trace (ρ * A)
-
-end DensityMatrix
-
-end SYK
-```
-
-Using a predicate rather than a subtype keeps theorem statements and rewriting
-simple. A subtype can be added later if many functions need to carry the same
-hypotheses.
-
-Prove these foundational lemmas:
-
-```lean
-theorem expectation_star_eq
-    (hρ : IsDensityMatrix ρ) (hA : star A = A) :
-    star (expectation ρ A) = expectation ρ A
-
-theorem expectation_im_eq_zero
-    (hρ : IsDensityMatrix ρ) (hA : star A = A) :
-    (expectation ρ A).im = 0
-
-theorem expectation_eq_ofReal_re
-    (hρ : IsDensityMatrix ρ) (hA : star A = A) :
-    ((expectation ρ A).re : ℂ) = expectation ρ A
-```
-
-For `expectation_star_eq`, use `Matrix.trace_conjTranspose`, the Hermitian part
-of `hρ.1`, `hA`, and `Matrix.trace_mul_comm`. This lemma is required because
-the coefficients in the anticommuting-family argument must be real.
-
-## The variance lemma
-
-The paper proof uses the operator norm inequality
-$|\operatorname{Tr}(\rho B)|\leq\|B\|$. A shorter Lean route is positivity of
-variance. Prove:
-
-```lean
-theorem density_variance_nonneg
-    (hρ : IsDensityMatrix ρ) (hB : star B = B) :
-    0 ≤ (expectation ρ (B * B)).re - (expectation ρ B).re ^ 2
-```
-
-Suggested proof construction:
-
-- Set `x : ℝ := (expectation ρ B).re`.
-- Set `C := B - (x : ℂ) • (1 : Matrix d d ℂ)`.
-- Show `star C = C`.
-- From `hρ.1.conjTranspose_mul_mul_same C`, obtain that
-  `Cᴴ * ρ * C` is positive semidefinite.
-- Apply `Matrix.PosSemidef.trace_nonneg`.
-- Rewrite the trace by cyclicity, expand `C`, use `Matrix.trace_mul_comm`, and
-  use `hρ.2` and `expectation_eq_ofReal_re`.
-- Finish the real polynomial identity with `ring_nf` or `nlinarith`.
-
-This isolates all positivity work in one lemma. No matrix square root or
-operator-norm estimate is needed for the main result.
-
-## Majorana observables
-
-Define the phase-corrected interaction observable in the existing namespace:
-
-```lean
-namespace MajoranaSystem
-
-noncomputable def interactionOperator
-    (M : MajoranaSystem N A) (s : InteractionIndex N q) : A :=
-  phase q • M.chiProduct s
-
-end MajoranaSystem
-```
-
-The following algebraic lemmas should be proved for the abstract algebra when
-possible. This makes the matrix theorem only a specialization.
-
-```lean
-theorem majorana_sq (i : Fin N) :
-    M.χ i * M.χ i = 1
-
-theorem chiProduct_sq (s : InteractionIndex N q) :
-    M.chiProduct s * M.chiProduct s =
-      ((-1 : ℂ) ^ (q * (q - 1) / 2)) • 1
-
-theorem interactionOperator_star
-    (hq : Even q) (s : InteractionIndex N q) :
-    star (M.interactionOperator s) = M.interactionOperator s
-
-theorem interactionOperator_sq
-    (hq : Even q) (s : InteractionIndex N q) :
-    M.interactionOperator s * M.interactionOperator s = 1
-```
-
-`majorana_sq` follows from `majorana_rel i i`; normalize the two occurrences of
-the same product and cancel the nonzero complex scalar $2$. For
-`chiProduct_sq`, induction on the sorted list is preferable to a large
-commutative-ring calculation. Moving the head generator across the tail gives
-one sign per tail element.
-
-`interactionOperator_star` should reuse
-`MajoranaSystem.star_chiProduct_of_even` and the existing phase identity. The
-current theorem `star_phase_mul_sign` is private, so either put these new
-observable lemmas in `model.lean` or make that scalar identity public first.
-For `interactionOperator_sq`, combine `chiProduct_sq` with the scalar phase
-identity
-
-$
-(i^{q/2})^2(-1)^{q(q-1)/2}=1.
-$
-
-Also prove the monomial commutation formula:
-
-```lean
-theorem chiProduct_mul_comm_sign
-    (s : InteractionIndex N r) (t : InteractionIndex N k) :
-    M.chiProduct s * M.chiProduct t =
-      ((-1 : ℂ) ^ (r * k - (s.1 ∩ t.1).card)) •
-        (M.chiProduct t * M.chiProduct s)
-```
-
-The same formula for `interactionOperator` follows because complex scalars are
-central. Prove the list version first, then rewrite the sorted lists back to
-finsets. The exponent counts pairs of distinct generators; a generator in the
-intersection is not swapped with itself.
-
-If the general intersection formula takes too much code, it is acceptable to
-prove only the fixed-core specialization below. The final theorem needs no
-other case.
-
-## Fixed-core family
-
-For a $(q-1)$-subset $A$, index the remaining labels by a subtype:
-
-```lean
-abbrev Outside (A : InteractionIndex N (q - 1)) :=
-  {j : Fin N // j ∉ A.1}
-
-def extendInteraction
-    (hq : 0 < q) (A : InteractionIndex N (q - 1)) (j : Outside A) :
-    InteractionIndex N q :=
-  ⟨insert j.1 A.1, by
-    rw [Finset.card_insert_of_notMem j.2, A.2]
-    omega⟩
-```
-
-The exact arithmetic proof may instead use `Nat.sub_add_cancel hq` after
-turning `hq` into `1 ≤ q`.
-
-Prove the fixed-core anticommutation theorem:
-
-```lean
-theorem extendInteraction_anticommute
-    (hq0 : 0 < q) (hq : Even q)
-    (A : InteractionIndex N (q - 1))
-    (j k : Outside A) (hjk : j ≠ k) :
-    M.interactionOperator (extendInteraction hq0 A j) *
-        M.interactionOperator (extendInteraction hq0 A k) =
-      -(M.interactionOperator (extendInteraction hq0 A k) *
-        M.interactionOperator (extendInteraction hq0 A j))
-```
-
-Useful intermediate facts are:
-
-```lean
-(insert j.1 A.1 ∩ insert k.1 A.1) = A.1
-(insert j.1 A.1).card = q
-(insert k.1 A.1).card = q
-Odd (q - 1)
-```
-
-The intersection equality is an extensional `simp` proof using `j.2`, `k.2`,
-and `hjk`. The sign exponent is odd because $q^2$ is even and $q-1$ is odd.
-
-## Generic anticommuting-family estimate
-
-Prove a theorem independent of Majorana operators:
-
-```lean
-theorem sum_sq_expectation_le_one
-    {ι d : Type*} [Fintype ι] [Fintype d] [DecidableEq d]
-    (ρ : Matrix d d ℂ) (A : ι → Matrix d d ℂ)
-    (hρ : IsDensityMatrix ρ)
-    (hstar : ∀ i, star (A i) = A i)
-    (hsq : ∀ i, A i * A i = 1)
-    (hanti : ∀ i j, i ≠ j → A i * A j = -(A j * A i)) :
-    ∑ i, ‖expectation ρ (A i)‖ ^ 2 ≤ 1
-```
-
-Proof plan without operator norms:
-
-- Work classically and set `x i := (expectation ρ (A i)).re`.
-- Set `s := ∑ i, (x i) ^ 2` and
-  `B := ∑ i, ((x i : ℂ) • A i)`.
-- Use `hstar` to show `star B = B`.
-- Show `B * B = (s : ℂ) • 1` from `hsq` and `hanti`.
-- Show `expectation ρ B = (s : ℂ)` by linearity of trace and
-  `expectation_eq_ofReal_re`.
-- Apply `density_variance_nonneg hρ` to `B`.
-- Rewrite both expectations using the preceding two identities. This gives
-  $0\leq s-s^2$.
-- Since `s` is a sum of squares, `nlinarith` gives $s\leq1$.
-- Rewrite `‖expectation ρ (A i)‖ ^ 2` as `(x i) ^ 2` using
-  `expectation_eq_ofReal_re` and `Complex.norm_real`.
-
-For the identity for `B * B`, induction over `Finset.univ` is likely simpler
-than manipulating a double sum. When inserting one new index, the two cross
-terms cancel by `hanti`, and the square term reduces with `hsq`.
-
-## Double-counting equivalence
-
-Package the combinatorics as a reusable equivalence. Define
-
-```lean
-abbrev ChosenPoint (I : InteractionIndex N q) :=
-  {j : Fin N // j ∈ I.1}
-```
-
-Then construct
-
-```lean
-def extensionEquiv (hq : 0 < q) :
-    (Σ A : InteractionIndex N (q - 1), Outside A) ≃
-      (Σ I : InteractionIndex N q, ChosenPoint I)
-```
-
-The forward map sends $(A,j)$ to $(A\cup\{j\},j)$. The inverse sends $(I,j)$
-to $(I\setminus\{j\},j)$. Use `Finset.erase_insert`,
-`Finset.insert_erase`, `Finset.card_erase_of_mem`, and subtype extensionality
-for the inverse laws.
-
-Derive the summation identity:
-
-```lean
-theorem sum_over_extensions
-    (hq : 0 < q) (f : InteractionIndex N q → ℝ) :
-    ∑ A : InteractionIndex N (q - 1),
-      ∑ j : Outside A, f (extendInteraction hq A j) =
-    (q : ℝ) * ∑ I : InteractionIndex N q, f I
-```
-
-Use `Fintype.sum_equiv extensionEquiv`. On the right, the inner sum is constant
-and `Fintype.card (ChosenPoint I) = I.1.card = q`.
-
-This equivalence is safer than proving informally that every $q$-subset occurs
-$q$ times.
-
-## Exact SYK theorem
-
-The main algebraic theorem should have a signature close to:
-
-```lean
-theorem syk_sum_sq_expectation_le
-    {N q : ℕ} (hq0 : 0 < q) (hq : Even q)
-    {d : Type*} [Fintype d] [DecidableEq d]
-    (M : MajoranaSystem N (Matrix d d ℂ))
-    (ρ : Matrix d d ℂ) (hρ : IsDensityMatrix ρ) :
-    ∑ I : InteractionIndex N q,
-        ‖expectation ρ (M.interactionOperator I)‖ ^ 2 ≤
-      (Nat.choose N (q - 1) : ℝ) / q
-```
-
-The proof is a short composition of earlier lemmas:
-
-- For every `A : InteractionIndex N (q - 1)`, apply
-  `sum_sq_expectation_le_one` to the family indexed by `Outside A`.
-- Sum these inequalities over `A`.
-- Rewrite the left side with `sum_over_extensions`.
-- Rewrite the number of cores with `Fintype.card_finset_len` and
-  `Fintype.card_fin N`.
-- Divide by the positive real number `(q : ℝ)` using `hq0`.
-
-A wrapper accepting `P : Params` can pass `P.q_pos` and `P.q_even`. The pure
-theorem should not depend on `P.β`.
-
-## Polynomial corollary
-
-First prove a pointwise estimate rather than introducing asymptotic notation:
-
-```lean
-theorem syk_sum_sq_expectation_le_pow ... :
-    ∑ I : InteractionIndex N q,
-        ‖expectation ρ (M.interactionOperator I)‖ ^ 2 ≤
-      (N : ℝ) ^ (q - 1) / q
-```
-
-This follows from `Nat.choose_le_pow N (q - 1)` after casting to `ℝ`. If an
-explicit big-O theorem is later required, use `isTheta_choose (q - 1)` from
-`Mathlib.Analysis.SpecialFunctions.Choose`, or derive big-O directly from the
-pointwise estimate.
-
-## Connection to the Gibbs state
-
-Do this only after the arbitrary-density theorem compiles. Add a normalized
-matrix, distinct from the existing scalar-valued `gibbsState`:
-
-```lean
-noncomputable def thermalDensity
-    (β : NNReal) (H : Matrix d d ℂ) : Matrix d d ℂ :=
-  (partitionFunction β H)⁻¹ • gibbsOperator β H
-```
-
-Required bridge lemmas are:
-
-```lean
-theorem gibbsOperator_posSemidef
-    (hH : star H = H) : (gibbsOperator β H).PosSemidef
-
-theorem partitionFunction_pos
-    [Nonempty d] (hH : star H = H) :
-    0 < (partitionFunction β H).re
-
-theorem thermalDensity_isDensityMatrix
-    [Nonempty d] (hH : star H = H) :
-    IsDensityMatrix (thermalDensity β H)
-
-theorem gibbsState_eq_expectation_thermalDensity
-    [Nonempty d] (hH : star H = H) :
-    gibbsState β H O = expectation (thermalDensity β H) O
-```
-
-`Matrix.IsHermitian.exp` already proves Hermiticity of the matrix exponential.
-Strict positivity of its eigenvalues can be proved with the Hermitian spectrum
-API in `Mathlib.Analysis.Matrix.Spectrum`. Keep this spectral work out of the
-generic anticommuting-family theorem.
-
-## Coupling space and probability measure
-
-Use an actual Euclidean space so that its norm is the square root of the sum of
-coordinate squares:
-
-```lean
-abbrev CouplingIndex (N q : ℕ) := InteractionIndex N q
-
-abbrev CouplingSpace (N q : ℕ) :=
-  EuclideanSpace ℝ (CouplingIndex N q)
-```
-
-One possible construction of the standard Gaussian measure is the finite
-product measure transported to `EuclideanSpace`:
-
-```lean
-noncomputable def standardGaussianMeasure (N q : ℕ) :
-    Measure (CouplingSpace N q) :=
-  (Measure.pi fun _ : CouplingIndex N q => gaussianReal 0 1).map
-    (WithLp.toLp 2)
-```
-
-The exact expression may need an explicit measurability proof for
-`WithLp.toLp 2`. Alternatively, state the concentration theorem for a random
-vector `G : Ω → CouplingSpace N q` whose coordinates are independent with law
-`gaussianReal 0 1`.
-
-The product measure is preferable because the mean can be written directly as
-
-```lean
-∫ J, logPartition P M 𝓙 J ∂standardGaussianMeasure P.N P.q
-```
-
-and the probability of the event is the measure of a set in the same space.
-
-## Normalized Hamiltonian and real log partition function
-
-The existing `hamiltonian` does not include the SYK normalization. Define:
-
-```lean
-noncomputable def couplingScale (P : Params) (𝓙 : ℝ) : ℝ :=
-  𝓙 * Real.sqrt ((P.q - 1).factorial / (P.N : ℝ) ^ (P.q - 1))
-
-noncomputable def normalizedHamiltonian
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (𝓙 : ℝ) (J : CouplingSpace P.N P.q) : Matrix d d ℂ :=
-  hamiltonian P M (fun I => couplingScale P 𝓙 * J I)
-```
-
-Since `partitionFunction` is complex-valued, define the real function only
-after proving positivity:
-
-```lean
-noncomputable def logPartition
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (𝓙 : ℝ) (J : CouplingSpace P.N P.q) : ℝ :=
-  Real.log
-    (partitionFunction P.inverseTemperature
-      (normalizedHamiltonian P M 𝓙 J)).re
-```
-
-The theorem `partitionFunction_pos` from the Gibbs bridge proves that the
-argument of `Real.log` is positive. This positivity is also needed for the
-derivative of the logarithm.
-
-## Derivative formula
-
-The coordinate derivative is
-
-$
-\frac{\partial X}{\partial J_I}
-=-\beta a_{N,q}\operatorname{Tr}(\rho_J\Gamma_I).
-$
-
-Prove its Fréchet form:
-
-```lean
-theorem hasFDerivAt_logPartition
-    (J : CouplingSpace P.N P.q) :
-    HasFDerivAt (logPartition P M 𝓙)
-      (ContinuousLinearMap.toSpanSingleton ℝ
-        (fun v =>
-          -P.β * couplingScale P 𝓙 *
-            ∑ I, v I *
-              (expectation
-                (thermalDensity P.inverseTemperature
-                  (normalizedHamiltonian P M 𝓙 J))
-                (M.interactionOperator I)).re)) J
-```
-
-The displayed constructor is schematic. In compiled code it may be easier to
-define the linear functional separately and prove its continuity by finite
-dimensionality.
-
-The mathematical derivation is:
-
-$
-D\operatorname{Tr}(e^{A(J)})[v]
-=\operatorname{Tr}(DA(J)[v]e^{A(J)}).
-$
-
-For noncommuting matrices, do not rewrite the derivative of the exponential as
-$e^A DA$. Use the Duhamel integral and cyclicity of trace. This derivative
-result is not presently available as a direct theorem in the local matrix
-exponential API, so isolate it as its own lemma.
-
-## Gradient bound from the sum-of-squares estimate
-
-Set
-
-$
-L_{N,q}^2
-=\beta^2 a_{N,q}^2\frac{1}{q}\binom{N}{q-1}.
-$
-
-Prove the exact bound first:
-
-```lean
-noncomputable def exactLipschitzSq (P : Params) (𝓙 : ℝ) : ℝ :=
-  P.β ^ 2 * couplingScale P 𝓙 ^ 2 *
-    (Nat.choose P.N (P.q - 1) : ℝ) / P.q
-
-theorem norm_fderiv_logPartition_sq_le
-    (J : CouplingSpace P.N P.q) :
-    ‖fderiv ℝ (logPartition P M 𝓙) J‖ ^ 2 ≤
-      exactLipschitzSq P 𝓙
-```
-
-Apply `syk_sum_sq_expectation_le` to the thermal density matrix at $J$. The
-operator norm of the derivative is bounded by the Euclidean norm of its
-coefficient vector; this is finite-dimensional Cauchy-Schwarz.
-
-Next prove the uniform simplification
-
-```lean
-theorem exactLipschitzSq_le
-    (h𝓙 : 0 ≤ 𝓙) :
-    exactLipschitzSq P 𝓙 ≤ P.β ^ 2 * 𝓙 ^ 2 / P.q
-```
-
-Use
-
-```lean
-Nat.choose_le_pow_div (α := ℝ) (P.q - 1) P.N
-```
-
-and the assumptions `P.q_pos` and `P.q_le_N` to handle all positive
-denominators. After unfolding `couplingScale`, `Real.sq_sqrt` removes the
-square root. The result is
-
-$
-\|\nabla X(J)\|_2^2\leq\frac{\beta^2\mathcal J^2}{q}
-$
-
-uniformly in $J$.
-
-Define the nonnegative Lipschitz constant
-
-```lean
-noncomputable def simpleLipschitzConstant (P : Params) (𝓙 : ℝ) : ℝ≥0 :=
-  Real.toNNReal (|P.β| * |𝓙| / Real.sqrt P.q)
-```
-
-The required real value is
-$|\beta|\mathcal J/\sqrt q$ when $\mathcal J\geq0$.
-
-Turn the derivative bound into a global Lipschitz theorem with the existing
-mathlib mean-value result:
-
-```lean
-theorem logPartition_lipschitzWith
-    (h𝓙 : 0 ≤ 𝓙) :
-    LipschitzWith (simpleLipschitzConstant P 𝓙)
-      (logPartition P M 𝓙) := by
-  apply lipschitzWith_of_nnnorm_fderiv_le
-  · exact differentiable_logPartition ...
-  · intro J
-    exact nnnorm_fderiv_logPartition_le ...
-```
-
-## Gaussian concentration input
-
-Place the general probability theorem in a separate file. Its mathematical
-statement is:
-
-```lean
-theorem gaussian_lipschitz_concentration
-    {ι : Type*} [Fintype ι]
-    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ)
-    (hL : 0 < L) (hF : LipschitzWith L.toNNReal F)
-    (t : ℝ) (ht : 0 < t) :
-    let γ := standardGaussianMeasureOnEuclidean ι
-    let m := ∫ x, F x ∂γ
-    γ {x | |F x - m| > t} ≤
-      ENNReal.ofReal (2 * Real.exp (-t ^ 2 / (2 * L ^ 2)))
-```
-
-It is useful to prove the two one-sided estimates first, each with no factor
-$2$, and then use `measure_union_le` for the absolute-value event. A proof from
-the Gaussian log-Sobolev inequality and the Herbst argument is substantial and
-independent of SYK. Until that theorem is formalized, make it an explicit
-hypothesis of the final SYK theorem rather than introducing an axiom.
-
-The concentration theorem also gives integrability of a Lipschitz function, so
-the mean is finite. If the chosen general theorem assumes integrability, prove
-it from
-
-```lean
-‖F x‖ ≤ ‖F 0‖ + L * ‖x‖
-```
-
-and Gaussian integrability of the Euclidean norm.
-
-## Final two-sided theorem
-
-The main Lean statement should be close to:
-
-```lean
-theorem logPartition_two_sided_tail
-    (hβ : P.β ≠ 0) (h𝓙 : 0 < 𝓙)
-    (t : ℝ) (ht : 0 < t) :
-    let γ := standardGaussianMeasure P.N P.q
-    let X := logPartition P M 𝓙
-    let m := ∫ J, X J ∂γ
-    γ {J | |X J - m| > t} ≤
-      ENNReal.ofReal
-        (2 * Real.exp
-          (-(P.q : ℝ) * t ^ 2 / (2 * P.β ^ 2 * 𝓙 ^ 2)))
-```
-
-Apply `gaussian_lipschitz_concentration` with
-$L=|\beta|\mathcal J/\sqrt q$. The exponent simplifies because
-$L^2=\beta^2\mathcal J^2/q$.
-
-Also add the zero-temperature theorem:
-
-```lean
-theorem logPartition_tail_of_beta_zero
-    (hβ : P.β = 0) (t : ℝ) (ht : 0 < t) :
-    let γ := standardGaussianMeasure P.N P.q
-    let X := logPartition P M 𝓙
-    let m := ∫ J, X J ∂γ
-    γ {J | |X J - m| > t} = 0
-```
-
-Here the Hamiltonian may still depend on $J$, but the factor $\beta=0$ makes
-the Gibbs exponential equal to the identity, so $X$ is constant.
-
-## Recommended implementation order
-
-Use this dependency order:
+Fix an even interaction order `q ≥ 4`, a system size `N ≥ q`, inverse
+temperature `β`, and standard Gaussian couplings
 
 ```text
-IsDensityMatrix and expectation
-  -> expectation is real on Hermitian matrices
-  -> density_variance_nonneg
-  -> sum_sq_expectation_le_one
-
-majorana_sq
-  -> chiProduct_sq
-  -> interactionOperator_sq
-
-chiProduct commutation sign
-  -> fixed-core anticommutation
-
-extendInteraction and extensionEquiv
-  -> sum_over_extensions
-
-generic estimate + fixed-core family + counting
-  -> syk_sum_sq_expectation_le
-  -> polynomial corollary
-
-Gibbs positivity and normalization
-  -> thermal-state specialization
-  -> derivative of logPartition
-  -> exact and simplified derivative bounds
-  -> logPartition_lipschitzWith
-
-general Euclidean Gaussian concentration theorem
-  + logPartition_lipschitzWith
-  -> logPartition_two_sided_tail
+g : CouplingSpace N q.
 ```
 
-The first completion milestone is `syk_sum_sq_expectation_le` for an arbitrary
-density matrix. The final milestone is `logPartition_two_sided_tail`; the
-theorem states the required two-sided probability bound.
+Let
+
+```text
+σ_N² = (q - 1)! / N^(q - 1),
+H_N(g) = σ_N ∑_I g_I Γ_I,
+X_N(g) = log Z_N(β; g).
+```
+
+The goal is a theorem of the following form, with `μ` the repository's product
+standard Gaussian measure:
+
+```lean
+theorem logPartition_centered_mgf_le
+    (P : CLT.FixedParameters) (k : ℕ) (β t : ℝ) :
+    mgf
+        (fun g ↦ logPartitionR P k β g -
+          ∫ h, logPartitionR P k β h
+            ∂standardGaussianMeasure (CLT.systemSize P k) P.q)
+        (standardGaussianMeasure (CLT.systemSize P k) P.q) t ≤
+      Real.exp
+        ((superConcentrationScale P k β : ℝ) * t ^ 2 / 2)
+```
+
+Here
+
+```text
+ε_N = superConcentrationScale P k β
+```
+
+must be explicit and satisfy
+
+```text
+ε_N = C_{β,q} N^(1-q/2).
+```
+
+For Lean, avoid negative natural exponents. Define the finite-volume quantity as
+
+```text
+ε_N = β² (q-1)! C_{β,q} N^(q/2) / N^(q-1),
+```
+
+then prove the displayed power-law identity or asymptotic estimate separately if it
+is ever needed. The MGF theorem itself should use the exact finite-volume expression.
+
+## Existing code to reuse
+
+The following files already contain the required general infrastructure:
+
+```text
+SYK/super_concentration/core.lean
+SYK/super_concentration/gibbs.lean
+SYK/super_concentration/super_conc.lean
+SYK/super_concentration/Gaussian_concentration/gaussian_concentration.lean
+```
+
+In particular, the Gaussian module already proves
+
+```lean
+theorem product_standardGaussian_mgf_le
+    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 < L)
+    (hLip : LipschitzWith L.toNNReal F) (t : ℝ) :
+    mgf (fun x ↦ F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι)
+        (standardGaussianMeasureOnEuclidean ι) t ≤
+      Real.exp (L ^ 2 * t ^ 2 / 2)
+```
+
+Therefore no new Gaussian concentration proof is needed. The task is to prove the
+sharp Lipschitz-square estimate for the SYK log partition function and instantiate
+this theorem with `L = sqrt ε_N`.
+
+The concrete sequence is defined in `SYK/CLT/main_result.lean`. Reuse
+`CLT.FixedParameters`, `CLT.systemSize`, `CLT.matrixMajorana`,
+`CLT.gaussianHamiltonian`, and `CLT.partitionFunctionR`. Do not duplicate the model.
+
+It is convenient to add
+
+```lean
+noncomputable def logPartitionR
+    (P : CLT.FixedParameters) (k : ℕ) (β : ℝ)
+    (g : CouplingSpace (CLT.systemSize P k) P.q) : ℝ :=
+  Real.log (CLT.partitionFunctionR P k β g)
+```
+
+after proving that `CLT.partitionFunctionR P k β g` is strictly positive.
+Normalization of the matrix trace changes `log Z_N` only by a deterministic
+constant, so it has no effect after centering.
+
+## The one new mathematical input
+
+The existing theorem `syk_sum_sq_expectation_le` applies to every density matrix and
+has size `choose N (q-1) / q`. It yields only a dimension-free concentration scale.
+It cannot imply the requested power of `N`.
+
+The sharper result requires a Gibbs-specific estimate. Introduce the Gibbs moments
+
+```text
+m_I(g) = Tr(ρ_{β,g} Γ_I)
+```
+
+using `thermalDensity` and `MajoranaSystem.interactionOperator`, and prove an explicit
+finite-volume theorem of the form
+
+```lean
+theorem gibbs_majorana_moment_sq_le
+    (P : CLT.FixedParameters) (k : ℕ) (β : ℝ)
+    (g : CouplingSpace (CLT.systemSize P k) P.q) :
+    ∑ I, ‖gibbsMajoranaMoment P k β g I‖ ^ 2 ≤
+      majoranaMomentConstant P β *
+        (CLT.systemSize P k : ℝ) ^ (P.q / 2)
+```
+
+The constant must be nonnegative, independent of `k` and `g`, and explicit enough
+to define `superConcentrationScale`. This theorem is the substantive missing result.
+Do not state it for arbitrary density matrices.
+
+The current `Params` API packages a nonnegative inverse temperature. Either state the
+first implementation for `0 ≤ β`, or reduce negative `β` to positive `-β` by the
+measure-preserving substitution `g ↦ -g`. Do not silently coerce an arbitrary real
+temperature to `NNReal`.
+
+## From Gibbs moments to the Lipschitz constant
+
+The affine-line derivative already developed in `super_conc.lean` gives
+
+```text
+D X_N(g)[v] = -β σ_N ∑_I v_I m_I(g).
+```
+
+Cauchy–Schwarz and `gibbs_majorana_moment_sq_le` give
+
+```text
+|D X_N(g)[v]|²
+  ≤ β² σ_N² ‖v‖² ∑_I |m_I(g)|²
+  ≤ ε_N ‖v‖².
+```
+
+Define a nonnegative scale, preferably in `ℝ≥0`:
+
+```lean
+noncomputable def superConcentrationScale
+    (P : CLT.FixedParameters) (k : ℕ) (β : ℝ) : ℝ≥0 :=
+  ⟨β ^ 2 * Nat.factorial (P.q - 1) * majoranaMomentConstant P β *
+      (CLT.systemSize P k : ℝ) ^ (P.q / 2) /
+      (CLT.systemSize P k : ℝ) ^ (P.q - 1), by positivity⟩
+```
+
+Adjust coercions to the final type of `majoranaMomentConstant`. Since
+`CLT.systemSize P k ≥ P.q ≥ 4`, the denominator is positive.
+
+Prove the directional bound directly:
+
+```lean
+theorem logPartition_directional_sq_le_superConcentration ... :
+    |D X_N(g)[v]| ^ 2 ≤
+      (superConcentrationScale P k β : ℝ) * ‖v‖ ^ 2
+```
+
+Then reuse the affine-line mean-value argument from `logPartition_lipschitz`; a full
+Fréchet derivative or an explicit gradient is unnecessary.
+
+```lean
+theorem logPartition_lipschitz_superConcentration ... :
+    LipschitzWith (superConcentrationScale P k β).sqrt
+      (logPartitionR P k β)
+```
+
+Keep the exact square throughout the proof. This avoids losing the sharp constant by
+replacing the finite-volume scale with a coarser upper bound.
+
+## Final MGF assembly
+
+When `0 < ε_N`, apply `product_standardGaussian_mgf_le` with
+
+```text
+F = logPartitionR P k β,
+L = sqrt ε_N.
+```
+
+Use `Real.sq_sqrt` and nonnegativity of `ε_N` to rewrite
+
+```text
+L² t² / 2 = ε_N t² / 2.
+```
+
+The Gaussian theorem is valid for every `t : ℝ`, so the final result must not add
+a sign hypothesis on `t`.
+
+When `ε_N = 0`, prove that `X_N` is constant and simplify the MGF directly. In the
+intended formula this includes `β = 0`. This separate branch is needed because
+`product_standardGaussian_mgf_le` assumes a strictly positive Lipschitz constant.
+
+The completed theorem is the endpoint of this project. Do not add tail, variance,
+relative-partition, or chaos corollaries to this blueprint.
+
+## Dependency summary
+
+```text
+Gibbs-specific Majorana moment estimate
+              |
+              v
+sharp directional derivative bound
+              |
+              v
+LipschitzWith (sqrt ε_N) X_N
+              |
+              v
+product_standardGaussian_mgf_le
+              |
+              v
+E exp(t (X_N - E X_N)) ≤ exp(t² ε_N / 2)
+```
+
+## Verification
+
+After implementation, run from the project root:
+
+```text
+lake env lean SYK/super_concentration/core.lean
+lake env lean SYK/super_concentration/gibbs.lean
+lake env lean SYK/super_concentration/super_conc.lean
+lake env lean SYK/super_concentration/SuperConcentrationMGF.lean
+```
+
+The last filename is a suggested focused module for the new theorem. If the theorem
+is added to an existing module, replace that command with its actual path.

@@ -1,5 +1,6 @@
 import SYK.super_concentration.core
-import Mathlib
+import Mathlib.Analysis.Calculus.SmoothSeries
+import Mathlib.Analysis.Matrix.Order
 
 /-!
 # Gibbs and trace calculus for SYK superconcentration
@@ -11,8 +12,6 @@ trace of a matrix exponential along affine lines.
 open scoped BigOperators ComplexOrder ENNReal NNReal
 open scoped MatrixOrder
 open scoped Matrix.Norms.Operator
-open MeasureTheory
-open ProbabilityTheory
 
 namespace SYK
 

@@ -1,8 +1,8 @@
-import GibbsMeasure.Mathlib.Data.ENNReal.Basic
-import GibbsMeasure.Mathlib.MeasureTheory.Function.L1Space.Integrable
-import GibbsMeasure.Mathlib.MeasureTheory.Function.LpSeminorm.Basic
-import GibbsMeasure.Mathlib.MeasureTheory.Integral.Bochner.Basic
-import GibbsMeasure.Mathlib.MeasureTheory.MeasurableSpace.Basic
+import SYK.GibbsMeasure.Mathlib.Data.ENNReal.Basic
+import SYK.GibbsMeasure.Mathlib.MeasureTheory.Function.L1Space.Integrable
+import SYK.GibbsMeasure.Mathlib.MeasureTheory.Function.LpSeminorm.Basic
+import SYK.GibbsMeasure.Mathlib.MeasureTheory.Integral.Bochner.Basic
+import SYK.GibbsMeasure.Mathlib.MeasureTheory.MeasurableSpace.Basic
 import Mathlib.MeasureTheory.Integral.Bochner.Set
 import Mathlib.MeasureTheory.Integral.DominatedConvergence
 import Mathlib.Probability.Kernel.Proper
@@ -117,8 +117,8 @@ lemma IsProper.integral_bdd_mul {f g : X → ℝ} (h𝓑𝓧 : 𝓑 ≤ 𝓧) (h
       · exact integrable_const C
       · intro n
         filter_upwards with x
-        calc ‖hg.approxBounded C n x * s.indicator 1 x‖
-            ≤ ‖hg.approxBounded C n x‖ * ‖s.indicator 1 x‖ := norm_mul_le _ _
+        calc ‖hg.approxBounded C n x * s.indicator (fun _ : X => (1 : ℝ)) x‖
+            ≤ ‖hg.approxBounded C n x‖ * ‖s.indicator (fun _ : X => (1 : ℝ)) x‖ := norm_mul_le _ _
           _ ≤ C * 1 := by
               apply mul_le_mul
               · exact hg.norm_approxBounded_le ((norm_nonneg _).trans (hC x₀)) n x
@@ -292,9 +292,9 @@ lemma IsProper.integral_bdd_mul {f g : X → ℝ} (h𝓑𝓧 : 𝓑 ≤ 𝓧) (h
                     (f := fun x => ‖f₁ x - f₂ x‖) (hf₁int.sub hf₂int).norm h_nonneg)
               have h_sub :
                   (fun x => ‖f₁ x - f₂ x‖ₑ) =ᵐ[π x₀] fun x => ‖(f₁ - f₂) x‖ₑ := by
-                have h' : (fun x => f₁ x - f₂ x) =ᵐ[π x₀] fun x => (f₁ - f₂) x := by
-                  simpa [Pi.sub_apply] using (Lp.coeFn_sub f₁ f₂).symm
-                simpa using h'.fun_comp (fun y : ℝ => ‖y‖ₑ)
+                filter_upwards [Lp.coeFn_sub f₁ f₂] with x hx
+                rw [hx]
+                simp only [Pi.sub_apply]
               calc
                 ENNReal.ofReal (∫ x, ‖f₁ x - f₂ x‖ ∂π x₀)
                     = ∫⁻ x, ENNReal.ofReal ‖f₁ x - f₂ x‖ ∂π x₀ := h_ofReal
@@ -312,7 +312,8 @@ lemma IsProper.integral_bdd_mul {f g : X → ℝ} (h𝓑𝓧 : 𝓑 ≤ 𝓧) (h
               -- We use `show` to avoid the `WithTop`/`Option` constructor ambiguity for `↑⟨C,hC_nonneg⟩`.
               have :
                   ENNReal.ofReal C = (↑(show NNReal from ⟨C, hC_nonneg⟩) : ℝ≥0∞) := by
-                simpa using (ENNReal.ofReal_eq_coe_nnreal (x := C) hC_nonneg)
+                rw [ENNReal.ofReal_eq_coe_nnreal hC_nonneg]
+                congr
               simp [this]
     exact LipschitzWith.continuous hLip
   · -- AE congruence case

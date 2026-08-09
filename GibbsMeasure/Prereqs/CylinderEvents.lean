@@ -43,7 +43,8 @@ lemma measurableSet_cylinderEvents_iff_determined_by_coords (Δ : Set S) (B : Se
           MeasurableSpace.comap (Set.restrict (π := fun _ : S ↦ E) Δ)
             (inferInstance : MeasurableSpace (Δ → E))]
         B := by
-    simpa [cylinderEvents_eq_comap_restrict (S := S) (E := E) (Δ := Δ)] using hB
+    rw [cylinderEvents_eq_comap_restrict (S := S) (E := E) (Δ := Δ)] at hB
+    exact hB
   rcases hB' with ⟨C, _hC, hpreim⟩
   intro σ₁ σ₂ hEq
   have hrestrict :

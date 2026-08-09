@@ -1,4 +1,5 @@
 import SYK.super_concentration.Gaussian_concentration.GaussianConcentrationAux
+import Mathlib.Analysis.Calculus.BumpFunction.Convolution
 
 /-!
 # Mollification of Lipschitz functions

@@ -1,4 +1,15 @@
-import Mathlib
+import Mathlib.Analysis.Calculus.Deriv.Pi
+import Mathlib.Analysis.Calculus.Gradient.Basic
+import Mathlib.Analysis.Convex.Deriv
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.IntegrationByParts
+import Mathlib.MeasureTheory.Integral.Pi
+import Mathlib.Probability.Distributions.Gaussian.HasGaussianLaw.Independence
+import Mathlib.Probability.Distributions.Gaussian.Real
+import Mathlib.Tactic.FunProp
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Ring
 
 open scoped BigOperators ENNReal NNReal
 open MeasureTheory
