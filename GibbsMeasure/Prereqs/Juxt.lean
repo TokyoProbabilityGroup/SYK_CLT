@@ -1,4 +1,4 @@
-import GibbsMeasure.Prereqs.CylinderEvents
+import SYK.GibbsMeasure.Prereqs.CylinderEvents
 
 open MeasureTheory
 

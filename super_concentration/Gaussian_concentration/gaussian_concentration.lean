@@ -1,6 +1,7 @@
 import SYK.super_concentration.Gaussian_concentration.GaussianConcentrationAux
 import SYK.super_concentration.Gaussian_concentration.GaussianCovSmooth
 import SYK.super_concentration.Gaussian_concentration.GaussianCovMollify
+import Mathlib.Probability.Moments.SubGaussian
 
 open scoped BigOperators ENNReal NNReal
 open MeasureTheory

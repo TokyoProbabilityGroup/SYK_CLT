@@ -1,4 +1,4 @@
-import Mathlib.MeasureTheory.Function.LpSeminorm.Basic
+import Mathlib.MeasureTheory.Function.LpSeminorm.Indicator
 
 open TopologicalSpace MeasureTheory Filter
 open scoped NNReal ENNReal Topology ComplexConjugate

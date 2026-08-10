@@ -1,4 +1,4 @@
-import GibbsMeasure.Mathlib.MeasureTheory.Function.ConditionalExpectation.Basic
+import SYK.GibbsMeasure.Mathlib.MeasureTheory.Function.ConditionalExpectation.Basic
 import Mathlib.Algebra.Order.Ring.Star
 import Mathlib.Data.Real.StarOrdered
 import Mathlib.GroupTheory.MonoidLocalization.Basic
@@ -143,8 +143,9 @@ private lemma condExp_simpleFunc_ae_eq_integral_kernel (f : @SimpleFunc X 𝓧 �
     (fun x₀ => ∫ x, f x ∂(π x₀))) ?_ ?_ f
   · intro c s hs
     simp [SimpleFunc.coe_piecewise, SimpleFunc.coe_const]
-    simpa using
-      (condExp_const_indicator_ae_eq_integral_kernel (μ := μ) (π := π) (A := s) c hs)
+    change condExp 𝓑 μ (s.indicator (fun _ : X => c)) =ᵐ[μ]
+      (fun x₀ => ∫ x, s.indicator (fun _ : X => c) x ∂(π x₀))
+    exact condExp_const_indicator_ae_eq_integral_kernel (μ := μ) (π := π) (A := s) c hs
   · intro f g _disj hf hg
     have hf_int : Integrable f μ := SimpleFunc.integrable_of_isFiniteMeasure f
     have hg_int : Integrable g μ := SimpleFunc.integrable_of_isFiniteMeasure g
@@ -312,8 +313,8 @@ lemma integrable_of_lintegral_ofReal_abs_lt_top
     Integrable f μ := by
   refine ⟨hf, ?_⟩
   have h' : (∫⁻ x, ENNReal.ofReal ‖f x‖ ∂μ) < ∞ := by
-    convert h using 2
-  exact (hasFiniteIntegral_iff_norm f).mpr h
+    simpa only [Real.norm_eq_abs] using h
+  exact (hasFiniteIntegral_iff_norm f).mpr h'
 
 /-- The bind of a finite measure by a Markov kernel is finite. -/
 private lemma isFiniteMeasure_bind
@@ -470,7 +471,8 @@ private lemma tendsto_setIntegral_integral_approxOn
           (∫⁻ x in s, ∫⁻ y, ‖f y‖ₑ ∂(π x) ∂μ)
             = ∫⁻ y, ‖f y‖ₑ ∂((μ.restrict s).bind π) := by
         rw [Measure.lintegral_bind hκ hf.enorm.aemeasurable]
-      simpa [h_eq] using hf_int.2
+      rw [h_eq]
+      exact hasFiniteIntegral_iff_enorm.mp hf_int.hasFiniteIntegral
     haveI : IsSFiniteKernel π := inferInstance
     have hf_enorm : Measurable fun y : X => ‖f y‖ₑ := hf.enorm
     have h_meas : Measurable (fun x => ∫⁻ y, ‖f y‖ₑ ∂(π x)) :=
