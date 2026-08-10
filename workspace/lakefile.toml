@@ -1,0 +1,46 @@
+name = "SYK"
+version = "0.1.0"
+keywords = ["math"]
+defaultTargets = ["SYK"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.32.2"
+
+[[lean_lib]]
+name = "SYK"
+
+[[lean_lib]]
+name = "Annealed_FE"
+globs = ["SYK.Annealed_FE.+"]
+
+[[lean_lib]]
+name = "CLT"
+globs = ["SYK.CLT.+"]
+
+[[lean_lib]]
+name = "GibbsMeasure"
+globs = ["SYK.GibbsMeasure.+"]
+
+[[lean_lib]]
+name = "SpinGlass"
+globs = ["SYK.SpinGlass.+"]
+
+[[lean_lib]]
+name = "super_concentration"
+globs = ["SYK.super_concentration.+"]
+
+[[lean_lib]]
+name = "SYK_model"
+globs = ["SYK.SYK_model.+"]
+
+[[lean_lib]]
+name = "Universality"
+globs = ["SYK.Universality.+"]

@@ -1,0 +1,34 @@
+name: Lean Action CI
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'maintenance-codes'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v5
+        with:
+          path: SYK
+
+      - name: Materialize workspace root
+        run: |
+          set -euo pipefail
+          cp SYK/workspace/lakefile.toml      ./lakefile.toml
+          cp SYK/workspace/lake-manifest.json ./lake-manifest.json
+          cp SYK/workspace/lean-toolchain     ./lean-toolchain
+          ls -la
+
+      - uses: leanprover/lean-action@v1
+        with:
+          use-github-cache: false
+          build-args: "SYK_model super_concentration"
