@@ -1,12 +1,12 @@
 name: LaTeX Action CI
 
 on:
-  push:
-    branches:
-      - 'main'
-      - 'maintenance-codes'
-    paths:
-      - '**.tex'
+  # push:
+  #   branches:
+  #     - 'main'
+  #     - 'maintenance-codes'
+  #   paths:
+  #     - '**.tex'
   workflow_dispatch:
 
 concurrency:
