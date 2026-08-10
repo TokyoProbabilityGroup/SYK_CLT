@@ -11,11 +11,23 @@ build/
 **/*.so
 **/*.dll
 **/*.dylib
-.out
-.log
-.aux
-.fdb_latexmk
-.synctex.gz
+*.aux
+*.log
+*.fls
+*.out
+*.toc
+*.bbl
+*.bbl-SAVE-ERROR
+*.bcf
+*.bcf-SAVE-ERROR
+*.blg
+*.run.xml
+*.fdb_latexmk
+*.synctex
+*.synctex(busy)
+*.synctex.gz
+*.synctex.gz(busy)
+/CLT/refs/CLT_SYK.pdf
 
 # OS junk
 .DS_Store
