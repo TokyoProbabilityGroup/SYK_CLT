@@ -900,9 +900,26 @@ Put
   a=\frac q2-1,\qquad
   X_N=\frac{Z_N(\beta)-\E Z_N(\beta)}{\E Z_N(\beta)},
   \qquad
-  W_N=\log\frac{Z_N(\beta)}{\E Z_N(\beta)}.
+  W_N=\log Z_N(\beta) - \log \E Z_N(\beta).
 \]
-Thus $W_N=\log(1+X_N)$, and Theorem~\ref{thm:partition-clt} gives
+It then holds that 
+\begin{align}
+  \log Z_N - \E\log Z_N 
+  &=
+  (\log Z_N - \log \E Z_N) + (\log \E Z_N - \E \log Z_N)\\
+  &=
+  W_N - \E W_N\\
+  &= 
+  (W_N - X_N) + X_N - \E W_N,
+\end{align}
+which yields 
+\begin{equation}
+  N^a(\log Z_N - \E \log Z_N)
+  =
+  N^a(W_N - X_N) + N^a X_N - N^a \E W_N.
+\end{equation}
+By Theorem~\ref{thm:partition-clt},
+we have 
 \[
   N^aX_N
   \Longrightarrow
@@ -910,12 +927,18 @@ Thus $W_N=\log(1+X_N)$, and Theorem~\ref{thm:partition-clt} gives
   \qquad
   \delta_N^2:=\E X_N^2\asymp N^{-(q-2)}.
 \]
-We claim that
-\begin{equation}\label{eq:log-centering-negligible}
-  \E W_N=o(N^{-(q/2-1)}).
-\end{equation}
-To prove this, we first establish a Lipschitz bound for
-$G\mapsto W_N(G)$.  Differentiation gives
+Hence, it suffices to show that 
+$N^a(W_N - X_N) \xrightarrow{\mathrm{p}} 0$
+and $\E W_N = o(N^{-a})$.
+
+To this end,
+we first establish a Lipschitz bound for $G\mapsto W_N(G)$.  
+% Thus $W_N=\log(1+X_N)$, and Theorem~\ref{thm:partition-clt} gives
+% We claim that
+% \begin{equation}\label{eq:log-centering-negligible}
+%   \E W_N=o(N^{-(q/2-1)}).
+% \end{equation}
+Differentiation gives
 \[
   \partial_{g_I}W_N
   =-\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
