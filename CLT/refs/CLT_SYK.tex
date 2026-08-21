@@ -894,6 +894,129 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
 \eqref{eq:standardized-clt}.
 \end{proof}
 
+\begin{lemma}[Gaussian concentration]
+  Write 
+  \begin{equation}
+    W_N \coloneqq \log \frac{Z_N(\beta)}{\E Z_N(\beta)}.
+  \end{equation}
+  Then, for any $\lambda, t > 0$,
+  \begin{align}
+    \mathbb P\!\left(|W_N - \E W_N| \geq t \right)
+    &\leq 2 \exp\left(-\frac{\sqrt{q}t^2}{2\beta}\right),
+    \label{eq:tail GC}\\
+    \E\exp\!\left(\lambda(W_N - \E W_N)\right) 
+    &\leq \exp\!\left(\frac{\lambda^2 \beta^2}{2q}\right).
+    \label{eq:exp GC}
+  \end{align}
+\end{lemma}
+
+\begin{proof}
+  To apply the Gaussian concentration inequality,
+  we view $Z_N(\beta;G)$ as a function of $G = (g_I)_{I \in \calI_N}$,
+  and establish its Lipshitz bound.
+  Fix $I \in \calI_N$.
+  By Duhamel's formula,
+  we deduce that 
+  \begin{align}
+    \partial_{g_I} Z_N 
+    &= 
+    \tr \partial_{g_I} e^{-\beta H_N(G)}\\
+    &=
+    -\beta     
+    \tr \!\left( \partial_{g_I} H_N(G) \cdot e^{-\beta H_N(G)} \right)\\ 
+    &=
+    -\beta \sigma_N \tr\bigl( e^{-\beta H_N} \psi_I \bigr).
+  \end{align}
+  Write $\langle \cdot \rangle_G$ 
+  for the expectation with respect to the normalized Gibbs measure,
+  i.e.,
+  \begin{equation}
+    \langle A \rangle_G
+    \coloneqq \frac{\tr(A e^{-\beta H_N(G)})}{Z_N(G)}.
+  \end{equation}
+  Then we obtain 
+  \begin{equation} \label{eq:GC1}
+    \partial_{g_I} W_N = -\beta \sigma_N \langle \psi_I \rangle_G.
+  \end{equation}
+  Fix an arbitrary subset $S \subseteq [N]$ with $|S| = q-1$.
+  Set $A_i \coloneqq \psi_{S \cup \{i\}}$ for each $i \notin S$.
+  Note that, by the relation $\{\psi_i, \psi_j\} = 2\delta_{ij} \I$,
+  it holds that   
+  \begin{equation}
+    A_i^2 = \I,
+    \qquad 
+    A_i A_j + A_j A_i = 0 \quad \text{if}\quad i \neq j.
+  \end{equation}
+  This yields 
+  \begin{equation}
+    \left(\sum_{i \notin S} \langle A_i \rangle A_i\right)^2
+    = 
+    \sum_{i \notin S}  \langle A_i \rangle_G^2 A_i^2
+    +
+    \sum_{\substack{i,j \notin S}\\ i < j}
+    \langle A_i \rangle \langle A_j \rangle_G
+    (A_iA_j + A_j A_i) 
+    = 
+    \sum_{i \notin S}  \langle A_i \rangle_G^2 \I.
+  \end{equation}
+  If we write $\|\cdot\|$ for the operator norm,
+  then we obtain 
+  \begin{equation}
+    \left\|\left(\sum_{i \notin S} \langle A_i \rangle A_i\right)^2\right\|
+    = 
+    \sum_{i \notin S}  \langle A_i \rangle_G^2.
+  \end{equation}
+  Since $A_i$ is self-adjoint,
+  it follows that 
+  \begin{equation} \label{eq:GC2}
+    \left\| \sum_{i \notin S} \langle A_i \rangle_G A_i \right\| 
+    = \sqrt{\sum_{i \notin S}  \langle A_i \rangle_G^2}.
+  \end{equation}
+  On the other hand, H\"{o}lder's inequality for Shatten norms yields 
+  \begin{equation} \label{eq:GC3}
+    \left\langle \sum_{i \notin S} \langle A_i \rangle A_i \right\rangle_G 
+    \leq    
+    \left\| \sum_{i \notin S} \langle A_i \rangle A_i \right\|.
+  \end{equation}
+  Since the left-hand side equals to $\sum_{i \notin S} \langle A_i \rangle^2$,
+  we deduce from \eqref{eq:GC2} and \eqref{eq:GC3} that 
+  \begin{equation} \label{eq:GC4}
+    \sum_{i \notin S} \langle A_i \rangle^2 \leq 1.
+  \end{equation}
+  For each $I \in \calI_N$,
+  there exist exactly $q$ subsets $S \subseteq [N]$ satisfying $I = S \cup \{i\}$.
+  Hence,
+  \begin{equation}
+    \sum_{\substack{S \subseteq [N]\\ |S| = q-1}} 
+    \sum_{i \notin S} 
+    \langle \psi_{S \cup \{i\}}\rangle_G^2 
+    = 
+    q \sum_{I \in \calI_N} \langle \psi_I\rangle_G^2.
+  \end{equation} 
+  This, combined with \eqref{eq:GC4}, yields 
+  \begin{equation}
+    \sum_{I \in \calI_N} \langle \psi_I \rangle_G^2
+    \leq 
+    \frac{1}{q} 
+    \sum_{\substack{S \subseteq [N]\\ |S| = q-1}} 1 
+    = 
+    \frac{1}{q} \binom{N}{q-1}
+    \leq    
+    \frac{N^{q-1}}{q!}.
+  \end{equation}
+  From this and \eqref{eq:GC1}, we deduce that 
+  \begin{equation}
+    \left\| \nabla W_N \right\|_2^2 
+    \leq
+    \frac{\beta^2 \sigma_N^2 N^{q-1}}{q!}
+    = 
+    \frac{\beta^2}{q},
+  \end{equation}
+  where the last equality follows from the definition of $\sigma_N^2$.
+  This implies that $W_N(G)$ is $\beta^2/q$-Lipshitz as a function of $G = (g_I)_{I \in \calI}$.
+  Hence, the Gaussian concentration inequality gives the desired result.
+\end{proof}
+
 \begin{proof}[Proof of Corollary~\ref{cor:free-energy-clt}]
 Put
 \[
@@ -920,64 +1043,77 @@ which yields
 \end{equation}
 By Theorem~\ref{thm:partition-clt},
 we have 
-\[
-  N^aX_N
-  \Longrightarrow
-  \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
-  \qquad
+\begin{equation} \label{eq:cor1}
+    N^aX_N
+    \Longrightarrow
+    \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
+    \qquad
   \delta_N^2:=\E X_N^2\asymp N^{-(q-2)}.
-\]
-Hence, it suffices to show that 
-$N^a(W_N - X_N) \xrightarrow{\mathrm{p}} 0$
-and $\E W_N = o(N^{-a})$.
-
-To this end,
-we first establish a Lipschitz bound for $G\mapsto W_N(G)$.  
+\end{equation}
+Let $C_0 \in (0,\infty)$ be such that 
+$|\log (1+x) - x| \leq C_0x^2$ for all $x \in [-1/2, 1/2]$.
+Since $W_N = \log(1+ X_N)$,
+it follows that 
+\begin{equation}
+  \E \bigl[ 1 \wedge (N^a|W_N - X_N|) \bigr]
+  = 
+  \E \bigl[ 1 \wedge (C_0 N^a|X_N|^2) \bigr]
+  + 
+  \mathbb P(|X_N| > 1/2).
+\end{equation}
+By \eqref{eq:cor1},
+$|X_N| \xrightarrow{\mathrm{p}} 0$ and $(N^a |X_N|)_{N \geq 1}$ is tight.
+Thus, 
+the right-hand side of the above inequality converges to $0$ as $N \to \infty$.
+Hence, $N^a(W_N - X_N) \xrightarrow{\mathrm{p}} 0$.
+Therefore, it suffices to show that $\E W_N = o(N^{-a})$.
+% To this end,
+% we first establish a Lipschitz bound for $G\mapsto W_N(G)$.  
 % Thus $W_N=\log(1+X_N)$, and Theorem~\ref{thm:partition-clt} gives
 % We claim that
 % \begin{equation}\label{eq:log-centering-negligible}
 %   \E W_N=o(N^{-(q/2-1)}).
 % \end{equation}
-Differentiation gives
-\[
-  \partial_{g_I}W_N
-  =-\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
-\]
-For each $(q-1)$-set $S$, the operators
-$(\psi_{S\cup\{i\}})_{i\notin S}$ are pairwise anticommuting Hermitian
-involutions.  If $A_1,\ldots,A_m$ are any such operators and
-$a_j=\langle A_j\rangle$ in a state, set $B=\sum_j a_jA_j$ and
-$s=\sum_j a_j^2$.  Pairwise anticommutation gives
-\[
-  B^2=s\I,
-  \qquad
-  s=\langle B\rangle\leq\norm{B}=\sqrt{s},
-\]
-and hence $s\leq1$.  Applying this observation for each $S$ and noting that
-every $I\in\calI_N$ is counted exactly $q$ times yields
-\[
-  \sum_{I\in\calI_N}|\langle\psi_I\rangle_{\beta,g}|^2
-  \leq \frac1q\binom N{q-1}.
-\]
-Consequently,
-\[
-  \sum_{I\in\calI_N}|\partial_{g_I}W_N|^2
-  \leq
-  \frac{\beta^2\sigma_N^2}{q}\binom N{q-1}
-  \leq\frac{\beta^2}{q}.
-\]
-Writing $\mu_N=\E W_N$, the Gaussian concentration inequality therefore
-implies, for every $\lambda\in\mathbb R$,
-\begin{equation}\label{eq:WN-subgaussian}
-  \E e^{\lambda(W_N-\mu_N)}
-  \leq \exp\left(\frac{\lambda^2\beta^2}{2q}\right).
-\end{equation}
-Jensen's inequality and the identity $\E e^{W_N}=1$ give
+% Differentiation gives
+% \[
+%   \partial_{g_I}W_N
+%   =-\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
+% \]
+% For each $(q-1)$-set $S$, the operators
+% $(\psi_{S\cup\{i\}})_{i\notin S}$ are pairwise anticommuting Hermitian
+% involutions.  If $A_1,\ldots,A_m$ are any such operators and
+% $a_j=\langle A_j\rangle$ in a state, set $B=\sum_j a_jA_j$ and
+% $s=\sum_j a_j^2$.  Pairwise anticommutation gives
+% \[
+%   B^2=s\I,
+%   \qquad
+%   s=\langle B\rangle\leq\norm{B}=\sqrt{s},
+% \]
+% and hence $s\leq1$.  Applying this observation for each $S$ and noting that
+% every $I\in\calI_N$ is counted exactly $q$ times yields
+% \[
+%   \sum_{I\in\calI_N}|\langle\psi_I\rangle_{\beta,g}|^2
+%   \leq \frac1q\binom N{q-1}.
+% \]
+% Consequently,
+% \[
+%   \sum_{I\in\calI_N}|\partial_{g_I}W_N|^2
+%   \leq
+%   \frac{\beta^2\sigma_N^2}{q}\binom N{q-1}
+%   \leq\frac{\beta^2}{q}.
+% \]
+% Writing $\mu_N=\E W_N$, the Gaussian concentration inequality therefore
+% implies, for every $\lambda\in\mathbb R$,
+% \begin{equation}\label{eq:WN-subgaussian}
+%   \E e^{\lambda(W_N-\mu_N)}
+%   \leq \exp\left(\frac{\lambda^2\beta^2}{2q}\right).
+% \end{equation}
+We claim that 
 \[
   -\frac{\beta^2}{2q}\leq \E W_N\leq0.
 \]
-Indeed, the upper bound follows from Jensen, while
-\eqref{eq:WN-subgaussian} with $\lambda=1$ gives the lower bound.
+Indeed, the upper bound follows from Jensen's inequality,
+while the lower bound follows from \eqref{eq:exp GC} and the identity $\E e^{W_N}=1$.
 
 Let $K_\beta=\beta^2/(2q)$.  Since $e^{W_N}-1=X_N$, Chebyshev's inequality
 gives, for $t\geq1$,
