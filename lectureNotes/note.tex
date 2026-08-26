@@ -1,0 +1,2024 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{physics}
+\usepackage{mathrsfs}
+\usepackage{tensor}
+\usepackage{slashed}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{csquotes}
+
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black}
+\setstretch{1.13}
+\setlength{\parindent}{1.3em}
+\setlength{\parskip}{0.18em}
+\setlength{\headheight}{14pt}
+\setlist[itemize]{topsep=0.25em,itemsep=0.15em}
+\setlist[enumerate]{topsep=0.25em,itemsep=0.15em}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{SYK for Mathematicians}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{conjecture}[definition]{Conjecture}
+\newtheorem{heuristic}[definition]{Physics principle}
+\newtheorem{remark}[definition]{Remark}
+\newtheorem{example}[definition]{Example}
+
+\newcommand{\E}{\mathbb E}
+\newcommand{\Pp}{\mathbb P}
+\newcommand{\C}{\mathbb C}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Pf}{\operatorname{Pf}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\Diff}{\operatorname{Diff}}
+\newcommand{\AdS}{\mathrm{AdS}}
+\newcommand{\SYK}{\mathrm{SYK}}
+\newcommand{\IR}{\mathrm{IR}}
+\newcommand{\UV}{\mathrm{UV}}
+\newcommand{\OTOC}{\mathrm{OTOC}}
+\newcommand{\Sch}{\mathrm{Sch}}
+\newcommand{\cH}{\mathcal H}
+\newcommand{\cF}{\mathcal F}
+\newcommand{\cO}{\mathcal O}
+\newcommand{\cA}{\mathcal A}
+\newcommand{\cG}{\mathcal G}
+
+\title{The Sachdev-Ye-Kitaev Model for Mathematicians\\
+\large Fermions, Large-$N$ Mean Field Theory, Non-Fermi Liquids, Quantum Chaos, and Nearly-$\AdS_2$ Gravity}
+\author{Introductory lecture notes based primarily on Rosenhaus, arXiv:1807.03334}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+These notes introduce the Sachdev-Ye-Kitaev model to a reader whose main background is probability theory and statistical mechanics, with some quantum mechanics but little prior exposure to fermions, Fermi-liquid theory, or general relativity. The central aim is to translate the physics vocabulary into mathematical objects and asymptotic statements. We begin with finite-dimensional fermionic Fock space, the CAR and Clifford algebras, Majorana operators, Grassmann integration, Gibbs states, and Green functions. We then define the random SYK Hamiltonian and explain the $N$-scaling, disorder average, melonic large-$N$ limit, Schwinger-Dyson equations, conformal infrared solution, bilocal effective action, four-point ladder kernel, Schwarzian soft mode, and quantum-chaos diagnostics. A separate section formulates what physicists mean by Fermi liquids and non-Fermi liquids in terms of singularities of the retarded Green function and the quasiparticle lifetime criterion. The last third of the notes gives a minimal mathematical introduction to the black-hole connection: Lorentzian metrics, $\AdS_2$, horizons, near-extremality, Jackiw-Teitelboim gravity, the Schwarzian boundary action, entropy, and the holographic dictionary. Throughout we distinguish finite-$N$ identities, controlled large-$N$ asymptotics, formal path-integral arguments, and conjectural holographic claims. We close with a probabilistic interpretation and a list of concrete mathematical problems suggested by SYK.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Orientation: why a mathematician should care about SYK}
+
+The Sachdev-Ye-Kitaev model is a random quantum many-body system with no spatial coordinate. In its most common form it consists of $N$ Majorana fermions and random all-to-all quartic interactions. Its Hamiltonian can be written in one line,
+\begin{equation}
+H_J=\sum_{1\le i<j<k<l\le N}J_{ijkl}\psi_i\psi_j\psi_k\psi_l,
+\qquad
+\{\psi_i,\psi_j\}=\delta_{ij}I,
+\label{eq:SYKH}
+\end{equation}
+with centered Gaussian couplings
+\begin{equation}
+\E J_{ijkl}=0,
+\qquad
+\E J_{ijkl}^2=\frac{3!J^2}{N^3}.
+\label{eq:variance}
+\end{equation}
+At finite $N$ this is simply a random self-adjoint operator on a Hilbert space of dimension $2^{N/2}$. Nothing here requires quantum field theory.
+
+What makes the model exceptional is the coexistence of several structures which are usually difficult to see in the same solvable system. At large $N$, a strongly interacting random Hamiltonian reduces to a deterministic nonlinear equation for a two-time correlation kernel. At low energy the solution acquires an emergent conformal scaling law. The leading fluctuation around that scaling regime is governed by the Schwarzian derivative. The connected four-point function is a geometric series of ladder operators, and its real-time analytic continuation produces maximal exponential growth of an out-of-time-order correlator. Finally, the same Schwarzian theory is the boundary theory of nearly-$\AdS_2$ gravity, the effective description of the near-horizon region of certain near-extremal black holes.
+
+For a probabilist, one useful slogan is
+\begin{equation}
+\boxed{\text{random operator on }\cH_N\text{ with }\dim\cH_N=e^{cN}
+\quad +\quad \text{special covariance scaling}.}
+\end{equation}
+For a statistical mechanician,
+\begin{equation}
+\boxed{\text{quantum mean-field system with quenched disorder}.}
+\end{equation}
+For a field theorist,
+\begin{equation}
+\boxed{\text{large-}N\text{ fermionic theory dominated by melonic diagrams}.}
+\end{equation}
+For a gravitational physicist,
+\begin{equation}
+\boxed{\text{infrared SYK soft mode}\;\leftrightarrow\;\text{Schwarzian theory}\;\leftrightarrow\;\text{nearly-}\AdS_2.}
+\end{equation}
+The point of the subject is that these are not independent analogies. They are different projections of the same asymptotic structure.
+
+\subsection{The mean-field analogy}
+
+In the Curie-Weiss model, one starts from $N$ spins and obtains in the thermodynamic limit a variational problem for one scalar order parameter $m$. In the Sherrington-Kirkpatrick model, disorder introduces more elaborate order parameters, including overlap distributions. In SYK the large-$N$ order parameter is a two-time function
+\begin{equation}
+G(\tau_1,\tau_2).
+\end{equation}
+Thus the microscopic system is zero-dimensional in space, but the order parameter is infinite-dimensional because it depends on time.
+
+The central reduction is
+\begin{equation}
+\psi_1,\ldots,\psi_N
+\quad\rightsquigarrow\quad
+(G,\Sigma),
+\end{equation}
+where $G$ is the Green kernel and $\Sigma$ is the self-energy. The collective action is proportional to $N$, so $1/N$ acts as a semiclassical fluctuation parameter. Strong coupling and analytic control coexist because the small parameter is not the interaction strength but the inverse number of fermion species.
+
+\subsection{A status convention used in these notes}
+
+We will repeatedly separate four logical levels.
+
+\begin{definition}[Finite-$N$ statement]
+A finite-$N$ statement is an identity, inequality, or definition about the random matrix $H_J$ and the finite-dimensional Gibbs state. These are ordinary statements in operator theory and probability.
+\end{definition}
+
+\begin{definition}[Large-$N$ physics statement]
+A large-$N$ physics statement is an asymptotic claim justified by diagrammatics, saddle-point analysis, or a functional integral. Some such statements are now theorems in restricted regimes, while others remain formal from the standpoint of rigorous analysis.
+\end{definition}
+
+\begin{definition}[Effective-theory statement]
+An effective-theory statement asserts that a prescribed class of observables in a prescribed scaling regime is reproduced by a simpler action, for example the Schwarzian action. Such a statement need not imply equivalence of microscopic Hilbert spaces.
+\end{definition}
+
+\begin{definition}[Holographic statement]
+A holographic statement identifies boundary observables with quantities in a gravitational theory. The strongest possible microscopic duality claims go beyond what is established for ordinary finite-$N$ SYK. In these notes, the robust content is the matching of the low-energy Schwarzian sector and associated observables.
+\end{definition}
+
+\section{Fermions without mystery: Fock space, CAR, and Majorana operators}
+
+A mathematician can understand all finite-$N$ fermion algebra in SYK using exterior algebra.
+
+\subsection{Antisymmetric Fock space}
+
+Let the one-particle Hilbert space be
+\begin{equation}
+\mathfrak h=\C^M.
+\end{equation}
+The fermionic Fock space is
+\begin{equation}
+\cF_-(\mathfrak h)
+=\bigoplus_{r=0}^{M}\Lambda^r\mathfrak h.
+\label{eq:fock}
+\end{equation}
+Its dimension is
+\begin{equation}
+\dim\cF_-(\C^M)=\sum_{r=0}^{M}\binom Mr=2^M.
+\end{equation}
+Choose an orthonormal basis $e_1,\ldots,e_M$. Exterior multiplication by $e_a$ defines the creation operator
+\begin{equation}
+c_a^\dagger\psi=e_a\wedge\psi,
+\end{equation}
+and its adjoint $c_a$ is the annihilation operator.
+
+\begin{proposition}[Canonical anticommutation relations]
+The operators $c_a,c_a^\dagger$ satisfy
+\begin{align}
+\{c_a,c_b^\dagger\}&=\delta_{ab}I,\\
+\{c_a,c_b\}&=0,\\
+\{c_a^\dagger,c_b^\dagger\}&=0.
+\end{align}
+\end{proposition}
+
+The nilpotence
+\begin{equation}
+(c_a^\dagger)^2=0
+\end{equation}
+is the algebraic form of Pauli exclusion. The number operator
+\begin{equation}
+n_a=c_a^\dagger c_a
+\end{equation}
+satisfies
+\begin{equation}
+n_a^2=n_a,
+\qquad
+\operatorname{spec}(n_a)=\{0,1\}.
+\end{equation}
+A convenient orthonormal basis is
+\begin{equation}
+\ket{n_1,\ldots,n_M},
+\qquad
+n_a\in\{0,1\}.
+\end{equation}
+Thus $M$ complex fermionic modes have the same Hilbert-space dimension as $M$ qubits, but the natural generators satisfy anticommutation relations rather than commuting across tensor factors.
+
+\subsection{Parity and the graded algebra}
+
+The total number operator is
+\begin{equation}
+\mathcal N=\sum_{a=1}^{M}n_a.
+\end{equation}
+The fermion-parity operator is
+\begin{equation}
+(-1)^F=e^{i\pi\mathcal N}.
+\end{equation}
+Operators which change particle number by an even amount commute with parity; odd operators anticommute with parity. Physical Hamiltonians are typically even. In SYK the quartic Hamiltonian is even, hence
+\begin{equation}
+[H,(-1)^F]=0.
+\end{equation}
+This grading is important when discussing spectral degeneracies and random-matrix symmetry classes.
+
+\subsection{Majorana fermions and Clifford algebras}
+
+For each complex mode define two self-adjoint operators
+\begin{align}
+\psi_{2a-1}&=\frac{c_a+c_a^\dagger}{\sqrt2},\\
+\psi_{2a}&=\frac{i(c_a-c_a^\dagger)}{\sqrt2}.
+\end{align}
+Then
+\begin{equation}
+\psi_i^*=\psi_i,
+\qquad
+\{\psi_i,\psi_j\}=\delta_{ij}I,
+\qquad
+\psi_i^2=\frac12 I.
+\label{eq:majoranaCAR}
+\end{equation}
+Conversely,
+\begin{equation}
+c_a=\frac{\psi_{2a-1}+i\psi_{2a}}{\sqrt2}.
+\end{equation}
+Hence $N=2M$ Majorana fermions act irreducibly on
+\begin{equation}
+\cH_N\cong\C^{2^{N/2}}.
+\end{equation}
+Algebraically, they generate a complex Clifford algebra.
+
+A product of $q$ distinct Majoranas has a simple adjoint rule. If
+\begin{equation}
+X=\psi_{i_1}\cdots\psi_{i_q},
+\qquad i_1<\cdots<i_q,
+\end{equation}
+then
+\begin{equation}
+X^*=(-1)^{q(q-1)/2}X.
+\end{equation}
+For $q=4$, the sign is $+1$, so $\psi_i\psi_j\psi_k\psi_l$ is self-adjoint. For general even $q$, one often inserts a phase $i^{q/2}$ in the Hamiltonian.
+
+\subsection{Jordan-Wigner representation}
+
+For numerical intuition, one may represent Majoranas using Pauli matrices. On $(\C^2)^{\otimes M}$,
+\begin{align}
+\psi_{2a-1}&=\frac1{\sqrt2}
+\left(\prod_{b<a}\sigma_b^z\right)\sigma_a^x,\\
+\psi_{2a}&=\frac1{\sqrt2}
+\left(\prod_{b<a}\sigma_b^z\right)\sigma_a^y.
+\end{align}
+The strings of $\sigma^z$ are precisely what generate anticommutation between different modes. Therefore a finite Majorana system is not a mysterious new kind of Hilbert space. It is a familiar finite-dimensional Hilbert space equipped with a preferred Clifford generating set.
+
+\subsection{Free fermions and quadratic Hamiltonians}
+
+A general quadratic Majorana Hamiltonian can be written as
+\begin{equation}
+H_2=\frac i2\sum_{i,j=1}^{N}A_{ij}\psi_i\psi_j,
+\qquad
+A^T=-A,
+\qquad A\in M_N(\R).
+\end{equation}
+By an orthogonal transformation, $A$ can be reduced to $2\times2$ blocks. Consequently $H_2$ becomes a sum of independent fermionic modes. This is the exact analogue of diagonalizing a quadratic bosonic Hamiltonian, except that the algebra is CAR rather than CCR.
+
+This elementary fact already suggests what ``interaction'' means in SYK. A quartic Hamiltonian cannot be reduced to independent one-particle modes by a linear transformation. The strongly interacting low-energy state therefore need not admit a quasiparticle interpretation.
+
+\section{Grassmann variables, Euclidean time, and thermal Green functions}
+
+The operator formulation is fundamental. Grassmann variables are a powerful algebraic device for reorganizing traces and correlation functions.
+
+\subsection{Grassmann algebra and Berezin integration}
+
+Let $\theta_1,\ldots,\theta_n$ generate a Grassmann algebra:
+\begin{equation}
+\theta_i\theta_j=-\theta_j\theta_i.
+\end{equation}
+In particular,
+\begin{equation}
+\theta_i^2=0.
+\end{equation}
+Berezin integration is defined by
+\begin{equation}
+\int d\theta\,1=0,
+\qquad
+\int d\theta\,\theta=1.
+\end{equation}
+It is differentiation and integration at the same time because every polynomial is affine in each Grassmann generator.
+
+For an antisymmetric $2m\times2m$ matrix $A$,
+\begin{equation}
+\int d\theta_{2m}\cdots d\theta_1
+\exp\left(\frac12\theta^T A\theta\right)
+=\Pf(A),
+\label{eq:pfaff}
+\end{equation}
+with
+\begin{equation}
+\Pf(A)^2=\det A.
+\end{equation}
+Compare this with the ordinary Gaussian integral
+\begin{equation}
+\int_{\R^n}e^{-x^TAx/2}\,dx
+=(2\pi)^{n/2}(\det A)^{-1/2}.
+\end{equation}
+The determinant occurs with the opposite power for fermions. This algebraic fact is the source of the logarithmic determinant in the large-$N$ collective action.
+
+\subsection{Finite-temperature quantum mechanics}
+
+For a fixed disorder realization $J$, define
+\begin{equation}
+Z_J(\beta)=\Tr e^{-\beta H_J},
+\qquad
+\rho_{\beta,J}=\frac{e^{-\beta H_J}}{Z_J(\beta)}.
+\end{equation}
+For an observable $A$,
+\begin{equation}
+\langle A\rangle_{\beta,J}=\Tr(\rho_{\beta,J}A).
+\end{equation}
+Imaginary-time evolution is
+\begin{equation}
+A(\tau)=e^{\tau H}Ae^{-\tau H},
+\qquad 0\le \tau<\beta.
+\end{equation}
+The Euclidean two-point function is
+\begin{equation}
+G_{ij,J}(\tau)=
+\langle T_\tau \psi_i(\tau)\psi_j(0)\rangle_{\beta,J}.
+\end{equation}
+After disorder averaging and flavor averaging,
+\begin{equation}
+G_N(\tau)=\frac1N\sum_{i=1}^{N}\E_J G_{ii,J}(\tau).
+\label{eq:GN}
+\end{equation}
+Fermionic thermal correlators are antiperiodic,
+\begin{equation}
+G_N(\tau+\beta)=-G_N(\tau),
+\end{equation}
+which implies the Matsubara frequencies
+\begin{equation}
+\omega_n=\frac{(2n+1)\pi}{\beta}.
+\end{equation}
+Thus
+\begin{equation}
+G(\tau)=\frac1\beta\sum_{n\in\mathbb Z}e^{-i\omega_n\tau}G(i\omega_n).
+\end{equation}
+
+\subsection{Spectral representation}
+
+Let $A(\omega)$ denote the fermionic spectral density. Then, under standard finite-dimensional hypotheses,
+\begin{equation}
+G(i\omega_n)=\int_{-\infty}^{\infty}\frac{A(\omega)}{i\omega_n-\omega}\,d\omega.
+\end{equation}
+The retarded Green function is obtained by analytic continuation,
+\begin{equation}
+G^R(\omega)=G(i\omega_n\to \omega+i0^+),
+\end{equation}
+and
+\begin{equation}
+A(\omega)=-\frac1\pi\operatorname{Im}G^R(\omega).
+\end{equation}
+This bridge from Euclidean to real time is conceptually important. Large-$N$ calculations are often easiest in Euclidean time, while transport and chaos are real-time phenomena.
+
+\section{The SYK Hamiltonian as a random operator}
+
+\subsection{Definition and normalization}
+
+Assume $N$ is even. The quartic Majorana SYK Hamiltonian is
+\begin{equation}
+H_J=\sum_{1\le i<j<k<l\le N}J_{ijkl}\psi_i\psi_j\psi_k\psi_l,
+\end{equation}
+where the $J_{ijkl}$ are independent centered Gaussian random variables with
+\begin{equation}
+\E J_{ijkl}^2=\frac{3!J^2}{N^3}.
+\end{equation}
+Equivalently, $J_{ijkl}$ can be regarded as a fully antisymmetric random tensor.
+
+For general even $q$,
+\begin{equation}
+H_q=i^{q/2}
+\sum_{1\le i_1<\cdots<i_q\le N}
+J_{i_1\cdots i_q}
+\psi_{i_1}\cdots\psi_{i_q},
+\end{equation}
+with
+\begin{equation}
+\E J_{i_1\cdots i_q}^2
+=\frac{(q-1)!J^2}{N^{q-1}}
+\end{equation}
+in a common convention.
+
+\subsection{Why the variance scales as $N^{-(q-1)}$}
+
+There are
+\begin{equation}
+\binom Nq\sim \frac{N^q}{q!}
+\end{equation}
+interaction monomials. The variance scaling is chosen so that the large-$N$ self-energy remains of order one and the total free energy is of order $N$. In diagrammatic language, each disorder contraction contributes $N^{-(q-1)}$, while free flavor-index sums contribute powers of $N$. The competition produces a nontrivial $N\to\infty$ limit rather than either a free theory or a divergent one.
+
+A crude second-moment computation gives some intuition. Using orthogonality of distinct Clifford monomials under the normalized trace, one finds schematically
+\begin{equation}
+2^{-N/2}\E\Tr H^2\asymp N J^2.
+\end{equation}
+Thus a typical energy scale is of order $\sqrt N$ for a random state, while the many-body ground-state energy is extensive, of order $N$, because of the exponentially large dimension of the Hilbert space and collective optimization over states.
+
+\subsection{Quenched and annealed thermodynamics}
+
+The quenched free-energy density is
+\begin{equation}
+f_N^{\mathrm q}(\beta)
+=-\frac1{\beta N}\E\log Z_J(\beta).
+\end{equation}
+The annealed free-energy density is
+\begin{equation}
+f_N^{\mathrm a}(\beta)
+=-\frac1{\beta N}\log\E Z_J(\beta).
+\end{equation}
+By Jensen,
+\begin{equation}
+\E\log Z\le \log\E Z,
+\end{equation}
+so
+\begin{equation}
+f_N^{\mathrm a}(\beta)\le f_N^{\mathrm q}(\beta).
+\end{equation}
+The comparison between the two is a concentration problem. In the usual large-$N$ treatment, many observables are expected to be self-averaging, but this should be stated observable by observable and scale by scale.
+
+\begin{heuristic}[Self-averaging]
+For fixed $\beta$ in a suitable regime, one expects
+\begin{equation}
+\frac1N\log Z_J(\beta)
+-\frac1N\E\log Z_J(\beta)
+\xrightarrow[N\to\infty]{\Pp}0.
+\end{equation}
+A stronger formulation asks for concentration inequalities and almost-sure convergence.
+\end{heuristic}
+
+Macroscopic self-averaging is compatible with microscopic random-matrix fluctuations. The free energy can concentrate while individual level spacings remain random.
+
+\section{Large-$N$ diagrammatics and the melonic limit}
+
+The key solvability mechanism is a combinatorial selection rule on Feynman graphs.
+
+\subsection{Disorder averaging}
+
+In a perturbative expansion, each interaction vertex carries a random tensor $J_{ijkl}$. Since the disorder is Gaussian, averaging pairs the couplings:
+\begin{equation}
+\E[J_IJ_{I'}]\propto \delta_{I,I'}.
+\end{equation}
+After averaging, every pair of interaction vertices comes with identified flavor indices. The resulting graph carries a power of $N$ determined by how many independent flavor-index loops remain.
+
+The leading graphs are the melonic graphs. They are recursively generated by replacing a propagator line with a two-vertex self-energy insertion and iterating.
+
+\begin{heuristic}[Melonic dominance]
+At fixed $q$ and fixed perturbative order, the leading power of $N$ is attained by melonic graphs. Nonmelonic graphs are suppressed by powers of $1/N$.
+\end{heuristic}
+
+For SYK, melonic dominance has a rigorous combinatorial diagrammatic proof. What remains formal is the passage from order-by-order diagrammatics to the full nonperturbative infrared theory in the strongest sense used in physics.
+
+\subsection{Dyson equation}
+
+Let $G_0(i\omega_n)=(-i\omega_n)^{-1}$ be the free Majorana propagator. The exact Dyson relation is
+\begin{equation}
+G(i\omega_n)^{-1}=G_0(i\omega_n)^{-1}-\Sigma(i\omega_n).
+\end{equation}
+With the convention used here,
+\begin{equation}
+G(i\omega_n)^{-1}=-i\omega_n-\Sigma(i\omega_n).
+\label{eq:dyson}
+\end{equation}
+Melonic closure gives for quartic SYK
+\begin{equation}
+\Sigma(\tau)=J^2G(\tau)^3.
+\label{eq:selfenergy}
+\end{equation}
+For general even $q$,
+\begin{equation}
+\Sigma(\tau)=J^2G(\tau)^{q-1}
+\end{equation}
+up to sign and normalization conventions.
+
+Equations \eqref{eq:dyson} and \eqref{eq:selfenergy} are the central large-$N$ Schwinger-Dyson equations.
+
+\subsection{Kernel form}
+
+Regard $G$ and $\Sigma$ as integral kernels. Then
+\begin{equation}
+(\partial_\tau-\Sigma)\circ G=I,
+\end{equation}
+meaning
+\begin{equation}
+\int_0^\beta d\tau'
+\left[
+\partial_{\tau_1}\delta(\tau_1-\tau')-\Sigma(\tau_1,\tau')
+\right]G(\tau',\tau_2)
+=\delta(\tau_1-\tau_2).
+\end{equation}
+At a translation-invariant thermal saddle,
+\begin{equation}
+G(\tau_1,\tau_2)=G(\tau_1-\tau_2).
+\end{equation}
+Thus a many-body problem on a Hilbert space of dimension $2^{N/2}$ becomes a nonlinear integral equation for one scalar function of time.
+
+\section{The bilocal collective action}
+
+There is a second derivation of the same equations which is closer to mean-field variational methods.
+
+\subsection{Introducing $G$ and $\Sigma$}
+
+Formally insert the constraint
+\begin{equation}
+G(\tau_1,\tau_2)
+=\frac1N\sum_{i=1}^{N}\psi_i(\tau_1)\psi_i(\tau_2)
+\end{equation}
+using a bilocal Lagrange multiplier $\Sigma(\tau_1,\tau_2)$. After Gaussian disorder averaging and integrating out the fermions, one obtains for $q=4$
+\begin{equation}
+\frac{I_{\mathrm{eff}}[G,\Sigma]}{N}
+=-\frac12\log\det(\partial_\tau-\Sigma)
++\frac12\int d\tau_1d\tau_2
+\left[
+\Sigma G-\frac{J^2}{4}G^4
+\right].
+\label{eq:collective}
+\end{equation}
+The determinant term is the logarithm of a Pfaffian in Majorana language. Equation \eqref{eq:pfaff} is the finite-dimensional algebraic prototype.
+
+The partition function has the formal large-$N$ form
+\begin{equation}
+Z\simeq\int \mathcal DG\,\mathcal D\Sigma\,
+\exp\left[-N\mathcal I(G,\Sigma)\right].
+\end{equation}
+Thus $N$ plays the role of inverse noise strength.
+
+\subsection{Stationary equations}
+
+Varying \eqref{eq:collective} with respect to $G$ gives
+\begin{equation}
+\Sigma(\tau_1,\tau_2)=J^2G(\tau_1,\tau_2)^3.
+\end{equation}
+Varying with respect to $\Sigma$ gives
+\begin{equation}
+G=(\partial_\tau-\Sigma)^{-1}.
+\end{equation}
+Hence the saddle equations are precisely the Schwinger-Dyson equations.
+
+\begin{remark}[Analogy with a Laplace principle]
+The schematic similarity
+\begin{equation}
+\int e^{-NI(x)}dx\sim e^{-N\inf I}
+\end{equation}
+is useful, but the fermionic functional integral is not automatically a rigorous probability measure. A mathematical derivation requires control of disorder averaging, the collective-variable transformation, saddle selection, and low-temperature limits.
+\end{remark}
+
+\subsection{Large-$N$ factorization}
+
+One consequence of the prefactor $N$ is that fluctuations of suitably normalized singlet observables are suppressed. Schematically,
+\begin{equation}
+\langle \cO_1\cO_2\rangle
+-\langle\cO_1\rangle\langle\cO_2\rangle
+=O(N^{-1}).
+\end{equation}
+This is the analogue of concentration around a mean-field saddle. The connected four-point function is therefore naturally an $O(1/N)$ object.
+
+\section{The infrared conformal solution}
+
+The next simplification occurs at strong coupling and low frequency.
+
+\subsection{Dropping the kinetic term}
+
+The full equation is
+\begin{equation}
+G(i\omega)^{-1}=-i\omega-\Sigma(i\omega).
+\end{equation}
+If
+\begin{equation}
+|\omega|\ll J,
+\end{equation}
+and if the self-energy dominates $i\omega$, one may first solve the scale-invariant equation obtained by dropping the kinetic term. In time-domain kernel notation,
+\begin{equation}
+\Sigma\circ G=-I.
+\label{eq:IRconv}
+\end{equation}
+Together with
+\begin{equation}
+\Sigma(\tau)=J^2G(\tau)^{q-1},
+\end{equation}
+this admits a power-law solution.
+
+Assume
+\begin{equation}
+G_c(\tau)=b\,\frac{\sgn\tau}{|J\tau|^{2\Delta}}.
+\end{equation}
+Then
+\begin{equation}
+\Sigma_c(\tau)\propto \frac{\sgn\tau}{|\tau|^{2\Delta(q-1)}}.
+\end{equation}
+The convolution in \eqref{eq:IRconv} must scale as a delta distribution. Since $\delta(\lambda\tau)=\lambda^{-1}\delta(\tau)$, dimensional consistency gives
+\begin{equation}
+2\Delta(q-1)+2\Delta=2,
+\end{equation}
+so
+\begin{equation}
+\boxed{\Delta=\frac1q.}
+\end{equation}
+For $q=4$,
+\begin{equation}
+\Delta=\frac14,
+\qquad
+G_c(\tau)=b\frac{\sgn\tau}{|J\tau|^{1/2}}.
+\label{eq:IRG}
+\end{equation}
+With the convention used by Rosenhaus,
+\begin{equation}
+b^4=\frac1{4\pi}.
+\end{equation}
+
+\subsection{Finite temperature}
+
+The conformal map from the line to the thermal circle suggests
+\begin{equation}
+G_{\beta,c}(\tau)
+=b\,\sgn(\tau)
+\left[
+\frac{\pi}{\beta J\sin(\pi|\tau|/\beta)}
+\right]^{2\Delta},
+\qquad 0<|\tau|<\beta.
+\label{eq:finiteTG}
+\end{equation}
+For $q=4$, the exponent is $1/2$.
+
+The physical interpretation is that strong interactions generate an anomalous scaling dimension. The fermion field does not behave like a weakly dressed free particle.
+
+\subsection{Emergent reparametrization covariance}
+
+The infrared equations are covariant under orientation-preserving time reparametrizations $\tau\mapsto f(\tau)$ if
+\begin{equation}
+G(\tau_1,\tau_2)
+\mapsto
+[f'(\tau_1)f'(\tau_2)]^\Delta
+G(f(\tau_1),f(\tau_2)),
+\label{eq:reparamG}
+\end{equation}
+while
+\begin{equation}
+\Sigma(\tau_1,\tau_2)
+\mapsto
+[f'(\tau_1)f'(\tau_2)]^{1-\Delta}
+\Sigma(f(\tau_1),f(\tau_2)).
+\end{equation}
+A particular conformal saddle is invariant only under the M\"obius subgroup
+\begin{equation}
+f(\tau)=\frac{a\tau+b}{c\tau+d},
+\qquad ad-bc=1.
+\end{equation}
+Thus the symmetry pattern is often written
+\begin{equation}
+\Diff(S^1)\longrightarrow PSL(2,\R).
+\end{equation}
+The full microscopic theory is not exactly reparametrization invariant. The kinetic term explicitly breaks the symmetry. Therefore the reparametrization modes are soft rather than exact zero modes.
+
+\section{The Schwarzian soft mode}
+
+\subsection{The Schwarzian derivative}
+
+For a smooth monotone function $f$ define
+\begin{equation}
+\{f,\tau\}
+=\frac{f'''(\tau)}{f'(\tau)}
+-\frac32\left(\frac{f''(\tau)}{f'(\tau)}\right)^2.
+\label{eq:schwarzian}
+\end{equation}
+It satisfies the projective invariance
+\begin{equation}
+\left\{\frac{af+b}{cf+d},\tau\right\}=\{f,\tau\}.
+\end{equation}
+Hence $PSL(2,\R)$ is naturally quotiented out.
+
+The leading low-energy action for reparametrization fluctuations has the form
+\begin{equation}
+I_{\Sch}[f]
+=-\frac{N\alpha_S}{J}
+\int_0^\beta d\tau
+\left\{
+\tan\left(\frac{\pi f(\tau)}{\beta}\right),\tau
+\right\},
+\label{eq:SchAction}
+\end{equation}
+where $\alpha_S>0$ is a model-dependent constant. The configuration space is morally
+\begin{equation}
+\Diff(S^1)/PSL(2,\R).
+\end{equation}
+
+\subsection{Why the Schwarzian matters}
+
+The strict conformal approximation produces a nearly flat manifold of reparametrized saddles. The small UV kinetic term lifts this degeneracy. The most infrared-singular fluctuations therefore come from motion along this almost-flat manifold, not from generic massive fluctuations. Integrating out the massive directions produces the Schwarzian action.
+
+A mathematical analogue would be a family of minimizers $\{x_f\}$ of a limiting functional $I_0$, followed by a small perturbation $\varepsilon I_1$ which selects an effective action along the minimizer manifold. Here
+\begin{equation}
+\varepsilon\sim \frac1{\beta J}.
+\end{equation}
+
+\subsection{Low-temperature thermodynamics}
+
+The Schwarzian theory implies a characteristic low-temperature expansion
+\begin{equation}
+F(T)=E_0-S_0T-cT^2+\cdots,
+\end{equation}
+so
+\begin{equation}
+S(T)=-\frac{\partial F}{\partial T}
+=S_0+2cT+\cdots.
+\end{equation}
+For SYK at large $N$,
+\begin{equation}
+S(T)=Ns_0+N\gamma T+\cdots.
+\label{eq:SYKentropy}
+\end{equation}
+The residual entropy density $s_0$ is nonzero in the order of limits
+\begin{equation}
+\lim_{T\downarrow0}\lim_{N\to\infty}\frac{S_N(T)}N=s_0>0.
+\end{equation}
+For generic nonsupersymmetric finite-$N$ SYK, exact ground-state degeneracy is not exponentially large. Therefore
+\begin{equation}
+\lim_{N\to\infty}\lim_{T\downarrow0}\frac{S_N(T)}N=0
+\end{equation}
+in the generic situation, up to symmetry degeneracies. The two limits do not commute.
+
+\section{Four-point functions and the ladder kernel}
+
+The two-point function determines the mean field. The four-point function probes interactions between collective excitations and is the gateway to the operator spectrum and chaos.
+
+\subsection{Connected four-point function}
+
+For distinct flavor indices in an averaged singlet channel, a normalized connected four-point function has size
+\begin{equation}
+\cF=O(N^{-1}).
+\end{equation}
+Its leading diagrams form a ladder series. If $K$ is the integral operator adding one rung, then
+\begin{equation}
+\cF=\cF_0+K\cF_0+K^2\cF_0+\cdots
+=(I-K)^{-1}\cF_0,
+\label{eq:laddergeom}
+\end{equation}
+whenever the series is interpreted in a suitable spectral sense.
+
+For quartic Majorana SYK, the conformal kernel can be written schematically as
+\begin{equation}
+K(\tau_1,\tau_2;\tau_3,\tau_4)
+=-3J^2
+G(\tau_{13})G(\tau_{24})G(\tau_{34})^2,
+\end{equation}
+with convention-dependent signs.
+
+\subsection{Conformal diagonalization}
+
+In the conformal limit, $K$ commutes with the $SL(2,\R)$ action. Hence it can be diagonalized using one-dimensional conformal eigenfunctions. For the $q=4$ model, a commonly used eigenvalue function is
+\begin{equation}
+k(h)
+=-\frac32
+\frac{\tan\left(\frac\pi2(h-\frac12)\right)}{h-\frac12}.
+\label{eq:kh}
+\end{equation}
+The dimensions $h$ of fermion bilinear operators satisfy
+\begin{equation}
+\boxed{k(h)=1.}
+\label{eq:kh1}
+\end{equation}
+The special solution
+\begin{equation}
+h=2
+\end{equation}
+corresponds to the reparametrization soft mode. Its eigenvalue approaches one in a singular way, which is why the Schwarzian correction is needed to regularize the strict conformal approximation.
+
+\subsection{Interpretation as an operator-spectrum problem}
+
+In a conformal theory one expects an operator product expansion of the schematic form
+\begin{equation}
+\psi_i(\tau_1)\psi_i(\tau_2)
+\sim
+\sum_n C_n |\tau_{12}|^{h_n-2\Delta}\cO_{h_n}(\tau_2).
+\end{equation}
+The transcendental equation \eqref{eq:kh1} determines the tower $h_n$. Thus a nontrivial interacting spectrum is reduced to the spectral analysis of an explicit integral operator.
+
+This is one of the places where SYK should feel especially natural to an analyst: the physics of composite excitations is encoded in the spectrum of a compact-like kernel after symmetry reduction.
+
+\section{Quantum chaos and out-of-time-order correlators}
+
+\subsection{Why ordinary Lyapunov exponents are not available}
+
+A quantum many-body system has no classical phase-space trajectory in the usual sense. To measure sensitivity to initially simple perturbations, one studies operator growth. Let
+\begin{equation}
+W(t)=e^{iHt}We^{-iHt}.
+\end{equation}
+If $W$ and $V$ initially act on effectively independent degrees of freedom, then $[W(0),V]$ may be small or vanish. Under chaotic evolution, $W(t)$ becomes increasingly nonlocal in operator space, and the commutator grows.
+
+A common diagnostic is
+\begin{equation}
+C(t)=-\langle[W(t),V]^2\rangle_\beta.
+\end{equation}
+A more analytically controlled object is a regularized OTOC such as
+\begin{equation}
+F(t)=\Tr\left(
+\rho^{1/4}W(t)\rho^{1/4}V
+\rho^{1/4}W(t)\rho^{1/4}V
+\right).
+\end{equation}
+
+\subsection{Exponential growth}
+
+In a large-$N$ scrambling window one finds
+\begin{equation}
+F(t)=F_{\mathrm{disc}}-\frac{A}{N}e^{\lambda_L t}+\cdots.
+\label{eq:OTOCgrowth}
+\end{equation}
+For strongly coupled SYK,
+\begin{equation}
+\boxed{\lambda_L=\frac{2\pi}{\beta}=2\pi T.}
+\label{eq:maxchaos}
+\end{equation}
+The correction becomes order one when
+\begin{equation}
+\frac1N e^{\lambda_L t_*}\sim1,
+\end{equation}
+so
+\begin{equation}
+t_*\sim \frac{\beta}{2\pi}\log N.
+\end{equation}
+This is the scrambling time.
+
+\subsection{The chaos bound}
+
+Maldacena, Shenker, and Stanford derived, under assumptions of analyticity, factorization, and thermal regularity, the bound
+\begin{equation}
+\lambda_L\le \frac{2\pi}{\beta}.
+\label{eq:chaosbound}
+\end{equation}
+SYK saturates it in the strong-coupling large-$N$ limit.
+
+The relevant mathematical statement is not that every finite-$N$ OTOC equals a pure exponential. The claim is an asymptotic one with a time window:
+\begin{equation}
+\beta\ll t\ll \beta\log N.
+\end{equation}
+A rigorous maximal-chaos theorem would need uniform control of errors in precisely such a joint limit.
+
+\subsection{Retarded ladder kernel}
+
+The exponent $\lambda_L$ can be extracted from an analytically continued ladder equation. One looks for eigenfunctions of a retarded kernel with time dependence
+\begin{equation}
+f(t_1,t_2)\sim e^{\frac{\lambda}{2}(t_1+t_2)}\phi(t_1-t_2).
+\end{equation}
+The leading value of $\lambda$ for which the corresponding eigenvalue equals one gives the Lyapunov exponent. The same exceptional reparametrization sector that produces the $h=2$ Euclidean mode controls the maximal real-time growth.
+
+This is a deep structural unity:
+\begin{equation}
+\text{nearly zero Euclidean mode}
+\quad\leftrightarrow\quad
+\text{Schwarzian action}
+\quad\leftrightarrow\quad
+\text{maximal OTOC growth}.
+\end{equation}
+
+\section{Fermi liquids: the quasiparticle paradigm}
+
+The term ``non-Fermi liquid'' is meaningful only after the Fermi-liquid paradigm is stated carefully.
+
+\subsection{Retarded Green function near a Fermi surface}
+
+Consider an interacting translationally invariant fermion system in spatial dimension $d\ge2$. The retarded Green function is
+\begin{equation}
+G^R(\omega,\mathbf k)
+=\frac1{\omega-\varepsilon_{\mathbf k}-\Sigma^R(\omega,\mathbf k)}.
+\label{eq:retarded}
+\end{equation}
+A Fermi surface may be characterized by a singularity or zero of the inverse Green function at zero frequency. Near a regular point $\mathbf k_F$, let $k_\perp$ be the momentum normal to the Fermi surface.
+
+Landau Fermi-liquid theory predicts
+\begin{equation}
+G^R(\omega,\mathbf k)
+\simeq
+\frac{Z}{\omega-v_F^*k_\perp+i\Gamma(\omega,T)}
++G^R_{\mathrm{inc}},
+\label{eq:FLpole}
+\end{equation}
+where $Z>0$ is the quasiparticle residue.
+
+\subsection{The lifetime criterion}
+
+A pole at
+\begin{equation}
+z_{\mathbf k}=E_{\mathbf k}-i\Gamma_{\mathbf k}
+\end{equation}
+represents a useful quasiparticle only if its width is asymptotically small compared with its energy:
+\begin{equation}
+\boxed{
+\frac{\Gamma_{\mathbf k}}{|E_{\mathbf k}|}\longrightarrow0
+\quad\text{as }\mathbf k\to\mathbf k_F.
+}
+\label{eq:qpcriterion}
+\end{equation}
+For an ordinary Fermi liquid,
+\begin{equation}
+\Gamma(\omega,T)\sim c_1\omega^2+c_2T^2
+\end{equation}
+up to dimension-dependent logarithms. Hence
+\begin{equation}
+\Gamma(\omega,0)=o(|\omega|).
+\end{equation}
+This is the core mathematical content of the statement that low-energy quasiparticles are long lived.
+
+The quasiparticle residue is formally
+\begin{equation}
+Z=
+\left[
+1-\partial_\omega\operatorname{Re}\Sigma^R(\omega,\mathbf k_F)|_{\omega=0}
+\right]^{-1},
+\end{equation}
+and also appears as the jump of the momentum distribution at the Fermi surface in a standard Fermi liquid.
+
+\begin{definition}[Quasiparticle-like singularity]
+A low-energy state is quasiparticle-like at $\mathbf k_F$ if there exist $Z_*>0$, $v_F^*\ne0$, and $\Gamma(\omega)=o(|\omega|)$ such that the most singular part of $G^R$ has the form
+\begin{equation}
+\frac{Z_*}{\omega-v_F^*k_\perp+i\Gamma(\omega)}.
+\end{equation}
+\end{definition}
+
+This definition captures the aspect of Fermi-liquid theory most relevant to SYK: the existence of an asymptotically sharp one-particle pole.
+
+\section{Non-Fermi liquids and why SYK is one}
+
+\subsection{A Green-function formulation}
+
+The label ``non-Fermi liquid'' covers several mechanisms. A useful sufficient signal is that the self-energy dominates the bare frequency in the infrared. Suppose
+\begin{equation}
+\Sigma^R(\omega)\sim c(-i\omega)^\alpha,
+\qquad 0<\alpha<1.
+\end{equation}
+Then
+\begin{equation}
+\frac{|\Sigma(\omega)|}{|\omega|}
+\sim |\omega|^{\alpha-1}\to\infty.
+\end{equation}
+The interaction correction is larger than the bare kinetic term, and a narrow quasiparticle pole cannot be treated perturbatively.
+
+\subsection{SYK scaling}
+
+For quartic SYK,
+\begin{equation}
+G(\tau)\sim \frac{\sgn\tau}{|\tau|^{1/2}}.
+\end{equation}
+Fourier transformation gives, schematically,
+\begin{equation}
+G(i\omega)
+\sim -i\,\sgn(\omega)|\omega|^{-1/2}.
+\end{equation}
+Since in the infrared
+\begin{equation}
+G^{-1}\simeq-\Sigma,
+\end{equation}
+we obtain
+\begin{equation}
+\Sigma(i\omega)
+\sim -i\,\sgn(\omega)|\omega|^{1/2}.
+\end{equation}
+Therefore
+\begin{equation}
+\boxed{
+\frac{|\Sigma(\omega)|}{|\omega|}
+\sim |\omega|^{-1/2}\to\infty.
+}
+\end{equation}
+The interaction is not a small correction to a free fermion. It is the dominant infrared dynamics.
+
+Another way to say the same thing is that the retarded Green function has a branch-type power-law singularity rather than a simple isolated quasiparticle pole:
+\begin{equation}
+G^R(\omega)\sim (\omega+i0^+)^{-1/2}
+\end{equation}
+up to a complex phase fixed by causality and particle-hole symmetry.
+
+\subsection{Important terminological caution}
+
+The basic SYK model is zero-dimensional in space. It has no momentum and therefore no literal Fermi surface. It is more precise to call the infrared state a local non-Fermi-liquid fixed point or a non-quasiparticle quantum liquid. To describe an actual metal one must add charge and spatial structure.
+
+\subsection{Complex SYK}
+
+Introduce complex fermions $c_i,c_i^\dagger$ and a conserved charge
+\begin{equation}
+Q=\sum_i c_i^\dagger c_i.
+\end{equation}
+A representative Hamiltonian is
+\begin{equation}
+H=\sum_{i,j,k,l}J_{ij;kl}c_i^\dagger c_j^\dagger c_k c_l
+-\mu\sum_i c_i^\dagger c_i.
+\end{equation}
+The large-$N$ equations take the form
+\begin{equation}
+G(i\omega_n)=\frac1{i\omega_n+\mu-\Sigma(i\omega_n)},
+\end{equation}
+\begin{equation}
+\Sigma(\tau)=-U^2G(\tau)^2G(-\tau),
+\end{equation}
+together with a density constraint. This version is particularly important for condensed matter and for charged black-hole comparisons.
+
+\subsection{SYK lattices and strange metals}
+
+One can put SYK dots on a lattice,
+\begin{equation}
+x\in\Lambda,
+\end{equation}
+with random interactions within each site and hopping between sites. A schematic Euclidean action is
+\begin{align}
+L&=\sum_{x,i}c_{i,x}^\dagger(\partial_\tau-\mu)c_{i,x}
+-\sum_{\langle xx'\rangle,ij}t_{ij,xx'}c_{i,x}^\dagger c_{j,x'}\\
+&\quad
+-\sum_{x,ijkl}J_{ijkl,x}
+ c_{i,x}^\dagger c_{j,x}^\dagger c_{k,x}c_{l,x}.
+\end{align}
+Such models can have incoherent transport without a quasiparticle Boltzmann equation.
+
+A ``strange metal'' is a phenomenological term, often associated with a broad regime of approximately linear resistivity,
+\begin{equation}
+\rho(T)=\rho_0+AT,
+\end{equation}
+and relaxation times of order the thermal time
+\begin{equation}
+\tau_{\mathrm{rel}}\sim\frac{\hbar}{k_BT}.
+\end{equation}
+These are related to, but not synonymous with, non-Fermi-liquid behavior.
+
+\section{Why SYK matters in condensed-matter physics}
+
+The physical importance of SYK is not that ordinary materials literally contain all-to-all Gaussian random couplings. Its importance is that it gives a controlled non-quasiparticle fixed point which can be embedded into more realistic constructions.
+
+\subsection{A solvable strongly interacting fixed point}
+
+Most analytic many-body calculations start from weakly interacting particles. SYK instead starts from a strongly interacting limit in which
+\begin{equation}
+|\Sigma(\omega)|\gg|\omega|.
+\end{equation}
+The low-energy Green function and scaling dimension are still calculable. Thus it provides a rare explicit model of strong-coupling universality.
+
+\subsection{Transport beyond kinetic theory}
+
+Conventional transport is often derived from a Boltzmann equation
+\begin{equation}
+\partial_t f+\mathbf v\cdot\nabla_x f=I_{\mathrm{coll}}[f].
+\end{equation}
+This presupposes a distribution of long-lived quasiparticles. In an SYK-derived incoherent metal, conductivity must instead be obtained directly from current-current correlation functions using a Kubo formula,
+\begin{equation}
+\sigma(\omega)=\frac1{i\omega}G^R_{JJ}(\omega,\mathbf k=0)
+\end{equation}
+with the usual contact-term qualifications. This makes SYK a laboratory for transport when quasiparticle kinetic theory is unavailable.
+
+\subsection{Hydrodynamics without quasiparticles}
+
+Even without quasiparticles, conserved quantities can produce hydrodynamics. In spatial SYK models, energy and charge can diffuse:
+\begin{equation}
+\partial_t \varepsilon=D_E\nabla^2\varepsilon+\cdots.
+\end{equation}
+The coexistence of local quantum criticality, diffusion, and chaos provides a controlled setting in which to study relations among diffusion constants, butterfly velocities, and thermal time scales.
+
+\section{Random matrices and spectral statistics}
+
+SYK is a structured random matrix, not a Wigner matrix. The distinction matters.
+
+\subsection{Global versus local spectral questions}
+
+Let the eigenvalues be $E_1\le\cdots\le E_D$ with
+\begin{equation}
+D=2^{N/2}.
+\end{equation}
+The empirical measure is
+\begin{equation}
+\mu_N=\frac1D\sum_{a=1}^{D}\delta_{E_a/s_N}
+\end{equation}
+for a suitable scale $s_N$. Global convergence of $\mu_N$ is a different question from local spacing statistics.
+
+At microscopic scales, the symmetry class depends on $N$ modulo $8$ because of the Clifford algebra and antiunitary symmetries. After unfolding, local level statistics are expected to follow the corresponding Gaussian random-matrix ensemble in chaotic sectors.
+
+\subsection{Spectral form factor}
+
+Define
+\begin{equation}
+K(\beta,t)=\E\left|Z(\beta+it)\right|^2.
+\end{equation}
+In eigenvalue coordinates,
+\begin{equation}
+K(\beta,t)=
+\E\sum_{a,b}
+ e^{-\beta(E_a+E_b)}e^{-it(E_a-E_b)}.
+\end{equation}
+Thus $K$ is a Fourier transform of a two-level correlation measure. Chaotic random-matrix statistics produce the qualitative sequence
+\begin{equation}
+\text{dip}\longrightarrow\text{ramp}\longrightarrow\text{plateau}.
+\end{equation}
+The ramp is a long-range signature of spectral rigidity.
+
+\subsection{Different time scales}
+
+Several limits must be separated:
+\begin{equation}
+J^{-1}\ll \beta\ll t_*\sim \beta\log N\ll t_H\sim e^{cN}.
+\end{equation}
+Here $J^{-1}$ is the microscopic interaction time, $t_*$ is the scrambling time, and $t_H$ is the Heisenberg time associated with the exponentially small mean level spacing. OTOC chaos is an intermediate-time phenomenon; random-matrix plateau physics lives at exponentially later times.
+
+\section{A minimal mathematical introduction to general relativity}
+
+The black-hole connection can be explained with a small amount of differential geometry.
+
+\subsection{Lorentzian manifolds}
+
+A spacetime is a smooth manifold $M$ equipped with a Lorentzian metric $g$ of signature $(-,+,\ldots,+)$. The metric gives the squared interval
+\begin{equation}
+ds^2=g_{\mu\nu}dx^\mu dx^\nu.
+\end{equation}
+Vectors are timelike, null, or spacelike according as $g(v,v)$ is negative, zero, or positive. The Levi-Civita connection determines geodesics and the curvature tensor.
+
+Einstein's equation is
+\begin{equation}
+R_{\mu\nu}-\frac12Rg_{\mu\nu}+\Lambda g_{\mu\nu}
+=8\pi G_N T_{\mu\nu}.
+\label{eq:Einstein}
+\end{equation}
+The cosmological constant $\Lambda<0$ leads to anti-de Sitter geometries.
+
+\subsection{$\AdS_2$}
+
+Two-dimensional anti-de Sitter space can be written in Poincar\'e coordinates as
+\begin{equation}
+ds^2=\frac{L^2}{z^2}(-dt^2+dz^2),
+\qquad z>0.
+\label{eq:ads2}
+\end{equation}
+Its scalar curvature is constant,
+\begin{equation}
+R=-\frac2{L^2}.
+\end{equation}
+Its isometry group is locally $SL(2,\R)$. The same group is the global conformal group of one-dimensional time. This common symmetry is the first structural hint of the SYK-$\AdS_2$ connection.
+
+\subsection{Horizons and black holes}
+
+An event horizon is a global causal boundary: the boundary of the region from which future-directed causal curves fail to reach the asymptotic exterior. It is not a material membrane. In smooth large black holes, local curvature at the horizon may be small.
+
+For the SYK story, charged near-extremal black holes are especially important. Extremality means that, at fixed conserved charge, the black hole reaches the minimum allowed mass and has zero Hawking temperature in the classical solution. Near extremality, the near-horizon geometry develops a long approximately $\AdS_2$ throat.
+
+\section{Jackiw-Teitelboim gravity and the Schwarzian}
+
+\subsection{Why two-dimensional gravity is special}
+
+In two dimensions, the Einstein-Hilbert integral
+\begin{equation}
+\int_M\sqrt g\,R\,d^2x
+\end{equation}
+is topological up to boundary terms by Gauss-Bonnet. Pure two-dimensional Einstein gravity therefore has no local propagating metric degree of freedom.
+
+Jackiw-Teitelboim gravity introduces a scalar dilaton $\Phi$. In Euclidean signature a common normalization is
+\begin{align}
+I_{JT}[g,\Phi]
+&=-\frac{\Phi_0}{16\pi G}\int_M\sqrt g\,R\,d^2x\\
+&\quad
+-\frac1{16\pi G}\int_M\sqrt g\,\Phi\left(R+\frac2{L^2}\right)d^2x
++I_{\partial M}.
+\label{eq:JT}
+\end{align}
+Varying with respect to $\Phi$ gives
+\begin{equation}
+R+\frac2{L^2}=0.
+\end{equation}
+Thus the metric is locally $\AdS_2$. The nontrivial degree of freedom is encoded in the dilaton and in the boundary embedding.
+
+\subsection{Boundary reparametrization}
+
+Regulate the asymptotic boundary by a curve parametrized by $u$. The physical boundary time is related to Poincar\'e time by
+\begin{equation}
+t=f(u).
+\end{equation}
+Solving the bulk constraints and evaluating the boundary action gives
+\begin{equation}
+I_{\mathrm{grav}}[f]
+=-C\int_0^\beta du
+\left\{
+\tan\left(\frac{\pi f(u)}{\beta}\right),u
+\right\}.
+\label{eq:gravsch}
+\end{equation}
+This is the same functional form as the SYK soft action \eqref{eq:SchAction}.
+
+The safest mathematical statement of the low-energy duality is therefore
+\begin{equation}
+\boxed{
+I_{\mathrm{SYK,soft}}[f]
+\cong
+I_{\mathrm{JT,boundary}}[f]
+}
+\end{equation}
+after matching the coefficient $C$ to $N\alpha_S/J$.
+
+\subsection{Symmetry interpretation}
+
+On the SYK side, the conformal equations possess approximate $\Diff(S^1)$ covariance, but a saddle preserves only $PSL(2,\R)$ and the UV kinetic term explicitly breaks the larger symmetry.
+
+On the gravity side, large boundary reparametrizations are physical except for the exact $PSL(2,\R)$ isometries of $\AdS_2$. The Schwarzian measures the action cost of these boundary modes.
+
+Thus the matching is not merely numerical. It is a matching of symmetry-breaking structures:
+\begin{equation}
+\Diff(S^1)/PSL(2,\R)
+\end{equation}
+appears on both sides.
+
+\section{Black-hole thermodynamics and SYK entropy}
+
+\subsection{Bekenstein-Hawking entropy}
+
+For a semiclassical black hole,
+\begin{equation}
+S_{BH}=\frac{k_Bc^3}{4G_N\hbar}\mathcal A_H.
+\end{equation}
+In units $c=\hbar=k_B=1$,
+\begin{equation}
+S_{BH}=\frac{\mathcal A_H}{4G_N}.
+\label{eq:BHentropy}
+\end{equation}
+For a near-extremal charged black hole at fixed charge,
+\begin{equation}
+S_{BH}(T)=S_0+\gamma_{BH}T+O(T^2).
+\label{eq:BHnear}
+\end{equation}
+Compare with large-$N$ SYK,
+\begin{equation}
+S_{SYK}(T)=Ns_0+N\gamma_{SYK}T+\cdots.
+\end{equation}
+The functional form is identical.
+
+This thermodynamic parallel predates the detailed Schwarzian matching and was an important clue that the same low-energy effective theory might be present.
+
+\subsection{Residual entropy and order of limits}
+
+On the black-hole side, $S_0$ is proportional to the extremal horizon area. On the SYK side, $Ns_0$ is the large-$N$ zero-temperature entropy obtained when $N\to\infty$ is taken before $T\to0$.
+
+The correspondence should not be interpreted as an exponentially degenerate exact finite-$N$ SYK ground state. Instead, the density of low-energy states becomes exponentially large in a scaling window whose spacing is invisible before taking the thermodynamic limit.
+
+\subsection{Schwarzian density of states}
+
+The Schwarzian theory has a characteristic low-energy spectral density of the form
+\begin{equation}
+\rho_{\Sch}(E)\propto \sinh\left(2\pi\sqrt{2CE}\right),
+\end{equation}
+up to normalization and an overall factor $e^{S_0}$. Its partition function is
+\begin{equation}
+Z(\beta)=\int_0^\infty \rho(E)e^{-\beta E}\,dE.
+\end{equation}
+The same Schwarzian spectral structure occurs in JT gravity.
+
+\section{The holographic dictionary in its weakest useful form}
+
+It is helpful to phrase holography as an inverse problem for correlation data.
+
+\subsection{Boundary dimensions and bulk masses}
+
+A scalar field of mass $m$ in $\AdS_2$ is related to a boundary operator of dimension $h$ by
+\begin{equation}
+m^2L^2=h(h-1).
+\label{eq:massdimension}
+\end{equation}
+SYK provides a tower of bilinear dimensions $h_n$ through
+\begin{equation}
+k(h_n)=1.
+\end{equation}
+One may therefore assign a candidate bulk field $\phi_n$ with
+\begin{equation}
+m_n^2L^2=h_n(h_n-1).
+\end{equation}
+A schematic bulk action is
+\begin{equation}
+\mathcal L_{\mathrm{bulk}}
+=\sum_n\left[
+\frac12(\partial\phi_n)^2+\frac12m_n^2\phi_n^2
+\right]
++\frac1{\sqrt N}\sum_{nmk}\lambda_{nmk}\phi_n\phi_m\phi_k+\cdots.
+\end{equation}
+Boundary three-point coefficients determine the cubic couplings after known $\AdS_2$ normalization factors are taken into account.
+
+\subsection{What is established and what is not}
+
+The robust statement is that the universal low-energy reparametrization sector of SYK is described by the same Schwarzian action as nearly-$\AdS_2$ JT gravity. This yields matching low-temperature thermodynamics and matching soft contributions to correlation functions and chaos.
+
+A much stronger statement would be an exact microscopic equivalence
+\begin{equation}
+\cH_{\SYK}\cong\cH_{\mathrm{pure\ JT}}
+\end{equation}
+with equality of all finite-$N$ observables. That is not what has been established. Ordinary SYK also contains an infinite tower of order-one-dimension bilinear operators, so pure JT gravity captures only the universal soft sector, not all microscopic data.
+
+\begin{conjecture}[Effective holographic matching]
+For a specified class of low-energy sources $J_{\partial}$ and a prescribed joint limit $N\to\infty$, $\beta J\to\infty$, the generating functional of the soft sector satisfies
+\begin{equation}
+W^{\mathrm{soft}}_{\SYK}[J_{\partial}]
+-W^{\mathrm{boundary}}_{JT}[J_{\partial}]
+\to0
+\end{equation}
+with controlled errors.
+\end{conjecture}
+
+This is a mathematically meaningful version of the slogan that SYK is dual to nearly-$\AdS_2$ gravity.
+
+\section{Black holes and maximal chaos}
+
+Near a black-hole horizon, a small perturbation sent in at an early time undergoes an exponentially large relative boost compared with a later probe. In the semiclassical shock-wave calculation this produces an exponential effect with scale
+\begin{equation}
+\lambda_L=\frac{2\pi}{\beta}.
+\end{equation}
+The same exponent appears from the Schwarzian mode and from the SYK retarded ladder kernel.
+
+Thus the triangle
+\begin{equation}
+\SYK\quad\longleftrightarrow\quad\text{Schwarzian}\quad\longleftrightarrow\quad\text{near-extremal black hole}
+\end{equation}
+explains the common value of the chaos exponent. The relation is much sharper than the vague statement that both systems are ``very chaotic.'' They share the same effective reparametrization theory.
+
+Restoring constants,
+\begin{equation}
+\lambda_L=\frac{2\pi k_BT}{\hbar},
+\end{equation}
+so the Lyapunov time is
+\begin{equation}
+\tau_L=\frac{\hbar}{2\pi k_BT}.
+\end{equation}
+The same thermal time also appears in discussions of Planckian relaxation in strange metals, although the equality of all such time scales is not a universal theorem.
+
+\section{Complex SYK, spectral asymmetry, and charged black holes}
+
+The charged complex SYK model has an additional parameter: the conserved density
+\begin{equation}
+\mathcal Q=\frac1N\langle Q\rangle.
+\end{equation}
+At nonzero density, the low-frequency spectral function need not be particle-hole symmetric. The conformal Green function contains a spectral-asymmetry parameter, often denoted $\mathcal E$ or an equivalent angle.
+
+A notable thermodynamic relation links spectral asymmetry to the charge derivative of the zero-temperature entropy:
+\begin{equation}
+\frac{\partial s_0}{\partial \mathcal Q}
+\propto \mathcal E
+\end{equation}
+with convention-dependent proportionality constants. An analogous relation appears in the thermodynamics of charged near-extremal black holes with an $\AdS_2$ throat.
+
+This makes the complex model especially valuable. The comparison is not merely
+\begin{equation}
+\text{large entropy}\leftrightarrow\text{large entropy},
+\end{equation}
+but connects charge, low-frequency asymmetry, entropy derivatives, and $\AdS_2$ response functions.
+
+\section{Probability and statistical mechanics viewpoints}
+
+We now recast SYK in a language closer to random operators and mean-field disordered systems.
+
+\subsection{A sequence of random operator models}
+
+For each even $N$, let
+\begin{equation}
+(\Omega_N,\mathscr F_N,\Pp_N)
+\end{equation}
+carry independent Gaussian variables $J_I$. Let
+\begin{equation}
+\cH_N\cong\C^{2^{N/2}}
+\end{equation}
+and define
+\begin{equation}
+H_N(\omega)=\sum_{|I|=q}J_I(\omega)\Gamma_I,
+\end{equation}
+where
+\begin{equation}
+\Gamma_I=i^{q/2}\psi_{i_1}\cdots\psi_{i_q}.
+\end{equation}
+The quenched pressure is
+\begin{equation}
+p_N(\beta)=\frac1N\E\log\Tr e^{-\beta H_N}.
+\end{equation}
+A basic mathematical problem is to prove existence and characterize
+\begin{equation}
+p(\beta)=\lim_{N\to\infty}p_N(\beta).
+\end{equation}
+
+Recent rigorous work has made major progress on precisely this thermodynamic limit, first in high-temperature regimes and, very recently, for the quartic model at all fixed positive temperatures in a particular normalization. These results indicate that the gap between the formal large-$N$ saddle and rigorous statistical mechanics is narrowing.
+
+\subsection{A dynamical order parameter}
+
+The large-$N$ prediction is that
+\begin{equation}
+G_\beta(\tau)
+=\lim_{N\to\infty}
+\frac1N\sum_i\E\langle T_\tau\psi_i(\tau)\psi_i(0)\rangle
+\end{equation}
+is deterministic and solves
+\begin{align}
+G^{-1}(i\omega_n)&=-i\omega_n-\Sigma(i\omega_n),\\
+\Sigma(\tau)&=J^2G(\tau)^3.
+\end{align}
+This resembles a mean-field fixed-point equation, but the order parameter is a function rather than a scalar.
+
+\subsection{Cavity intuition}
+
+Separate one Majorana:
+\begin{equation}
+H_N=H_{N-1}+\psi_N B_N,
+\end{equation}
+where
+\begin{equation}
+B_N=\sum_{i<j<k<N}J_{ijkN}\psi_i\psi_j\psi_k.
+\end{equation}
+The distinguished mode $\psi_N$ interacts with a random dynamical bath generated by the remaining $N-1$ modes. In the large-$N$ limit, the bath's two-time correlations become self-consistent and deterministic. The resulting memory kernel is precisely the self-energy
+\begin{equation}
+\Sigma(\tau)=J^2G(\tau)^3.
+\end{equation}
+This is the noncommutative, dynamical analogue of a cavity field.
+
+\subsection{Replica method}
+
+The quenched average contains $\E\log Z$. Physicists often use
+\begin{equation}
+\E\log Z
+=\lim_{n\to0}\frac{\E Z^n-1}{n}.
+\label{eq:replica}
+\end{equation}
+For positive integers $n$, $Z^n$ introduces $n$ replicas. One computes $\E Z^n$, analyzes saddle points, and then analytically continues in $n$. This procedure is not automatically rigorous because the analytic continuation from integers to $n=0$ is not unique without additional control.
+
+In ordinary SYK the standard saddle is replica diagonal in the usual parameter regime, unlike the low-temperature Parisi structure of the Sherrington-Kirkpatrick spin glass. The contrast is physically important: random couplings do not imply spin-glass order by themselves. Fermionic anticommutation changes the structure of frustration and low-energy states.
+
+\section{What is rigorous, what is controlled physics, and what remains open}
+
+A useful map of the subject is the following.
+
+\subsection{Finite-$N$ mathematics}
+
+At finite $N$, the following objects are completely well-defined:
+\begin{equation}
+H_N,\quad Z_N(\beta),\quad \rho_{\beta,N},\quad G_N(\tau),\quad
+\operatorname{spec}(H_N),\quad \OTOC_N(t).
+\end{equation}
+They are finite-dimensional random operator quantities.
+
+\subsection{Rigorous large-$N$ results}
+
+There are rigorous results on global spectral laws, spectral edges in several regimes, concentration, combinatorial melonic dominance, and free-energy limits. The exact hypotheses and normalizations vary among papers. These results should be viewed as mathematical foundations for parts of the standard physics picture, not as a single theorem proving every infrared claim.
+
+\subsection{Controlled but formal physics}
+
+The chain
+\begin{equation}
+H_N
+\xrightarrow{N\to\infty}
+(G,\Sigma)
+\xrightarrow{\omega/J\to0}
+G_c
+\xrightarrow{\text{soft fluctuations}}
+I_{\Sch}
+\xrightarrow{\text{real time}}
+\lambda_L=2\pi/\beta
+\end{equation}
+is supported by mutually consistent diagrammatic, saddle-point, numerical, and effective-field-theory calculations. But obtaining all arrows as one rigorous theorem with uniform error bounds in a joint low-temperature and large-$N$ limit remains a substantial challenge.
+
+\subsection{The holographic layer}
+
+The equality of the Schwarzian effective action on the SYK and JT sides is a concrete calculational correspondence. The interpretation as a full microscopic quantum-gravity dual is more ambitious and should be stated separately.
+
+\section{Concrete mathematical problems suggested by SYK}
+
+The model generates a long list of precise questions.
+
+\subsection{Derive the bilocal variational principle directly}
+
+One would like a theorem of the schematic form
+\begin{equation}
+\lim_{N\to\infty}\frac1N\log Z_N[\eta]
+=-\inf_{G,\Sigma}I_{\mathrm{eff}}[G,\Sigma;\eta],
+\end{equation}
+for a suitable generating functional with source $\eta$, together with existence, uniqueness, and regularity of the relevant saddle.
+
+A stronger version would prove convergence of thermal two-point functions to the Schwinger-Dyson solution.
+
+\subsection{Rigorous infrared scaling}
+
+Prove that in a scaling window
+\begin{equation}
+1\ll J|\tau|\ll \beta J
+\end{equation}
+one has
+\begin{equation}
+G_\beta(\tau)
+=b\frac{\sgn\tau}{|J\tau|^{1/2}}(1+o(1))
+\end{equation}
+with quantitative, uniform error bounds. At finite temperature the target is the sine-law form \eqref{eq:finiteTG}.
+
+\subsection{Derive the Schwarzian as a fluctuation theory}
+
+One would like to make precise a statement of the form
+\begin{equation}
+\Pp_N(G\approx G_f)
+\asymp
+\exp\left[-C_N I_{\Sch}(f)\right]
+\end{equation}
+on an appropriate quotient of reparametrizations, after integrating out massive directions. This resembles a moderate-deviation theorem near a manifold of almost-degenerate minimizers.
+
+\subsection{Four-point convergence}
+
+Prove convergence of connected four-point functions after $N$ rescaling:
+\begin{equation}
+N\,\cF_N\longrightarrow (I-K)^{-1}\cF_0
+\end{equation}
+in a suitable function space, and control the singular $h=2$ sector by a separate perturbation theory.
+
+\subsection{A maximal-chaos theorem}
+
+Specify operators $V_N,W_N$, temperature scaling, and a time window such that
+\begin{equation}
+C_N(t)=\frac{a}{N}e^{2\pi t/\beta}(1+o(1))
+\end{equation}
+uniformly for
+\begin{equation}
+1\ll t/\beta\ll \log N.
+\end{equation}
+This requires precise real-time analytic continuation and error control in a regime where small errors can be exponentially magnified.
+
+\subsection{Universality in the disorder law}
+
+Replace Gaussian $J_I$ by centered variables with matching variance and sufficient moments. Ask whether the thermodynamic limit, infrared scaling, Schwarzian sector, and chaos exponent are universal. At the global spectral level this resembles Lindeberg replacement. At the level of soft modes and OTOCs it is far subtler.
+
+\subsection{Sparse SYK}
+
+Retain only a random subset of $q$-body interactions. The interaction structure becomes a random $q$-uniform hypergraph. Natural questions include the connectivity threshold for melonic mean-field behavior, concentration, localization, and the transition from sparse-cluster physics to dense SYK universality.
+
+\subsection{Double scaling}
+
+Let $q=q(N)$ grow with $N$. Then chord diagrams and noncommutative moment methods become natural. The fixed-$q$ and double-scaled limits are genuinely different asymptotic theories.
+
+\subsection{Mathematical definition of a non-Fermi liquid}
+
+For a spatial fermionic system, formulate hypotheses under which the failure of the quasiparticle property can be stated purely in terms of singularities of $G^R(\omega,\mathbf k)$. A possible criterion is the absence of any decomposition
+\begin{equation}
+G^R(\omega,\mathbf k)
+=\frac{Z_*}{\omega-v_F^*k_\perp+i\Gamma(\omega)}+R(\omega,\mathbf k)
+\end{equation}
+with $Z_*>0$, $\Gamma(\omega)=o(|\omega|)$, and $R$ less singular near the Fermi surface.
+
+\subsection{Holography as an inverse problem}
+
+Given conformal data
+\begin{equation}
+\{h_n,C_{nmk},C_{nmkl},\ldots\},
+\end{equation}
+find hypotheses ensuring the existence of a local or approximately local two-dimensional bulk action reproducing the boundary correlators order by order in $1/N$. Determine when such an action is unique and how bulk locality is encoded in asymptotics of boundary operator data.
+
+\section{A guided derivation of the central equations}
+
+This section collects the main derivations in one chain.
+
+\subsection{From disorder to a quartic bilocal interaction}
+
+Start from the Euclidean action
+\begin{equation}
+S[\chi;J]
+=\frac12\sum_i\int d\tau\,\psi_i\partial_\tau\psi_i
++\sum_{i<j<k<l}J_{ijkl}\int d\tau\,
+\psi_i\psi_j\psi_k\psi_l.
+\end{equation}
+The Gaussian identity
+\begin{equation}
+\E e^{-JX}=e^{\frac12\operatorname{Var}(J)X^2}
+\end{equation}
+produces after disorder averaging a two-time interaction. Summing over flavor indices yields, to leading order in $N$,
+\begin{equation}
+\exp\left[
+\frac{NJ^2}{8}\int d\tau_1d\tau_2
+G(\tau_1,\tau_2)^4
+\right]
+\end{equation}
+up to convention-dependent constants.
+
+The appearance of $N$ follows from
+\begin{equation}
+N^{-3}\times N^4=N.
+\end{equation}
+This simple counting is the reason for the variance scaling $N^{-3}$ in quartic SYK.
+
+\subsection{From the collective action to Dyson}
+
+Using
+\begin{equation}
+\delta\log\det A=\Tr(A^{-1}\delta A),
+\end{equation}
+variation of
+\begin{equation}
+-\frac12\log\det(\partial_\tau-\Sigma)
+\end{equation}
+with respect to $\Sigma$ yields
+\begin{equation}
+\frac12(\partial_\tau-\Sigma)^{-1}.
+\end{equation}
+Balancing against the $\frac12\int\Sigma G$ term gives
+\begin{equation}
+G=(\partial_\tau-\Sigma)^{-1}.
+\end{equation}
+Fourier transformation yields
+\begin{equation}
+G(i\omega_n)=\frac1{-i\omega_n-\Sigma(i\omega_n)}.
+\end{equation}
+Variation with respect to $G$ gives
+\begin{equation}
+\Sigma=J^2G^3.
+\end{equation}
+
+\subsection{From scaling to $\Delta=1/q$}
+
+Assume under $\tau\mapsto \lambda\tau$,
+\begin{equation}
+G(\lambda\tau)=\lambda^{-2\Delta}G(\tau).
+\end{equation}
+Then
+\begin{equation}
+\Sigma(\lambda\tau)=\lambda^{-2\Delta(q-1)}\Sigma(\tau).
+\end{equation}
+The convolution has scaling dimension
+\begin{equation}
+[\Sigma\circ G]=2\Delta q-1,
+\end{equation}
+because one integrates once over time. To match $\delta(\tau)$, which has dimension $1$, require
+\begin{equation}
+2\Delta q-1=1.
+\end{equation}
+Hence
+\begin{equation}
+\Delta=1/q.
+\end{equation}
+
+\subsection{From reparametrizations to the Schwarzian}
+
+The strict infrared equations are invariant under \eqref{eq:reparamG}. Any reparametrized conformal solution $G_f$ has the same conformal action. The microscopic derivative term breaks this degeneracy. Locality in time, projective invariance, and the requirement of three derivatives at leading nontrivial order single out the Schwarzian derivative as the natural local functional. Thus one obtains
+\begin{equation}
+I_{\mathrm{soft}}[f]
+\propto \frac NJ\int\{f,\tau\}\,d\tau
+\end{equation}
+on the line, or the thermal-circle form \eqref{eq:SchAction}.
+
+This argument explains the form of the action but not its coefficient. The coefficient $\alpha_S$ must be matched to the full theory, including the UV region neglected by the conformal approximation.
+
+\section{A compact dictionary of concepts}
+
+\begin{longtable}{p{0.24\textwidth}p{0.69\textwidth}}
+\toprule
+Physics term & Mathematical translation \\
+\midrule
+\endfirsthead
+\toprule
+Physics term & Mathematical translation \\
+\midrule
+\endhead
+Majorana fermion & Self-adjoint Clifford generator $\psi_i$ with $\{\psi_i,\psi_j\}=\delta_{ij}I$. \\
+Quenched disorder & Random Hamiltonian sampled once, then thermodynamics computed at fixed sample before averaging $\E\log Z$. \\
+Self-energy & Kernel $\Sigma$ entering the nonlinear resolvent identity $G^{-1}=G_0^{-1}-\Sigma$. \\
+Large $N$ & Asymptotic regime in which singlet fluctuations are suppressed and melonic diagrams dominate. \\
+Melon & Recursively generated leading graph maximizing powers of the flavor index $N$. \\
+Infrared & Frequency regime $|\omega|\ll J$, or time regime $J|\tau|\gg1$. \\
+Emergent conformal symmetry & Approximate scale/reparametrization covariance of the low-energy Schwinger-Dyson equations after dropping the kinetic term. \\
+Soft mode & Nearly zero-cost reparametrization fluctuation $f\in\Diff/PSL(2,\R)$. \\
+Schwarzian & Effective action for the soft mode, built from $\{f,\tau\}$. \\
+Quasiparticle & Pole-like excitation with width $\Gamma=o(|E|)$. \\
+Non-Fermi liquid & Gapless fermionic state lacking the Landau quasiparticle pole structure. \\
+OTOC & Four-point function probing growth of noncommutativity and operator complexity. \\
+Maximal chaos & Exponential OTOC growth with $\lambda_L=2\pi/\beta$, saturating the chaos bound. \\
+$\AdS_2$ & Constant negative curvature two-dimensional spacetime with isometry group $SL(2,\R)$. \\
+JT gravity & Two-dimensional dilaton gravity whose boundary mode is governed by a Schwarzian action. \\
+Holography & Reconstruction of bulk gravitational observables from lower-dimensional quantum correlation data in an appropriate limit. \\
+\bottomrule
+\end{longtable}
+
+\section{A suggested self-study route}
+
+A reader with probability and statistical-mechanics training can approach the subject in the following conceptual order.
+
+First, become completely comfortable with finite-dimensional fermions. The essential algebra is just exterior algebra, CAR, and Clifford generators. One does not need relativistic quantum field theory to define SYK.
+
+Next, treat the SYK Hamiltonian as a random operator and understand the two layers of expectation:
+\begin{equation}
+\langle\cdot\rangle_{\beta,J}
+\qquad\text{and}\qquad
+\E_J[\cdot].
+\end{equation}
+Then study the large-$N$ closure
+\begin{equation}
+G^{-1}=G_0^{-1}-\Sigma,
+\qquad
+\Sigma=J^2G^3.
+\end{equation}
+This is the mathematical core.
+
+After that, study the infrared approximation and derive
+\begin{equation}
+G(\tau)\sim \frac{\sgn\tau}{|\tau|^{1/2}}.
+\end{equation}
+Only then introduce the language of non-Fermi liquids: the power law means there is no isolated long-lived fermion pole.
+
+Next, study the ladder kernel and understand why the equation $k(h)=1$ produces a spectrum of bilinear dimensions. The exceptional $h=2$ solution motivates the Schwarzian.
+
+Finally, learn the minimal gravity needed to recognize the same Schwarzian as the boundary action of nearly-$\AdS_2$ JT gravity. This order avoids importing black-hole terminology before the mathematical structure requiring it is visible.
+
+\section{Summary of the main equations}
+
+The introductory physics of SYK can be compressed into the following collection.
+
+Fermion algebra:
+\begin{equation}
+\{\psi_i,\psi_j\}=\delta_{ij}.
+\end{equation}
+Random Hamiltonian:
+\begin{equation}
+H=\sum_{i<j<k<l}J_{ijkl}\psi_i\psi_j\psi_k\psi_l,
+\qquad
+\E J_{ijkl}^2=\frac{6J^2}{N^3}.
+\end{equation}
+Large-$N$ Schwinger-Dyson equations:
+\begin{equation}
+G^{-1}(i\omega)=-i\omega-\Sigma(i\omega),
+\qquad
+\Sigma(\tau)=J^2G(\tau)^3.
+\end{equation}
+Infrared solution:
+\begin{equation}
+G_{\IR}(\tau)=b\frac{\sgn\tau}{|J\tau|^{1/2}},
+\qquad
+b^4=\frac1{4\pi}.
+\end{equation}
+Reparametrization covariance:
+\begin{equation}
+G_f(\tau_1,\tau_2)
+=[f'(\tau_1)f'(\tau_2)]^{1/4}
+G(f(\tau_1),f(\tau_2)).
+\end{equation}
+Schwarzian derivative:
+\begin{equation}
+\{f,\tau\}=\frac{f'''}{f'}-\frac32\left(\frac{f''}{f'}\right)^2.
+\end{equation}
+Soft action:
+\begin{equation}
+I_{\mathrm{soft}}
+=-\frac{N\alpha_S}{J}\int_0^\beta
+\left\{\tan\frac{\pi f}{\beta},\tau\right\}d\tau.
+\end{equation}
+Ladder spectrum:
+\begin{equation}
+k(h)
+=-\frac32\frac{\tan\left[\pi(h-\frac12)/2\right]}{h-\frac12},
+\qquad
+k(h)=1.
+\end{equation}
+Maximal chaos:
+\begin{equation}
+\lambda_L=\frac{2\pi}{\beta}.
+\end{equation}
+Low-temperature entropy:
+\begin{equation}
+S_{\SYK}=Ns_0+N\gamma T+\cdots.
+\end{equation}
+Black-hole entropy:
+\begin{equation}
+S_{BH}=\frac{\mathcal A_H}{4G_N}=S_0+\gamma_{BH}T+\cdots.
+\end{equation}
+Bulk mass and boundary dimension:
+\begin{equation}
+m^2L^2=h(h-1).
+\end{equation}
+
+The conceptual chain is
+\begin{equation}
+\boxed{
+\begin{aligned}
+\text{random Clifford Hamiltonian}
+&\longrightarrow \text{deterministic large-}N\text{ Dyson equation}\\
+&\longrightarrow \text{conformal IR fixed point}\\
+&\longrightarrow \text{Schwarzian soft mode}\\
+&\longrightarrow
+\begin{cases}
+\text{non-quasiparticle dynamics},\\
+\text{maximal chaos},\\
+\text{nearly-}\AdS_2\text{ gravity}.
+\end{cases}
+\end{aligned}
+}
+\end{equation}
+The mathematical frontier is to turn as many arrows in this diagram as possible into theorems with explicit regimes and quantitative error bounds.
+
+\appendix
+\section{Appendix: Fourier transform of the infrared power law}
+
+For $0<\alpha<1$, the distributional Fourier transform obeys
+\begin{equation}
+\int_0^\infty e^{i\omega t}t^{-\alpha}\,dt
+=\Gamma(1-\alpha)e^{i\pi(1-\alpha)\sgn\omega/2}|\omega|^{\alpha-1}
+\end{equation}
+with the usual regularization. For an odd function
+\begin{equation}
+f(t)=\sgn(t)|t|^{-2\Delta},
+\end{equation}
+one obtains
+\begin{equation}
+\widehat f(\omega)
+\propto -i\,\sgn(\omega)|\omega|^{2\Delta-1}.
+\end{equation}
+For $q=4$, $2\Delta=1/2$, hence
+\begin{equation}
+G(i\omega)\propto -i\,\sgn(\omega)|\omega|^{-1/2}.
+\end{equation}
+This is the simple analytic origin of the singular infrared Green function.
+
+\section{Appendix: a finite-$N$ Clifford trace identity}
+
+Let $\Gamma_I$ and $\Gamma_J$ be distinct normalized Clifford monomials of equal degree. With normalized trace
+\begin{equation}
+\tau_N(A)=2^{-N/2}\Tr A,
+\end{equation}
+one has orthogonality
+\begin{equation}
+\tau_N(\Gamma_I\Gamma_J)=0,
+\qquad I\ne J,
+\end{equation}
+while
+\begin{equation}
+\tau_N(\Gamma_I^2)=c_q
+\end{equation}
+for a constant depending only on the normalization of the Majoranas. Consequently
+\begin{equation}
+\E\tau_N(H^2)
+=c_q\sum_I\E J_I^2.
+\end{equation}
+For fixed $q$,
+\begin{equation}
+\sum_I\E J_I^2
+\asymp
+N^qN^{-(q-1)}\asymp N.
+\end{equation}
+This gives a direct finite-dimensional explanation for the $O(N)$ second moment of the Hamiltonian.
+
+\section{Appendix: projective invariance of the Schwarzian}
+
+Let
+\begin{equation}
+M(f)=\frac{af+b}{cf+d},
+\qquad ad-bc\ne0.
+\end{equation}
+A direct differentiation gives
+\begin{equation}
+M'(f)=\frac{ad-bc}{(cf+d)^2}f'.
+\end{equation}
+Substituting the first three derivatives into \eqref{eq:schwarzian}, all terms depending on $a,b,c,d$ cancel, yielding
+\begin{equation}
+\{M\circ f,\tau\}=\{f,\tau\}.
+\end{equation}
+In particular,
+\begin{equation}
+\left\{\frac{a\tau+b}{c\tau+d},\tau\right\}=0.
+\end{equation}
+This identity is the elementary reason $PSL(2,\R)$ is the exact redundancy of the Schwarzian theory.
+
+\section{Appendix: Euclidean versus real-time correlators}
+
+For a finite-dimensional Hamiltonian with eigenvectors $\ket n$ and energies $E_n$, the thermal Euclidean correlator of fermionic operators has a Lehmann expansion. For $0<\tau<\beta$,
+\begin{equation}
+G(\tau)
+=\frac1Z\sum_{m,n}
+e^{-\beta E_n}e^{-\tau(E_m-E_n)}
+\langle n|\chi|m\rangle\langle m|\chi|n\rangle.
+\end{equation}
+The retarded function is
+\begin{equation}
+G^R(t)=-i\theta(t)\langle\{\chi(t),\chi(0)\}\rangle_\beta.
+\end{equation}
+Both are determined by the same spectral measure, and analytic continuation connects their frequency-domain representations. The difficulty in chaos calculations is not the finite-$N$ existence of analytic continuation, but obtaining uniform asymptotics after taking large $N$, low temperature, and long time.
+
+\section{Appendix: brief notes on notation and conventions}
+
+Different papers normalize Majorana fermions either by
+\begin{equation}
+\{\psi_i,\psi_j\}=\delta_{ij}
+\end{equation}
+or by
+\begin{equation}
+\{\psi_i,\psi_j\}=2\delta_{ij}.
+\end{equation}
+This changes factors of $2$ in the Hamiltonian, propagator, and coupling variance. Likewise some authors write
+\begin{equation}
+G(\tau)=-\langle T_\tau\chi(\tau)\chi(0)\rangle
+\end{equation}
+with an explicit minus sign, while others absorb it into conventions. The universal structural statements are unaffected:
+\begin{equation}
+\Sigma\propto J^2G^{q-1},
+\qquad
+\Delta=1/q,
+\qquad
+I_{\mathrm{soft}}\propto \frac NJ I_{\Sch},
+\qquad
+\lambda_L\to 2\pi/\beta.
+\end{equation}
+When comparing formulas between papers, one should first align these conventions.
+
+\section{References and further reading}
+
+\begin{thebibliography}{99}
+
+\bibitem{Rosenhaus}
+V. Rosenhaus,
+\emph{An introduction to the SYK model},
+arXiv:1807.03334 (2018).
+
+\bibitem{SachdevYe}
+S. Sachdev and J. Ye,
+\emph{Gapless spin-fluid ground state in a random quantum Heisenberg magnet},
+Phys. Rev. Lett. 70, 3339 (1993), arXiv:cond-mat/9212030.
+
+\bibitem{MaldacenaStanford}
+J. Maldacena and D. Stanford,
+\emph{Remarks on the Sachdev-Ye-Kitaev model},
+Phys. Rev. D 94, 106002 (2016), arXiv:1604.07818.
+
+\bibitem{PolchinskiRosenhaus}
+J. Polchinski and V. Rosenhaus,
+\emph{The spectrum in the Sachdev-Ye-Kitaev model},
+JHEP 04 (2016) 001, arXiv:1601.06768.
+
+\bibitem{KitaevSuh}
+A. Kitaev and S. J. Suh,
+\emph{The soft mode in the Sachdev-Ye-Kitaev model and its gravity dual},
+JHEP 05 (2018) 183, arXiv:1711.08467.
+
+\bibitem{MSY}
+J. Maldacena, D. Stanford, and Z. Yang,
+\emph{Conformal symmetry and its breaking in two dimensional Nearly Anti-de-Sitter space},
+Prog. Theor. Exp. Phys. 2016, 12C104, arXiv:1606.01857.
+
+\bibitem{MSS}
+J. Maldacena, S. H. Shenker, and D. Stanford,
+\emph{A bound on chaos},
+JHEP 08 (2016) 106, arXiv:1503.01409.
+
+\bibitem{SachdevBH}
+S. Sachdev,
+\emph{Bekenstein-Hawking entropy and strange metals},
+Phys. Rev. X 5, 041025 (2015), arXiv:1506.05111.
+
+\bibitem{SachdevReview}
+S. Sachdev,
+\emph{Quantum statistical mechanics of the Sachdev-Ye-Kitaev model and charged black holes},
+arXiv:2304.13744.
+
+\bibitem{NFLReview}
+D. Chowdhury, A. Georges, O. Parcollet, and S. Sachdev,
+\emph{Sachdev-Ye-Kitaev models and beyond: a window into non-Fermi liquids},
+Rev. Mod. Phys. 94, 035004 (2022), arXiv:2109.05037.
+
+\bibitem{GuLucasQi}
+Y. Gu, X.-L. Qi, and D. Stanford,
+\emph{Local criticality, diffusion and chaos in generalized Sachdev-Ye-Kitaev models},
+JHEP 05 (2017) 125, arXiv:1609.07832.
+
+\bibitem{PatelSachdev}
+A. A. Patel and S. Sachdev,
+\emph{Theory of a Planckian metal},
+Phys. Rev. Lett. 123, 066601 (2019), arXiv:1906.03265.
+
+\bibitem{Cotler}
+J. S. Cotler et al.,
+\emph{Black holes and random matrices},
+JHEP 05 (2017) 118, arXiv:1611.04650.
+
+\bibitem{SSS}
+P. Saad, S. H. Shenker, and D. Stanford,
+\emph{JT gravity as a matrix integral},
+arXiv:1903.11115.
+
+\bibitem{Bonzom}
+V. Bonzom, V. Nador, and A. Tanasa,
+\emph{Diagrammatic proof of the large $N$ melonic dominance in the SYK model},
+Lett. Math. Phys. 109, 2611 (2019), arXiv:1808.10314.
+
+\bibitem{Feng}
+R. Feng, G. Tian, and D. Wei,
+\emph{Spectrum of SYK model},
+arXiv:1801.10073.
+
+\bibitem{Anschuetz}
+E. R. Anschuetz, C.-F. Chen, B. T. Kiani, and R. King,
+\emph{Strongly interacting fermions are non-trivial yet non-glassy},
+arXiv:2408.15699.
+
+\bibitem{Gamarnik}
+D. Gamarnik, M. Pernice, M. Schmidhuber, and A. Zlokapa,
+\emph{The free energy limit of the SYK model at high temperature},
+arXiv:2605.02768.
+
+\bibitem{He}
+Y. He,
+\emph{The spectral edge of the quartic SYK model},
+arXiv:2607.18998.
+
+\bibitem{Trunin}
+D. A. Trunin,
+\emph{Pedagogical introduction to SYK model and 2D dilaton gravity},
+arXiv:2002.12187.
+
+\end{thebibliography}
+
+\end{document}
