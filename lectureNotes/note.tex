@@ -78,17 +78,23 @@ These notes introduce the Sachdev-Ye-Kitaev model to a reader whose main backgro
 
 The Sachdev-Ye-Kitaev model is a random quantum many-body system with no spatial coordinate. In its most common form it consists of $N$ Majorana fermions and random all-to-all quartic interactions. Its Hamiltonian can be written in one line,
 \begin{equation}
-H_J=\sum_{1\le i<j<k<l\le N}J_{ijkl}\psi_i\psi_j\psi_k\psi_l,
+H_q=\sigma_N\sum_{I\in\mathcal I_N}g_I\psi_I,
 \qquad
-\{\psi_i,\psi_j\}=\delta_{ij}I,
+\{\psi_i,\psi_j\}=2\delta_{ij}I,
 \label{eq:SYKH}
 \end{equation}
-with centered Gaussian couplings
+where $q$ is even,
 \begin{equation}
-\E J_{ijkl}=0,
+\mathcal I_N=\{(i_1,\ldots,i_q):1\le i_1<\cdots<i_q\le N\},
 \qquad
-\E J_{ijkl}^2=\frac{3!J^2}{N^3}.
+g_I\overset{\mathrm{iid}}\sim\mathcal N(0,1),
 \label{eq:variance}
+\end{equation}
+and
+\begin{equation}
+\psi_I:=i^{q/2}\psi_{i_1}\cdots\psi_{i_q},
+\qquad
+\sigma_N^2=\frac{(q-1)!}{N^{q-1}}.
 \end{equation}
 At finite $N$ this is simply a random self-adjoint operator on a Hilbert space of dimension $2^{N/2}$. Nothing here requires quantum field theory.
 
@@ -134,7 +140,7 @@ where $G$ is the Green kernel and $\Sigma$ is the self-energy. The collective ac
 We will repeatedly separate four logical levels.
 
 \begin{definition}[Finite-$N$ statement]
-A finite-$N$ statement is an identity, inequality, or definition about the random matrix $H_J$ and the finite-dimensional Gibbs state. These are ordinary statements in operator theory and probability.
+A finite-$N$ statement is an identity, inequality, or definition about the random matrix $H_q$ and the finite-dimensional Gibbs state. These are ordinary statements in operator theory and probability.
 \end{definition}
 
 \begin{definition}[Large-$N$ physics statement]
@@ -226,21 +232,21 @@ This grading is important when discussing spectral degeneracies and random-matri
 
 For each complex mode define two self-adjoint operators
 \begin{align}
-\psi_{2a-1}&=\frac{c_a+c_a^\dagger}{\sqrt2},\\
-\psi_{2a}&=\frac{i(c_a-c_a^\dagger)}{\sqrt2}.
+\psi_{2a-1}&=c_a+c_a^\dagger,\\
+\psi_{2a}&=i(c_a-c_a^\dagger).
 \end{align}
 Then
 \begin{equation}
 \psi_i^*=\psi_i,
 \qquad
-\{\psi_i,\psi_j\}=\delta_{ij}I,
+\{\psi_i,\psi_j\}=2\delta_{ij}I,
 \qquad
-\psi_i^2=\frac12 I.
+\psi_i^2=I.
 \label{eq:majoranaCAR}
 \end{equation}
 Conversely,
 \begin{equation}
-c_a=\frac{\psi_{2a-1}+i\psi_{2a}}{\sqrt2}.
+c_a=\frac{\psi_{2a-1}+i\psi_{2a}}2.
 \end{equation}
 Hence $N=2M$ Majorana fermions act irreducibly on
 \begin{equation}
@@ -257,15 +263,15 @@ then
 \begin{equation}
 X^*=(-1)^{q(q-1)/2}X.
 \end{equation}
-For $q=4$, the sign is $+1$, so $\psi_i\psi_j\psi_k\psi_l$ is self-adjoint. For general even $q$, one often inserts a phase $i^{q/2}$ in the Hamiltonian.
+For $q=4$, the sign is $+1$, so $\psi_i\psi_j\psi_k\psi_l$ is self-adjoint. For every even $q$, the phase in $\psi_I=i^{q/2}\psi_{i_1}\cdots\psi_{i_q}$ makes $\psi_I$ self-adjoint; moreover $\psi_I^2=I$ in the normalization used here.
 
 \subsection{Jordan-Wigner representation}
 
 For numerical intuition, one may represent Majoranas using Pauli matrices. On $(\C^2)^{\otimes M}$,
 \begin{align}
-\psi_{2a-1}&=\frac1{\sqrt2}
+\psi_{2a-1}&=
 \left(\prod_{b<a}\sigma_b^z\right)\sigma_a^x,\\
-\psi_{2a}&=\frac1{\sqrt2}
+\psi_{2a}&=
 \left(\prod_{b<a}\sigma_b^z\right)\sigma_a^y.
 \end{align}
 The strings of $\sigma^z$ are precisely what generate anticommutation between different modes. Therefore a finite Majorana system is not a mysterious new kind of Hilbert space. It is a familiar finite-dimensional Hilbert space equipped with a preferred Clifford generating set.
@@ -274,7 +280,7 @@ The strings of $\sigma^z$ are precisely what generate anticommutation between di
 
 A general quadratic Majorana Hamiltonian can be written as
 \begin{equation}
-H_2=\frac i2\sum_{i,j=1}^{N}A_{ij}\psi_i\psi_j,
+H_2=\frac i4\sum_{i,j=1}^{N}A_{ij}\psi_i\psi_j,
 \qquad
 A^T=-A,
 \qquad A\in M_N(\R).
@@ -325,15 +331,15 @@ The determinant occurs with the opposite power for fermions. This algebraic fact
 
 \subsection{Finite-temperature quantum mechanics}
 
-For a fixed disorder realization $J$, define
+For a fixed disorder realization $g=(g_I)_{I\in\mathcal I_N}$, define
 \begin{equation}
-Z_J(\beta)=\Tr e^{-\beta H_J},
+Z_g(\beta)=\Tr e^{-\beta H_q},
 \qquad
-\rho_{\beta,J}=\frac{e^{-\beta H_J}}{Z_J(\beta)}.
+\rho_{\beta,g}=\frac{e^{-\beta H_q}}{Z_g(\beta)}.
 \end{equation}
 For an observable $A$,
 \begin{equation}
-\langle A\rangle_{\beta,J}=\Tr(\rho_{\beta,J}A).
+\langle A\rangle_{\beta,g}=\Tr(\rho_{\beta,g}A).
 \end{equation}
 Imaginary-time evolution is
 \begin{equation}
@@ -342,12 +348,12 @@ A(\tau)=e^{\tau H}Ae^{-\tau H},
 \end{equation}
 The Euclidean two-point function is
 \begin{equation}
-G_{ij,J}(\tau)=
-\langle T_\tau \psi_i(\tau)\psi_j(0)\rangle_{\beta,J}.
+G_{ij,g}(\tau)=
+\langle T_\tau \psi_i(\tau)\psi_j(0)\rangle_{\beta,g}.
 \end{equation}
 After disorder averaging and flavor averaging,
 \begin{equation}
-G_N(\tau)=\frac1N\sum_{i=1}^{N}\E_J G_{ii,J}(\tau).
+G_N(\tau)=\frac1N\sum_{i=1}^{N}\E_g G_{ii,g}(\tau).
 \label{eq:GN}
 \end{equation}
 Fermionic thermal correlators are antiperiodic,
@@ -383,29 +389,22 @@ This bridge from Euclidean to real time is conceptually important. Large-$N$ cal
 
 \subsection{Definition and normalization}
 
-Assume $N$ is even. The quartic Majorana SYK Hamiltonian is
+Fix an even integer $q\ge2$ and let
 \begin{equation}
-H_J=\sum_{1\le i<j<k<l\le N}J_{ijkl}\psi_i\psi_j\psi_k\psi_l,
+\mathcal I_N=\{(i_1,\ldots,i_q):1\le i_1<\cdots<i_q\le N\}.
 \end{equation}
-where the $J_{ijkl}$ are independent centered Gaussian random variables with
+For $I=(i_1,\ldots,i_q)\in\mathcal I_N$, set
 \begin{equation}
-\E J_{ijkl}^2=\frac{3!J^2}{N^3}.
+\psi_I:=i^{q/2}\psi_{i_1}\cdots\psi_{i_q}.
 \end{equation}
-Equivalently, $J_{ijkl}$ can be regarded as a fully antisymmetric random tensor.
-
-For general even $q$,
+Let $(g_I)_{I\in\mathcal I_N}$ be iid standard normal random variables and define
 \begin{equation}
-H_q=i^{q/2}
-\sum_{1\le i_1<\cdots<i_q\le N}
-J_{i_1\cdots i_q}
-\psi_{i_1}\cdots\psi_{i_q},
+H_q=\sigma_N\sum_{I\in\mathcal I_N}g_I\psi_I,
+\qquad
+\sigma_N^2=\frac{(q-1)!}{N^{q-1}}.
+\label{eq:Hqnormalized}
 \end{equation}
-with
-\begin{equation}
-\E J_{i_1\cdots i_q}^2
-=\frac{(q-1)!J^2}{N^{q-1}}
-\end{equation}
-in a common convention.
+Because $q$ is even and $\{\psi_i,\psi_j\}=2\delta_{ij}I$, each $\psi_I$ is a self-adjoint unitary. For $q=4$, formula \eqref{eq:Hqnormalized} differs by an irrelevant overall sign from writing the interaction as a sum of $\psi_i\psi_j\psi_k\psi_l$, since the centered Gaussian law is invariant under $g_I\mapsto-g_I$.
 
 \subsection{Why the variance scales as $N^{-(q-1)}$}
 
@@ -417,7 +416,9 @@ interaction monomials. The variance scaling is chosen so that the large-$N$ self
 
 A crude second-moment computation gives some intuition. Using orthogonality of distinct Clifford monomials under the normalized trace, one finds schematically
 \begin{equation}
-2^{-N/2}\E\Tr H^2\asymp N J^2.
+2^{-N/2}\E\Tr H_q^2
+=\sigma_N^2\binom Nq
+\sim\frac Nq.
 \end{equation}
 Thus a typical energy scale is of order $\sqrt N$ for a random state, while the many-body ground-state energy is extensive, of order $N$, because of the exponentially large dimension of the Hilbert space and collective optimization over states.
 
@@ -426,12 +427,12 @@ Thus a typical energy scale is of order $\sqrt N$ for a random state, while the 
 The quenched free-energy density is
 \begin{equation}
 f_N^{\mathrm q}(\beta)
-=-\frac1{\beta N}\E\log Z_J(\beta).
+=-\frac1{\beta N}\E\log Z_g(\beta).
 \end{equation}
 The annealed free-energy density is
 \begin{equation}
 f_N^{\mathrm a}(\beta)
-=-\frac1{\beta N}\log\E Z_J(\beta).
+=-\frac1{\beta N}\log\E Z_g(\beta).
 \end{equation}
 By Jensen,
 \begin{equation}
@@ -446,8 +447,8 @@ The comparison between the two is a concentration problem. In the usual large-$N
 \begin{heuristic}[Self-averaging]
 For fixed $\beta$ in a suitable regime, one expects
 \begin{equation}
-\frac1N\log Z_J(\beta)
--\frac1N\E\log Z_J(\beta)
+\frac1N\log Z_g(\beta)
+-\frac1N\E\log Z_g(\beta)
 \xrightarrow[N\to\infty]{\Pp}0.
 \end{equation}
 A stronger formulation asks for concentration inequalities and almost-sure convergence.
@@ -461,9 +462,10 @@ The key solvability mechanism is a combinatorial selection rule on Feynman graph
 
 \subsection{Disorder averaging}
 
-In a perturbative expansion, each interaction vertex carries a random tensor $J_{ijkl}$. Since the disorder is Gaussian, averaging pairs the couplings:
+In a perturbative expansion, each interaction vertex carries a random coefficient $\sigma_Ng_I$. Since the disorder is Gaussian, averaging pairs the couplings:
 \begin{equation}
-\E[J_IJ_{I'}]\propto \delta_{I,I'}.
+\E[(\sigma_Ng_I)(\sigma_Ng_{I'})]
+=\sigma_N^2\delta_{I,I'}.
 \end{equation}
 After averaging, every pair of interaction vertices comes with identified flavor indices. The resulting graph carries a power of $N$ determined by how many independent flavor-index loops remain.
 
@@ -477,25 +479,25 @@ For SYK, melonic dominance has a rigorous combinatorial diagrammatic proof. What
 
 \subsection{Dyson equation}
 
-Let $G_0(i\omega_n)=(-i\omega_n)^{-1}$ be the free Majorana propagator. The exact Dyson relation is
+Under $\{\psi_i,\psi_j\}=2\delta_{ij}I$, the free Majorana propagator is $G_0(i\omega_n)=2(-i\omega_n)^{-1}$. The exact Dyson relation is
 \begin{equation}
 G(i\omega_n)^{-1}=G_0(i\omega_n)^{-1}-\Sigma(i\omega_n).
 \end{equation}
 With the convention used here,
 \begin{equation}
-G(i\omega_n)^{-1}=-i\omega_n-\Sigma(i\omega_n).
+G(i\omega_n)^{-1}=-\frac{i\omega_n}{2}-\Sigma(i\omega_n).
 \label{eq:dyson}
 \end{equation}
 Melonic closure gives for quartic SYK
 \begin{equation}
-\Sigma(\tau)=J^2G(\tau)^3.
+\Sigma(\tau)=G(\tau)^3.
 \label{eq:selfenergy}
 \end{equation}
 For general even $q$,
 \begin{equation}
-\Sigma(\tau)=J^2G(\tau)^{q-1}
+\Sigma(\tau)=G(\tau)^{q-1}.
 \end{equation}
-up to sign and normalization conventions.
+The unit coefficient follows from using both $\sigma_N^2=(q-1)!/N^{q-1}$ and Clifford generators squaring to $I$.
 
 Equations \eqref{eq:dyson} and \eqref{eq:selfenergy} are the central large-$N$ Schwinger-Dyson equations.
 
@@ -503,13 +505,13 @@ Equations \eqref{eq:dyson} and \eqref{eq:selfenergy} are the central large-$N$ S
 
 Regard $G$ and $\Sigma$ as integral kernels. Then
 \begin{equation}
-(\partial_\tau-\Sigma)\circ G=I,
+(\tfrac12\partial_\tau-\Sigma)\circ G=I,
 \end{equation}
 meaning
 \begin{equation}
 \int_0^\beta d\tau'
 \left[
-\partial_{\tau_1}\delta(\tau_1-\tau')-\Sigma(\tau_1,\tau')
+\frac12\partial_{\tau_1}\delta(\tau_1-\tau')-\Sigma(\tau_1,\tau')
 \right]G(\tau',\tau_2)
 =\delta(\tau_1-\tau_2).
 \end{equation}
@@ -533,10 +535,10 @@ G(\tau_1,\tau_2)
 using a bilocal Lagrange multiplier $\Sigma(\tau_1,\tau_2)$. After Gaussian disorder averaging and integrating out the fermions, one obtains for $q=4$
 \begin{equation}
 \frac{I_{\mathrm{eff}}[G,\Sigma]}{N}
-=-\frac12\log\det(\partial_\tau-\Sigma)
+=-\frac12\log\det(\tfrac12\partial_\tau-\Sigma)
 +\frac12\int d\tau_1d\tau_2
 \left[
-\Sigma G-\frac{J^2}{4}G^4
+\Sigma G-\frac14G^4
 \right].
 \label{eq:collective}
 \end{equation}
@@ -553,11 +555,11 @@ Thus $N$ plays the role of inverse noise strength.
 
 Varying \eqref{eq:collective} with respect to $G$ gives
 \begin{equation}
-\Sigma(\tau_1,\tau_2)=J^2G(\tau_1,\tau_2)^3.
+\Sigma(\tau_1,\tau_2)=G(\tau_1,\tau_2)^3.
 \end{equation}
 Varying with respect to $\Sigma$ gives
 \begin{equation}
-G=(\partial_\tau-\Sigma)^{-1}.
+G=(\tfrac12\partial_\tau-\Sigma)^{-1}.
 \end{equation}
 Hence the saddle equations are precisely the Schwinger-Dyson equations.
 
@@ -587,11 +589,11 @@ The next simplification occurs at strong coupling and low frequency.
 
 The full equation is
 \begin{equation}
-G(i\omega)^{-1}=-i\omega-\Sigma(i\omega).
+G(i\omega)^{-1}=-\frac{i\omega}{2}-\Sigma(i\omega).
 \end{equation}
 If
 \begin{equation}
-|\omega|\ll J,
+|\omega|\ll1,
 \end{equation}
 and if the self-energy dominates $i\omega$, one may first solve the scale-invariant equation obtained by dropping the kinetic term. In time-domain kernel notation,
 \begin{equation}
@@ -600,13 +602,13 @@ and if the self-energy dominates $i\omega$, one may first solve the scale-invari
 \end{equation}
 Together with
 \begin{equation}
-\Sigma(\tau)=J^2G(\tau)^{q-1},
+\Sigma(\tau)=G(\tau)^{q-1},
 \end{equation}
 this admits a power-law solution.
 
 Assume
 \begin{equation}
-G_c(\tau)=b\,\frac{\sgn\tau}{|J\tau|^{2\Delta}}.
+G_c(\tau)=b\,\frac{\sgn\tau}{|\tau|^{2\Delta}}.
 \end{equation}
 Then
 \begin{equation}
@@ -624,10 +626,10 @@ For $q=4$,
 \begin{equation}
 \Delta=\frac14,
 \qquad
-G_c(\tau)=b\frac{\sgn\tau}{|J\tau|^{1/2}}.
+G_c(\tau)=b\frac{\sgn\tau}{|\tau|^{1/2}}.
 \label{eq:IRG}
 \end{equation}
-With the convention used by Rosenhaus,
+With the normalization used here,
 \begin{equation}
 b^4=\frac1{4\pi}.
 \end{equation}
@@ -639,7 +641,7 @@ The conformal map from the line to the thermal circle suggests
 G_{\beta,c}(\tau)
 =b\,\sgn(\tau)
 \left[
-\frac{\pi}{\beta J\sin(\pi|\tau|/\beta)}
+\frac{\pi}{\beta\sin(\pi|\tau|/\beta)}
 \right]^{2\Delta},
 \qquad 0<|\tau|<\beta.
 \label{eq:finiteTG}
@@ -696,7 +698,7 @@ Hence $PSL(2,\R)$ is naturally quotiented out.
 The leading low-energy action for reparametrization fluctuations has the form
 \begin{equation}
 I_{\Sch}[f]
-=-\frac{N\alpha_S}{J}
+=-N\alpha_S
 \int_0^\beta d\tau
 \left\{
 \tan\left(\frac{\pi f(\tau)}{\beta}\right),\tau
@@ -714,7 +716,7 @@ The strict conformal approximation produces a nearly flat manifold of reparametr
 
 A mathematical analogue would be a family of minimizers $\{x_f\}$ of a limiting functional $I_0$, followed by a small perturbation $\varepsilon I_1$ which selects an effective action along the minimizer manifold. Here
 \begin{equation}
-\varepsilon\sim \frac1{\beta J}.
+\varepsilon\sim \frac1\beta.
 \end{equation}
 
 \subsection{Low-temperature thermodynamics}
@@ -764,7 +766,7 @@ whenever the series is interpreted in a suitable spectral sense.
 For quartic Majorana SYK, the conformal kernel can be written schematically as
 \begin{equation}
 K(\tau_1,\tau_2;\tau_3,\tau_4)
-=-3J^2
+=-3
 G(\tau_{13})G(\tau_{24})G(\tau_{34})^2,
 \end{equation}
 with convention-dependent signs.
@@ -1006,7 +1008,7 @@ Q=\sum_i c_i^\dagger c_i.
 \end{equation}
 A representative Hamiltonian is
 \begin{equation}
-H=\sum_{i,j,k,l}J_{ij;kl}c_i^\dagger c_j^\dagger c_k c_l
+H=\sum_{i,j,k,l}g_{ij;kl}c_i^\dagger c_j^\dagger c_k c_l
 -\mu\sum_i c_i^\dagger c_i.
 \end{equation}
 The large-$N$ equations take the form
@@ -1029,7 +1031,7 @@ with random interactions within each site and hopping between sites. A schematic
 L&=\sum_{x,i}c_{i,x}^\dagger(\partial_\tau-\mu)c_{i,x}
 -\sum_{\langle xx'\rangle,ij}t_{ij,xx'}c_{i,x}^\dagger c_{j,x'}\\
 &\quad
--\sum_{x,ijkl}J_{ijkl,x}
+-\sum_{x,ijkl}g_{ijkl,x}
  c_{i,x}^\dagger c_{j,x}^\dagger c_{k,x}c_{l,x}.
 \end{align}
 Such models can have incoherent transport without a quasiparticle Boltzmann equation.
@@ -1116,9 +1118,9 @@ The ramp is a long-range signature of spectral rigidity.
 
 Several limits must be separated:
 \begin{equation}
-J^{-1}\ll \beta\ll t_*\sim \beta\log N\ll t_H\sim e^{cN}.
+1\ll \beta\ll t_*\sim \beta\log N\ll t_H\sim e^{cN}.
 \end{equation}
-Here $J^{-1}$ is the microscopic interaction time, $t_*$ is the scrambling time, and $t_H$ is the Heisenberg time associated with the exponentially small mean level spacing. OTOC chaos is an intermediate-time phenomenon; random-matrix plateau physics lives at exponentially later times.
+Here the microscopic interaction time is one in the units fixed by $\sigma_N^2=(q-1)!/N^{q-1}$, $t_*$ is the scrambling time, and $t_H$ is the Heisenberg time associated with the exponentially small mean level spacing. OTOC chaos is an intermediate-time phenomenon; random-matrix plateau physics lives at exponentially later times.
 
 \section{A minimal mathematical introduction to general relativity}
 
@@ -1210,7 +1212,7 @@ I_{\mathrm{SYK,soft}}[f]
 I_{\mathrm{JT,boundary}}[f]
 }
 \end{equation}
-after matching the coefficient $C$ to $N\alpha_S/J$.
+after matching the coefficient $C$ to $N\alpha_S$.
 
 \subsection{Symmetry interpretation}
 
@@ -1308,10 +1310,10 @@ A much stronger statement would be an exact microscopic equivalence
 with equality of all finite-$N$ observables. That is not what has been established. Ordinary SYK also contains an infinite tower of order-one-dimension bilinear operators, so pure JT gravity captures only the universal soft sector, not all microscopic data.
 
 \begin{conjecture}[Effective holographic matching]
-For a specified class of low-energy sources $J_{\partial}$ and a prescribed joint limit $N\to\infty$, $\beta J\to\infty$, the generating functional of the soft sector satisfies
+For a specified class of low-energy sources $g_{\partial}$ and a prescribed joint limit $N\to\infty$, $\beta\to\infty$, the generating functional of the soft sector satisfies
 \begin{equation}
-W^{\mathrm{soft}}_{\SYK}[J_{\partial}]
--W^{\mathrm{boundary}}_{JT}[J_{\partial}]
+W^{\mathrm{soft}}_{\SYK}[g_{\partial}]
+-W^{\mathrm{boundary}}_{JT}[g_{\partial}]
 \to0
 \end{equation}
 with controlled errors.
@@ -1374,18 +1376,15 @@ For each even $N$, let
 \begin{equation}
 (\Omega_N,\mathscr F_N,\Pp_N)
 \end{equation}
-carry independent Gaussian variables $J_I$. Let
+carry independent standard normal variables $g_I$. Let
 \begin{equation}
 \cH_N\cong\C^{2^{N/2}}
 \end{equation}
 and define
 \begin{equation}
-H_N(\omega)=\sum_{|I|=q}J_I(\omega)\Gamma_I,
+H_N(\omega)=\sigma_N\sum_{I\in\mathcal I_N}g_I(\omega)\psi_I,
 \end{equation}
-where
-\begin{equation}
-\Gamma_I=i^{q/2}\psi_{i_1}\cdots\psi_{i_q}.
-\end{equation}
+where $\psi_I=i^{q/2}\psi_{i_1}\cdots\psi_{i_q}$ and $\sigma_N^2=(q-1)!/N^{q-1}$.
 The quenched pressure is
 \begin{equation}
 p_N(\beta)=\frac1N\E\log\Tr e^{-\beta H_N}.
@@ -1407,24 +1406,25 @@ G_\beta(\tau)
 \end{equation}
 is deterministic and solves
 \begin{align}
-G^{-1}(i\omega_n)&=-i\omega_n-\Sigma(i\omega_n),\\
-\Sigma(\tau)&=J^2G(\tau)^3.
+G^{-1}(i\omega_n)&=-\frac{i\omega_n}{2}-\Sigma(i\omega_n),\\
+\Sigma(\tau)&=G(\tau)^3.
 \end{align}
 This resembles a mean-field fixed-point equation, but the order parameter is a function rather than a scalar.
 
 \subsection{Cavity intuition}
 
-Separate one Majorana:
+For the quartic model, separate one Majorana while keeping the $N$-dependent normalization fixed:
 \begin{equation}
-H_N=H_{N-1}+\psi_N B_N,
+H_N=H_N^{(0)}+\psi_N B_N,
 \end{equation}
 where
 \begin{equation}
-B_N=\sum_{i<j<k<N}J_{ijkN}\psi_i\psi_j\psi_k.
+B_N=\sigma_N\sum_{i<j<k<N}g_{ijkN}\psi_i\psi_j\psi_k,
 \end{equation}
+and $H_N^{(0)}$ is the sum of the terms whose index sets do not contain $N$. Notice that $H_N^{(0)}$ uses $\sigma_N$, so it is not literally the normalized $(N-1)$-fermion Hamiltonian.
 The distinguished mode $\psi_N$ interacts with a random dynamical bath generated by the remaining $N-1$ modes. In the large-$N$ limit, the bath's two-time correlations become self-consistent and deterministic. The resulting memory kernel is precisely the self-energy
 \begin{equation}
-\Sigma(\tau)=J^2G(\tau)^3.
+\Sigma(\tau)=G(\tau)^3.
 \end{equation}
 This is the noncommutative, dynamical analogue of a cavity field.
 
@@ -1464,7 +1464,7 @@ The chain
 H_N
 \xrightarrow{N\to\infty}
 (G,\Sigma)
-\xrightarrow{\omega/J\to0}
+\xrightarrow{\omega\to0}
 G_c
 \xrightarrow{\text{soft fluctuations}}
 I_{\Sch}
@@ -1496,12 +1496,12 @@ A stronger version would prove convergence of thermal two-point functions to the
 
 Prove that in a scaling window
 \begin{equation}
-1\ll J|\tau|\ll \beta J
+1\ll |\tau|\ll \beta
 \end{equation}
 one has
 \begin{equation}
 G_\beta(\tau)
-=b\frac{\sgn\tau}{|J\tau|^{1/2}}(1+o(1))
+=b\frac{\sgn\tau}{|\tau|^{1/2}}(1+o(1))
 \end{equation}
 with quantitative, uniform error bounds. At finite temperature the target is the sine-law form \eqref{eq:finiteTG}.
 
@@ -1537,7 +1537,7 @@ This requires precise real-time analytic continuation and error control in a reg
 
 \subsection{Universality in the disorder law}
 
-Replace Gaussian $J_I$ by centered variables with matching variance and sufficient moments. Ask whether the thermodynamic limit, infrared scaling, Schwarzian sector, and chaos exponent are universal. At the global spectral level this resembles Lindeberg replacement. At the level of soft modes and OTOCs it is far subtler.
+Replace the standard normal variables $g_I$ by centered, unit-variance variables with sufficient moments. Ask whether the thermodynamic limit, infrared scaling, Schwarzian sector, and chaos exponent are universal. At the global spectral level this resembles Lindeberg replacement. At the level of soft modes and OTOCs it is far subtler.
 
 \subsection{Sparse SYK}
 
@@ -1570,25 +1570,25 @@ This section collects the main derivations in one chain.
 
 \subsection{From disorder to a quartic bilocal interaction}
 
-Start from the Euclidean action
+For $q=4$, start from the Euclidean action
 \begin{equation}
-S[\chi;J]
-=\frac12\sum_i\int d\tau\,\psi_i\partial_\tau\psi_i
-+\sum_{i<j<k<l}J_{ijkl}\int d\tau\,
-\psi_i\psi_j\psi_k\psi_l.
+S[\psi;g]
+=\frac14\sum_i\int d\tau\,\psi_i\partial_\tau\psi_i
++\sigma_N\sum_{I\in\mathcal I_N}g_I\int d\tau\,\psi_I.
 \end{equation}
 The Gaussian identity
 \begin{equation}
-\E e^{-JX}=e^{\frac12\operatorname{Var}(J)X^2}
+\E e^{-gX}=e^{X^2/2},
+\qquad g\sim\mathcal N(0,1),
 \end{equation}
 produces after disorder averaging a two-time interaction. Summing over flavor indices yields, to leading order in $N$,
 \begin{equation}
 \exp\left[
-\frac{NJ^2}{8}\int d\tau_1d\tau_2
+\frac N8\int d\tau_1d\tau_2
 G(\tau_1,\tau_2)^4
 \right]
 \end{equation}
-up to convention-dependent constants.
+with the sign determined by the definition of the Euclidean Green function.
 
 The appearance of $N$ follows from
 \begin{equation}
@@ -1604,23 +1604,23 @@ Using
 \end{equation}
 variation of
 \begin{equation}
--\frac12\log\det(\partial_\tau-\Sigma)
+-\frac12\log\det(\tfrac12\partial_\tau-\Sigma)
 \end{equation}
 with respect to $\Sigma$ yields
 \begin{equation}
-\frac12(\partial_\tau-\Sigma)^{-1}.
+\frac12(\tfrac12\partial_\tau-\Sigma)^{-1}.
 \end{equation}
 Balancing against the $\frac12\int\Sigma G$ term gives
 \begin{equation}
-G=(\partial_\tau-\Sigma)^{-1}.
+G=(\tfrac12\partial_\tau-\Sigma)^{-1}.
 \end{equation}
 Fourier transformation yields
 \begin{equation}
-G(i\omega_n)=\frac1{-i\omega_n-\Sigma(i\omega_n)}.
+G(i\omega_n)=\frac1{-i\omega_n/2-\Sigma(i\omega_n)}.
 \end{equation}
 Variation with respect to $G$ gives
 \begin{equation}
-\Sigma=J^2G^3.
+\Sigma=G^3.
 \end{equation}
 
 \subsection{From scaling to $\Delta=1/q$}
@@ -1651,7 +1651,7 @@ Hence
 The strict infrared equations are invariant under \eqref{eq:reparamG}. Any reparametrized conformal solution $G_f$ has the same conformal action. The microscopic derivative term breaks this degeneracy. Locality in time, projective invariance, and the requirement of three derivatives at leading nontrivial order single out the Schwarzian derivative as the natural local functional. Thus one obtains
 \begin{equation}
 I_{\mathrm{soft}}[f]
-\propto \frac NJ\int\{f,\tau\}\,d\tau
+\propto N\int\{f,\tau\}\,d\tau
 \end{equation}
 on the line, or the thermal-circle form \eqref{eq:SchAction}.
 
@@ -1668,12 +1668,12 @@ Physics term & Mathematical translation \\
 Physics term & Mathematical translation \\
 \midrule
 \endhead
-Majorana fermion & Self-adjoint Clifford generator $\psi_i$ with $\{\psi_i,\psi_j\}=\delta_{ij}I$. \\
+Majorana fermion & Self-adjoint Clifford generator $\psi_i$ with $\{\psi_i,\psi_j\}=2\delta_{ij}I$. \\
 Quenched disorder & Random Hamiltonian sampled once, then thermodynamics computed at fixed sample before averaging $\E\log Z$. \\
 Self-energy & Kernel $\Sigma$ entering the nonlinear resolvent identity $G^{-1}=G_0^{-1}-\Sigma$. \\
 Large $N$ & Asymptotic regime in which singlet fluctuations are suppressed and melonic diagrams dominate. \\
 Melon & Recursively generated leading graph maximizing powers of the flavor index $N$. \\
-Infrared & Frequency regime $|\omega|\ll J$, or time regime $J|\tau|\gg1$. \\
+Infrared & Frequency regime $|\omega|\ll1$, or time regime $|\tau|\gg1$, in the units fixed by $\sigma_N$. \\
 Emergent conformal symmetry & Approximate scale/reparametrization covariance of the low-energy Schwinger-Dyson equations after dropping the kinetic term. \\
 Soft mode & Nearly zero-cost reparametrization fluctuation $f\in\Diff/PSL(2,\R)$. \\
 Schwarzian & Effective action for the soft mode, built from $\{f,\tau\}$. \\
@@ -1695,15 +1695,15 @@ First, become completely comfortable with finite-dimensional fermions. The essen
 
 Next, treat the SYK Hamiltonian as a random operator and understand the two layers of expectation:
 \begin{equation}
-\langle\cdot\rangle_{\beta,J}
+\langle\cdot\rangle_{\beta,g}
 \qquad\text{and}\qquad
-\E_J[\cdot].
+\E_g[\cdot].
 \end{equation}
 Then study the large-$N$ closure
 \begin{equation}
 G^{-1}=G_0^{-1}-\Sigma,
 \qquad
-\Sigma=J^2G^3.
+\Sigma=G^3.
 \end{equation}
 This is the mathematical core.
 
@@ -1723,23 +1723,25 @@ The introductory physics of SYK can be compressed into the following collection.
 
 Fermion algebra:
 \begin{equation}
-\{\psi_i,\psi_j\}=\delta_{ij}.
+\{\psi_i,\psi_j\}=2\delta_{ij}I.
 \end{equation}
 Random Hamiltonian:
 \begin{equation}
-H=\sum_{i<j<k<l}J_{ijkl}\psi_i\psi_j\psi_k\psi_l,
+H_q=\sigma_N\sum_{I\in\mathcal I_N}g_I\psi_I,
 \qquad
-\E J_{ijkl}^2=\frac{6J^2}{N^3}.
+g_I\overset{\mathrm{iid}}\sim\mathcal N(0,1),
+\qquad
+\sigma_N^2=\frac{(q-1)!}{N^{q-1}}.
 \end{equation}
 Large-$N$ Schwinger-Dyson equations:
 \begin{equation}
-G^{-1}(i\omega)=-i\omega-\Sigma(i\omega),
+G^{-1}(i\omega)=-\frac{i\omega}{2}-\Sigma(i\omega),
 \qquad
-\Sigma(\tau)=J^2G(\tau)^3.
+\Sigma(\tau)=G(\tau)^3.
 \end{equation}
 Infrared solution:
 \begin{equation}
-G_{\IR}(\tau)=b\frac{\sgn\tau}{|J\tau|^{1/2}},
+G_{\IR}(\tau)=b\frac{\sgn\tau}{|\tau|^{1/2}},
 \qquad
 b^4=\frac1{4\pi}.
 \end{equation}
@@ -1756,7 +1758,7 @@ Schwarzian derivative:
 Soft action:
 \begin{equation}
 I_{\mathrm{soft}}
-=-\frac{N\alpha_S}{J}\int_0^\beta
+=-N\alpha_S\int_0^\beta
 \left\{\tan\frac{\pi f}{\beta},\tau\right\}d\tau.
 \end{equation}
 Ladder spectrum:
