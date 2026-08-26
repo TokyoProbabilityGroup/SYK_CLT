@@ -404,6 +404,12 @@ H_q=\sigma_N\sum_{I\in\mathcal I_N}g_I\psi_I,
 \sigma_N^2=\frac{(q-1)!}{N^{q-1}}.
 \label{eq:Hqnormalized}
 \end{equation}
+Equivalently, the random coefficients $J_I:=\sigma_Ng_I$ are independent centered Gaussians with
+\begin{equation}
+\E[J_IJ_{I'}]
+=\frac{(q-1)!}{N^{q-1}}\delta_{I,I'}.
+\label{eq:Jcovariance}
+\end{equation}
 Because $q$ is even and $\{\psi_i,\psi_j\}=2\delta_{ij}I$, each $\psi_I$ is a self-adjoint unitary. For $q=4$, formula \eqref{eq:Hqnormalized} differs by an irrelevant overall sign from writing the interaction as a sum of $\psi_i\psi_j\psi_k\psi_l$, since the centered Gaussian law is invariant under $g_I\mapsto-g_I$.
 
 \subsection{Why the variance scales as $N^{-(q-1)}$}
@@ -414,10 +420,11 @@ There are
 \end{equation}
 interaction monomials. The variance scaling is chosen so that the large-$N$ self-energy remains of order one and the total free energy is of order $N$. In diagrammatic language, each disorder contraction contributes $N^{-(q-1)}$, while free flavor-index sums contribute powers of $N$. The competition produces a nontrivial $N\to\infty$ limit rather than either a free theory or a divergent one.
 
-A crude second-moment computation gives some intuition. Using orthogonality of distinct Clifford monomials under the normalized trace, one finds schematically
+A second-moment computation makes the scale precise. Since $\psi_I^2=I$ and distinct Clifford monomials are orthogonal under the normalized trace,
 \begin{equation}
 2^{-N/2}\E\Tr H_q^2
 =\sigma_N^2\binom Nq
+=\frac Nq\prod_{r=1}^{q-1}\left(1-\frac rN\right)
 \sim\frac Nq.
 \end{equation}
 Thus a typical energy scale is of order $\sqrt N$ for a random state, while the many-body ground-state energy is extensive, of order $N$, because of the exponentially large dimension of the Hilbert space and collective optimization over states.
@@ -479,7 +486,7 @@ For SYK, melonic dominance has a rigorous combinatorial diagrammatic proof. What
 
 \subsection{Dyson equation}
 
-Under $\{\psi_i,\psi_j\}=2\delta_{ij}I$, the free Majorana propagator is $G_0(i\omega_n)=2(-i\omega_n)^{-1}$. The exact Dyson relation is
+Under $\{\psi_i,\psi_j\}=2\delta_{ij}I$, one has $G_0(0^+)=1$ and the free Majorana propagator is $G_0(i\omega_n)=2(-i\omega_n)^{-1}$. The exact Dyson relation is
 \begin{equation}
 G(i\omega_n)^{-1}=G_0(i\omega_n)^{-1}-\Sigma(i\omega_n).
 \end{equation}
@@ -532,13 +539,13 @@ Formally insert the constraint
 G(\tau_1,\tau_2)
 =\frac1N\sum_{i=1}^{N}\psi_i(\tau_1)\psi_i(\tau_2)
 \end{equation}
-using a bilocal Lagrange multiplier $\Sigma(\tau_1,\tau_2)$. After Gaussian disorder averaging and integrating out the fermions, one obtains for $q=4$
+using a bilocal Lagrange multiplier $\Sigma(\tau_1,\tau_2)$. After Gaussian disorder averaging and integrating out the fermions, one obtains for general even $q$
 \begin{equation}
 \frac{I_{\mathrm{eff}}[G,\Sigma]}{N}
 =-\frac12\log\det(\tfrac12\partial_\tau-\Sigma)
 +\frac12\int d\tau_1d\tau_2
 \left[
-\Sigma G-\frac14G^4
+\Sigma G-\frac1qG^q
 \right].
 \label{eq:collective}
 \end{equation}
@@ -555,7 +562,7 @@ Thus $N$ plays the role of inverse noise strength.
 
 Varying \eqref{eq:collective} with respect to $G$ gives
 \begin{equation}
-\Sigma(\tau_1,\tau_2)=G(\tau_1,\tau_2)^3.
+\Sigma(\tau_1,\tau_2)=G(\tau_1,\tau_2)^{q-1}.
 \end{equation}
 Varying with respect to $\Sigma$ gives
 \begin{equation}
@@ -1120,7 +1127,7 @@ Several limits must be separated:
 \begin{equation}
 1\ll \beta\ll t_*\sim \beta\log N\ll t_H\sim e^{cN}.
 \end{equation}
-Here the microscopic interaction time is one in the units fixed by $\sigma_N^2=(q-1)!/N^{q-1}$, $t_*$ is the scrambling time, and $t_H$ is the Heisenberg time associated with the exponentially small mean level spacing. OTOC chaos is an intermediate-time phenomenon; random-matrix plateau physics lives at exponentially later times.
+Here the microscopic interaction time is of order one because the normalization $\sigma_N^2=(q-1)!/N^{q-1}$ makes the effective large-$N$ coupling scale equal to one; $t_*$ is the scrambling time, and $t_H$ is the Heisenberg time associated with the exponentially small mean level spacing. OTOC chaos is an intermediate-time phenomenon; random-matrix plateau physics lives at exponentially later times.
 
 \section{A minimal mathematical introduction to general relativity}
 
@@ -1581,7 +1588,7 @@ The Gaussian identity
 \E e^{-gX}=e^{X^2/2},
 \qquad g\sim\mathcal N(0,1),
 \end{equation}
-produces after disorder averaging a two-time interaction. Summing over flavor indices yields, to leading order in $N$,
+produces after disorder averaging a two-time interaction. Here $\sigma_N^2/2=3/N^3$ and the conversion of the sum over increasing quadruples to unrestricted flavor sums contributes $1/4!$. Thus, to leading order in $N$,
 \begin{equation}
 \exp\left[
 \frac N8\int d\tau_1d\tau_2
@@ -1590,11 +1597,13 @@ G(\tau_1,\tau_2)^4
 \end{equation}
 with the sign determined by the definition of the Euclidean Green function.
 
-The appearance of $N$ follows from
+Indeed, its coefficient is
 \begin{equation}
-N^{-3}\times N^4=N.
+\frac{\sigma_N^2}{2}\frac{N^4}{4!}
+=\frac{3}{N^3}\frac{N^4}{24}
+=\frac N8.
 \end{equation}
-This simple counting is the reason for the variance scaling $N^{-3}$ in quartic SYK.
+This counting is the reason for the variance scaling $N^{-3}$ in quartic SYK and fixes the $G^4$ coefficient in \eqref{eq:collective}.
 
 \subsection{From the collective action to Dyson}
 
@@ -1673,7 +1682,7 @@ Quenched disorder & Random Hamiltonian sampled once, then thermodynamics compute
 Self-energy & Kernel $\Sigma$ entering the nonlinear resolvent identity $G^{-1}=G_0^{-1}-\Sigma$. \\
 Large $N$ & Asymptotic regime in which singlet fluctuations are suppressed and melonic diagrams dominate. \\
 Melon & Recursively generated leading graph maximizing powers of the flavor index $N$. \\
-Infrared & Frequency regime $|\omega|\ll1$, or time regime $|\tau|\gg1$, in the units fixed by $\sigma_N$. \\
+Infrared & Frequency regime $|\omega|\ll1$, or time regime $|\tau|\gg1$, with the effective large-$N$ coupling scale set to one. \\
 Emergent conformal symmetry & Approximate scale/reparametrization covariance of the low-energy Schwinger-Dyson equations after dropping the kinetic term. \\
 Soft mode & Nearly zero-cost reparametrization fluctuation $f\in\Diff/PSL(2,\R)$. \\
 Schwarzian & Effective action for the soft mode, built from $\{f,\tau\}$. \\
@@ -1730,6 +1739,8 @@ Random Hamiltonian:
 H_q=\sigma_N\sum_{I\in\mathcal I_N}g_I\psi_I,
 \qquad
 g_I\overset{\mathrm{iid}}\sim\mathcal N(0,1),
+\qquad
+\psi_I=i^{q/2}\psi_{i_1}\cdots\psi_{i_q},
 \qquad
 \sigma_N^2=\frac{(q-1)!}{N^{q-1}}.
 \end{equation}
@@ -1829,29 +1840,30 @@ This is the simple analytic origin of the singular infrared Green function.
 
 \section{Appendix: a finite-$N$ Clifford trace identity}
 
-Let $\Gamma_I$ and $\Gamma_J$ be distinct normalized Clifford monomials of equal degree. With normalized trace
+Let $\psi_I$ and $\psi_J$ be the Clifford monomials defined in \eqref{eq:Hqnormalized}. With normalized trace
 \begin{equation}
 \tau_N(A)=2^{-N/2}\Tr A,
 \end{equation}
 one has orthogonality
 \begin{equation}
-\tau_N(\Gamma_I\Gamma_J)=0,
+\tau_N(\psi_I\psi_J)=0,
 \qquad I\ne J,
 \end{equation}
 while
 \begin{equation}
-\tau_N(\Gamma_I^2)=c_q
+\tau_N(\psi_I^2)=1.
 \end{equation}
-for a constant depending only on the normalization of the Majoranas. Consequently
+Consequently, for $H_q=\sum_IJ_I\psi_I$ with $J_I=\sigma_Ng_I$,
 \begin{equation}
-\E\tau_N(H^2)
-=c_q\sum_I\E J_I^2.
+\E\tau_N(H_q^2)
+=\sum_I\E J_I^2
+=\sigma_N^2\binom Nq.
 \end{equation}
-For fixed $q$,
+In the present normalization this is exactly
 \begin{equation}
-\sum_I\E J_I^2
-\asymp
-N^qN^{-(q-1)}\asymp N.
+\E\tau_N(H_q^2)
+=\frac Nq\prod_{r=1}^{q-1}\left(1-\frac rN\right)
+\sim\frac Nq.
 \end{equation}
 This gives a direct finite-dimensional explanation for the $O(N)$ second moment of the Hamiltonian.
 
@@ -1901,7 +1913,18 @@ or by
 \begin{equation}
 \{\psi_i,\psi_j\}=2\delta_{ij}.
 \end{equation}
-This changes factors of $2$ in the Hamiltonian, propagator, and coupling variance. Likewise some authors write
+The convention in these notes is the second one, so $\psi_i^2=I$. If $\chi_i:=\psi_i/\sqrt2$, then $\{\chi_i,\chi_j\}=\delta_{ij}I$ and
+\begin{equation}
+i^{q/2}\psi_{i_1}\cdots\psi_{i_q}
+=2^{q/2}i^{q/2}\chi_{i_1}\cdots\chi_{i_q}.
+\end{equation}
+Thus the same operator $H_q$ has coupling variance $2^q(q-1)!/N^{q-1}$ when written in the $\chi$ convention. Correspondingly $G_\psi=2G_\chi$, while the equations used in these notes are
+\begin{equation}
+G_\psi^{-1}(i\omega)=-\frac{i\omega}{2}-\Sigma_\psi(i\omega),
+\qquad
+\Sigma_\psi(\tau)=G_\psi(\tau)^{q-1}.
+\end{equation}
+Likewise some authors write
 \begin{equation}
 G(\tau)=-\langle T_\tau\chi(\tau)\chi(0)\rangle
 \end{equation}
