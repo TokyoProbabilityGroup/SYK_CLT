@@ -899,21 +899,21 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
   \begin{equation}
     W_N \coloneqq \log \frac{Z_N(\beta)}{\E Z_N(\beta)}.
   \end{equation}
-  Then, for any $\lambda, t > 0$,
+  Then, for $\beta\neq0$ and any $\lambda, t > 0$,
   \begin{align}
-    \mathbb P\!\left(|W_N - \E W_N| \geq t \right)
-    &\leq 2 \exp\left(-\frac{\sqrt{q}t^2}{2\beta}\right),
-    \label{eq:tail GC}\\
+    \mathbb P\!\left(W_N - \E W_N < -t \right)
+    &\leq \exp\left(-\frac{qt^2}{2\beta^2}\right),
+    \label{eq:centered W_N tail}\\
     \E\exp\!\left(\lambda(W_N - \E W_N)\right) 
     &\leq \exp\!\left(\frac{\lambda^2 \beta^2}{2q}\right).
-    \label{eq:exp GC}
+    \label{eq:centered W_N exp}
   \end{align}
 \end{lemma}
 
 \begin{proof}
   To apply the Gaussian concentration inequality,
   we view $Z_N(\beta;G)$ as a function of $G = (g_I)_{I \in \calI_N}$,
-  and establish its Lipshitz bound.
+  and establish its Lipschitz bound.
   Fix $I \in \calI_N$.
   By Duhamel's formula,
   we deduce that 
@@ -928,11 +928,12 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
     -\beta \sigma_N \tr\bigl( e^{-\beta H_N} \psi_I \bigr).
   \end{align}
   Write $\langle \cdot \rangle_G$ 
-  for the expectation with respect to the normalized Gibbs measure,
+  for the expectation with respect to the normalized Gibbs state,
   i.e.,
   \begin{equation}
     \langle A \rangle_G
-    \coloneqq \frac{\tr(A e^{-\beta H_N(G)})}{Z_N(G)}.
+    \coloneqq 
+    \frac{\tr(A e^{-\beta H_N(G)})}{Z_N(\beta;G)}.
   \end{equation}
   Then we obtain 
   \begin{equation} \label{eq:GC1}
@@ -942,27 +943,28 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
   Set $A_i \coloneqq \psi_{S \cup \{i\}}$ for each $i \notin S$.
   Note that, by the relation $\{\psi_i, \psi_j\} = 2\delta_{ij} \I$,
   it holds that   
-  \begin{equation}
+  \begin{equation} \label{eq:A_i relation}
     A_i^2 = \I,
     \qquad 
     A_i A_j + A_j A_i = 0 \quad \text{if}\quad i \neq j.
   \end{equation}
   This yields 
   \begin{equation}
-    \left(\sum_{i \notin S} \langle A_i \rangle A_i\right)^2
+    \left(\sum_{i \notin S} \langle A_i \rangle_G A_i\right)^2
     = 
     \sum_{i \notin S}  \langle A_i \rangle_G^2 A_i^2
     +
     \sum_{\substack{i,j \notin S}\\ i < j}
-    \langle A_i \rangle \langle A_j \rangle_G
+    \langle A_i \rangle_G \langle A_j \rangle_G
     (A_iA_j + A_j A_i) 
     = 
     \sum_{i \notin S}  \langle A_i \rangle_G^2 \I.
   \end{equation}
   If we write $\|\cdot\|$ for the operator norm,
-  then we obtain 
+  then, by \eqref{eq:A_i relation},
+  we obtain 
   \begin{equation}
-    \left\|\left(\sum_{i \notin S} \langle A_i \rangle A_i\right)^2\right\|
+    \left\|\left(\sum_{i \notin S} \langle A_i \rangle_G A_i\right)^2\right\|
     = 
     \sum_{i \notin S}  \langle A_i \rangle_G^2.
   \end{equation}
@@ -972,13 +974,13 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
     \left\| \sum_{i \notin S} \langle A_i \rangle_G A_i \right\| 
     = \sqrt{\sum_{i \notin S}  \langle A_i \rangle_G^2}.
   \end{equation}
-  On the other hand, H\"{o}lder's inequality for Shatten norms yields 
+  On the other hand, H\"{o}lder's inequality for Schatten norms yields 
   \begin{equation} \label{eq:GC3}
-    \left\langle \sum_{i \notin S} \langle A_i \rangle A_i \right\rangle_G 
-    \leq    
-    \left\| \sum_{i \notin S} \langle A_i \rangle A_i \right\|.
+    \left\langle \sum_{i \notin S} \langle A_i \rangle_G A_i \right\rangle_G 
+    \leq
+    \left\| \sum_{i \notin S} \langle A_i \rangle_G A_i \right\|.
   \end{equation}
-  Since the left-hand side equals to $\sum_{i \notin S} \langle A_i \rangle^2$,
+  Since the left-hand side equals $\sum_{i \notin S} \langle A_i \rangle_G^2$,
   we deduce from \eqref{eq:GC2} and \eqref{eq:GC3} that 
   \begin{equation} \label{eq:GC4}
     \sum_{i \notin S} \langle A_i \rangle^2 \leq 1.
@@ -1013,11 +1015,12 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
     \frac{\beta^2}{q},
   \end{equation}
   where the last equality follows from the definition of $\sigma_N^2$.
-  This implies that $W_N(G)$ is $\beta^2/q$-Lipshitz as a function of $G = (g_I)_{I \in \calI}$.
+  This implies that $W_N(G)$ is $|\beta|/\sqrt q$-Lipschitz as a function of $G = (g_I)_{I \in \calI_N}$.
   Hence, the Gaussian concentration inequality gives the desired result.
 \end{proof}
 
 \begin{proof}[Proof of Corollary~\ref{cor:free-energy-clt}]
+The case $\beta=0$ is trivial, so assume $\beta\neq0$.
 Put
 \[
   a=\frac q2-1,\qquad
@@ -1046,9 +1049,7 @@ we have
 \begin{equation} \label{eq:cor1}
     N^aX_N
     \Longrightarrow
-    \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
-    \qquad
-  \delta_N^2:=\E X_N^2\asymp N^{-(q-2)}.
+    \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi.
 \end{equation}
 Let $C_0 \in (0,\infty)$ be such that 
 $|\log (1+x) - x| \leq C_0x^2$ for all $x \in [-1/2, 1/2]$.
@@ -1056,7 +1057,7 @@ Since $W_N = \log(1+ X_N)$,
 it follows that 
 \begin{equation}
   \E \bigl[ 1 \wedge (N^a|W_N - X_N|) \bigr]
-  = 
+  \leq
   \E \bigl[ 1 \wedge (C_0 N^a|X_N|^2) \bigr]
   + 
   \mathbb P(|X_N| > 1/2).
@@ -1108,91 +1109,100 @@ Therefore, it suffices to show that $\E W_N = o(N^{-a})$.
 %   \E e^{\lambda(W_N-\mu_N)}
 %   \leq \exp\left(\frac{\lambda^2\beta^2}{2q}\right).
 % \end{equation}
-We claim that 
-\[
-  -\frac{\beta^2}{2q}\leq \E W_N\leq0.
-\]
-Indeed, the upper bound follows from Jensen's inequality,
-while the lower bound follows from \eqref{eq:exp GC} and the identity $\E e^{W_N}=1$.
 
-Let $K_\beta=\beta^2/(2q)$.  Since $e^{W_N}-1=X_N$, Chebyshev's inequality
-gives, for $t\geq1$,
-\[
+We claim that 
+\begin{equation} \label{eq:EWN range}
+  -\frac{\beta^2}{2q}\leq \E W_N\leq0.
+\end{equation}
+Indeed, the upper bound follows from Jensen's inequality,
+while the lower bound follows from \eqref{eq:centered W_N exp} and the identity $\E e^{W_N}=1$.
+Let $K_\beta=\beta^2/(2q)$ and $\delta_N \coloneqq (\E X_N^2)^{1/2}$.  
+By Theorem~\ref{thm:partition-clt},
+\begin{equation} \label{eq:deltaN asymp}
+  \delta_N^2 = \E X_N^2\asymp N^{-(q-2)}.
+\end{equation}
+Henceforth, we consider sufficiently large $N$ so that $\delta_N \leq e^{-1}$.
+Since $e^{W_N}-1=X_N$, 
+Markov's inequality gives
+\begin{equation} \label{eq:W_N tail1}
   \mathbb P(W_N<-t)
   \leq \frac{\delta_N^2}{(1-e^{-t})^2}
-  \leq C\delta_N^2.
-\]
-On the other hand, $\mu_N\geq-K_\beta$, so
-\eqref{eq:WN-subgaussian} and the Chernoff bound imply
-\[
+  \leq C \delta_N^2,
+  \qquad 
+  \forall t \geq 1.
+\end{equation}
+On the other hand, 
+by $\E W_N \geq -K_\beta$ and \eqref{eq:centered W_N tail},
+\begin{equation} \label{eq:W_N tail2}
   \mathbb P(W_N<-t)
   \leq
   \exp\left(-\frac{q(t-K_\beta)^2}{2\beta^2}\right),
-  \qquad t>K_\beta.
-\]
+  \qquad 
+  \forall t>K_\beta.
+\end{equation}
 Set
 \[
   T_N=\max\left\{
     1,\,
     K_\beta+\frac{2|\beta|}{\sqrt q}
-    \sqrt{\log(e/\delta_N)}
+    \sqrt{\log(1/\delta_N)}
   \right\}.
 \]
-Indeed, the layer-cake formula gives
+By the layer-cake representation,
+we have 
 \[
   \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
   =
   \mathbb P(W_N<-1)+
   \int_1^\infty\mathbb P(W_N<-t)\,\mathrm dt.
 \]
-The interval $[1,T_N]$ contributes at most $C\delta_N^2T_N$, while
-integration of the Gaussian bound over $[T_N,\infty)$ contributes at most
-$C\delta_N^2$.  Consequently,
+Applying \eqref{eq:W_N tail1} to the first term and the integral over $[1,T_N]$
+and applying \eqref{eq:W_N tail2} to the integral over $(T_N, \infty)$,
+we obtain
+\begin{equation}
+  \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
+  \leq     
+  C T_N \delta_N^2
+  +
+  \int_{T_N}^\infty \exp\left(-\frac{q(t-K_\beta)^2}{2\beta^2}\right) \mathrm dt.
+\end{equation}
+By the Gaussian tail bound $\int_a^\infty e^{-t^2} \mathrm dt \leq C e^{-a^2}$ for any $a \geq 0$,
+the second term is bounded by $C \delta_N^2$. 
+Consequently,
 \begin{equation}\label{eq:WN-negative-tail}
   \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
-  \leq C\delta_N^2\sqrt{\log(e/\delta_N)}.
+  \leq C\delta_N^2\sqrt{\log(1/\delta_N)}.
 \end{equation}
-
-Now set $h(w)=e^w-1-w$.  There is an absolute constant $C$ such that
+Now set $h(w)=e^w-1-w$.  
+Note that
 \[
   h(w)\leq C(e^w-1)^2\quad (w\geq-1),
   \qquad
   h(w)\leq |w|\quad (w<-1).
 \]
-Since $\E e^{W_N}=1$, \eqref{eq:WN-negative-tail} yields
-\[
-  0\leq-\mu_N=\E h(W_N)
-  \leq C\delta_N^2\sqrt{\log(e/\delta_N)}
+This, combined with $e^{W_N} - 1 = X_N$ and \eqref{eq:WN-negative-tail}, yields
+\begin{equation}
+  \E h(W_N) 
+  \leq    
+  \textcolor{red}{C}\E X_N^2 + \E\bigl[|W_N|\, \mathbf1_{\{W_N<-1\}}\bigr]
+  \leq
+  C\delta_N^2\sqrt{\log(1/\delta_N)}.
+\end{equation}
+Moreover,
+since $h(W_N) = X_N - W_N$ and $\E X_N = 0$,
+we have $-\E W_N = \E h(W_N)$.
+Therefore, by \eqref{eq:EWN range},
+we deduce that 
+\begin{equation}
+  0 \leq -\E W_N \leq C\delta_N^2\sqrt{\log(1/\delta_N)}.
+\end{equation}
+From this and \eqref{eq:deltaN asymp},
+it follows that 
+\[\E W_N
   =O\!\left(N^{2-q}\sqrt{\log N}\right)
-  =o(N^{-(q/2-1)}).
+  =o(N^{-(q/2-1)}),
 \]
-This proves \eqref{eq:log-centering-negligible}.
-
-It remains to compare the random parts.  The sequence $N^aX_N$ is tight and
-$X_N\to0$ in probability.  On the event $\{|X_N|\leq1/2\}$, the Taylor
-bound $|\log(1+x)-x|\leq Cx^2$ gives
-\[
-  N^a|W_N-X_N|
-  \leq C\bigl(N^a|X_N|\bigr)|X_N|.
-\]
-The right-hand side converges to zero in probability, while
-$\mathbb P(|X_N|>1/2)\to0$.  Therefore
-\[
-  N^a\bigl(W_N-X_N\bigr)\longrightarrow0
-  \qquad\text{in probability}.
-\]
-Together with \eqref{eq:log-centering-negligible}, this shows that
-\[
-  N^a\bigl((W_N-\E W_N)-X_N\bigr)
-  \longrightarrow0
-  \qquad\text{in probability}.
-\]
-Finally,
-\[
-  \log Z_N-\E\log Z_N=W_N-\E W_N,
-\]
-so the claimed convergence follows from
-\eqref{eq:scaled-relative-clt}.
+which completes the proof.
 \end{proof}
 
 
