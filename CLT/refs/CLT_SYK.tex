@@ -122,14 +122,55 @@ Under the assumptions of Theorem~\ref{thm:partition-clt},
 \end{corollary}
 
 \subsection{A brief background and relation to earlier work}
-The Sachdev--Ye--Kitaev (SYK) model is a mean-field model of randomly
-interacting fermions originating in the work of Sachdev and Ye
-\cite{SachdevYe1993} and its Majorana formulation by Kitaev.  Its combination
-of solvability, strong interactions, and chaotic behavior has made it a
-central model in quantum statistical mechanics and holography; see, for
-example, \cite{MaldacenaStanford2016}.  At positive temperature, the
-partition function contains both the thermodynamic information and the
-sample-to-sample fluctuations of the disorder.
+The Sachdev–Ye–Kitaev (SYK) model is a quantum-mechanical model of \(N\) fermionic degrees of freedom with random, all-to-all interactions. It originates from the work of Sachdev and Ye on random quantum magnets in 1993. A related Majorana-fermion model was introduced by Kitaev in 2015 in the context of quantum holography and is now known as the SYK model. Subsequent work, notably by Maldacena and Stanford, clarified its large-\(N\) structure and its connections to quantum chaos and nearly two-dimensional gravity.
+
+The SYK model is strongly interacting but remains tractable in the large-\(N\) limit. Depending on the relative scales of \(\beta J\) and \(N\), it exhibits several asymptotic regimes:
+
+(i) High-temperature regime:
+
+$$
+\beta\ll 1.
+$$
+
+The temperature is high compared with the interaction scale, and the system is close to its infinite-temperature behavior.
+
+(ii) Fixed-temperature large-\(N\) regime:
+
+$$
+\beta =\text{fixed}, \qquad N\to\infty.
+$$
+
+Here the temperature is held fixed while the number of fermions becomes large. This is the standard large-\(N\) limit at finite temperature and does not by itself imply conformal behavior.
+
+(iii) Conformal scaling regime:
+
+$$
+1\ll \beta \ll N.
+$$
+
+The system is strongly interacting and approximately conformal, while finite-\(N\) effects remain small.
+
+(iv) Schwarzian crossover regime:
+
+$$
+\beta \asymp N.
+$$
+
+Finite-\(N\) fluctuations become of order one, and the Schwarzian description becomes important. This is a crossover rather than a thermodynamic phase transition.
+
+(v) Quantum-Schwarzian regime:
+
+$$
+N\ll \beta .
+$$
+
+Quantum fluctuations of the Schwarzian mode become strong, and finite-\(N\) effects play an essential role.
+
+(vi) Finite-size / discrete-spectrum regime:
+
+At sufficiently low temperatures, individual energy levels become relevant and the continuum low-energy description breaks down.
+
+Thus, the SYK model exhibits several asymptotic scaling regimes, ranging from high temperature and the fixed-temperature large-\(N\) limit to the conformal, Schwarzian, and discrete-spectrum regimes. These are scaling regimes separated by crossovers rather than distinct thermodynamic phases.
 
 Rigorous results have recently identified the high-temperature annealed and
 quenched free-energy limits \cite{GPSZ2026} and established complex
