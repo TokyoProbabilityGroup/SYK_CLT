@@ -127,14 +127,23 @@ Under the assumptions of Theorem~\ref{thm:partition-clt},
 \end{corollary}
 
 \subsection{A brief background and relation to earlier work}
-The Sachdev--Ye--Kitaev (SYK) model is a mean-field model of randomly
-interacting fermions originating in the work of Sachdev and Ye
-\cite{SachdevYe1993} and its Majorana formulation by Kitaev.  Its combination
-of solvability, strong interactions, and chaotic behavior has made it a
-central model in quantum statistical mechanics and holography; see, for
-example, \cite{MaldacenaStanford2016}.  At positive temperature, the
-partition function contains both the thermodynamic information and the
-sample-to-sample fluctuations of the disorder.
+The Sachdev–Ye–Kitaev (SYK) model is a quantum-mechanical model of \(N\) fermionic degrees of freedom with random, all-to-all interactions. It originates from the work of Sachdev and Ye on random quantum magnets in 1993. A related Majorana-fermion model was introduced by Kitaev in 2015 in the context of quantum holography and is now known as the SYK model. Subsequent work, notably by Maldacena and Stanford, clarified its large-\(N\) structure and its connections to quantum chaos and nearly two-dimensional gravity.
+
+The SYK model is strongly interacting, yet it remains analytically tractable in the large-\(N\) limit. Depending on how the inverse temperature \(\beta = \beta_N\) scales as \(N \to \infty\), the model exhibits several distinct asymptotic regimes.
+
+(i) Fixed-temperature large-\(N\) regime ($\beta:\text{ fixed}$):  This is the basic mathematical large-\(N\) limit of the SYK model. It suppresses finite-size and disorder fluctuations and provides a tractable framework for studying finite-temperature observables and the emergence of the lower-temperature physical regimes.
+
+(ii) Conformal scaling regime \((1\ll \beta \ll N)\): The system is strongly interacting and approximately conformal, while finite-\(N\) effects remain small. In this regime, the SYK model realizes a non-Fermi liquid, in which conventional quasiparticle excitations are absent and the low-energy behavior is governed instead by collective scale-invariant dynamics.
+
+
+
+(iii) Schwarzian crossover regime \((\beta \asymp N)\): Finite-\(N\) fluctuations become of order one, and the Schwarzian effective theory becomes important. This regime is closely related to the boundary dynamics of nearly-\(\mathrm{AdS}_2\) gravity and therefore provides a direct link between SYK and low-dimensional quantum gravity.
+
+(iv) Quantum-Schwarzian regime \((N\ll \beta)\): Quantum fluctuations of the Schwarzian mode become strong, and finite-\(N\) effects are essential. In this regime, the SYK model probes the fully quantum dynamics of the same Schwarzian degree of freedom that appears in nearly-\(\mathrm{AdS}_2\) gravity.
+
+(vi) Finite-size / discrete-spectrum regime ($\liminf_N \log (\beta_N)/N > 0$): Individual energy levels become relevant, and hence, Random matrix theory are applied.
+
+It is quite rare for a strongly interacting quantum system to exhibit such a rich hierarchy of asymptotic regimes while still remaining analytically accessible. This combination makes the SYK model an important testing ground for both mathematics and physics. In particular, many physicists study these regimes in order to understand more precisely how strongly interacting quantum systems behave across different scales, and to identify which mathematical structures and physical mechanisms persist in more realistic models. In this sense, the SYK model serves as a relatively simple prototype from which one can develop tools and ideas for the study of more complicated quantum many-body systems, disordered systems, quantum chaos, and models of quantum gravity.
 
 Rigorous results have recently identified the high-temperature annealed and
 quenched free-energy limits \cite{GPSZ2026} and established complex
@@ -902,146 +911,315 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
 \eqref{eq:standardized-clt}.
 \end{proof}
 
+\begin{lemma}[Gaussian concentration]
+  Write 
+  \begin{equation}
+    W_N \coloneqq \log \frac{Z_N(\beta)}{\E Z_N(\beta)}.
+  \end{equation}
+  Then, for $\beta\neq0$ and any $\lambda, t > 0$,
+  \begin{align}
+    \mathbb P\!\left(W_N - \E W_N < -t \right)
+    &\leq \exp\left(-\frac{qt^2}{2\beta^2}\right),
+    \label{eq:centered W_N tail}\\
+    \E\exp\!\left(\lambda(W_N - \E W_N)\right) 
+    &\leq \exp\!\left(\frac{\lambda^2 \beta^2}{2q}\right).
+    \label{eq:centered W_N exp}
+  \end{align}
+\end{lemma}
+
+\begin{proof}
+  To apply the Gaussian concentration inequality,
+  we view $Z_N(\beta;G)$ as a function of $G = (g_I)_{I \in \calI_N}$,
+  and establish its Lipschitz bound.
+  Fix $I \in \calI_N$.
+  By Duhamel's formula,
+  we deduce that 
+  \begin{align}
+    \partial_{g_I} Z_N 
+    &= 
+    \tr \partial_{g_I} e^{-\beta H_N(G)}\\
+    &=
+    -\beta     
+    \tr \!\left( \partial_{g_I} H_N(G) \cdot e^{-\beta H_N(G)} \right)\\ 
+    &=
+    -\beta \sigma_N \tr\bigl( e^{-\beta H_N} \psi_I \bigr).
+  \end{align}
+  Write $\langle \cdot \rangle_G$ 
+  for the expectation with respect to the normalized Gibbs state,
+  i.e.,
+  \begin{equation}
+    \langle A \rangle_G
+    \coloneqq 
+    \frac{\tr(A e^{-\beta H_N(G)})}{Z_N(\beta;G)}.
+  \end{equation}
+  Then we obtain 
+  \begin{equation} \label{eq:GC1}
+    \partial_{g_I} W_N = -\beta \sigma_N \langle \psi_I \rangle_G.
+  \end{equation}
+  Fix an arbitrary subset $S \subseteq [N]$ with $|S| = q-1$.
+  Set $A_i \coloneqq \psi_{S \cup \{i\}}$ for each $i \notin S$.
+  Note that, by the relation $\{\psi_i, \psi_j\} = 2\delta_{ij} \I$,
+  it holds that   
+  \begin{equation} \label{eq:A_i relation}
+    A_i^2 = \I,
+    \qquad 
+    A_i A_j + A_j A_i = 0 \quad \text{if}\quad i \neq j.
+  \end{equation}
+  This yields 
+  \begin{equation}
+    \left(\sum_{i \notin S} \langle A_i \rangle_G A_i\right)^2
+    = 
+    \sum_{i \notin S}  \langle A_i \rangle_G^2 A_i^2
+    +
+    \sum_{\substack{i,j \notin S}\\ i < j}
+    \langle A_i \rangle_G \langle A_j \rangle_G
+    (A_iA_j + A_j A_i) 
+    = 
+    \sum_{i \notin S}  \langle A_i \rangle_G^2 \I.
+  \end{equation}
+  If we write $\|\cdot\|$ for the operator norm,
+  then, by \eqref{eq:A_i relation},
+  we obtain 
+  \begin{equation}
+    \left\|\left(\sum_{i \notin S} \langle A_i \rangle_G A_i\right)^2\right\|
+    = 
+    \sum_{i \notin S}  \langle A_i \rangle_G^2.
+  \end{equation}
+  Since $A_i$ is self-adjoint,
+  it follows that 
+  \begin{equation} \label{eq:GC2}
+    \left\| \sum_{i \notin S} \langle A_i \rangle_G A_i \right\| 
+    = \sqrt{\sum_{i \notin S}  \langle A_i \rangle_G^2}.
+  \end{equation}
+  On the other hand, H\"{o}lder's inequality for Schatten norms yields 
+  \begin{equation} \label{eq:GC3}
+    \left\langle \sum_{i \notin S} \langle A_i \rangle_G A_i \right\rangle_G 
+    \leq
+    \left\| \sum_{i \notin S} \langle A_i \rangle_G A_i \right\|.
+  \end{equation}
+  Since the left-hand side equals $\sum_{i \notin S} \langle A_i \rangle_G^2$,
+  we deduce from \eqref{eq:GC2} and \eqref{eq:GC3} that 
+  \begin{equation} \label{eq:GC4}
+    \sum_{i \notin S} \langle A_i \rangle^2 \leq 1.
+  \end{equation}
+  For each $I \in \calI_N$,
+  there exist exactly $q$ subsets $S \subseteq [N]$ satisfying $I = S \cup \{i\}$.
+  Hence,
+  \begin{equation}
+    \sum_{\substack{S \subseteq [N]\\ |S| = q-1}} 
+    \sum_{i \notin S} 
+    \langle \psi_{S \cup \{i\}}\rangle_G^2 
+    = 
+    q \sum_{I \in \calI_N} \langle \psi_I\rangle_G^2.
+  \end{equation} 
+  This, combined with \eqref{eq:GC4}, yields 
+  \begin{equation}
+    \sum_{I \in \calI_N} \langle \psi_I \rangle_G^2
+    \leq 
+    \frac{1}{q} 
+    \sum_{\substack{S \subseteq [N]\\ |S| = q-1}} 1 
+    = 
+    \frac{1}{q} \binom{N}{q-1}
+    \leq    
+    \frac{N^{q-1}}{q!}.
+  \end{equation}
+  From this and \eqref{eq:GC1}, we deduce that 
+  \begin{equation}
+    \left\| \nabla W_N \right\|_2^2 
+    \leq
+    \frac{\beta^2 \sigma_N^2 N^{q-1}}{q!}
+    = 
+    \frac{\beta^2}{q},
+  \end{equation}
+  where the last equality follows from the definition of $\sigma_N^2$.
+  This implies that $W_N(G)$ is $|\beta|/\sqrt q$-Lipschitz as a function of $G = (g_I)_{I \in \calI_N}$.
+  Hence, the Gaussian concentration inequality gives the desired result.
+\end{proof}
+
 \begin{proof}[Proof of Corollary~\ref{cor:free-energy-clt}]
+The case $\beta=0$ is trivial, so assume $\beta\neq0$.
 Put
 \[
   a=\frac q2-1,\qquad
   X_N=\frac{Z_N(\beta)-\E Z_N(\beta)}{\E Z_N(\beta)},
   \qquad
-  W_N=\log\frac{Z_N(\beta)}{\E Z_N(\beta)}.
+  W_N=\log Z_N(\beta) - \log \E Z_N(\beta).
 \]
-Thus $W_N=\log(1+X_N)$, and Theorem~\ref{thm:partition-clt} gives
-\[
-  N^aX_N
-  \Longrightarrow
-  \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi,
-  \qquad
-  \delta_N^2:=\E X_N^2\asymp N^{-(q-2)}.
-\]
-We claim that
-\begin{equation}\label{eq:log-centering-negligible}
-  \E W_N=o(N^{-(q/2-1)}).
+It then holds that 
+\begin{align}
+  \log Z_N - \E\log Z_N 
+  &=
+  (\log Z_N - \log \E Z_N) + (\log \E Z_N - \E \log Z_N)\\
+  &=
+  W_N - \E W_N\\
+  &= 
+  (W_N - X_N) + X_N - \E W_N,
+\end{align}
+which yields 
+\begin{equation}
+  N^a(\log Z_N - \E \log Z_N)
+  =
+  N^a(W_N - X_N) + N^a X_N - N^a \E W_N.
 \end{equation}
-To prove this, we first establish a Lipschitz bound for
-$G\mapsto W_N(G)$.  Differentiation gives
-\[
-  \partial_{g_I}W_N
-  =-\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
-\]
-For each $(q-1)$-set $S$, the operators
-$(\psi_{S\cup\{i\}})_{i\notin S}$ are pairwise anticommuting Hermitian
-involutions.  If $A_1,\ldots,A_m$ are any such operators and
-$a_j=\langle A_j\rangle$ in a state, set $B=\sum_j a_jA_j$ and
-$s=\sum_j a_j^2$.  Pairwise anticommutation gives
-\[
-  B^2=s\I,
-  \qquad
-  s=\langle B\rangle\leq\norm{B}=\sqrt{s},
-\]
-and hence $s\leq1$.  Applying this observation for each $S$ and noting that
-every $I\in\calI_N$ is counted exactly $q$ times yields
-\[
-  \sum_{I\in\calI_N}|\langle\psi_I\rangle_{\beta,g}|^2
-  \leq \frac1q\binom N{q-1}.
-\]
-Consequently,
-\[
-  \sum_{I\in\calI_N}|\partial_{g_I}W_N|^2
+By Theorem~\ref{thm:partition-clt},
+we have 
+\begin{equation} \label{eq:cor1}
+    N^aX_N
+    \Longrightarrow
+    \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi.
+\end{equation}
+Let $C_0 \in (0,\infty)$ be such that 
+$|\log (1+x) - x| \leq C_0x^2$ for all $x \in [-1/2, 1/2]$.
+Since $W_N = \log(1+ X_N)$,
+it follows that 
+\begin{equation}
+  \E \bigl[ 1 \wedge (N^a|W_N - X_N|) \bigr]
   \leq
-  \frac{\beta^2\sigma_N^2}{q}\binom N{q-1}
-  \leq\frac{\beta^2}{q}.
-\]
-Writing $\mu_N=\E W_N$, the Gaussian concentration inequality therefore
-implies, for every $\lambda\in\mathbb R$,
-\begin{equation}\label{eq:WN-subgaussian}
-  \E e^{\lambda(W_N-\mu_N)}
-  \leq \exp\left(\frac{\lambda^2\beta^2}{2q}\right).
+  \E \bigl[ 1 \wedge (C_0 N^a|X_N|^2) \bigr]
+  + 
+  \mathbb P(|X_N| > 1/2).
 \end{equation}
-Jensen's inequality and the identity $\E e^{W_N}=1$ give
-\[
-  -\frac{\beta^2}{2q}\leq \E W_N\leq0.
-\]
-Indeed, the upper bound follows from Jensen, while
-\eqref{eq:WN-subgaussian} with $\lambda=1$ gives the lower bound.
+By \eqref{eq:cor1},
+$|X_N| \xrightarrow{\mathrm{p}} 0$ and $(N^a |X_N|)_{N \geq 1}$ is tight.
+Thus, 
+the right-hand side of the above inequality converges to $0$ as $N \to \infty$.
+Hence, $N^a(W_N - X_N) \xrightarrow{\mathrm{p}} 0$.
+Therefore, it suffices to show that $\E W_N = o(N^{-a})$.
+% To this end,
+% we first establish a Lipschitz bound for $G\mapsto W_N(G)$.  
+% Thus $W_N=\log(1+X_N)$, and Theorem~\ref{thm:partition-clt} gives
+% We claim that
+% \begin{equation}\label{eq:log-centering-negligible}
+%   \E W_N=o(N^{-(q/2-1)}).
+% \end{equation}
+% Differentiation gives
+% \[
+%   \partial_{g_I}W_N
+%   =-\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
+% \]
+% For each $(q-1)$-set $S$, the operators
+% $(\psi_{S\cup\{i\}})_{i\notin S}$ are pairwise anticommuting Hermitian
+% involutions.  If $A_1,\ldots,A_m$ are any such operators and
+% $a_j=\langle A_j\rangle$ in a state, set $B=\sum_j a_jA_j$ and
+% $s=\sum_j a_j^2$.  Pairwise anticommutation gives
+% \[
+%   B^2=s\I,
+%   \qquad
+%   s=\langle B\rangle\leq\norm{B}=\sqrt{s},
+% \]
+% and hence $s\leq1$.  Applying this observation for each $S$ and noting that
+% every $I\in\calI_N$ is counted exactly $q$ times yields
+% \[
+%   \sum_{I\in\calI_N}|\langle\psi_I\rangle_{\beta,g}|^2
+%   \leq \frac1q\binom N{q-1}.
+% \]
+% Consequently,
+% \[
+%   \sum_{I\in\calI_N}|\partial_{g_I}W_N|^2
+%   \leq
+%   \frac{\beta^2\sigma_N^2}{q}\binom N{q-1}
+%   \leq\frac{\beta^2}{q}.
+% \]
+% Writing $\mu_N=\E W_N$, the Gaussian concentration inequality therefore
+% implies, for every $\lambda\in\mathbb R$,
+% \begin{equation}\label{eq:WN-subgaussian}
+%   \E e^{\lambda(W_N-\mu_N)}
+%   \leq \exp\left(\frac{\lambda^2\beta^2}{2q}\right).
+% \end{equation}
 
-Let $K_\beta=\beta^2/(2q)$.  Since $e^{W_N}-1=X_N$, Chebyshev's inequality
-gives, for $t\geq1$,
-\[
+We claim that 
+\begin{equation} \label{eq:EWN range}
+  -\frac{\beta^2}{2q}\leq \E W_N\leq0.
+\end{equation}
+Indeed, the upper bound follows from Jensen's inequality,
+while the lower bound follows from \eqref{eq:centered W_N exp} and the identity $\E e^{W_N}=1$.
+Let $K_\beta=\beta^2/(2q)$ and $\delta_N \coloneqq (\E X_N^2)^{1/2}$.  
+By Theorem~\ref{thm:partition-clt},
+\begin{equation} \label{eq:deltaN asymp}
+  \delta_N^2 = \E X_N^2\asymp N^{-(q-2)}.
+\end{equation}
+Henceforth, we consider sufficiently large $N$ so that $\delta_N \leq e^{-1}$.
+Since $e^{W_N}-1=X_N$, 
+Markov's inequality gives
+\begin{equation} \label{eq:W_N tail1}
   \mathbb P(W_N<-t)
   \leq \frac{\delta_N^2}{(1-e^{-t})^2}
-  \leq C\delta_N^2.
-\]
-On the other hand, $\mu_N\geq-K_\beta$, so
-\eqref{eq:WN-subgaussian} and the Chernoff bound imply
-\[
+  \leq C \delta_N^2,
+  \qquad 
+  \forall t \geq 1.
+\end{equation}
+On the other hand, 
+by $\E W_N \geq -K_\beta$ and \eqref{eq:centered W_N tail},
+\begin{equation} \label{eq:W_N tail2}
   \mathbb P(W_N<-t)
   \leq
   \exp\left(-\frac{q(t-K_\beta)^2}{2\beta^2}\right),
-  \qquad t>K_\beta.
-\]
+  \qquad 
+  \forall t>K_\beta.
+\end{equation}
 Set
 \[
   T_N=\max\left\{
     1,\,
     K_\beta+\frac{2|\beta|}{\sqrt q}
-    \sqrt{\log(e/\delta_N)}
+    \sqrt{\log(1/\delta_N)}
   \right\}.
 \]
-Indeed, the layer-cake formula gives
+By the layer-cake representation,
+we have 
 \[
   \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
   =
   \mathbb P(W_N<-1)+
   \int_1^\infty\mathbb P(W_N<-t)\,\mathrm dt.
 \]
-The interval $[1,T_N]$ contributes at most $C\delta_N^2T_N$, while
-integration of the Gaussian bound over $[T_N,\infty)$ contributes at most
-$C\delta_N^2$.  Consequently,
+Applying \eqref{eq:W_N tail1} to the first term and the integral over $[1,T_N]$
+and applying \eqref{eq:W_N tail2} to the integral over $(T_N, \infty)$,
+we obtain
+\begin{equation}
+  \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
+  \leq     
+  C T_N \delta_N^2
+  +
+  \int_{T_N}^\infty \exp\left(-\frac{q(t-K_\beta)^2}{2\beta^2}\right) \mathrm dt.
+\end{equation}
+By the Gaussian tail bound $\int_a^\infty e^{-t^2} \mathrm dt \leq C e^{-a^2}$ for any $a \geq 0$,
+the second term is bounded by $C \delta_N^2$. 
+Consequently,
 \begin{equation}\label{eq:WN-negative-tail}
   \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
-  \leq C\delta_N^2\sqrt{\log(e/\delta_N)}.
+  \leq C\delta_N^2\sqrt{\log(1/\delta_N)}.
 \end{equation}
-
-Now set $h(w)=e^w-1-w$.  There is an absolute constant $C$ such that
+Now set $h(w)=e^w-1-w$.  
+Note that
 \[
   h(w)\leq C(e^w-1)^2\quad (w\geq-1),
   \qquad
   h(w)\leq |w|\quad (w<-1).
 \]
-Since $\E e^{W_N}=1$, \eqref{eq:WN-negative-tail} yields
-\[
-  0\leq-\mu_N=\E h(W_N)
-  \leq C\delta_N^2\sqrt{\log(e/\delta_N)}
+This, combined with $e^{W_N} - 1 = X_N$ and \eqref{eq:WN-negative-tail}, yields
+\begin{equation}
+  \E h(W_N) 
+  \leq    
+  C\E X_N^2 + \E\bigl[|W_N|\, \mathbf1_{\{W_N<-1\}}\bigr]
+  \leq
+  C\delta_N^2\sqrt{\log(1/\delta_N)}.
+\end{equation}
+Moreover,
+since $h(W_N) = X_N - W_N$ and $\E X_N = 0$,
+we have $-\E W_N = \E h(W_N)$.
+Therefore, by \eqref{eq:EWN range},
+we deduce that 
+\begin{equation}
+  0 \leq -\E W_N \leq C\delta_N^2\sqrt{\log(1/\delta_N)}.
+\end{equation}
+From this and \eqref{eq:deltaN asymp},
+it follows that 
+\[\E W_N
   =O\!\left(N^{2-q}\sqrt{\log N}\right)
-  =o(N^{-(q/2-1)}).
+  =o(N^{-(q/2-1)}),
 \]
-This proves \eqref{eq:log-centering-negligible}.
-
-It remains to compare the random parts.  The sequence $N^aX_N$ is tight and
-$X_N\to0$ in probability.  On the event $\{|X_N|\leq1/2\}$, the Taylor
-bound $|\log(1+x)-x|\leq Cx^2$ gives
-\[
-  N^a|W_N-X_N|
-  \leq C\bigl(N^a|X_N|\bigr)|X_N|.
-\]
-The right-hand side converges to zero in probability, while
-$\mathbb P(|X_N|>1/2)\to0$.  Therefore
-\[
-  N^a\bigl(W_N-X_N\bigr)\longrightarrow0
-  \qquad\text{in probability}.
-\]
-Together with \eqref{eq:log-centering-negligible}, this shows that
-\[
-  N^a\bigl((W_N-\E W_N)-X_N\bigr)
-  \longrightarrow0
-  \qquad\text{in probability}.
-\]
-Finally,
-\[
-  \log Z_N-\E\log Z_N=W_N-\E W_N,
-\]
-so the claimed convergence follows from
-\eqref{eq:scaled-relative-clt}.
+which completes the proof.
 \end{proof}
 
 
