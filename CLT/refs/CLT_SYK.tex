@@ -78,6 +78,11 @@ Then $\psi_I$ is Hermitian, $\psi_I^2=\I$, and $\norm{\psi_I}=1$.  Define
 Here $\tr=2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
 particular, $Z_N(0;G)=F_N(0)=1$.  This normalization does not affect the
 relative fluctuations studied below. We sometime write $Z_N(\beta) = Z_N(\beta;G)$ for brevity. 
+For real $\beta$, set
+\[
+  Y_N(\beta;G)=\frac{Z_N(\beta;G)}{F_N(\beta)}.
+\]
+Thus $\E Y_N(\beta)=1$.
 Throughout, all limits are taken as $N\to\infty$ through even integers.
 
 \subsection{Main results}
@@ -158,17 +163,16 @@ $Z_N(\beta)$.
 By applying the chaos expansion, since Clifford sign-gauge symmetry eliminates the first Gaussian chaos and
 identifies the second chaos exactly, we have the following:
 \[
-  Z_N(\beta)=  \mathbb E Z_N(\beta)
-  + 
+  Y_N(\beta)-1=
   A_N(\beta)Q_N+\mathcal R_N(\beta),
   \]
   where
   \begin{equation}\label{eq:finite-N-FTW-coefficient}
-          A_N(\beta)=\frac{\beta}{2}F'_N(\beta),
+          A_N(\beta)=\frac{\beta}{2}\partial_\beta\log F_N(\beta),
     \qquad
     Q_N=\frac1{|\mathcal I_N|}\sum_I(g_I^2-1).
     \end{equation}
-Here $\mathcal R_N$ is the sum of the Gaussian chaoses of orders at least
+Here $\mathcal R_N$ is the sum of the Gaussian chaoses of $Y_N$ of orders at least
 three.  Thus the leading random term is a normalized sum of $\mathcal I_N$
 independent centered variables.  The main task is to prove
 \[
@@ -179,7 +183,7 @@ independent centered variables.  The main task is to prove
 Indeed, a Duhamel derivative bound and the sign-gauge
 parity rule give
 \begin{equation}
-  \sum_{r\geq3}\lVert P_r Z_N(\beta)\rVert_2^2
+  \sum_{r\geq3}\lVert P_r Y_N(\beta)\rVert_2^2
   \leq
   \sum_{r\geq3}(\beta\sigma_N)^{2r}
   \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
@@ -191,7 +195,7 @@ bounded by  $O(N^{-3(q/2-1)})=o(N^{-(q-2)})$.
 
 Moreover, the annealed free-energy input and convexity imply
 \[
-  \frac{A_N(\beta)}{N \mathbb E Z_N(\beta)}
+  \frac{A_N(\beta)}N
   \longrightarrow \frac{\beta}{2}\ell_q'(\beta).
 \]
 Since $M_N\sim N^q/q!$, the classical central limit theorem for $Q_N$, the
@@ -216,6 +220,10 @@ where the second sum runs over all multi-index $\alpha$ such that $\sum_{I} \alp
 $L^2(\gamma_{|\mathcal I_N|})$ onto the $r$-th homogeneous Gaussian chaos:
  Then, we can write 
 $$P_r Z_N(G) =  \sum_{\alpha:~|\alpha|=k} \frac{\mathbb E[Z_N(\beta:G')H_\alpha(G')]}{\alpha!} H_\alpha(G). $$
+Since $F_N(\beta)$ is deterministic, we also have
+\[
+  P_rY_N(\beta)=\frac{P_rZ_N(\beta)}{F_N(\beta)}.
+\]
 
 
 For every sufficiently regular random
@@ -228,12 +236,12 @@ variable $X$,
 \end{equation}
 
 
-Recall $A_N(\beta):=\frac{\beta}{2}\,F'_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
+Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log F_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
  The next lemma proves the exact radial decomposition
 \begin{equation}\label{eq:exact-FTW-decomposition-preview}
-  Z_N(\beta)=\mathbb E Z_N(\beta)+ A_N(\beta)Q_N+\mathcal R_N(\beta),
+  Y_N(\beta)-1=A_N(\beta)Q_N+\mathcal R_N(\beta),
   \qquad
-  \mathcal R_N=\sum_{r\geq3}P_r Z_N.
+  \mathcal R_N=\sum_{r\geq3}P_r Y_N.
 \end{equation}
 
 
@@ -352,13 +360,13 @@ which gives the second claim.
 \begin{lemma}[First and second chaoses]\label{lem:exact-second-chaos}
 For every real $\beta$,
 \[
-  P_1Z_N(\beta)=0
+  P_1Y_N(\beta)=0
 \]
 and
 \begin{equation}\label{eq:P2Y-exact}
-  P_2 Z_N(\beta)
+  P_2 Y_N(\beta)
   =
-  \frac{\beta\,F'_N(\beta)}{2M_N}
+  \frac{\beta\,\partial_\beta\log F_N(\beta)}{2M_N}
   \sum_{I\in\calI_N}(g_I^2-1).
 \end{equation}
 \end{lemma}
@@ -414,7 +422,7 @@ where we used $H_N(tG)=tH_N(G)$.  Differentiating at $t=1$ gives
   \sum_Ig_I\partial_{g_I}Z_N(\beta;G)
   =\beta\,\partial_\beta Z_N(\beta;G).
 \]
-This  proves
+Since $F_N(\beta)$ is deterministic, division by $F_N(\beta)$ proves
 \eqref{eq:P2Y-exact}.
 \end{proof}
 
@@ -636,7 +644,7 @@ which proves \eqref{eq:Rademacher-exponential-moment}.
 There exists $\beta_{\rm Rad}=\beta_{\rm Rad}(q)>0$ such that, for every
 fixed real $\beta$ with $|\beta|<\beta_{\rm Rad}$,
 \begin{equation}\label{eq:higher-chaos-closure}
-  \sum_{r\geq3}\norm{P_r Z_N(\beta)}_2^2
+  \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
   =O\!\left(N^{-3(q/2-1)}\right)
   =o(N^{2-q}).
 \end{equation}
@@ -651,7 +659,7 @@ Put
 The Hermite coefficient formula, Lemma~\ref{lem:Z-derivative-bound}, and
 $F_N(\beta)>0$ give
 \begin{align}
-  \norm{P_r Z_N(\beta)}_2^2
+  \norm{P_r Y_N(\beta)}_2^2
   &=\frac1{F_N(\beta)^2}
     \sum_{|\alpha|=r}\frac1{\alpha!}
     \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \leq t_N^r
@@ -663,7 +671,7 @@ Here the sum may be restricted to even $\alpha$ by the sign-gauge symmetry.
 By \eqref{eq:even-sum-Rademacher-moment}, summing
 \eqref{eq:Hermite-Rademacher-bound} over all $r\geq3$ yields
 \begin{align}
-  \sum_{r\geq3}\norm{P_r Z_N(\beta)}_2^2
+  \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
   &\leq
   \sum_{r\geq3}\frac{t_N^r}{r!}
   \E_\varepsilon\!\left[S_{N,q}^r\right] \\
@@ -689,7 +697,7 @@ $t_N\leq c_qN^{-(q-1)}$.  Therefore
 \eqref{eq:Rademacher-exponential-moment} and
 \eqref{eq:all-higher-chaoses-at-once} imply
 \begin{align}
-  \sum_{r\geq3}\norm{P_r Z_N(\beta)}_2^2
+  \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
   &\leq C_{q,\beta}
   N^{-3(q-1)}N^{3q/2} \\
   &=C_{q,\beta}N^{-3(q/2-1)}.
@@ -743,7 +751,7 @@ uniformly on this interval,
 \begin{align}
   \frac1N\log F_N(\beta)&\longrightarrow\ell_q(\beta),
   \label{eq:annealed-free-energy-limit}\\
-  \frac1NF'_N(\beta)&\longrightarrow\ell_q'(\beta).
+  \frac1N\partial_\beta\log F_N(\beta)&\longrightarrow\ell_q'(\beta).
   \label{eq:annealed-derivative-limit}
 \end{align}
 Moreover,
@@ -863,7 +871,7 @@ By \eqref{eq:finite-N-FTW-coefficient} and
 \begin{proof}[Proof of Theorem~\ref{thm:partition-clt}]
 Let
 \[
-  Y_N(\beta;G)=\frac{Z_N(\beta;G)}{F_N(\beta)},\qquad   S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\calI_N}(g_I^2-1).
+  S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\calI_N}(g_I^2-1).
 \]
 The classical i.i.d.\ central limit theorem gives
 $S_N\Rightarrow\xi\sim\N(0,1)$.
@@ -873,9 +881,9 @@ By Lemma~\ref{lem:exact-second-chaos},
   =c_N(\beta)S_N+\mathcal R_N(\beta),
   \qquad
   c_N(\beta)
-  =\frac{\beta\,F'_N(\beta)}{\sqrt{2M_N}},
+  =\frac{\beta\,\partial_\beta\log F_N(\beta)}{\sqrt{2M_N}},
 \end{equation}
-where $\mathcal R_N=\sum_{r\geq3}P_r Z_N$ is orthogonal to $S_N$.
+where $\mathcal R_N=\sum_{r\geq3}P_r Y_N$ is orthogonal to $S_N$.
 Since $M_N\sim N^q/q!$, \eqref{eq:annealed-derivative-limit} gives
 \[
   N^{q/2-1}c_N(\beta)
