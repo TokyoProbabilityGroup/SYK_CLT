@@ -364,7 +364,56 @@ Hence, we have
 \end{align*}
 which gives the second claim. 
 \end{proof}
-\begin{lemma}[First and second chaoses]\label{lem:exact-second-chaos}
+
+\subsection{Gaussian integration by parts}
+\begin{lemma}
+    It holds
+    \begin{align*}
+        \mathbb E[ {\rm He}_\alpha(G) Z_N] = \mathbb E[\partial^\alpha_g Z_N].
+    \end{align*}
+\end{lemma}
+\begin{proof}
+Recall that the one-dimensional integration-by-parts identity yields 
+\[
+\mathbb{E}\!\left[\operatorname{He}_k(g)f(g)\right] = \mathbb{E}\!\left[f^{(k)}(g)\right], \qquad g\sim N(0,1),
+\]
+ for every function $f\in C^k(\mathbb R)$ for which the relevant expectations are finite. We now apply this identity successively to the independent Gaussian coordinates
+$(g_I)_{I\in\mathcal I_N}$. Since
+\[
+{\rm He}_\alpha(G) = \prod_{I\in\mathcal I_N} \operatorname{He}_{\alpha_I}(g_I),
+\]
+ together with repeated one-dimensional Gaussian integration by parts, provided that the relevant mixed partial derivatives of \(Z_N(\beta;G)\) are integrable, it gives
+\begin{align*}
+\mathbb{E}\!\left[
+{\rm He}_{\alpha}(G)Z_N(\beta;G)
+\right]
+&=
+\mathbb{E}\!\left[
+\left(
+\prod_{I\in\mathcal I_N}
+\operatorname{He}_{\alpha_I}(g_I)
+\right)
+Z_N(\beta;G)
+\right] \\
+&=
+\mathbb{E}\!\left[
+\left(
+\prod_{I\in\mathcal I_N}
+\partial_{g_I}^{\alpha_I}
+\right)
+Z_N(\beta;G)
+\right] \\
+&=
+\mathbb{E}\!\left[
+\partial_g^\alpha Z_N(\beta;G)
+\right].
+\end{align*}
+
+It remains to justify the integrability. For fixed $N$ and $\beta$, the partition function $Z_N(\beta;G)$ is a smooth function of finitely many Gaussian coordinates, and all of its derivatives have at most exponential growth in $\lVert G\rVert$. Hence the relevant quantities are integrable with respect to Gaussian measure. This proves the claim.
+\end{proof}
+\subsection{First and second moment}
+
+\begin{lemma}\label{lem:exact-second-chaos}
 For every real $\beta$,
 \[
   P_1Y_N(\beta)=0
