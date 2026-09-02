@@ -71,16 +71,14 @@ Then $\psi_I$ is Hermitian, $\psi_I^2=\I$, and $\norm{\psi_I}=1$.  Define
 \[
   H_N(G)=\sigma_N\sum_{I\in\calI_N}g_I\psi_I,
   \qquad
-  Z_N(z;G)=\tr e^{-zH_N(G)},
-  \qquad
-  F_N(z)=\E Z_N(z;G).
+  Z_N(z;G)=\tr e^{-zH_N(G)}.
 \]
 Here $\tr=2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
-particular, $Z_N(0;G)=F_N(0)=1$.  This normalization does not affect the
+particular, $Z_N(0;G)=1$.  This normalization does not affect the
 relative fluctuations studied below. We sometime write $Z_N(\beta) = Z_N(\beta;G)$ for brevity. 
 For real $\beta$, set
 \[
-  Y_N(\beta;G)=\frac{Z_N(\beta;G)}{F_N(\beta)}.
+  Y_N(\beta;G):=\frac{Z_N(\beta;G)}{\mathbb E Z_N(\beta)}.
 \]
 Thus $\E Y_N(\beta)=1$.
 Throughout, all limits are taken as $N\to\infty$ through even integers.
@@ -165,7 +163,7 @@ $Z_N(\beta)$.
 
 \subsection{Outline of the proof}
 
-
+Recall that $\frac{Z_N(\beta)}{\mathbb E Z_N(\beta)}$. 
 By applying the chaos expansion, since Clifford sign-gauge symmetry eliminates the first Gaussian chaos and
 identifies the second chaos exactly, we have the following:
 \[
@@ -174,7 +172,7 @@ identifies the second chaos exactly, we have the following:
   \]
   where
   \begin{equation}\label{eq:finite-N-FTW-coefficient}
-          A_N(\beta)=\frac{\beta}{2}\partial_\beta\log F_N(\beta),
+          A_N(\beta)=\frac{\beta}{2}\partial_\beta\log \mathbb E Z_N(\beta),
     \qquad
     Q_N=\frac1{|\mathcal I_N|}\sum_I(g_I^2-1).
     \end{equation}
@@ -232,9 +230,9 @@ Then, we can write
   =\sum_{|\alpha|=r}
   \frac{\mathbb E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!}H_\alpha(G).
 \]
-Since $F_N(\beta)$ is deterministic, we also have
+Since $\mathbb E Z_N(\beta)$ is deterministic, we also have
 \[
-  P_rY_N(\beta)=\frac{P_rZ_N(\beta)}{F_N(\beta)}.
+  P_rY_N(\beta)=\frac{P_rZ_N(\beta)}{\mathbb E Z_N(\beta)}.
 \]
 
 
@@ -248,7 +246,7 @@ sufficiently regular random variable $X=X(G)$,
 \end{equation*}
 
 
-Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log F_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
+Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \mathbb E Z_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
  The next lemma proves the exact radial decomposition
 \begin{equation*}
   Y_N(\beta)-1=A_N(\beta)Q_N+\mathcal R_N(\beta),
@@ -440,7 +438,7 @@ and
 \begin{equation}\label{eq:P2Y-exact}
   P_2 Y_N(\beta)
   =
-  \frac{\beta\,\partial_\beta\log F_N(\beta)}{2M_N}
+  \frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{2M_N}
   \sum_{I\in\calI_N}(g_I^2-1).
 \end{equation}
 \end{lemma}
@@ -496,8 +494,7 @@ where we used $H_N(tG)=tH_N(G)$.  Differentiating at $t=1$ gives
   \sum_Ig_I\partial_{g_I}Z_N(\beta;G)
   =\beta\,\partial_\beta Z_N(\beta;G).
 \]
-Since $F_N(\beta)$ is deterministic, division by $F_N(\beta)$ proves
-\eqref{eq:P2Y-exact}.
+This proves \eqref{eq:P2Y-exact}.
 \end{proof}
 
 {
@@ -854,10 +851,10 @@ the squared norm of the $r$th projection is the sum of the squared Hermite
 coefficients.  Lemma~\ref{lem: parity rule lemma} eliminates every odd
 multi-index, while Lemma~\ref{lem:Gaussian-Hermite-IBP} replaces each
 remaining Hermite coefficient by the corresponding expected derivative.
-Consequently, Lemma~\ref{lem:Z-derivative-bound} and $F_N(\beta)>0$ give
+Consequently, Lemma~\ref{lem:Z-derivative-bound} and $\mathbb E Z_N(\beta)>0$ give
 \begin{align}
   \norm{P_r Y_N(\beta)}_2^2
-  &=\frac1{F_N(\beta)^2}
+  &=\frac1{\mathbb E Z_N(\beta)^2}
     \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
     \frac1{\alpha!}
     \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \notag\\
@@ -953,9 +950,9 @@ There are $\beta_{\rm FE}=\beta_{\rm FE}(q)>0$ and an even real-analytic
 function $\ell_q$ on $(-\beta_{\rm FE},\beta_{\rm FE})$ such that, locally
 uniformly on this interval,
 \begin{align}
-  \frac1N\log F_N(\beta)&\longrightarrow\ell_q(\beta),
+  \frac1N\log \mathbb E Z_N(\beta)&\longrightarrow\ell_q(\beta),
   \label{eq:annealed-free-energy-limit}\\
-  \frac1N\partial_\beta\log F_N(\beta)&\longrightarrow\ell_q'(\beta).
+  \frac1N\partial_\beta\log \mathbb E Z_N(\beta)&\longrightarrow\ell_q'(\beta).
   \label{eq:annealed-derivative-limit}
 \end{align}
 Moreover,
@@ -992,7 +989,7 @@ Set $u=2^{q/2}\beta$.  Gaussian symmetry gives
 and $uH_N^{\rm GPSZ}=\beta H_N$.  Thus the sign and normalization conventions
 of \cite{GPSZ2026} give
 \begin{equation}\label{eq:GPSZ-conversion}
-  \frac1N\log F_N(\beta)=\frac{u}{N}f_{N,q}^{\rm GPSZ}(u),
+  \frac1N\log \mathbb E Z_N(\beta)=\frac{u}{N}f_{N,q}^{\rm GPSZ}(u),
 \end{equation}
 where $f_{N,q}^{\rm GPSZ}(u)=u^{-1}\log\E Z_N^{\rm GPSZ}(u)$.
 
@@ -1056,7 +1053,7 @@ $h_N=N^{-1}\log F_N$.  If
 \[
   \overline\nu_N(B)=\E\,\tr\mathbf1_{\{H_N\in B\}},
 \]
-then $F_N(\beta)=\int e^{-\beta x}\overline\nu_N(\mathrm dx)$; hence $h_N$
+then $\mathbb E Z_N(\beta)=\int e^{-\beta x}\overline\nu_N(\mathrm dx)$; hence $h_N$
 is finite, differentiable, and convex.  {Differentiation is
 justified by
 $\norm{H_N(G)}\leq\sigma_N\sum_{I\in\calI_N}|g_I|$ and Gaussian
@@ -1085,7 +1082,7 @@ By Lemma~\ref{lem:exact-second-chaos},
   =c_N(\beta)S_N+\mathcal R_N(\beta),
   \qquad
   c_N(\beta)
-  =\frac{\beta\,\partial_\beta\log F_N(\beta)}{\sqrt{2M_N}},
+  =\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{\sqrt{2M_N}},
 \end{equation}
 where $\mathcal R_N=\sum_{r\geq3}P_r Y_N$ is orthogonal to $S_N$.
 Since $M_N\sim N^q/q!$, \eqref{eq:annealed-derivative-limit} gives
@@ -1123,8 +1120,6 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
 \end{lemma}
 
 \begin{proof}
-%  Since $F_N(\beta)$ is deterministic, the derivatives of $W_N$ are the
-%  derivatives of $\log Z_N(\beta)$.
 To apply the Gaussian concentration
   inequality, we view $Z_N(\beta;G)$ as a function of
   $G = (g_I)_{I \in \calI_N}$ and establish the Lipschitz bound for $W_N$.
