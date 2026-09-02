@@ -101,9 +101,7 @@ Our main result is the following fluctuation resutls:
 }
 There exists $\beta_q\in (0,\tilde{\beta}_q]$ such that for any $\beta\in (-\beta_q,\beta_q)$,
  \begin{equation}\label{eq:scaled-relative-clt}
-  N^{q/2-1}\left(
-    \frac{Z_N(\beta)}{\E Z_N(\beta)}-1
-  \right)
+  N^{q/2-1}\left(Y_N(\beta)-1\right)
   \Longrightarrow
   \,\N\left(0,\frac{q!}{2}\beta^2(\ell_q'(\beta))^2\right).
 \end{equation}
@@ -209,7 +207,7 @@ Moreover, the annealed free-energy input and convexity imply
 \]
 Since $M_N\sim N^q/q!$, the classical central limit theorem for $Q_N$, the
 remainder estimate  gives the claimed limit for
-$Z_N/\mathbb E Z_N$.  
+$Y_N$.
 
 \section{Gaussian-chaos decomposition}
 \label{sec:chaos-decomposition}
@@ -450,18 +448,90 @@ For real $\beta$, every multi-index $\alpha$ of total order $r$ satisfies
 \end{lemma}
 
 \begin{proof}
-Label the $r$ differentiations by $I_1,\ldots,I_r$.  The iterated Duhamel
-formula is a sum over $r!$ permutations of integrals over the simplex
-$\Delta_r=\{t_j\geq0:\sum_{j=0}^rt_j=1\}$, whose volume is $1/r!$.
-Every integrand, apart from the factor $(|\beta|\sigma_N)^r$, has the form
+Write $H_N=H_N(G)$ for brevity.  We first derive the equality
+\begin{align}
+	&\partial_{g_{I_r}}\cdots\partial_{g_{I_1}}Z_N(\beta;G)
+	\notag\\
+	&\quad=(-\beta\sigma_N)^r
+	\sum_{\pi\in S_r}\int_{\Delta_r}
+	\tr\!\left(
+	e^{-t_0\beta H_N}\psi_{I_{\pi(1)}}e^{-t_1\beta H_N}
+	\cdots
+	\psi_{I_{\pi(r)}}e^{-t_r\beta H_N}
+	\right)\,\mathrm dt_1\cdots\mathrm dt_r
+	\label{eq:iterated-Duhamel-formula}
+\end{align}
+where
+\[\Delta_r=\left\{(t_j)_{j=1}^r: t_j\ge0,\quad \sum_{j=1}^r t_j\le 1\right\},\qquad t_0=1-\sum_{i=1}^r t_j. \]
+ For a differentiable matrix-valued function $A(\theta)$,
+the one-variable Duhamel formula is
 \[
-  \tr\left(
-    e^{-t_0\beta H_N}\psi_{I_{\pi(1)}}e^{-t_1\beta H_N}
-    \cdots
-    \psi_{I_{\pi(r)}}e^{-t_r\beta H_N}
-  \right).
+  \frac{\mathrm d}{\mathrm d\theta}e^{A(\theta)}
+  =\int_0^1
+    e^{sA(\theta)}A'(\theta)e^{(1-s)A(\theta)}\,\mathrm ds.
 \]
-Here and below the Schatten norms are defined using the normalized trace:
+Since
+\[
+  \partial_{g_I}H_N=\sigma_N\psi_I,
+\]
+applying this formula to $A=-t\beta H_N$ gives, for $t\geq0$,
+\begin{align}
+  \partial_{g_I}e^{-t\beta H_N}
+  &=-t\beta\sigma_N\int_0^1
+    e^{-st\beta H_N}\psi_I
+    e^{-(1-s)t\beta H_N}\,\mathrm ds \notag\\
+  &=-\beta\sigma_N\int_0^t
+    e^{-u\beta H_N}\psi_I
+    e^{-(t-u)\beta H_N}\,\mathrm du.
+  \label{eq:Duhamel-interval-splitting}
+\end{align}
+Here, \eqref{eq:Duhamel-interval-splitting} with $t=1$ yields
+\eqref{eq:iterated-Duhamel-formula} for $r=1$.  Suppose inductively that the
+formula holds at order $r-1$.  Then
+\begin{align}
+	&\partial_{g_{I_r}}\cdots\partial_{g_{I_1}}Z_N(\beta;G)
+	\notag\\
+	&\quad=(-\beta\sigma_N)^{r-1}
+	\sum_{\pi\in S_{r-1}}\int_{\Delta_{r-1}}\partial_{g_{I_r}}
+	\tr\!\left(
+	e^{-t_0\beta H_N}\psi_{I_{\pi(1)}}e^{-t_1\beta H_N}
+	\cdots
+	\psi_{I_{\pi(r-1)}}e^{-t_{r-1}\beta H_N}
+	\right)\,\mathrm dt_1\cdots\mathrm dt_{r-1}.
+	\label{eq:iterated-Duhamel-formula-induction}
+\end{align}
+For fixed $\pi\in S_{r-1}$ and $j\in\{1,\ldots,r\}$, differentiating the
+factor $e^{-t_{j-1}\beta H_N}$ replaces it, by
+\eqref{eq:Duhamel-interval-splitting}, with
+\[
+  -\beta\sigma_N\int_0^{t_{j-1}}
+  e^{-u\beta H_N}\psi_{I_r}
+  e^{-(t_{j-1}-u)\beta H_N}\,\mathrm du.
+\]
+Splitting $t_{j-1}$ into $u$ and $t_{j-1}-u$ and relabeling the resulting
+simplex variables, the corresponding term in the Leibniz rule becomes
+\begin{align*}
+  -\beta\sigma_N\int_{\Delta_r}
+  \tr\!\left(
+    e^{-t_0\beta H_N}\psi_{I_{\sigma_{\pi,j}(1)}}e^{-t_1\beta H_N}
+    \cdots
+    \psi_{I_{\sigma_{\pi,j}(r)}}e^{-t_r\beta H_N}
+  \right)\,\mathrm dt_1\cdots\mathrm dt_r,
+\end{align*}
+where
+\[\sigma_{\pi,j}(k)=\begin{cases}
+	\pi(k) & (k<j)\\
+	r &(k=j)\\
+	\pi(k-1) & (k>j)
+\end{cases}. \]
+Since $(\pi,j)\mapsto\sigma_{\pi,j}$ is a bijection from
+$S_{r-1}\times\{1,\ldots,r\}$ onto $S_r$, summing the Leibniz-rule terms in
+\eqref{eq:iterated-Duhamel-formula-induction} proves
+\eqref{eq:iterated-Duhamel-formula}.
+
+It remains to estimate each integrand in
+\eqref{eq:iterated-Duhamel-formula}.  Here and below the Schatten norms are
+defined using the normalized trace:
 \[
   \norm{A}_p=(\tr|A|^p)^{1/p},
   \qquad
@@ -475,16 +545,50 @@ For $t_j>0$,
 \]
 with the usual $p=\infty$ interpretation when $t_j=0$.  Noncommutative
 H\"older, with Schatten exponents $1/t_j$, and
-$\norm{\psi_I}_\infty=1$, therefore bounds the absolute value of the
-integrand by
-\[
+$\norm{\psi_I}_\infty=1$, gives, for every $\pi\in S_r$ and
+$t\in\Delta_r$,
+\begin{align}
+  &\left|
+  \tr\!\left(
+    e^{-t_0\beta H_N}\psi_{I_{\pi(1)}}e^{-t_1\beta H_N}
+    \cdots
+    \psi_{I_{\pi(r)}}e^{-t_r\beta H_N}
+  \right)
+  \right| \notag\\
+  &\quad\leq
+  \prod_{j=0}^r\norm{e^{-t_j\beta H_N}}_{1/t_j}
+  \prod_{k=1}^r\norm{\psi_{I_{\pi(k)}}}_\infty \notag\\
+  &\quad\leq
   \prod_{j=0}^r
   \left(\tr e^{-\beta H_N}\right)^{t_j}
-  =Z_N(\beta;G).
-\]
-The permutation count cancels the simplex volume, proving
-\eqref{eq:Z-derivative-bound}.  The same labeled formula covers repeated
-coordinates.
+  =\tr e^{-\beta H_N}
+  =Z_N(\beta;G),
+  \label{eq:Duhamel-integrand-Holder-bound}
+\end{align}
+where we used $\sum_{j=0}^rt_j=1$.  Hence
+%\begin{align}
+%  \int_{\Delta_r}Z_N(\beta;G)\,\mathrm dt_1\cdots\mathrm dt_r
+%  &=Z_N(\beta;G)
+%    \int_{\Delta_r}1\,\mathrm dt_1\cdots\mathrm dt_r \notag\\
+%  &=Z_N(\beta;G)\operatorname{vol}(\Delta_r)
+%  =\frac{Z_N(\beta;G)}{r!}.
+%  \label{eq:simplex-constant-integral}
+%\end{align}
+%Consequently,
+\begin{align*}
+ \left|
+  \partial_{g_{I_r}}\cdots\partial_{g_{I_1}}Z_N(\beta;G)
+  \right|
+  &\leq
+  (|\beta|\sigma_N)^r
+  \sum_{\pi\in S_r}\int_{\Delta_r}Z_N(\beta;G)
+  \,\mathrm dt_1\cdots\mathrm dt_r\\
+  &=
+  (|\beta|\sigma_N)^rZ_N(\beta;G)|S_r|\int_{\Delta_r}\mathrm dt_1\cdots\mathrm dt_r\\
+  &=
+  (|\beta|\sigma_N)^rZ_N(\beta;G),
+\end{align*}
+which proves \eqref{eq:Z-derivative-bound}.
 \end{proof}
 
 \begingroup
@@ -496,8 +600,6 @@ Let $(\varepsilon_x)_{x=1}^N$ be independent Rademacher variables on an
 auxiliary probability space, and write $\E_\varepsilon$ for expectation on
 this space.  Set
 \begin{equation}\label{eq:Rademacher-chaos-definition}
-  L_N=\sum_{x=1}^N\varepsilon_x,
-  \qquad
   S_{N,q}
   =\sum_{I\in\calI_N}\varepsilon_I,
   \qquad
@@ -529,7 +631,7 @@ for every $N$ and every $0\leq t\leq c_qN^{-(q-1)}$.
 Expanding $S_{N,q}^r$ by the multinomial formula gives
 \begin{equation}\label{eq:Rademacher-multinomial-expansion}
   \frac1{r!}\E_\varepsilon\!\left[S_{N,q}^r\right]
-  =
+  =\frac1{r!}\E_\varepsilon\!\left[ \sum_{|\alpha|=r}r! \prod_{I\in\calI_N}\frac{\varepsilon_I^{\alpha_I}}{\alpha_I!}\right]=
   \sum_{|\alpha|=r}\frac1{\alpha!}
   \E_\varepsilon\!\left[
     \prod_{I\in\calI_N}\varepsilon_I^{\alpha_I}
@@ -538,76 +640,85 @@ Expanding $S_{N,q}^r$ by the multinomial formula gives
 For a fixed $\alpha$, the product inside the expectation is
 \begin{equation}
   \prod_{x=1}^N
-  \varepsilon_x^{\sum_{I\ni x}\alpha_I}.
+  \varepsilon_x^{\sum_{I: x\in I}\alpha_I}.
 \end{equation}
 Its expectation is one if $\alpha$ is even and zero otherwise.  This proves
 \eqref{eq:even-sum-Rademacher-moment}.
 
-We next prove a deterministic bound for $S_{N,q}$.  For $0\leq m\leq q$,
-let
+We next prove a deterministic bound for $S_{N,q}$.  For every $N\geq1$
+and every integer $m\geq0$, let $e_m^{(N)}$ denote the $m$th elementary
+symmetric polynomial in $N$ variables, that is,
 \begin{equation}
-  e_m(\varepsilon)
-  =\sum_{\substack{I\subset[N]\\ |I|=m}}
-  \prod_{x\in I}\varepsilon_x,
-  \qquad e_0(\varepsilon)=1.
+  e_m^{(N)}(z_1,\ldots,z_N)
+  :=\sum_{\substack{I\subset[N]\\ |I|=m}}
+  \prod_{x\in I}z_x,
+  \qquad e_0^{(N)}(z_1,\ldots,z_N)=1.
 \end{equation}
-The power sums of the Rademacher signs satisfy
-\begin{equation}
-  p_j:=\sum_{x=1}^N\varepsilon_x^j
-  =
-  \begin{cases}
-    L_N,&j\text{ odd},\\
-    N,&j\text{ even}.
-  \end{cases}
-\end{equation}
+For the rest of the proof, we use the abbreviation
+\[
+  e_m:=e_m^{(N)}(\varepsilon_1,\ldots,\varepsilon_N).
+\]
+In particular, $e_1=\sum_{x=1}^N\varepsilon_x$ and $S_{N,q}=e_q$.
 Newton's identities state that
 \begin{equation}\label{eq:Newton-identities}
   m e_m
-  =\sum_{j=1}^m(-1)^{j-1}e_{m-j}p_j.
+  =\sum_{j=1}^m(-1)^{j-1}e_{m-j}p_j,
 \end{equation}
-An induction on $m$, using \eqref{eq:Newton-identities}, shows that there is
-a constant $C_m<\infty$ such that
+where $p_j:=\sum_{x=1}^N\varepsilon_x^j$.  Since
+$\varepsilon_x\in\{\pm1\}$, we have
+\begin{equation}
+  p_j
+  =
+  \begin{cases}
+    e_1,&j\text{ odd},\\
+    N,&j\text{ even}.
+  \end{cases}
+\end{equation}
+An induction on $m$, using \eqref{eq:Newton-identities}, shows that there is a constant $C_m<\infty$ such that
 \begin{equation}\label{eq:elementary-symmetric-bound}
-  |e_m(\varepsilon)|
-  \leq C_m\left(N^{m/2}+|L_N|^m\right).
+	|e_m|
+	\le C_m\left(N^{m/2}+|e_1|^m\right).
 \end{equation}
-For completeness, suppose that the estimate is known below order $m$ and
-write $u=|L_N|/\sqrt N$.  If $j$ is even, then
-\begin{align}
-  |e_{m-j}p_j|
-  &\leq
-  C_{m-j}\left(N^{(m-j)/2}+|L_N|^{m-j}\right)N \\
-  &\leq
-  C_{m-j}N^{m/2}\left(1+u^m\right),
-\end{align}
-because $j\geq2$ and $u^{m-j}\leq1+u^m$.  If $j$ is odd, then
-\begin{align}
-  |e_{m-j}p_j|
-  &\leq
-  C_{m-j}\left(N^{(m-j)/2}+|L_N|^{m-j}\right)|L_N| \\
-  &\leq
-  C_{m-j}N^{m/2}\left(1+u^m\right),
-\end{align}
-because $j\geq1$ and $u^{m-j+1}\leq1+u^m$.  Substitution into
-\eqref{eq:Newton-identities} proves the induction step.  Since
-$S_{N,q}=e_q(\varepsilon)$, we have in particular
+Indeed, suppose that the estimate is known below order $m$ and set
+\[
+X_N:=\frac{e_1}{\sqrt N}.
+\]
+For every $j\ge1$,
+\[
+|p_j|\le N^{j/2}(1+|X_N|^j).
+\]
+Hence, with $C_0=1$,
+\[
+\begin{aligned}
+	|e_{m-j}p_j|
+	&\le
+	C_{m-j}N^{m/2}
+	(1+|X_N|^{m-j})(1+|X_N|^j)\\
+	&\le
+	2C_{m-j}N^{m/2}(1+|X_N|^m),
+\end{aligned}
+\]
+where we used $1+|X|^m-|X|^{m-j}-|X|^j
+=(1-|X|^j)(1-|X|^{m-j})\ge0.$
+Substitution into \eqref{eq:Newton-identities} proves the induction step. Since
+$S_{N,q}=e_q$, we have in particular
 \begin{equation}\label{eq:Rademacher-chaos-deterministic-bound}
   |S_{N,q}|
-  \leq C_q\left(N^{q/2}+|L_N|^q\right).
+  \leq C_q\left(N^{q/2}+|e_1|^q\right).
 \end{equation}
 
-Set $X_N=L_N/\sqrt N$.  Since $|X_N|\leq\sqrt N$ and
-$a=q/2-1$, \eqref{eq:Rademacher-chaos-deterministic-bound} implies that,
+Since $|X_N|\leq\sqrt N$,
+\eqref{eq:Rademacher-chaos-deterministic-bound} implies that,
 for $0\leq t\leq c_qN^{-(q-1)}$,
 \begin{align}
   t|S_{N,q}|
-  &\leq C_qc_qN^{-a}\left(1+|X_N|^q\right) \\
+  &\leq C_qc_qN^{-(q/2-1)}\left(1+|X_N|^q\right) \\
   &\leq C_qc_q\left(1+|X_N|^2\right).
   \label{eq:Rademacher-exponent-reduction}
 \end{align}
 Indeed,
 \begin{equation}
-  N^{-a}|X_N|^q
+  N^{-(q/2-1)}|X_N|^q
   =|X_N|^2
   \left(\frac{|X_N|}{\sqrt N}\right)^{q-2}
   \leq |X_N|^2.
@@ -914,7 +1025,7 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
 \begin{lemma}[Gaussian concentration]
   Write 
   \begin{equation}
-    W_N \coloneqq \log \frac{Z_N(\beta)}{\E Z_N(\beta)}.
+    W_N \coloneqq \log Y_N(\beta).
   \end{equation}
   Then, for $\beta\neq0$ and any $\lambda, t > 0$,
   \begin{align}
@@ -928,9 +1039,11 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
 \end{lemma}
 
 \begin{proof}
-  To apply the Gaussian concentration inequality,
-  we view $Z_N(\beta;G)$ as a function of $G = (g_I)_{I \in \calI_N}$,
-  and establish its Lipschitz bound.
+%  Since $F_N(\beta)$ is deterministic, the derivatives of $W_N$ are the
+%  derivatives of $\log Z_N(\beta)$.
+To apply the Gaussian concentration
+  inequality, we view $Z_N(\beta;G)$ as a function of
+  $G = (g_I)_{I \in \calI_N}$ and establish the Lipschitz bound for $W_N$.
   Fix $I \in \calI_N$.
   By Duhamel's formula,
   we deduce that 
@@ -1041,9 +1154,7 @@ The case $\beta=0$ is trivial, so assume $\beta\neq0$.
 Put
 \[
   a=\frac q2-1,\qquad
-  X_N=\frac{Z_N(\beta)-\E Z_N(\beta)}{\E Z_N(\beta)},
-  \qquad
-  W_N=\log Z_N(\beta) - \log \E Z_N(\beta).
+  W_N=\log Y_N(\beta).
 \]
 It then holds that 
 \begin{align}
@@ -1053,41 +1164,44 @@ It then holds that
   &=
   W_N - \E W_N\\
   &= 
-  (W_N - X_N) + X_N - \E W_N,
+  \bigl(W_N-(Y_N(\beta)-1)\bigr)
+  +(Y_N(\beta)-1)-\E W_N,
 \end{align}
 which yields 
 \begin{equation}
   N^a(\log Z_N - \E \log Z_N)
   =
-  N^a(W_N - X_N) + N^a X_N - N^a \E W_N.
+  N^a\bigl(W_N-(Y_N(\beta)-1)\bigr)
+  +N^a(Y_N(\beta)-1)-N^a \E W_N.
 \end{equation}
 By Theorem~\ref{thm:partition-clt},
 we have 
 \begin{equation} \label{eq:cor1}
-    N^aX_N
+    N^a(Y_N(\beta)-1)
     \Longrightarrow
     \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi.
 \end{equation}
 Let $C_0 \in (0,\infty)$ be such that 
 $|\log (1+x) - x| \leq C_0x^2$ for all $x \in [-1/2, 1/2]$.
-Since $W_N = \log(1+ X_N)$,
+Since $W_N = \log Y_N(\beta)=\log(1+(Y_N(\beta)-1))$,
 it follows that 
 \begin{equation}
-  \E \bigl[ 1 \wedge (N^a|W_N - X_N|) \bigr]
+  \E \bigl[ 1 \wedge (N^a|W_N-(Y_N(\beta)-1)|) \bigr]
   \leq
-  \E \bigl[ 1 \wedge (C_0 N^a|X_N|^2) \bigr]
+  \E \bigl[ 1 \wedge (C_0 N^a|Y_N(\beta)-1|^2) \bigr]
   + 
-  \mathbb P(|X_N| > 1/2).
+  \mathbb P(|Y_N(\beta)-1| > 1/2).
 \end{equation}
 By \eqref{eq:cor1},
-$|X_N| \xrightarrow{\mathrm{p}} 0$ and $(N^a |X_N|)_{N \geq 1}$ is tight.
+$|Y_N(\beta)-1| \xrightarrow{\mathrm{p}} 0$ and
+$(N^a |Y_N(\beta)-1|)_{N \geq 1}$ is tight.
 Thus, 
 the right-hand side of the above inequality converges to $0$ as $N \to \infty$.
-Hence, $N^a(W_N - X_N) \xrightarrow{\mathrm{p}} 0$.
+Hence, $N^a(W_N-(Y_N(\beta)-1)) \xrightarrow{\mathrm{p}} 0$.
 Therefore, it suffices to show that $\E W_N = o(N^{-a})$.
 % To this end,
 % we first establish a Lipschitz bound for $G\mapsto W_N(G)$.  
-% Thus $W_N=\log(1+X_N)$, and Theorem~\ref{thm:partition-clt} gives
+% Thus $W_N=\log(1+(Y_N-1))$, and Theorem~\ref{thm:partition-clt} gives
 % We claim that
 % \begin{equation}\label{eq:log-centering-negligible}
 %   \E W_N=o(N^{-(q/2-1)}).
@@ -1133,13 +1247,14 @@ We claim that
 \end{equation}
 Indeed, the upper bound follows from Jensen's inequality,
 while the lower bound follows from \eqref{eq:centered W_N exp} and the identity $\E e^{W_N}=1$.
-Let $K_\beta=\beta^2/(2q)$ and $\delta_N \coloneqq (\E X_N^2)^{1/2}$.  
+Let $K_\beta=\beta^2/(2q)$ and
+$\delta_N \coloneqq (\E (Y_N(\beta)-1)^2)^{1/2}$.
 By Theorem~\ref{thm:partition-clt},
 \begin{equation} \label{eq:deltaN asymp}
-  \delta_N^2 = \E X_N^2\asymp N^{-(q-2)}.
+  \delta_N^2 = \E (Y_N(\beta)-1)^2\asymp N^{-(q-2)}.
 \end{equation}
 Henceforth, we consider sufficiently large $N$ so that $\delta_N \leq e^{-1}$.
-Since $e^{W_N}-1=X_N$, 
+Since $e^{W_N}-1=Y_N(\beta)-1$,
 Markov's inequality gives
 \begin{equation} \label{eq:W_N tail1}
   \mathbb P(W_N<-t)
@@ -1197,16 +1312,18 @@ Note that
   \qquad
   h(w)\leq |w|\quad (w<-1).
 \]
-This, combined with $e^{W_N} - 1 = X_N$ and \eqref{eq:WN-negative-tail}, yields
+This, combined with $e^{W_N} - 1 = Y_N(\beta)-1$ and
+\eqref{eq:WN-negative-tail}, yields
 \begin{equation}
   \E h(W_N) 
   \leq    
-  C\E X_N^2 + \E\bigl[|W_N|\, \mathbf1_{\{W_N<-1\}}\bigr]
+  C\E (Y_N(\beta)-1)^2
+  +\E\bigl[|W_N|\, \mathbf1_{\{W_N<-1\}}\bigr]
   \leq
   C\delta_N^2\sqrt{\log(1/\delta_N)}.
 \end{equation}
 Moreover,
-since $h(W_N) = X_N - W_N$ and $\E X_N = 0$,
+since $h(W_N) = Y_N(\beta)-1-W_N$ and $\E(Y_N(\beta)-1) = 0$,
 we have $-\E W_N = \E h(W_N)$.
 Therefore, by \eqref{eq:EWN range},
 we deduce that 
