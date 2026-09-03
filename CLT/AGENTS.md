@@ -10,11 +10,11 @@ CLT 原稿、証明構造、または Lean 形式化を変更する前に、次�
 
 1. `ARCHITECTURE.md`
 2. `EDITING_PLAN.md`
-3. `refs/CLT_SYK.tex` の関係箇所
+3. `refs/CLT_SYK.tex` と `refs/sections/` の関係箇所
 
 ## Source of truth
 
-- `refs/CLT_SYK.tex` は現在の論文の定理文を記録する。
+- `refs/CLT_SYK.tex` は現在の論文の root と共通 preamble を記録し、`refs/sections/` は本文を記録する。両者を合わせたものを定理文の source of truth とする。
 - `ARCHITECTURE.md` は意図した証明依存関係と各結果の現在の状態を記録する。
 - `EDITING_PLAN.md` は既知の問題、優先順位、作業の完了条件を記録する。
 - Lean ファイルは、Lean kernel が検査した正確な定理文についてのみ証明状態を記録する。
@@ -29,7 +29,7 @@ CLT 原稿、証明構造、または Lean 形式化を変更する前に、次�
 
 partition-function CLT は、sign-gauge incidence parity、Gaussian--Hermite integration by parts、first chaos の消滅と second chaos の厳密な同定、Duhamel derivative bound、Rademacher encoding と exponential-moment estimate、annealed free-energy derivative asymptotics、および classical i.i.d. CLT を使用する。
 
-現在の higher-chaos remainder proof を説明するときは、`refs/CLT_SYK.tex` にある Rademacher encoding と exponential-moment estimate による直接評価を用いる。
+現在の higher-chaos remainder proof を説明するときは、`refs/sections/gaussian-chaos.tex` にある Rademacher encoding と exponential-moment estimate による直接評価を用いる。
 
 log-partition CLT にはさらに、logarithmic linearization、Gaussian concentration、negative-tail control、および log-centering estimate が必要である。
 

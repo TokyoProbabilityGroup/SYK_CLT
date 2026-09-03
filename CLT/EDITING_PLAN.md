@@ -2,7 +2,7 @@
 
 ## 目的と管理範囲
 
-この文書は `refs/CLT_SYK.tex` の修正、数学的監査、および Lean 形式化の作業順序と完了条件を管理する。
+この文書は `refs/CLT_SYK.tex` と `refs/sections/` から成る原稿の修正、数学的監査、および Lean 形式化の作業順序と完了条件を管理する。
 
 最小構成を維持するため、独立した `issue_register.md` は作成せず、既知の問題をこの文書で管理する。`decision_log.md` と `work_log.md` も作成せず、重要な判断理由は該当項目または `ARCHITECTURE.md` に反映する。
 

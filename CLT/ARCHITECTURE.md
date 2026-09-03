@@ -2,7 +2,7 @@
 
 ## 目的と役割
 
-この文書は `refs/CLT_SYK.tex` にある Theorem 1.1--1.2 と Corollary 1.3 の意図した依存関係、および各結果の現在の証明状態を記録する。正確な論文の定理文は `refs/CLT_SYK.tex` を source of truth とする。
+この文書は `refs/CLT_SYK.tex` と `refs/sections/` にある Theorem 1.1--1.2 と Corollary 1.3 の意図した依存関係、および各結果の現在の証明状態を記録する。正確な論文の定理文はこれらを合わせた原稿を source of truth とする。
 
 最小構成を維持するため、独立した `proof_status.md` は作成せず、証明状態をこの文書に併記する。
 
