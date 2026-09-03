@@ -1,12 +1,11 @@
 name: LaTeX Action CI
 
 on:
-  # push:
-  #   branches:
-  #     - 'main'
-  #     - 'maintenance-codes'
-  #   paths:
-  #     - '**.tex'
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**.tex'
   workflow_dispatch:
 
 concurrency:
@@ -26,8 +25,7 @@ jobs:
           root_file: |
             CLT/refs/CLT_SYK.tex
       - name: Upload PDF files
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
-          name: PDF
-          path: |
-            CLT_SYK.pdf
+          path: CLT_SYK.pdf
+          archive: false
