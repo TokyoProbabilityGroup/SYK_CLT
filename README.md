@@ -58,3 +58,7 @@ lake build
 The command `lake exe mk_all` generates a Lean source file on which the `import` statement is written.
 It is required to build all math libraries as the default target (See also the `lakefile.toml` file).
 When you would like to build each library individually, for example, you should just run `lake build SYK_model`.
+
+## References
+
+- [Spin glass by Lean](https://github.com/or4nge19/SpinGlass)

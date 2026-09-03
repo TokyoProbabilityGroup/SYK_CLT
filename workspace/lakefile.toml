@@ -26,14 +26,6 @@ name = "CLT"
 globs = ["SYK.CLT.+"]
 
 [[lean_lib]]
-name = "GibbsMeasure"
-globs = ["SYK.GibbsMeasure.+"]
-
-[[lean_lib]]
-name = "SpinGlass"
-globs = ["SYK.SpinGlass.+"]
-
-[[lean_lib]]
 name = "super_concentration"
 globs = ["SYK.super_concentration.+"]
 
