@@ -2,9 +2,7 @@
 
 ## 適用範囲
 
-このファイルは現在の `SYK/super_concentration/` 以下に適用する。再設計後は
-`SYK/SuperConcentration/` へ移す。workspace ルート、`SYK/AGENTS.md`、共有模型の
-`AGENTS.md` も適用する。
+このファイルは現在の `SYK/super_concentration/` 以下に適用する。再設計後は `SYK/SuperConcentration/` へ移す。ワークスペースのルート、`SYK/AGENTS.md`、共有模型の `AGENTS.md` の規則も適用する。
 
 ## 作業前に読む文書
 
@@ -13,47 +11,26 @@
 3. `../SYK_model/ARCHITECTURE.md`
 4. `../SYK_model/EDITING_PLAN.md`
 5. `README.md`
-6. 二つの blueprint（historical document としてのみ参照する）
+6. 二つの証明計画書（過去の資料としてのみ参照する）
 
-正確な theorem と検証状態は Lean source、目標設計は `ARCHITECTURE.md`、作業順序は
-`EDITING_PLAN.md` を優先する。
+正確な定理文と検証状態は Lean のソースコード、目標設計は `ARCHITECTURE.md`、作業順序は `EDITING_PLAN.md` を優先する。
 
-## 境界
+## 役割の境界
 
-有限座標型上の Gaussian measure、Herbst argument、mollification、Lipschitz Gaussian
-concentration は `SYK/Probability/GaussianConcentration/` の独立 backend とする。この
-backend に `N`、`q`、`InteractionIndex`、`CouplingSpace`、Majorana operator、Hamiltonianを
-置かない。
+有限の座標添字型に対するガウス測度、Herbst の議論、平滑化、リプシッツ関数に対するガウス集中不等式は、`SYK/Probability/GaussianConcentration/` の独立した基盤部分とする。この基盤部分に `N`、`q`、`InteractionIndex`、`CouplingSpace`、マヨラナ演算子、ハミルトニアンを置かない。
 
-`CouplingSpace` とその standard Gaussian measure は `SYKModel` に置く。この
-directory には density-matrix estimate、Majorana sum-of-squares bound、physical
-log-partition の Lipschitz estimate と concentration specialization だけを置く。
+`CouplingSpace` とその標準ガウス測度は `SYKModel` に置く。このディレクトリには、密度行列に関する評価、相互作用演算子 `Ψ_A` の期待値の絶対値の二乗和の評価、物理的な逆温度での分配関数の対数に対するリプシッツ評価、およびその集中不等式への適用だけを置く。
+
+相互作用演算子と二乗和の定義は `ARCHITECTURE.md` の「SYK に固有の証明」を参照する。
 
 ## 保護する数学的内容
 
-- normalized trace による `Z(0)=1` と `log Z(0)=0`
-- product standard Gaussian coupling law
-- exact finite-volume Majorana sum-of-squares bound
-- `β : ℝ≥0` に対する Gibbs-state derivative formula
-- canonical scale における Lipschitz constant `β / sqrt q`
-- centered log-partition の sub-Gaussian parameter `β^2 / q`
-- lower/upper tail の先頭係数 `1`、two-sided tail の先頭係数 `2`
-- exponent `-q t^2 / (2 β^2)`
+`ARCHITECTURE.md` の「SYK に固有の証明」に記録した規格化、座標、有限サイズの二乗和評価、ギブス状態の微分公式、モーメント母関数と裾の定数を保持する。最良定数の主張と、有効な上界を区別する。
 
-`β=0` は constant function として扱う。complex temperature に positivity、density-matrix
-性、real `log Z`、probability tail を一般化しない。一般 coupling scale `𝒥` は基本 APIに
-含めず、必要なら coupling の scalar multiplicationから派生させる。
+`β=0` は定数関数として扱い、物理的な密度行列・実対数・裾確率の性質を複素逆温度へ一般化しない。一般スケール `𝒥` は基本 API に含めず、必要なら相互作用係数のスカラー倍から導く。
 
-## Blueprint の状態
-
-`blueprint_super_concentration.txt` の `N^(q/2)` scale と existential constant は、現行の
-強い結果より弱い放棄済み target である。Gaussian blueprint の「upper-tail theorem に
-唯一の `sorry` が残る」という記述と旧 path も現状と一致しない。これらを根拠に証明や
-API を後退させない。
+過去の証明計画書との相違は `EDITING_PLAN.md` の「過去の証明計画書との相違」を確認し、旧記述を根拠に証明や API を後退させない。
 
 ## 編集と検証
 
-file/module component は再設計時に `UpperCamelCase` とする。互換 alias は作らない。
-一度に dependency graph の一 layer だけを変更し、各変更ファイルを `lake env lean` で
-検査する。最後に `lake build SYKModel SuperConcentration` と主要 theorem の
-`#print axioms` を確認する。新しい placeholder は許容しない。
+再設計時には、ファイル名とモジュール名を構成する各部分を `UpperCamelCase` とする。互換性のための別名は作らない。一度に依存関係の一つの層だけを変更し、各変更ファイルを `lake env lean` で検査する。最後に `lake build SYKModel SuperConcentration` と主要な定理の `#print axioms` を確認する。証明の未完成箇所を新たに導入することは許容しない。

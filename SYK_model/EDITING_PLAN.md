@@ -2,66 +2,64 @@
 
 ## 目的
 
-現在の API との互換性を要求せず、normalized trace、complex analytic temperature、physical
-nonnegative temperature、abstract/concrete Majorana layer を明確に分離する。
+現在の API との互換性は要求せず、規格化トレース、解析に用いる複素逆温度、物理的な非負の実逆温度、およびマヨラナ系の抽象的な定義と具体的な表現を明確に分離する。
 
-## Phase 0: Baseline と文書監査
+## 段階0：現状と文書の確認
 
-- [ ] 現行 public symbols と consumer を列挙する。
-- [ ] lecture notes、CLT TeX、`model.txt`、Lean source の相違を記録する。
-- [ ] 現行 build と重要 theorem の axioms を記録する。
+各項目は移行作業の計画であり、チェックの付いていない項目を実装済みとみなさない。現行と目標の型・規格化・ビルド対象の差は `ARCHITECTURE.md` の対応表を参照する。以下のコマンドで使う新名称は、対象の改名と Lake 設定の更新後に有効になる。
 
-## Phase 1: Module と parameter
+- [ ] 現在公開されている識別子と、その利用箇所を列挙する。
+- [ ] 講義ノート、CLT 原稿、`model.txt`、Lean のソースコードの相違を記録する。
+- [ ] 現在のビルド結果と、重要な定理が依存する公理を記録する。
 
-- [ ] `SYK_model` を `SYKModel` へ移し、file/module component を `UpperCamelCase` にする。
-- [ ] `lakefile.toml` の target `SYK_model` を `SYKModel` へ改名し、理由と全 consumer への
+## 段階1：モジュールとパラメータ
+
+- [ ] `SYK_model` を `SYKModel` へ移し、ファイル名とモジュール名を構成する各部分を `UpperCamelCase` にする。
+- [ ] `lakefile.toml` のビルド対象 `SYK_model` を `SYKModel` へ改名し、理由とすべての利用箇所への
   影響を説明してから変更する。
-- [ ] temperature を model parameter から削除する。
-- [ ] interaction index、canonical ordering、phase、abstract Majorana API を整理する。
-- [ ] compatibility alias は作らない。
+- [ ] 逆温度を模型のパラメータから削除する。
+- [ ] 相互作用の添字、標準的な順序、位相因子、および抽象的なマヨラナ系の API を整理する。
+- [ ] 互換性のための別名は作らない。
 
-## Phase 2: Abstract algebra と standard realization
+## 段階2：抽象代数と標準表現
 
-- [ ] phase-corrected interaction と canonical Hamiltonian を共有定義にする。
-- [ ] even `N` の standard Jordan--Wigner matrix realization を構成する。
-- [ ] dimension、CAR、self-adjointness、normalized-trace orthogonality を証明する。
+- [ ] 位相因子を含む相互作用演算子と、標準的な規格化によるハミルトニアンを共有定義にする。
+- [ ] 偶数 `N` に対する Jordan–Wigner 変換による標準的な行列表現を構成する。
+- [ ] 行列の次元、正準反交換関係、自己共役性、および規格化トレースから定まる内積に関する直交性を証明する。
 
-## Phase 3: Complex matrix calculus
+## 段階3：複素行列の解析
 
-- [ ] raw trace と normalized trace を定義し、後者を標準にする。
-- [ ] exponent matrix に対する normalized trace exponential を定義する。
-- [ ] `partitionFunction (z : ℂ) H = tr(exp(-zH))` を specialization として定義する。
-- [ ] `partitionFunction` が `rawPartitionFunction / card d` に definitionally 展開される
+- [ ] 非規格化トレースと規格化トレースを定義し、後者を標準にする。
+- [ ] 指数関数を取る前の行列に対し、行列指数関数の規格化トレースを定義する。
+- [ ] `partitionFunction (z : ℂ) H = tr(exp(-zH))` をその特殊な場合として定義する。
+- [ ] `partitionFunction` を定義に沿って展開すると `rawPartitionFunction / card d` になるように
   定義配置にする。
-- [ ] `Z(0)=1`、entire 性、複素微分公式を証明する。
-- [ ] `Z z ≠ 0` の下で logarithmic derivative を証明する。
+- [ ] `Z(0)=1`、整関数性、および複素微分の公式を証明する。
+- [ ] `Z z ≠ 0` の仮定の下で対数微分の公式を証明する。
 
-## Phase 4: Physical Gibbs layer
+## 段階4：物理的なギブス状態
 
-- [ ] `β : ℝ≥0` specialization の positivity を証明する。
-- [ ] thermal density、Gibbs expectation、real log-partition を定義・検証する。
-- [ ] raw/normalized Gibbs expectation と centered `log Z` の対応を証明する。
+- [ ] `β : ℝ≥0` に限定した分配関数の正値性を証明する。
+- [ ] 熱平衡状態の密度行列、ギブス期待値、および分配関数の実対数を定義して検証する。
+- [ ] 非規格化・規格化トレースによるギブス期待値の対応と、中心化した `log Z` の対応を証明する。
 
-## Phase 5: Gaussian disorder と consumer migration
+## 段階5：ガウス型相互作用と利用側の移行
 
-- [ ] `CouplingSpace`、canonical `σ_N`、standard Gaussian measure を共有模型に置く。
-- [ ] 汎用 Gaussian concentration 定義を共有模型へ混入させない。
+- [ ] `CouplingSpace`、標準的な規格化係数 `σ_N`、標準ガウス測度を共有模型に置く。
+- [ ] 汎用的なガウス集中不等式の定義を共有模型に混入させない。
 - [ ] `SuperConcentration` を新 API へ移行する。
-- [ ] CLT interface を `SYK/CLT/ARCHITECTURE.md` と照合する。
+- [ ] CLT との接続部分を `SYK/CLT/ARCHITECTURE.md` と照合する。
 - [ ] `Annealed_FE` は編集せず、既知の破損を正確に記録する。
 
-## Deferred: Zero-free regions
+## 後で扱う課題：零点のない領域
 
-- [ ] fixed Hamiltonian の real axis 近傍など、最初の具体的 zero-free theorem を選定する。
-- [ ] high-temperature disk/strip の一様評価が必要か CLT と照合する。
-- [ ] zero-free theorem から conditional logarithmic API の仮定を供給する。
-- [ ] simply connected region 上の holomorphic logarithm を必要な場合だけ構成する。
+- [ ] 固定したハミルトニアンに対する実軸近傍など、最初に証明する具体的な零点のない領域を選定する。
+- [ ] 高温領域に対応する円板または帯状領域で一様な評価が必要か、CLT の要件と照合する。
+- [ ] 零点がないことを示す定理から、対数を扱う条件付き API に必要な仮定を供給する。
+- [ ] 単連結領域上の正則な対数を、必要な場合だけ構成する。
 
-`Z z ≠ 0` を全複素平面で証明すること、または complex Gibbs operator の positivity を
-目標にしない。
+`Z z ≠ 0` を全複素平面で証明することや、複素逆温度におけるギブス演算子の正値性を示すことは目標にしない。
 
 ## 検証条件
 
-各 Lean file を個別に検査し、`lake build SYKModel SuperConcentration` を実行する。主要
-theorem では `#print axioms` を確認する。新しい `sorry`、`admit`、`axiom`、未解決 goal は
-許容しない。full build の failure は未移行の `Annealed_FE` に限定して報告する。
+各 Lean ファイルを個別に検査し、`lake build SYKModel SuperConcentration` を実行する。主要な定理では `#print axioms` を確認する。新しい `sorry`、`admit`、`axiom`、未解決の証明目標は許容しない。ワークスペース全体のビルドに失敗する場合、許容する既知の失敗は未移行の `Annealed_FE` に限り、その内容を報告する。

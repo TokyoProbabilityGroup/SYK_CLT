@@ -1,50 +1,54 @@
-# SYK super-concentration の編集計画
+# SYK 分配関数の対数に対する集中不等式の編集計画
 
-## Phase 0: Baseline
+## 段階0：現状の記録
 
-- [ ] 現行 theorem、axioms、build status、consumer を記録する。
-- [ ] blueprint と Lean source の scale、path、proof status の相違を記録する。
+この計画は移行後の配置と API に向けた未完了作業を管理する。現行の一般スケールと目標の標準規格化の対応は `ARCHITECTURE.md` に記録する。末尾の `SYKModel`・`SuperConcentration` を使うビルドは改名後の検証であり、現行の対象名はルートの `lakefile.toml` と照合する。
 
-## Phase 1: Generic Gaussian backend
+- [ ] 現在の定理、依存する公理、ビルド結果、および利用箇所を記録する。
+- [ ] 証明計画書と Lean のソースコードについて、スケール、パス、証明状態の相違を記録する。
 
-- [ ] `SYK/Probability/GaussianConcentration/` を `UpperCamelCase` modules で構成する。
-- [ ] SYK coupling definitions と `N,q` specialization を backend から除く。
-- [ ] smooth proof、mollification、MGF theorem の最小 import graph を作る。
-- [ ] tail corollary は mathlib の `HasSubgaussianMGF` API から導く。
+## 段階1：汎用的なガウス集中不等式
 
-完了条件：backend の statement と imports に SYK-specific data が現れない。
+- [ ] `SYK/Probability/GaussianConcentration/` を、名前の各部分が `UpperCamelCase` であるモジュールによって構成する。
+- [ ] SYK の相互作用係数に関する定義と、`N, q` に限定した結果を汎用部分から除く。
+- [ ] 滑らかな関数に対する証明、平滑化、およびモーメント母関数の定理について、必要最小限のインポートによる依存関係を作る。
+- [ ] 裾の評価は mathlib の `HasSubgaussianMGF` API から系として導く。
 
-## Phase 2: Shared-model migration
+完了条件：汎用部分の定理文と `import` に SYK 固有のデータが現れない。
 
-- [ ] interaction と Gaussian coupling は `SYKModel` から importする。
-- [ ] matrix trace-exponential と physical Gibbs calculus は `SYKModel` から importする。
-- [ ] density-matrix estimate と Majorana sum-of-squares bound だけを残す。
+## 段階2：共有模型への移行
 
-## Phase 3: Concentration specialization
+- [ ] 相互作用演算子とガウス型の相互作用係数は `SYKModel` から `import` する。
+- [ ] 行列指数関数のトレースと、物理的なギブス状態に関する解析は `SYKModel` から `import` する。
+- [ ] この部分には、密度行列に関する評価とマヨラナ相互作用演算子の二乗和評価だけを残す。
 
-- [ ] `β : ℝ≥0` の log-partition derivative を証明する。
-- [ ] exact Majorana boundから `β / sqrt q` Lipschitz estimate を導く。
-- [ ] centered log-partition の `HasSubgaussianMGF` parameter `β^2/q` を証明する。
-- [ ] lower、upper、two-sided tail を導く。
-- [ ] `β=0` を normalized `Z(0)=1` から処理する。
+## 段階3：SYK への集中不等式の適用
 
-完了条件：CLT の MGF と片側 tail を係数の損失なしに供給できる。
+- [ ] `β : ℝ≥0` における分配関数の対数の微分公式を証明する。
+- [ ] マヨラナ相互作用演算子に対する有限サイズの上界から、リプシッツ定数として `β / sqrt q` を取れることを導く。
+- [ ] 中心化した分配関数の対数が、パラメータ `β^2/q` の `HasSubgaussianMGF` を満たすことを証明する。
+- [ ] 下側・上側・両側の裾の評価を導く。
+- [ ] `β=0` の場合は、規格化による `Z(0)=1` を使って処理する。
 
-## Phase 4: Module migration と cleanup
+完了条件：CLT に必要なモーメント母関数と片側の裾の評価を、係数を悪化させずに供給できる。
 
-- [ ] directory を `SuperConcentration`、files を `UpperCamelCase` に改名する。
-- [ ] `lakefile.toml` の target `super_concentration` を `SuperConcentration` へ改名し、
-  consumer と build command を同時に更新する。
-- [ ] 旧重複 definitions、中間 public constants、一般 `𝒥` API を削除する。
-- [ ] compatibility alias は作らない。
-- [ ] Lean 安定後に README と blueprint を更新または historical と明示する。
+## 段階4：モジュールの移行と整理
 
-## Verification
+- [ ] ディレクトリを `SuperConcentration` に改名し、ファイル名を `UpperCamelCase` にする。
+- [ ] `lakefile.toml` のビルド対象 `super_concentration` を `SuperConcentration` へ改名し、利用箇所とビルドコマンドを同時に更新する。
+- [ ] 旧実装で重複している定義、途中の計算だけに使う公開定数、および一般の `𝒥` を含む API を削除する。
+- [ ] 互換性のための別名は作らない。
+- [ ] Lean の実装が安定した後、README と証明計画書を更新するか、過去の資料であることを明記する。
 
-- [ ] 各変更ファイルを dependency order で `lake env lean` により検査する。
+## 検証
+
+- [ ] 変更した各ファイルを、依存先から順に `lake env lean` で検査する。
 - [ ] `lake build SYKModel SuperConcentration` を実行する。
-- [ ] MGF、片側 tail、二側 tail の定数を theorem statement で確認する。
-- [ ] 主要 theorem の `#print axioms` を確認する。
+- [ ] モーメント母関数、片側および両側の裾の評価に現れる定数を、定理文で確認する。
+- [ ] 主要な定理について `#print axioms` の結果を確認する。
 
-`Annealed_FE` は編集対象外とし、新しい placeholder と同 project 以外の build error は
-許容しない。
+`Annealed_FE` は編集対象外とする。新たな証明の未完成箇所と、`Annealed_FE` 以外に生じるビルドエラーは許容しない。
+
+## 過去の証明計画書との相違
+
+`blueprint_super_concentration.txt` にある `N^(q/2)` のスケールと、定数の存在のみを主張する評価は、現行の強い結果より弱い、放棄済みの目標である。ガウス集中不等式の証明計画書にある「上側の裾の定理に唯一の `sorry` が残る」という記述と旧パスも現状と一致しない。これらを根拠に証明や API を後退させない。

@@ -2,8 +2,7 @@
 
 ## 適用範囲
 
-このファイルは `SYK/SYK_model/` 以下に適用する。workspace ルートの
-`AGENTS.md` と `SYK/AGENTS.md` の規則も引き続き適用する。
+このファイルは `SYK/SYK_model/` 以下に適用する。ワークスペースのルートにある `AGENTS.md` と `SYK/AGENTS.md` の規則も引き続き適用する。
 
 ## 作業前に読む文書
 
@@ -11,84 +10,41 @@
 
 1. `ARCHITECTURE.md`
 2. `EDITING_PLAN.md`
-3. `../lectureNotes/note.tex` の finite-dimensional SYK model に関する箇所
+3. `../lectureNotes/note.tex` の有限次元 SYK 模型に関する箇所
 4. `../CLT/refs/sections/introduction.tex` の `subsec:SYK-model`
-5. `model.txt`（historical blueprint としてのみ参照する）
-6. 変更する識別子を利用するすべての Lean file
+5. `model.txt`（過去の設計案としてのみ参照する）
+6. 変更する識別子を利用するすべての Lean ファイル
 
-## 役割と source of truth
+## 役割と正式な参照元
 
-このディレクトリは複数の研究課題が共有する有限次元 SYK 模型の API を提供する。
-一般の有限次元模型の規約は lecture notes、CLT 固有の追加条件と normalization は
-CLT 原稿、実装済み API の正確な型と検証状態は Lean source を source of truth とする。
-`model.txt` は現行仕様ではなく、非負実温度と raw trace を中心にした初期案である。
-これらが一致しない場合は黙って統合せず、相違を報告する。
+このディレクトリは複数の研究課題が共有する有限次元 SYK 模型の API を提供する。一般の有限次元模型の規約は講義ノート、CLT 固有の追加条件と規格化は CLT 原稿、実装済み API の正確な型と検証状態は Lean のソースコードを正式な参照元とする。`model.txt` は現行仕様ではなく、非負実数の逆温度と非規格化トレースを中心にした初期案である。これらが一致しない場合は黙って統合せず、相違を報告する。
 
-lecture notes の large-`N` diagrammatics、Schwinger--Dyson equation、conformal
-limit、Schwarzian theory などの heuristic statement を finite-`N` Lean theorem の
-根拠として使用しない。
+講義ノートにある、大きな `N` におけるダイアグラムを用いた解析、Schwinger–Dyson 方程式、共形極限、Schwarzian 有効理論などの発見的な議論に基づく主張を、有限の `N` に対する Lean の定理の根拠として使用しない。
 
 ## 保護する模型規約
 
-明示的な承認なしに次を変更しない。
+模型を編集する前に `ARCHITECTURE.md` の「固定する模型規約」を照合し、反交換関係・自己共役性、積の順序と位相、分散、ギブス因子の符号、トレース、型と量化範囲を明示的な承認なしに変更しない。
 
-- Majorana relation `ψ i * ψ j + ψ j * ψ i = 2 δᵢⱼ` と `ψ i ^ 2 = 1`
-- Majorana generator の self-adjointness
-- canonical increasing order による interaction product
-- even `q` に対する phase `Complex.I ^ (q / 2)`
-- coupling variance `(q - 1)! / N ^ (q - 1)`
-- Gibbs exponential の符号 `exp (-z H)` とその `z = β` specialization
-- normalized trace と unnormalized trace の区別
-- interaction order、fermion number、inverse temperature の型と量化範囲
+タプルと `Finset` の対応では積の昇順を明示する。共有模型は偶数 `q >= 2` を扱い、CLT の `q >= 4`、高温条件、ガウスカオスなどを基本構造に組み込まない。規格化・非規格化トレースには異なる名前を使う。
 
-tuple で書かれた interaction label と `q`-element `Finset` の対応では、canonical
-increasing order を明示する。共有模型では even `q >= 2` を扱い、`q >= 4`、high
-temperature、Gaussian chaos、CLT などの課題固有条件を基本構造へ組み込まない。
+## 各層の役割と境界
 
-## Layer の境界
+抽象的な `MajoranaSystem`、有限行列による具体的な実現、確定的なハミルトニアン、ガウス分布に従うランダムな相互作用、行列を用いた熱力学を区別する。抽象的なマヨラナの関係式だけから従う結果と、既約性、行列の次元、規格化トレースから定まる内積に関する演算子族の直交性を必要とする結果を混同しない。
 
-abstract `MajoranaSystem`、concrete finite matrix realization、deterministic
-Hamiltonian、Gaussian disorder、matrix thermodynamics を区別する。abstract Majorana
-relations だけから従う結果と、irreducibility、matrix dimension、normalized-trace
-orthogonalityを必要とする結果を混同しない。
+有限個の座標を持つユークリッド空間上の汎用的なガウス集中不等式は、`SYK/Probability/GaussianConcentration/` に完全に分離する。ガウス分布に従う相互作用係数を SYK 模型に適用するための定義や結果は共有模型側に置くが、CLT 固有のカオス成分への射影や漸近定理は置かない。規格化トレースと非規格化トレースには異なる名前を使い、暗黙の定数倍として扱わない。
 
-有限座標 Euclidean space 上の汎用 Gaussian concentration は
-`SYK/Probability/GaussianConcentration/` に完全分離する。Gaussian coupling の
-SYK specialization は共有模型側に置くが、CLT 固有の chaos projection や漸近定理は
-置かない。normalized trace と raw trace には異なる名前を使い、暗黙の定数倍として
-扱わない。
+## 解析・物理部分の変更前の確認
 
-## 複素温度と physical layer
+`ARCHITECTURE.md` の「現行実装と移行後の区別」と「複素逆温度を扱う定理の仮定」に従う。解析は `z : ℂ`、物理的な量は `β : ℝ≥0` に分離する。`Z z ≠ 0` を必要とする結果では仮定を明記し、密度行列の性質を複素逆温度に一般化しない。標準行列表現の性質を抽象的な `MajoranaSystem` に暗黙に追加しない。
 
-analytic layer は `z : ℂ` に対する normalized partition function、entire 性、複素微分を
-扱う。これらに positivity を要求しない。`Z z ≠ 0` を必要とする logarithmic derivative
-または quotient では仮定を theorem statement に明記する。これは全平面では偽であり、
-将来は具体的な zero-free region の theorem から供給する。
-
-physical layer は `β : ℝ≥0` に限定し、partition positivity、thermal density、Gibbs
-expectation、real log-partition を扱う。complex temperature に density-matrix 性を
-一般化しない。standard Majorana matrix realization と、その dimension・normalized-trace
-orthogonality は abstract `MajoranaSystem` と分離して提供する。
-
-再設計後の目標 module path は `SYK.SYKModel` である。移行時にはこの `AGENTS.md` も
-`SYK/SYKModel/` へ移す。SpinGlass repository は generic/concrete layer 分離の参考資料と
-するが、明示的な承認なしに Lake dependency を追加したりコードを複製したりしない。
+再設計後の目標となるモジュールのパスは `SYK.SYKModel` である。移行時にはこの `AGENTS.md` も `SYK/SYKModel/` へ移す。SpinGlass リポジトリは汎用部分と具体的な模型に依存する部分の分離の参考資料とするが、明示的な承認なしに Lake の依存パッケージを追加したりコードを複製したりしない。
 
 ## 公開 API の変更
 
-公開 definition、structure field、theorem statement を変更する前に `rg` で全 consumer
-を確認し、型、normalization、import graph への影響を説明する。現在の移行では
-`../Annealed_FE/` は編集対象外であり、旧 API の削除による同 library の一時的破損は
-承認済みである。ただし破損した識別子と検証結果を列挙し、それ以外の consumer を
-壊さない。
+公開する定義、構造体のフィールド、定理文を変更する前に、`rg` で利用箇所をすべて確認し、型、規格化、インポートによる依存関係への影響を説明する。現在の移行では `../Annealed_FE/` は編集対象外であり、旧 API の削除により同ライブラリが一時的にビルドできなくなることは承認済みである。ただし、使えなくなった識別子と検証結果を列挙し、それ以外の利用箇所を壊さない。
 
-`sorry`、`admit`、`axiom` または同等の未検証な仮定を導入しない。CLT の未証明
-statement に対する個別の許可は、このディレクトリには適用しない。
+`sorry`、`admit`、`axiom` または同等の未検証な仮定を導入しない。CLT の未証明の主張に対する個別の許可は、このディレクトリには適用しない。
 
 ## 検証
 
-変更した各 Lean file を workspace ルートから `lake env lean` で検査し、続いて
-`lake build SYK_model` と移行済み consumer の最小 target を実行する。workspace 全体に
-影響する変更では `lake build` も実行し、`Annealed_FE` に限定された既知の失敗と、
-許容されない新規 error を区別して報告する。重要な theorem では `#print axioms` を
-確認する。
+変更した各 Lean ファイルをワークスペースのルートから `lake env lean` で検査し、続いて `lake build SYK_model` と移行済みの利用側の最小のビルド対象を実行する。ワークスペース全体に影響する変更では `lake build` も実行し、`Annealed_FE` に限定された既知の失敗と、許容されない新規エラーを区別して報告する。重要な定理では `#print axioms` を確認する。

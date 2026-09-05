@@ -2,31 +2,27 @@
 
 ## 目的
 
-有限次元 SYK 模型を、複素温度の解析と非負実温度の Gibbs theory の双方から利用できる
-共有 API として再設計する。現在の `SYK/SYK_model/` は将来 `SYK/SYKModel/` へ改名する。
+有限次元 SYK 模型を、複素逆温度に関する解析と、非負の実逆温度におけるギブス状態の理論の双方から利用できる共有 API として再設計する。現在の `SYK/SYK_model/` は将来 `SYK/SYKModel/` へ改名する。
 
-## Source と既知の相違
+## 正式な参照元と既知の相違
 
-finite-`N` 規約は `SYK/lectureNotes/note.tex`、CLT の normalization は
-`SYK/CLT/refs/`、検証状態は Lean source を優先する。`model.txt` は historical
-blueprint であり、`β ≥ 0` を `Params` に格納すること、raw trace のみを使うこと、
-Gaussian disorder を optional とすること、および concrete representation を持たない
-ことは目標設計として採用しない。
+有限の `N` に対する模型の規約は `SYK/lectureNotes/note.tex`、CLT 固有の規格化は `SYK/CLT/refs/`、実装済みの型と検証状態は Lean のソースコードを優先する。`model.txt` は過去の設計案としてのみ参照する。同文書にある、`β ≥ 0` を `Params` に格納する設計、非規格化トレースだけを使う設計、ガウス型のランダムな相互作用を任意の追加要素とする設計、および具体的な表現を持たない設計は、移行後の目標には採用しない。
 
 ## 固定する模型規約
 
-| 項目 | 共有模型での扱い |
-| --- | --- |
-| Majorana relation | `{ψ_i,ψ_j}=2δᵢⱼ I` |
-| fermion number | even `N`、physical dimension `2^(N/2)` |
-| interaction order | even `q >= 2`。CLT の `q >= 4` は consumer 側 |
-| interaction | canonical order と phase `Complex.I ^ (q / 2)` |
-| Gaussian scale | `σ_N²=(q-1)!/N^(q-1)` |
-| partition function | `Z(z)=tr(exp(-zH))`、`tr` は normalized trace |
-| physical temperature | `β : ℝ≥0`、analytic temperature は `z : ℂ` |
+以下の規約とモジュール構成は移行後の目標を記録する。抽象的な代数の定義に必要な仮定と、標準行列表現に必要な偶数 `N`・次元の条件は区別する。
 
-raw trace は基礎・互換 API として残すが、標準の `partitionFunction` は normalized traceを
-使い、`Z(0)=1` とする。
+| 項目 | 固定する内容と注意点 |
+| --- | --- |
+| マヨラナ演算子 | 自己共役とし、`ψᵢψⱼ + ψⱼψᵢ = 2δᵢⱼI`、従って `ψᵢ² = I` とする。演算子を定数倍すると相互作用の積も変わるため、相互作用係数との対応を確認する。 |
+| トレース | 非零の次元を `d` として `tr = Tr / d` とする。`Z = tr(exp(-zH))` と非規格化の `Z_raw = Tr(exp(-zH))` は `Z_raw = d Z` の関係にあり、実逆温度では対数に `log d` の差が生じる。 |
+| 相互作用係数 | 独立な標準正規変数 `g_A` と、実際の係数 `J_A = σ_N g_A` を区別する。`Var(J_A) = σ_N² = (q-1)! / N^(q-1)` は各係数の分散であり、ハミルトニアン全体の分散ではない。 |
+| ギブス因子 | `exp(-zH)` を用い、実逆温度では `z = β` とする。指数の符号は、エネルギーの重み付けと逆温度による微分公式の符号を決める。 |
+| 相互作用の次数 | `q` は一つの相互作用に含まれるマヨラナ演算子の個数。共有模型は偶数 `q >= 2`、CLT は偶数 `q >= 4` を扱う。添字を昇順に並べた積に位相因子 `i^(q/2)` を掛け、自己共役な相互作用を作る。 |
+| 系の大きさと極限 | `N` はマヨラナ演算子の個数。偶数 `N` 個を二つずつ組み合わせると、`N/2` 組のフェルミオン生成・消滅演算子を構成でき、その標準的なフォック表現の次元は `2^(N/2)` である。CLT は `q` を固定し、偶数 `N` を通る極限を扱う。別の部分列や `q` も増加する極限へ暗黙に移らない。 |
+| 逆温度 | 物理的・確率論的結果は `β >= 0` を対象とする方針だが、各定理の高温条件や端点の除外は別途保持する。非負全体で成り立つことを意味せず、特に `β = 0` で分散が消える場合の標準化に注意する。 |
+
+非規格化トレースは基礎的な API および互換用の API として残すが、標準の `partitionFunction` には規格化トレースを使い、`Z(0)=1` とする。
 
 定義の向きは次で固定する。
 
@@ -37,23 +33,37 @@ partitionFunction z H = normalizedTrace (exp (-z • H))
                       = rawPartitionFunction z H / (Fintype.card d : ℂ)
 ```
 
-最下層の analytic functional は exponent matrix を直接受け取る
-`A ↦ normalizedTrace (exp A)` とし、`partitionFunction` は `A=-z • H` による
-specialization とする。normalized API には `[Nonempty d]` を要求し、除数の非零性を
-明示する。raw/normalized の逆向き等式は consumer が必要とする場合だけ補題として持つ。
+解析部分の最下層には、指数関数を取る前の行列を直接受け取る汎関数 `A ↦ normalizedTrace (exp A)` を置く。`partitionFunction` は、この汎関数に `A=-z • H` を代入した特殊な場合として定義する。規格化トレースを使う API には `[Nonempty d]` を要求し、除数が0でないことを明示する。非規格化トレースと規格化トレースを結ぶ逆向きの等式は、利用側で実際に必要となる場合だけ補題として用意する。
 
-## 目標 layer
+異なる添字のマヨラナ演算子は反交換するため、二つを入れ替えると積の符号が変わる。位相因子は偶数 `q` の相互作用を自己共役にするためのものであり、添字集合を同一視するだけでは順序と位相の一致は保証されない。
+
+ここで相互作用演算子 `Ψ_A` は、昇順に並べたマヨラナ演算子の積に位相因子を掛けたものを指す。「直交性」は対象とする演算子族に対する内積 `⟨A, B⟩ = tr(A* B)` での直交性を意味し、`A*` は随伴を表す。標準表現の性質を、抽象的な `MajoranaSystem` の仮定として暗黙に追加しない。
+
+## 現行実装と移行後の区別
+
+| 項目 | 現行の `model.lean` | 移行後の目標 |
+| --- | --- | --- |
+| 逆温度 | `Params` に実数 `β` と非負性の証明を保持する。 | 模型のパラメータから分離し、解析には `z : ℂ`、物理的な結果には `β : ℝ≥0` を渡す。 |
+| 分配関数 | `partitionFunction` は非規格化トレースを使い、逆温度は `NNReal`。 | 複素逆温度に拡張し、規格化トレースを標準とする。 |
+| 逆温度0 | 現行定義では `partitionFunction 0 H = Fintype.card d`。 | 非零次元の規格化分配関数では `Z(0)=1`。 |
+| ビルド対象 | ルートの `lakefile.toml` に `SYK_model` と `super_concentration` がある。 | 移行計画の `SYKModel` と `SuperConcentration` へ変更する。 |
+
+この表は定義と設定の読み取りによる区別であり、新たなビルド検証や移行完了の報告ではない。実装変更時には再確認する。移行順序と検証条件は `EDITING_PLAN.md` に従う。
+
+非零次元・実逆温度で規格化を変更すると `log Z_raw = log Z + log d` となるが、次元は相互作用係数に依存しないため、中心化した対数や相互作用係数による微分ではこの差が消える。一方、`N^(-1) log Z` の極限では `N^(-1) log d` が残り得る。ギブス期待値は分子・分母を同じ規約で規格化すれば変わらない。
+
+## 目標とする各層
 
 ```mermaid
 flowchart TD
-    params["Model parameters and interaction indices"]
-    abstract["Abstract Majorana algebra"]
-    concrete["Standard matrix realization"]
-    hamiltonian["Hamiltonian and SYK Gaussian disorder"]
-    analytic["Complex trace-exponential calculus"]
-    zeroFree["Zero-free analytic results"]
-    physical["Physical Gibbs theory"]
-    consumers["SuperConcentration and CLT"]
+    params["模型のパラメータと相互作用の添字"]
+    abstract["抽象的なマヨラナ代数"]
+    concrete["標準的な行列表現"]
+    hamiltonian["ハミルトニアンとガウス型のランダムな相互作用"]
+    analytic["複素変数に対するトレース指数関数の解析"]
+    zeroFree["零点のない領域における解析的結果"]
+    physical["物理的なギブス状態の理論"]
+    consumers["SuperConcentration と CLT"]
 
     params --> abstract
     abstract --> concrete
@@ -66,42 +76,41 @@ flowchart TD
     physical --> consumers
 ```
 
-- model parameter は `N`, `q` と admissibility のみを持ち、temperature を持たない。
-- abstract relations と standard Jordan--Wigner matrix realization を分離する。
-- generic matrix layer は exponent matrix、normalized trace、trace exponential、entire 性、
-  複素微分を扱う。
-- SYK Gaussian coupling space は shared model に置き、finite coordinate type 上の Gaussian
-  concentration proof は `SYK/Probability/GaussianConcentration/` に置く。
+- 模型のパラメータは `N`、`q` と、それらが許容条件を満たすことの証明だけを持ち、逆温度を持たない。
+- 抽象的な反交換関係と、Jordan–Wigner 変換による標準的な行列表現を分離する。
+- 汎用的な行列解析の層では、指数関数を取る前の行列、規格化トレース、行列指数関数のトレース、整関数性、および複素微分を扱う。
+- SYK のガウス型相互作用係数の空間は共有模型に置く。有限個の座標を持つ型上のガウス集中不等式の証明は `SYK/Probability/GaussianConcentration/` に置く。
 
-## 複素温度の theorem contract
+## 複素逆温度を扱う定理の仮定
+
+以下で分配関数の正値性は `Z(β) > 0`、密度行列の条件は半正定値性と通常のトレースが1であることを指す。
+
+ここで「無条件」は零点のない領域を仮定しないという意味であり、有限次元などの基本設定まで不要という意味ではない。`z` は逆温度の複素数への拡張を表す。
 
 | 分類 | 内容 | 仮定 |
 | --- | --- | --- |
-| 無条件 | `Z(0)=1`、entire 性、`Z'` の公式 | `[Nonempty d]` |
-| zero-free | logarithmic derivative、complex normalized quotient | `Z z ≠ 0` |
-| physical | positivity、thermal density、Gibbs expectation、real `log Z` | `β : ℝ≥0`、self-adjoint `H` |
+| 零点に関する仮定なし | `Z(0)=1`、整関数性、`Z'` の公式 | `[Nonempty d]` |
+| 零点のない点または領域 | 対数微分、複素数値の規格化された商 | `Z z ≠ 0` |
+| 物理的な実逆温度 | 正値性、熱平衡状態の密度行列、ギブス期待値、実数値の `log Z` | `β : ℝ≥0`、自己共役な `H` |
 
-`Z z ≠ 0` は複素平面全体では一般に偽である。将来は high-temperature disk や strip などの
-具体的な zero-free region を証明し、その範囲で仮定を供給する。global holomorphic
-logarithm には zero-free 性に加えて branch を選べる領域条件が必要である。複素温度での
-positivity と density-matrix 性は deferred proof ではなく、主張しない性質である。
+`Z z ≠ 0` は複素平面全体では一般に成り立たない。将来は高温領域に対応する円板や帯状領域など、具体的に零点がない領域を証明し、その範囲で仮定を供給する。領域全体で正則な対数を定めるには、零点がないことに加えて、対数の枝を選べる領域であることが必要になる。複素逆温度における正値性や密度行列としての性質は、証明を後回しにしているのではなく、そもそも主張しない。
 
-## Consumer
+通常の密度行列は `ρ = exp(-βH) / Tr(exp(-βH))` とし、半正定値で `Tr(ρ) = 1` を満たす。分配関数に規格化トレースを使っても、この分母を無条件に `Z` に置き換えない。次元を `d` とすれば分母は `d Z` である。
 
-- `SYK/SuperConcentration/`：physical Gibbs specialization と SYK coupling を使う。
-- `SYK/CLT/`：complex analytic inputs と `β : ℝ≥0` の確率論的 specializationを使う。
+## 利用側
+
+- `SYK/SuperConcentration/`：物理的なギブス状態に限定した結果と SYK の相互作用係数を使う。
+- `SYK/CLT/`：複素解析に関する結果と、`β : ℝ≥0` に限定した確率論的結果を使う。
 - `SYK/Annealed_FE/`：現在は編集・移行対象外とする。
 
-SpinGlass の generic finite Gibbs calculus は layer 分離の参考とするが、classical finite-sum
-API、raw normalization、外部 repository dependency は採用しない。
+SpinGlass にある有限系の汎用的なギブス解析は、層を分離する際の参考とする。ただし、古典系の有限和を対象とする API、非規格化トレースを使う規約、外部リポジトリへの依存関係は採用しない。
 
 参照先は <https://github.com/or4nge19/SpinGlass> である。特に `FiniteGibbs` の
-model-independent boundary、concrete model への bridge lemma、calculus の module 分離を
-参考にする。
+模型に依存しない部分と依存する部分の境界、具体的な模型へ結果を移す補題、および解析機能のモジュール分割を参考にする。
 
-## Module と namespace
+## モジュールと名前空間
 
-目標 module tree は次で固定する。
+目標とするモジュール構成は次のとおりとする。
 
 ```text
 SYK/SYKModel/
@@ -112,6 +121,4 @@ SYK/SYKModel/
   GaussianDisorder.lean
 ```
 
-module path は `SYK.SYKModel.*` とするが、共有する主要 declaration は `namespace SYK`
-に置く。file ごとの追加 namespace を機械的に作らない。内部 helper は必要な局所 namespace
-または `private` で閉じる。
+モジュールのパスは `SYK.SYKModel.*` とするが、共有する主要な宣言は `namespace SYK` に置く。ファイルごとの名前空間を機械的に追加しない。内部だけで使う補助宣言は、必要な局所名前空間または `private` に置いて公開しない。

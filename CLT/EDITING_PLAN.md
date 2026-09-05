@@ -4,106 +4,118 @@
 
 この文書は `refs/CLT_SYK.tex` と `refs/sections/` から成る原稿の修正、数学的監査、および Lean 形式化の作業順序と完了条件を管理する。
 
-最小構成を維持するため、独立した `issue_register.md` は作成せず、既知の問題をこの文書で管理する。`decision_log.md` と `work_log.md` も作成せず、重要な判断理由は該当項目または `ARCHITECTURE.md` に反映する。
+文書を必要以上に増やさないため、問題一覧だけを記録する `issue_register.md` は作成せず、既知の問題をこの文書で管理する。判断記録だけを残す `decision_log.md` と作業記録だけを残す `work_log.md` も作成せず、重要な判断とその理由は該当項目または `ARCHITECTURE.md` に反映する。
 
-## Phase 0: 運用文書の整備
+## 再開時に確認する未完了事項
 
-- [x] 共有 Lean workspace 用 `AGENTS.md` を一般化する。
+- Theorem 1.1 の完全な証明が原稿にない。段階4で扱う。
+- 標準化した CLT は `beta = 0` で未定義であり、原稿には負の逆温度を含む旧来の範囲が残る。段階2で各定理の条件を照合する。
+
+これらは解決済みの記録ではない。定理文を変更する解決には人間の研究者の承認が必要である。
+
+## 段階0：運用文書の整備
+
+- [x] 共有 Lean ワークスペース用の `AGENTS.md` を一般化する。
 - [x] `SYK/workspace/AGENTS.md` を配布用テンプレートとして追加する。
 - [x] `SYK/AGENTS.md` と `SYK/CLT/AGENTS.md` を追加する。
 - [x] `SYK/CLT/ARCHITECTURE.md` と本計画を追加する。
 - [x] 公開用の英語版 `SYK/workspace/README.md` と `SYK/CLT/README.md` を追加する。
 
-完了条件：source of truth、依存関係、未完了事項、および文書の役割分担が明示されている。
+完了条件：正式な参照元、依存関係、未完了事項、および文書の役割分担が明示されている。
 
-## Phase 1: 数学的内容を変えない原稿整理
+## 段階1：数学的内容を変えない原稿整理
 
-- [ ] Gaussian-chaos expansion にある未完成の等号を修正する。
+- [ ] ガウスカオス展開にある未完成の等号を修正する。
 - [ ] Lemma 3.1 と Corollary 1.3 の証明にある重複を削除する。
-- [ ] `paritcular` などの明らかな spelling error を修正する。
-- [ ] 文脈上明白な `ell_p` と `ell'` の notation error を精査する。
+- [ ] `paritcular` などの明らかな綴りの誤りを修正する。
+- [ ] 文脈上明らかな `ell_p` と `ell'` の記号上の誤りを精査する。
 - [ ] 長いコメントアウト済み旧証明を残すか削除するか決める。
-- [ ] LaTeX 生成物を version control に含める方針を確認する。
-- [ ] 原稿を compile し、error、warning、未解決参照を報告する。
+- [ ] LaTeX の生成物をバージョン管理の対象に含めるか確認する。
+- [ ] 原稿をコンパイルし、エラー、警告、および未解決の参照を報告する。
 
-完了条件：定理文の数学的内容を変更せず、原稿が重複や壊れた式なしに compile される。
+完了条件：定理文の数学的内容を変更せず、重複した記述や壊れた数式がない状態で原稿をコンパイルできる。
 
-## Phase 2: 定理文レベルの問題
+## 段階2：定理文に関わる問題
 
-この phase の変更は人間の研究者の明示的な承認後に行う。
+「非負領域へ統一する」は高温の上限を取り除く意味ではない。各結果で必要な上限と端点を照合し、特に `beta = 0` の退化した相対 CLT と、分散で割るためそこで未定義となる標準化 CLT を分ける。候補の温度上限や非退化条件は、確認が済むまで確定した仮定として使わない。
 
-- [ ] relative CLT の `beta = 0` における退化極限と、そこで未定義な standardized CLT の parameter range を分離する。
-- [ ] Theorem 1.1--1.2、Corollary 1.3 と内部補題の温度領域を `beta >= 0` に統一する。
-- [ ] 非負領域で `ell_q'(beta) > 0` を使う正確な nondegeneracy range を記述する。
-- [ ] `beta_FE`、`beta_Rad`、nondegeneracy range、および Theorem 1.1 の range の関係を明記する。候補となる関係 `beta_q <= min(beta_FE, beta_Rad, beta_nd, tilde_beta_q)` が実際の依存関係を正しく表すか確認する。
-- [ ] Theorem 1.1 を内部で証明するか、外部の quenched result を引用するか決定する。
+この段階の変更は、人間の研究者による明示的な承認を得てから行う。
 
-完了条件：三つの主結果の temperature range と nondegeneracy condition が相互に整合する。
+- [ ] 相対ゆらぎの CLT が `beta = 0` で持つ退化した極限と、そこで未定義となる標準化した CLT のパラメータ範囲を分けて記述する。
+- [ ] Theorem 1.1–1.2、Corollary 1.3 と内部補題の温度領域を `beta >= 0` に統一する。
+- [ ] 非負領域で `ell_q'(beta) > 0` を使える、正確な非退化領域を記述する。
+- [ ] `beta_FE`、`beta_Rad`、非退化領域、および Theorem 1.1 の適用範囲の関係を明記する。候補となる関係 `beta_q <= min(beta_FE, beta_Rad, beta_nd, tilde_beta_q)` が実際の依存関係を正しく表すか確認する。
+- [ ] Theorem 1.1 を原稿内で証明するか、クエンチ量に関する外部結果を引用するか決定する。
 
-## Phase 3: Theorem 1.2 の監査
+完了条件：三つの主結果について、逆温度の範囲と非退化条件が相互に整合する。
 
-- [ ] Clifford sign-gauge action と incidence-parity rule を検証する。
-- [ ] first chaos の消滅と exact second-chaos coefficient の normalization を検証する。
-- [ ] iterated Duhamel formula と noncommutative Holder estimate を検証する。
-- [ ] Rademacher encoding identity と exponential-moment estimate の一様性を検証する。
+## 段階3：Theorem 1.2 の監査
+
+- [ ] Clifford 代数上の符号ゲージ変換と、各頂点の出現回数に関する偶奇則を検証する。
+- [ ] 一次カオスの消滅と、二次カオスの係数の厳密な値および規格化を検証する。
+- [ ] Duhamel の反復微分公式と非可換 Hölder 不等式による評価を検証する。
+- [ ] ラデマッハ変数による符号化の恒等式と、指数モーメント評価の一様性を検証する。
 - [ ] `O(N^(-3(q/2-1))) = o(N^(2-q))` を確認する。
-- [ ] annealed free-energy result の引用箇所、normalization conversion、analyticity の導出を確認する。
-- [ ] variance asymptotic と standardized CLT の論理を確認する。
+- [ ] アニール自由エネルギーに関する結果の引用箇所、規格化の変換、および解析性の導出を確認する。
+- [ ] 分散の漸近挙動と、標準化した CLT を導く論理を確認する。
 
-完了条件：現稿内の結果と明示した外部入力だけで Theorem 1.2 が閉じる。
+完了条件：現在の原稿内の結果と、明示した外部入力だけから Theorem 1.2 が証明される。
 
-## Phase 4: Theorem 1.1 の完成
+## 段階4：Theorem 1.1 の完成
 
-- [ ] 必要な quenched/annealed comparison lemma を正確に定式化する。
-- [ ] 既存の Gaussian concentration lemma が与える tail bound を整理する。
+- [ ] 必要となる、クエンチ量とアニール量を比較する補題を正確に定式化する。
+- [ ] 既存のガウス集中不等式に関する補題が与える裾確率の評価を整理する。
 - [ ] `E[log Z_N]-log E[Z_N]` の必要な評価を証明または引用する。
-- [ ] almost-sure convergence に十分な summable tail estimate を導く。
-- [ ] Borel--Cantelli または適切な外部定理を用いて almost-sure statement を証明する。
-- [ ] Theorem 1.1 の明示的な proof を原稿へ追加する。
+- [ ] 概収束を導くのに十分な、総和可能な裾確率の評価を導く。
+- [ ] Borel–Cantelli の補題または適切な外部定理を用いて、概収束を証明する。
+- [ ] Theorem 1.1 の明示的な証明を原稿へ追加する。
 
 完了条件：Theorem 1.1 の両方の極限が、明示された仮定と依存関係から証明される。
 
-## Phase 5: Corollary 1.3 の監査
+## 段階5：Corollary 1.3 の監査
 
-- [ ] probabilistic logarithmic linearization を検証する。
-- [ ] negative tail の uniform-integrability argument を検証する。
+- [ ] 確率論的な意味での対数の線形近似を検証する。
+- [ ] 負の側の裾の評価を用いて一様可積分性を示す議論を検証する。
 - [ ] `E[log Y_N] = o(N^(1-q/2))` を検証する。
-- [ ] `beta = 0` の扱いが standardized CLT に依存していないことを確認する。
+- [ ] `beta = 0` の扱いが、標準化した CLT に依存していないことを確認する。
 
-完了条件：random linearization error と deterministic centering error がともに CLT scale で negligible である。
+完了条件：線形近似に伴うランダムな誤差と、中心化に伴う確定的な誤差が、いずれも CLT のスケールでは無視できることが示されている。
 
-## Phase 6: Lean 形式化
+## 段階6：Lean による形式化
 
-既存 skeleton の theorem-label grouping を維持し、file/module component は
-`UpperCamelCase`、namespace は `SYK.CLT` とする。README に存在しない module を掲載しない。
+以下は移行後の API を使う計画である。共有模型の複素分配関数や改名後のパスがすでに存在すると仮定せず、`../SYK_model/ARCHITECTURE.md` の現行・目標の対応と照合する。文書の整理だけで数学的監査や形式化の項目を完了扱いにしない。
 
-- [ ] `lemmas/` を `Lemmas/` へ改名し、全 import を同時に更新する。
-- [ ] Lean comment と docstring が theorem number でなく TeX label を参照することを確認する。
+既存の雛形で採用している、TeX の定理ラベルに基づくファイル分けを維持する。ファイル名と
+モジュール名を構成する各部分は `UpperCamelCase`、名前空間は `SYK.CLT` とする。README には
+実在するモジュールだけを掲載する。
 
-形式化の候補順序は、incidence-even combinatorics、Rademacher encoding identity、remainder に必要な指数比較、abstract second-chaos-plus-remainder CLT transfer、logarithmic transfer lemmas、SYK 固有の finite model と matrix-analytic inputs である。
+- [ ] `lemmas/` を `Lemmas/` へ改名し、すべての `import` を同時に更新する。
+- [ ] Lean のコメントとドキュメント文字列が、定理番号ではなく TeX のラベルを参照することを確認する。
 
-- [ ] `SYK.SYKModel` の complex `partitionFunction (z : ℂ)` を使用する。
-- [ ] entire 性・複素微分と、`β : ℝ≥0` の positivity・確率結果を分離する。
-- [ ] Lemma 3.3 は `SYK.SuperConcentration` の MGF と片側 tail を係数の損失なしに使う。
-- [ ] complex logarithmic derivative の `Z z ≠ 0` を conditional input として明示する。
+形式化は、各頂点の出現回数に関する偶奇条件、ラデマッハ変数による符号化の恒等式、剰余項の評価に必要な指数の比較、二次カオスと剰余項から CLT を導く抽象的な定理、分配関数からその対数へ CLT を移す補題、SYK 固有の有限模型と行列解析上の入力、という順序で進める。
 
-各段階で exact paper statement との対応、外部入力、Lean kernel による検証範囲を記録する。
+- [ ] `SYK.SYKModel` の複素変数版 `partitionFunction (z : ℂ)` を使用する。
+- [ ] 整関数性・複素微分と、`β : ℝ≥0` における正値性・確率論的結果を分離する。
+- [ ] Lemma 3.3 では `SYK.SuperConcentration` のモーメント母関数と片側の裾の評価を、係数を悪化させずに使う。
+- [ ] 複素対数微分に必要な `Z z ≠ 0` を、条件として与える外部入力であることを明示する。
 
-完了条件：作成した各 Lean theorem が placeholder なしに検査され、重要な最終 theorem の `#print axioms` 結果が報告されている。
+各段階で、原稿の正確な定理文との対応、外部入力、および Lean のカーネルによる検証範囲を記録する。
 
-## Deferred: Complex zero-free region
+完了条件：作成した各 Lean 定理が仮置きの証明なしに検査され、重要な最終定理について `#print axioms` の結果が報告されている。
 
-- [ ] CLT の複素解析に必要な disk または strip を確定する。
-- [ ] 一様 zero-free estimate を内部で証明するか外部結果を利用するか決定する。
-- [ ] 証明済み領域上で logarithmic derivative の `Z z ≠ 0` 仮定を供給する。
+## 後で扱う課題：複素平面上の零点のない領域
 
-全複素平面での zero-free 性や complex Gibbs positivity は目標にしない。
+- [ ] CLT の複素解析に必要な円板または帯状領域を確定する。
+- [ ] 零点がないことの一様な評価を内部で証明するか、外部結果を利用するか決定する。
+- [ ] 零点がないと証明した領域上で、対数微分に必要な仮定 `Z z ≠ 0` を供給する。
+
+全複素平面で零点がないことや、複素逆温度におけるギブス演算子の正値性は目標にしない。
 
 ## 後から分離する可能性のある文書
 
 現時点では次を作成しない。
 
 - `proof_status.md`：結果数が増えて `ARCHITECTURE.md` の状態記述で管理できなくなった場合に分離する。
-- `issue_register.md`：issue が増えて本計画の phase 別管理では追跡できなくなった場合に分離する。
+- `issue_register.md`：問題が増えて本計画の段階別管理では追跡できなくなった場合に分離する。
 - `decision_log.md`：重要な設計変更が増え、現在の文書から判断理由を追えなくなった場合に追加する。
 - `work_log.md`：Git 履歴と本計画では作業履歴が不足する場合に限り追加する。

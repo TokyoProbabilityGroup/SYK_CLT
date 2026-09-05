@@ -1,21 +1,21 @@
-# SYK log-partition concentration の構造
+# SYK 分配関数の対数に対する集中不等式の構造
 
 ## 目的
 
-共有 SYK 模型の physical Gibbs layer と、模型から独立した Gaussian concentration
-backend を接続して、canonical SYK log-partition の concentration を証明する。現在の
-path は将来 `SYK/SuperConcentration/` へ改名する。
+共有 SYK 模型のうち物理的なギブス状態を扱う層と、模型に依存しないガウス集中不等式の基盤部分を接続し、標準的に規格化した SYK 分配関数の対数に対する集中不等式を証明する。現在のパスは将来 `SYK/SuperConcentration/` へ改名する。
 
-## Dependency graph
+## 依存関係
+
+この文書の配置と API は移行後の目標である。現行の `super_conc.lean` は一般スケール `𝒥` と非規格化分配関数の対数を扱う。移行後の基本 API は `𝒥 = 1` に対応する標準の規格化を用い、共有模型から分配関数を受け取る。図の矢印は「上流の結果を下流が利用する」という意味である。
 
 ```mermaid
 flowchart TD
-    gaussian["SYK.Probability.GaussianConcentration<br/>Finite Euclidean Gaussian backend"]
-    model["SYK.SYKModel<br/>Couplings, Hamiltonian, and physical Gibbs API"]
-    density["Density-matrix expectation estimate"]
-    majorana["Majorana sum-of-squares bound"]
-    lipschitz["Log-partition derivative and Lipschitz bound"]
-    concentration["MGF and tail specializations"]
+    gaussian["SYK.Probability.GaussianConcentration<br/>有限次元ユークリッド空間上のガウス集中不等式"]
+    model["SYK.SYKModel<br/>相互作用係数、ハミルトニアン、物理的なギブス状態"]
+    density["密度行列に関する期待値の評価"]
+    majorana["マヨラナ相互作用演算子の二乗和評価"]
+    lipschitz["分配関数の対数の微分とリプシッツ評価"]
+    concentration["モーメント母関数と裾の評価への適用"]
 
     gaussian --> concentration
     model --> density
@@ -26,50 +26,53 @@ flowchart TD
     lipschitz --> concentration
 ```
 
-依存は下向きの一方向とし、Gaussian backend は `SYKModel` も `SuperConcentration` も
-import しない。
+依存は図の矢印に沿う一方向とする。ガウス集中不等式の基盤部分は `SYKModel` も `SuperConcentration` も `import` しない。
 
-## Generic backend の抽出
+## 汎用的な基盤部分の分離
 
-現行 `GaussianConcentrationAux.lean` 冒頭の `CouplingSpace`、`couplingSpace_card`、
-`standardGaussianMeasure` とその generic measure への等式は `SYKModel` へ移す。現行
-`gaussian_concentration.lean` 末尾の `N,q` specialization も model または concentration
-adapter 側へ移す。
+現行の `GaussianConcentrationAux.lean` 冒頭にある `CouplingSpace`、`couplingSpace_card`、`standardGaussianMeasure` と、汎用的な測度との同一性を述べる等式は `SYKModel` へ移す。現行の `gaussian_concentration.lean` 末尾にある `N, q` への特殊化も、共有模型または集中不等式を SYK に適用する側へ移す。
 
-残る backend は任意の finite coordinate type `ι` だけに量化し、中心結果を
-`HasSubgaussianMGF` とする。upper/lower/two-sided tail は mathlib の sub-Gaussian APIから
-導く。
+残る基盤部分では、座標を添字付ける任意の有限型 `ι` だけについて量化し、中心となる結果をモーメント母関数の評価 `HasSubgaussianMGF` として述べる。上側・下側・両側の裾の評価は、mathlib の劣ガウス確率変数に関する API から導く。
 
-## SYK-specific proof
+## 共通ガウス集中不等式の定数
 
-physical inverse temperature `β : ℝ≥0` と canonical Hamiltonianに対し、normalized Gibbs
-state derivative と Majorana boundから
+ここで標準ガウス測度は各座標が独立な平均0・分散1の分布、距離はユークリッドノルムによるものとする。`X = f - E[f]` の劣ガウス性のパラメータが `L^2` とは、すべての実数 `s` に対する `E[exp(s X)] <= exp(s^2 L^2 / 2)` という評価を指し、`Var(X) = L^2` という等式ではない。`L = 0` は定数関数の場合であり、`L^2` で割る裾の公式と区別する。
+
+## SYK に固有の証明
+
+`Ψ_A` はマヨラナ演算子の昇順の積に位相因子を掛けた相互作用演算子である。規格化トレースでは `Z(0)=1`、`log Z(0)=0` となる。
+
+ここで二乗和の評価は、相互作用演算子 `Ψ_A` に対する `sum_A |Tr(ρ Ψ_A)|^2` の上界を指す。個々のマヨラナ演算子の期待値の和ではない。また、以下の `L` は使えるリプシッツ定数であり、その最小値を同定したという意味ではない。
+
+期待値と確率は、独立な標準正規座標 `g_A` の積測度に関するものとする。ハミルトニアンの実際の係数は `J_A = σ_N g_A` であり、リプシッツ定数は `g_A` のユークリッドノルムに関して測る。係数 `J_A` 自体を座標にすると定数も変わるため、二つを混同しない。
+
+物理的な逆温度 `β : ℝ≥0` と標準的に規格化したハミルトニアンに対し、規格化したギブス状態の微分公式と、マヨラナ相互作用演算子の二乗和評価から
 
 ```text
 L = β / sqrt q,
-sub-Gaussian parameter = β^2 / q
+劣ガウス性のパラメータ = β^2 / q
 ```
 
-を得る。公開結果は MGF、lower tail、upper tail、two-sided tail とする。normalized trace
-への変更は Gibbs expectation、coupling derivative、centered `log Z` を変えない。
+を得る。公開する結果はモーメント母関数、下側・上側・両側の裾の評価とする。非規格化トレースから規格化トレースへ変更しても、ギブス期待値、相互作用係数に関する微分、および中心化した `log Z` は変わらない。
 
-complex `z` に対する partition function の entire 性や logarithmic derivative は
-`SYKModel` の analytic layer の責務である。この proof は positive real partition
-function を必要とするため、complex zero-free 仮定付き API を経由しない。
+`X = log Z - E[log Z]` とすると、モーメント母関数の評価とは、すべての実数 `s` に対する `E[exp(s X)] <= exp(s^2 β^2 / (2q))` を指す。劣ガウス性のパラメータ `β^2/q` は分散そのものではなく上界の定数である。`β > 0`、`t > 0` では上下それぞれの裾に `exp(-q t^2/(2β^2))`、両側の裾にその2倍を得る。`β = 0` では `X = 0` を直接使い、この分母を持つ式には代入しない。
+
+現行の一般スケールでは、モーメント母関数のパラメータに `𝒥^2` が掛かる。標準の規格化への移行はこのスケールを基本 API から分離するものであり、定数を粗い評価に置き換えることではない。非規格化・規格化トレースの差が中心化で消える理由は `../SYK_model/ARCHITECTURE.md` を参照する。
+
+複素数 `z` に対する分配関数の整関数性や対数微分は、`SYKModel` の解析部分で扱う。この証明には正の実数値を取る分配関数が必要なので、複素逆温度に対して非零性を仮定する API は経由しない。
 
 ## 廃止する構造
 
-- `core.lean` 内で再定義された interaction operator
-- `gibbs.lean` 内の共有 matrix thermodynamics
+- `core.lean` 内で再定義された相互作用演算子
+- `gibbs.lean` 内で再定義された、共有すべき行列による熱力学
 - `exactLipschitzSq` と `simpleLipschitzConstant` の二重公開
-- 基本 theorem の一般 scale `𝒥`
-- empty physical Hilbert space branch
-- blueprint の `N^(q/2)` target と旧 file layout
+- 基本定理に含まれる一般のスケール `𝒥`
+- 物理的なヒルベルト空間が空である場合の分岐
+- 証明計画書にある `N^(q/2)` の目標と旧来のファイル構成
 
-abstract Majorana proof と standard matrix realization の specialization は区別するが、
-同じ定義を重複して持たない。
+抽象的なマヨラナ系に対する証明と、標準的な行列表現への特殊化は区別する。ただし、同じ定義を重複して持たない。
 
-## Module と namespace
+## モジュールと名前空間
 
 ```text
 SYK/Probability/GaussianConcentration/
@@ -83,6 +86,4 @@ SYK/SuperConcentration/
   Main.lean
 ```
 
-generic backend の declaration は `namespace SYK.GaussianConcentration`、SYK-specific な
-concentration result は `namespace SYK` に置く。generic backend は独立した `lean_lib`
-target を増やさず、workspace の `SYK` library の一部とする。
+汎用的な基盤部分の宣言は `namespace SYK.GaussianConcentration`、SYK に固有の集中不等式は `namespace SYK` に置く。汎用的な基盤部分のために独立した `lean_lib` のビルド対象を増やさず、ワークスペースの `SYK` ライブラリの一部とする。
