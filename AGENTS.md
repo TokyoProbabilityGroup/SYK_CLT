@@ -36,16 +36,7 @@
 
 異なる文献またはディレクトリ間で規約が異なる場合、結果を移す前に変換を明示する。
 
-## LaTeX と Lean の関係
-
-- LaTeX 原稿は意図した数学的主張と論証を記録する。
-- Lean は実際に記述された定義と定理文だけを検証する。
-- 仮定、normalization、量化、型、結論を明示的に照合するまでは、Lean theorem が論文の theorem を検証したと述べない。
-- 未形式化の解析的結果を named external input として切り出す場合、その状態を明記する。
-- external input または conditional theorem を、内部で証明済みの事実として表現しない。
-
-## プロジェクト文書
-
-大きな証明課題では、必要に応じて対象ディレクトリに、公開用の案内を記す英語の `README.md`、Codex と研究者が依存関係を共有する日本語の `ARCHITECTURE.md`、未完了作業を管理する日本語の `EDITING_PLAN.md` を置く。
-
-文書数は最小限に保ち、一つの文書で十分に代替できる status、issue、履歴用ファイルを機械的に増やさない。
+再設計する共有 SYK 模型では、複素温度を扱う解析層に `z : ℂ`、物理的な Gibbs state と確率論的結果に
+`β : ℝ≥0` を使用し、両者を同じ parameter field に格納しない。複素 partition
+function の零点なし、holomorphic logarithm、positivity を暗黙に仮定しない。
+normalized trace を標準とし、raw trace を使う場合は dimension factor を明示する。

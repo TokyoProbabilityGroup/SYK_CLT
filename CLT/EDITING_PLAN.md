@@ -33,7 +33,8 @@
 この phase の変更は人間の研究者の明示的な承認後に行う。
 
 - [ ] relative CLT の `beta = 0` における退化極限と、そこで未定義な standardized CLT の parameter range を分離する。
-- [ ] `ell_q` の evenness と矛盾する `ell_q'(beta) > 0` を、意図した nondegeneracy statement に修正する。
+- [ ] Theorem 1.1--1.2、Corollary 1.3 と内部補題の温度領域を `beta >= 0` に統一する。
+- [ ] 非負領域で `ell_q'(beta) > 0` を使う正確な nondegeneracy range を記述する。
 - [ ] `beta_FE`、`beta_Rad`、nondegeneracy range、および Theorem 1.1 の range の関係を明記する。候補となる関係 `beta_q <= min(beta_FE, beta_Rad, beta_nd, tilde_beta_q)` が実際の依存関係を正しく表すか確認する。
 - [ ] Theorem 1.1 を内部で証明するか、外部の quenched result を引用するか決定する。
 
@@ -73,13 +74,30 @@
 
 ## Phase 6: Lean 形式化
 
-現時点では Lean module tree を固定しない。README に存在しない module を掲載しない。
+既存 skeleton の theorem-label grouping を維持し、file/module component は
+`UpperCamelCase`、namespace は `SYK.CLT` とする。README に存在しない module を掲載しない。
+
+- [ ] `lemmas/` を `Lemmas/` へ改名し、全 import を同時に更新する。
+- [ ] Lean comment と docstring が theorem number でなく TeX label を参照することを確認する。
 
 形式化の候補順序は、incidence-even combinatorics、Rademacher encoding identity、remainder に必要な指数比較、abstract second-chaos-plus-remainder CLT transfer、logarithmic transfer lemmas、SYK 固有の finite model と matrix-analytic inputs である。
+
+- [ ] `SYK.SYKModel` の complex `partitionFunction (z : ℂ)` を使用する。
+- [ ] entire 性・複素微分と、`β : ℝ≥0` の positivity・確率結果を分離する。
+- [ ] Lemma 3.3 は `SYK.SuperConcentration` の MGF と片側 tail を係数の損失なしに使う。
+- [ ] complex logarithmic derivative の `Z z ≠ 0` を conditional input として明示する。
 
 各段階で exact paper statement との対応、外部入力、Lean kernel による検証範囲を記録する。
 
 完了条件：作成した各 Lean theorem が placeholder なしに検査され、重要な最終 theorem の `#print axioms` 結果が報告されている。
+
+## Deferred: Complex zero-free region
+
+- [ ] CLT の複素解析に必要な disk または strip を確定する。
+- [ ] 一様 zero-free estimate を内部で証明するか外部結果を利用するか決定する。
+- [ ] 証明済み領域上で logarithmic derivative の `Z z ≠ 0` 仮定を供給する。
+
+全複素平面での zero-free 性や complex Gibbs positivity は目標にしない。
 
 ## 後から分離する可能性のある文書
 

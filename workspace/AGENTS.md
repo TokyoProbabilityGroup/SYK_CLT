@@ -68,6 +68,38 @@ build の成功は Lean がコードを受理したことを意味するが、�
 6. 意味のある変更ごとに Lean を実行する。
 7. 方針が失敗した場合、大きな変更に進む前に Lean の error と数学的障害を説明する。
 
+## Lean の命名
+
+新規作成または再設計で改名する Lean module component と file は `UpperCamelCase`、type・structure・class、および `Prop` を返す predicate は `UpperCamelCase`、通常の値と関数は `lowerCamelCase`、theorem・lemma・proof field は mathlib の規則に従う `snake_case` とする。既存 declaration を theorem 名に含める場合は、その `lowerCamelCase` を一つの name atom として保持する。
+
+この規則を理由に、現在の課題と無関係な既存 project や module を一括改名しない。
+
+## Lean コードの設計
+
+- 数学的内容を直接読める具体的な定義と定理を既定とする。
+- 複数箇所で実際に再利用する場合、循環依存を避ける場合、または模型に依存しない結果を明確に分離する場合に限り抽象化する。
+- 単一用途の typeclass、wrapper、alias、bridge lemma、module layer を予防的に追加しない。
+- `import` は declaration が実際に必要とする最小の module に限定する。
+- 依存を減らすために同じ数学的定義を重複させず、共有すべき定義は最も低い適切な layer に一度だけ置く。
+- 抽象化を導入するときは、その具体的な consumer または依存関係上の利点を説明する。
+- 将来の再利用可能性のための抽象化よりも、現在の数学的議論との対応と人間による可読性を優先する。
+
+## LaTeX と Lean の関係
+
+- LaTeX 原稿は意図した数学的主張と論証を記録する。
+- Lean は実際に記述された定義と定理文だけを検証する。
+- 仮定、normalization、量化、型、結論を明示的に照合するまでは、Lean theorem が論文の theorem を検証したと述べない。
+- 未形式化の解析的結果を named external input として切り出す場合、その状態を明記する。
+- external input または conditional theorem を、内部で証明済みの事実として表現しない。
+
+## プロジェクト文書
+
+大きな証明課題では、必要に応じて対象ディレクトリに、公開用の案内を記す英語の `README.md`、Codex と研究者が依存関係を共有する日本語の `ARCHITECTURE.md`、未完了作業を管理する日本語の `EDITING_PLAN.md` を置く。
+
+文書数は最小限に保ち、一つの文書で十分に代替できる status、issue、履歴用ファイルを機械的に増やさない。
+
+三つ以上の layer、分岐・合流、または複数 consumer を含む依存関係は、原則として Mermaid の `flowchart` で記述する。正確な theorem statement、仮定、型、定数、数式は diagram に埋め込まず、Markdown table、code block、または本文に記録する。単純な一方向の関係に diagram を追加しない。
+
 ## 言語方針
 
 - ユーザーとの会話は、問い掛けが日本語なら日本語、英語なら英語で行う。

@@ -8,7 +8,11 @@
 
 ## 基本設定
 
-偶数 `q >= 4` と偶数 `N` に対して、論文では `M_N = binomial(N,q)`、`sigma_N^2 = (q-1)!/N^(q-1)`、`Y_N = Z_N/E[Z_N]`、および fluctuation exponent `a = q/2-1` を用いる。normalization の詳細と正確な数式は原稿を参照する。
+偶数 `q >= 4` と偶数 `N` に対して、論文では `M_N = binomial(N,q)`、`sigma_N^2 = (q-1)!/N^(q-1)`、normalized trace による `Z_N`、`Y_N = Z_N/E[Z_N]`、および fluctuation exponent `a = q/2-1` を用いる。論文の確率論的結果は `β >= 0` で述べ、Lean の analytic partition function は `z : ℂ` に拡張する。
+
+Lean の complex layer では `Z_N(z)` の entire 性と微分を無条件で扱う。logarithmic
+derivative は `Z_N(z) != 0` を仮定し、具体的 zero-free region は将来の別結果とする。
+positivity、real `log Z_N`、tail probability、CLT は `β : ℝ≥0` に限定する。
 
 ## 主結果と現在の状態
 
@@ -16,7 +20,7 @@
 
 annealed free-energy limit と、quenched free energy が同じ極限を持つ almost-sure statement を主張する。
 
-現在の定理文は、十分小さい `|beta|` に対して
+目標とする定理文は、十分小さい非負の `beta` に対して
 
 ```text
 N^(-1) log Z_N(beta) -> ell_q(beta),
@@ -25,7 +29,7 @@ N^(-1) log E[Z_N(beta)] -> ell_q(beta)    almost surely
 
 および `ell_q` の微分可能性を主張する。原稿中の `ell_p` は `ell_q` の notation error と考えられるが、定理文の修正前に確認する。
 
-状態：**未完成**。Proposition 3.2 は annealed limit とその導関数の収束を与えるが、almost-sure quenched/annealed comparison の明示的な証明が本文にない。
+状態：**未完成**。Proposition 3.2 は annealed limit とその導関数の収束を与えるが、almost-sure quenched/annealed comparison の明示的な証明が本文にない。原稿には対称な実区間を使う旧記述が残るため、非負領域へ統一する必要がある。
 
 ### Theorem 1.2: partition-function CLT
 
@@ -125,6 +129,21 @@ u = 2^(q/2) beta
 
 次の Mermaid 図は論理依存関係の概観であり、本文に記録した正確な statement と convergence mode を置き換えるものではない。
 
+Lean module の外部依存は次の一方向とする。
+
+```mermaid
+flowchart TD
+    gaussian["SYK.Probability.GaussianConcentration"]
+    model["SYK.SYKModel"]
+    superConcentration["SYK.SuperConcentration"]
+    clt["SYK.CLT"]
+
+    gaussian --> superConcentration
+    model --> superConcentration
+    model --> clt
+    superConcentration --> clt
+```
+
 ```mermaid
 flowchart TD
     parity["Lemma 2.1<br/>Sign-gauge parity rule"]
@@ -180,8 +199,26 @@ flowchart TD
     class quenched incomplete;
 ```
 
-## 将来の Lean module 構成
+## Lean module 構成
 
-Lean 形式化はまだ開始していない。Lean ファイルと module の構成は、最初の形式化対象と interface が確定してから定める。候補となる順序は incidence parity、Rademacher encoding、指数比較、抽象的な CLT transfer、logarithmic transfer、最後に SYK 固有の行列解析である。
+既存 skeleton の theorem-label に基づく grouping を維持する。file/module component は
+`UpperCamelCase` とし、namespace は `SYK.CLT` とする。形式化の順序は incidence parity、
+Rademacher encoding、指数比較、抽象的な CLT transfer、logarithmic transfer、最後に
+SYK-specific specialization とする。共有 matrix analysis と Gaussian concentration を
+CLT 内へ複製しない。
 
-README には実在する module だけを掲載し、計画段階の module を既存ファイルとして記述しない。
+README には実在する module だけを掲載する。
+
+現在の label-to-file 対応は次で固定する。原稿番号が変わっても、この表と Lean commentは
+TeX label によって追跡する。
+
+| Lean file | TeX label |
+| --- | --- |
+| `Main.lean` | `thm:partition-clt`, `cor:free-energy-clt`、および currently unlabeled free-energy law of large numbers |
+| `Lemmas/CLTComponents.lean` | `lem:exact-second-chaos`, `prop:higher-chaos-closure`, `prop:annealed-free-energy` |
+| `Lemmas/GaussianConcentration.lean` | `eq:centered W_N tail`, `eq:centered W_N exp` |
+| `Lemmas/ConvexDerivatives.lean` | `lem:convex-derivatives` |
+| `Lemmas/Preliminaries.lean` | `lem: parity rule lemma`, `lem:Gaussian-Hermite-IBP`, `lem:Z-derivative-bound`, `lem:Rademacher-encoding` |
+
+現在の `lemmas/` は module migration 時に `Lemmas/` へ改名する。label の空白を含む既存名は
+TeX source と厳密に一致させ、TeX 側を変更するまでは Lean comment だけ整形しない。
