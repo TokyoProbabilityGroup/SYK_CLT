@@ -1,5 +1,5 @@
-import SYK.CLT.lemmas.CLTComponents
-import SYK.CLT.lemmas.GaussianConcentration
+import SYK.CLT.Lemmas.CLTComponents
+import SYK.CLT.Lemmas.GaussianConcentration
 
 /-!
 # Central limit theorem for the SYK model

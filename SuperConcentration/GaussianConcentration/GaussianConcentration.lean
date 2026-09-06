@@ -1,4 +1,4 @@
-import SYK.super_concentration.Gaussian_concentration.GaussianCovMollify
+import SYK.SuperConcentration.GaussianConcentration.GaussianCovMollify
 import Mathlib.Probability.Moments.SubGaussian
 
 open scoped BigOperators ENNReal NNReal

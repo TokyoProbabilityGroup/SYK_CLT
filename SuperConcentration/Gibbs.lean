@@ -1,4 +1,4 @@
-import SYK.super_concentration.core
+import SYK.SuperConcentration.Core
 import Mathlib.Analysis.Calculus.SmoothSeries
 import Mathlib.Analysis.Matrix.Order
 

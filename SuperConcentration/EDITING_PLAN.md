@@ -2,7 +2,7 @@
 
 ## 段階0：現状の記録
 
-この計画は移行後の配置と API に向けた未完了作業を管理する。現行の一般スケールと目標の標準規格化の対応は `ARCHITECTURE.md` に記録する。末尾の `SYKModel`・`SuperConcentration` を使うビルドは改名後の検証であり、現行の対象名はルートの `lakefile.toml` と照合する。
+この計画は移行後の配置と API に向けた未完了作業を管理する。現行の一般スケールと目標の標準規格化の対応は `ARCHITECTURE.md` に記録する。末尾の `Model`・`SuperConcentration` を使うビルドは改名後の検証であり、現行の対象名はルートの `lakefile.toml` と照合する。
 
 - [ ] 現在の定理、依存する公理、ビルド結果、および利用箇所を記録する。
 - [ ] 証明計画書と Lean のソースコードについて、スケール、パス、証明状態の相違を記録する。
@@ -18,8 +18,8 @@
 
 ## 段階2：共有模型への移行
 
-- [ ] 相互作用演算子とガウス型の相互作用係数は `SYKModel` から `import` する。
-- [ ] 行列指数関数のトレースと、物理的なギブス状態に関する解析は `SYKModel` から `import` する。
+- [ ] 相互作用演算子とガウス型の相互作用係数は `Model` から `import` する。
+- [ ] 行列指数関数のトレースと、物理的なギブス状態に関する解析は `Model` から `import` する。
 - [ ] この部分には、密度行列に関する評価とマヨラナ相互作用演算子の二乗和評価だけを残す。
 
 ## 段階3：SYK への集中不等式の適用
@@ -34,8 +34,8 @@
 
 ## 段階4：モジュールの移行と整理
 
-- [ ] ディレクトリを `SuperConcentration` に改名し、ファイル名を `UpperCamelCase` にする。
-- [ ] `lakefile.toml` のビルド対象 `super_concentration` を `SuperConcentration` へ改名し、利用箇所とビルドコマンドを同時に更新する。
+- [x] ディレクトリを `SuperConcentration` に改名し、既存の Lean ファイル名を `UpperCamelCase` にする。
+- [x] `lakefile.toml` のビルド対象 `super_concentration` を `SuperConcentration` へ改名し、利用箇所とビルドコマンドを同時に更新する。
 - [ ] 旧実装で重複している定義、途中の計算だけに使う公開定数、および一般の `𝒥` を含む API を削除する。
 - [ ] 互換性のための別名は作らない。
 - [ ] Lean の実装が安定した後、README と証明計画書を更新するか、過去の資料であることを明記する。
@@ -43,7 +43,7 @@
 ## 検証
 
 - [ ] 変更した各ファイルを、依存先から順に `lake env lean` で検査する。
-- [ ] `lake build SYKModel SuperConcentration` を実行する。
+- [ ] `lake build Model SuperConcentration` を実行する。
 - [ ] モーメント母関数、片側および両側の裾の評価に現れる定数を、定理文で確認する。
 - [ ] 主要な定理について `#print axioms` の結果を確認する。
 

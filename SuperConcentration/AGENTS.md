@@ -2,14 +2,14 @@
 
 ## 適用範囲
 
-このファイルは現在の `SYK/super_concentration/` 以下に適用する。再設計後は `SYK/SuperConcentration/` へ移す。ワークスペースのルート、`SYK/AGENTS.md`、共有模型の `AGENTS.md` の規則も適用する。
+このファイルは `SYK/SuperConcentration/` 以下に適用する。ワークスペースのルート、`SYK/AGENTS.md`、共有模型の `AGENTS.md` の規則も適用する。
 
 ## 作業前に読む文書
 
 1. `ARCHITECTURE.md`
 2. `EDITING_PLAN.md`
-3. `../SYK_model/ARCHITECTURE.md`
-4. `../SYK_model/EDITING_PLAN.md`
+3. `../Model/ARCHITECTURE.md`
+4. `../Model/EDITING_PLAN.md`
 5. `README.md`
 6. 二つの証明計画書（過去の資料としてのみ参照する）
 
@@ -19,7 +19,7 @@
 
 有限の座標添字型に対するガウス測度、Herbst の議論、平滑化、リプシッツ関数に対するガウス集中不等式は、`SYK/Probability/GaussianConcentration/` の独立した基盤部分とする。この基盤部分に `N`、`q`、`InteractionIndex`、`CouplingSpace`、マヨラナ演算子、ハミルトニアンを置かない。
 
-`CouplingSpace` とその標準ガウス測度は `SYKModel` に置く。このディレクトリには、密度行列に関する評価、相互作用演算子 `Ψ_A` の期待値の絶対値の二乗和の評価、物理的な逆温度での分配関数の対数に対するリプシッツ評価、およびその集中不等式への適用だけを置く。
+`CouplingSpace` とその標準ガウス測度は `Model` に置く。このディレクトリには、密度行列に関する評価、相互作用演算子 `Ψ_A` の期待値の絶対値の二乗和の評価、物理的な逆温度での分配関数の対数に対するリプシッツ評価、およびその集中不等式への適用だけを置く。
 
 相互作用演算子と二乗和の定義は `ARCHITECTURE.md` の「SYK に固有の証明」を参照する。
 
@@ -33,4 +33,4 @@
 
 ## 編集と検証
 
-再設計時には、ファイル名とモジュール名を構成する各部分を `UpperCamelCase` とする。互換性のための別名は作らない。一度に依存関係の一つの層だけを変更し、各変更ファイルを `lake env lean` で検査する。最後に `lake build SYKModel SuperConcentration` と主要な定理の `#print axioms` を確認する。証明の未完成箇所を新たに導入することは許容しない。
+再設計時には、ファイル名とモジュール名を構成する各部分を `UpperCamelCase` とする。互換性のための別名は作らない。一度に依存関係の一つの層だけを変更し、各変更ファイルを `lake env lean` で検査する。最後に `lake build Model SuperConcentration` と主要な定理の `#print axioms` を確認する。証明の未完成箇所を新たに導入することは許容しない。

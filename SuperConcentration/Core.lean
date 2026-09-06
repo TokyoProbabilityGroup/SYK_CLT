@@ -1,4 +1,4 @@
-import SYK.SYK_model.model
+import SYK.Model.Definitions
 import Mathlib.Analysis.CStarAlgebra.Matrix
 import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.Data.Fintype.Powerset

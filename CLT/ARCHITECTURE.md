@@ -144,7 +144,7 @@ Lean モジュール間の依存関係は次の一方向とする。
 ```mermaid
 flowchart TD
     gaussian["SYK.Probability.GaussianConcentration"]
-    model["SYK.SYKModel"]
+    model["SYK.Model"]
     superConcentration["SYK.SuperConcentration"]
     clt["SYK.CLT"]
 
@@ -225,4 +225,4 @@ README には実在するモジュールだけを掲載する。
 | `Lemmas/ConvexDerivatives.lean` | `lem:convex-derivatives` |
 | `Lemmas/Preliminaries.lean` | `lem: parity rule lemma`, `lem:Gaussian-Hermite-IBP`, `lem:Z-derivative-bound`, `lem:Rademacher-encoding` |
 
-現在の `lemmas/` はモジュール移行時に `Lemmas/` へ改名する。空白を含む既存のラベル名は TeX のソースコードと厳密に一致させ、TeX 側を変更するまでは Lean のコメントだけを整形しない。
+補助モジュールは `Lemmas/` に配置する。空白を含む既存のラベル名は TeX のソースコードと厳密に一致させ、TeX 側を変更するまでは Lean のコメントだけを整形しない。

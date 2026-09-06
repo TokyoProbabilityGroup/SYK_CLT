@@ -1,5 +1,5 @@
-import SYK.CLT.lemmas.Preliminaries
-import SYK.CLT.lemmas.ConvexDerivatives
+import SYK.CLT.Lemmas.Preliminaries
+import SYK.CLT.Lemmas.ConvexDerivatives
 
 /-!
 # Components of the SYK central limit theorem

@@ -14,8 +14,8 @@
 
 ## 段階1：モジュールとパラメータ
 
-- [ ] `SYK_model` を `SYKModel` へ移し、ファイル名とモジュール名を構成する各部分を `UpperCamelCase` にする。
-- [ ] `lakefile.toml` のビルド対象 `SYK_model` を `SYKModel` へ改名し、理由とすべての利用箇所への
+- [x] `SYK_model/model.lean` を `Model/Definitions.lean` へ移す。
+- [x] `lakefile.toml` のビルド対象 `SYK_model` を `Model` へ改名し、理由とすべての利用箇所への
   影響を説明してから変更する。
 - [ ] 逆温度を模型のパラメータから削除する。
 - [ ] 相互作用の添字、標準的な順序、位相因子、および抽象的なマヨラナ系の API を整理する。
@@ -62,4 +62,4 @@
 
 ## 検証条件
 
-各 Lean ファイルを個別に検査し、`lake build SYKModel SuperConcentration` を実行する。主要な定理では `#print axioms` を確認する。新しい `sorry`、`admit`、`axiom`、未解決の証明目標は許容しない。ワークスペース全体のビルドに失敗する場合、許容する既知の失敗は未移行の `Annealed_FE` に限り、その内容を報告する。
+各 Lean ファイルを個別に検査し、`lake build Model SuperConcentration` を実行する。主要な定理では `#print axioms` を確認する。新しい `sorry`、`admit`、`axiom`、未解決の証明目標は許容しない。ワークスペース全体のビルドに失敗する場合、許容する既知の失敗は未移行の `Annealed_FE` に限り、その内容を報告する。

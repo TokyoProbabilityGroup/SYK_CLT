@@ -8,7 +8,7 @@ indexed by the $q$-element subsets of $\{0,\ldots,N-1\}$.
 ## Main theorem
 
 The public result is
-`SYK.logPartition_two_sided_tail_standardGaussian` in `super_conc.lean`.
+`SYK.logPartition_two_sided_tail_standardGaussian` in `Main.lean`.
 Let `P : SYK.Params`, let `M` be a finite-dimensional matrix realization of
 the Majorana relations, and let $\mathcal J>0$, $\beta\ne0$, and $t>0$. Then
 
@@ -82,31 +82,31 @@ for every density matrix $\rho$.
 
 ## File guide
 
-- `core.lean` develops density-matrix identities, anticommuting-observable
+- `Core.lean` develops density-matrix identities, anticommuting-observable
   estimates, Majorana interaction algebra, and the model-specific
   sum-of-squares estimate.
-- `gibbs.lean` proves positivity and normalization properties of Gibbs states
+- `Gibbs.lean` proves positivity and normalization properties of Gibbs states
   and differentiates traces of affine matrix exponentials.
-- `Gaussian_concentration/GaussianConcentrationAux.lean` supplies measure,
+- `GaussianConcentration/GaussianConcentrationAux.lean` supplies measure,
   integrability, gradient, and Herbst-method infrastructure.
-- `Gaussian_concentration/GaussianCovSmooth.lean` proves the smooth Gaussian
+- `GaussianConcentration/GaussianCovSmooth.lean` proves the smooth Gaussian
   covariance estimate using integration by parts and rotation invariance.
-- `Gaussian_concentration/GaussianCovMollify.lean` extends that estimate from
+- `GaussianConcentration/GaussianCovMollify.lean` extends that estimate from
   smooth functions to Lipschitz functions by mollification.
-- `Gaussian_concentration/gaussian_concentration.lean` packages the
+- `GaussianConcentration/GaussianConcentration.lean` packages the
   moment-generating-function bounds and the one-sided and two-sided Gaussian
   tail inequalities.
-- `super_conc.lean` defines the normalized Hamiltonian and log-partition
+- `Main.lean` defines the normalized Hamiltonian and log-partition
   function, proves the Lipschitz estimate, and states the public theorem.
 - `blueprint_super_concentration.txt` and
-  `Gaussian_concentration/blueprint_gaussian_concentration.txt` contain proof
+  `GaussianConcentration/blueprint_gaussian_concentration.txt` contain proof
   plans. The Lean sources are authoritative if a blueprint records an older
   target.
 
 ## Building
 
-The directory is part of the `SYK` Lean library in the repository root. The
-project uses Lean 4.32.1 and Mathlib 4.32.1.
+The directory is built as the `SuperConcentration` Lean library in the shared
+workspace. The project uses Lean 4.32.2 and Mathlib 4.32.2.
 
 From the repository root, build the complete `SYK` library with:
 
@@ -117,11 +117,11 @@ lake build SYK
 To check only the public module, run:
 
 ```powershell
-lake env lean SYK/super_concentration/super_conc.lean
+lake env lean SYK/SuperConcentration/Main.lean
 ```
 
 Downstream Lean files can import the result with:
 
 ```lean
-import SYK.super_concentration.super_conc
+import SYK.SuperConcentration.Main
 ```

@@ -1,4 +1,4 @@
-import SYK.super_concentration.Gaussian_concentration.GaussianCovSmooth
+import SYK.SuperConcentration.GaussianConcentration.GaussianCovSmooth
 import Mathlib.Analysis.Calculus.BumpFunction.Convolution
 
 /-!

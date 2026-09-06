@@ -2,7 +2,7 @@
 
 ## 目的
 
-有限次元 SYK 模型を、複素逆温度に関する解析と、非負の実逆温度におけるギブス状態の理論の双方から利用できる共有 API として再設計する。現在の `SYK/SYK_model/` は将来 `SYK/SYKModel/` へ改名する。
+有限次元 SYK 模型を、複素逆温度に関する解析と、非負の実逆温度におけるギブス状態の理論の双方から利用できる共有 API として再設計する。ディレクトリは `SYK/Model/` へ改名済みであり、以下の API の再設計は引き続き未完了である。
 
 ## 正式な参照元と既知の相違
 
@@ -41,12 +41,12 @@ partitionFunction z H = normalizedTrace (exp (-z • H))
 
 ## 現行実装と移行後の区別
 
-| 項目 | 現行の `model.lean` | 移行後の目標 |
+| 項目 | 現行の `Definitions.lean` | 移行後の目標 |
 | --- | --- | --- |
 | 逆温度 | `Params` に実数 `β` と非負性の証明を保持する。 | 模型のパラメータから分離し、解析には `z : ℂ`、物理的な結果には `β : ℝ≥0` を渡す。 |
 | 分配関数 | `partitionFunction` は非規格化トレースを使い、逆温度は `NNReal`。 | 複素逆温度に拡張し、規格化トレースを標準とする。 |
 | 逆温度0 | 現行定義では `partitionFunction 0 H = Fintype.card d`。 | 非零次元の規格化分配関数では `Z(0)=1`。 |
-| ビルド対象 | ルートの `lakefile.toml` に `SYK_model` と `super_concentration` がある。 | 移行計画の `SYKModel` と `SuperConcentration` へ変更する。 |
+| ビルド対象 | ルートの `lakefile.toml` に `Model` と `SuperConcentration` がある。 | 改名は完了している。API の移行後もこの名称を維持する。 |
 
 この表は定義と設定の読み取りによる区別であり、新たなビルド検証や移行完了の報告ではない。実装変更時には再確認する。移行順序と検証条件は `EDITING_PLAN.md` に従う。
 
@@ -113,12 +113,12 @@ SpinGlass にある有限系の汎用的なギブス解析は、層を分離す�
 目標とするモジュール構成は次のとおりとする。
 
 ```text
-SYK/SYKModel/
-  Model.lean
+SYK/Model/
+  Definitions.lean
   Majorana.lean
   StandardRepresentation.lean
   MatrixThermodynamics.lean
   GaussianDisorder.lean
 ```
 
-モジュールのパスは `SYK.SYKModel.*` とするが、共有する主要な宣言は `namespace SYK` に置く。ファイルごとの名前空間を機械的に追加しない。内部だけで使う補助宣言は、必要な局所名前空間または `private` に置いて公開しない。
+モジュールのパスは `SYK.Model.*` とするが、共有する主要な宣言は `namespace SYK` に置く。ファイルごとの名前空間を機械的に追加しない。内部だけで使う補助宣言は、必要な局所名前空間または `private` に置いて公開しない。

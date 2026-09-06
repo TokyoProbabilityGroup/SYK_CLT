@@ -1,4 +1,4 @@
-import SYK.super_concentration.Gaussian_concentration.GaussianConcentrationAux
+import SYK.SuperConcentration.GaussianConcentration.GaussianConcentrationAux
 
 /-!
 # Smooth-case Gaussian covariance bound: supporting lemmas
@@ -22,7 +22,7 @@ namespace SYK
 
 variable {ι : Type*} [Fintype ι]
 
-/-! ## Infrastructure moved from gaussian_concentration.lean -/
+/-! ## Infrastructure moved from GaussianConcentration.lean -/
 
 /-- Per-coordinate Gaussian integration by parts: the tensorized one-dimensional Stein
 identity along coordinate `i`. -/

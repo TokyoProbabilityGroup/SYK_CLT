@@ -41,7 +41,7 @@ CLT 原稿、証明構造、または Lean 形式化を変更する前に、次�
 
 ## Lean の依存関係
 
-依存方向は `SYK.Probability.GaussianConcentration`、`SYK.SYKModel`、`SYK.SuperConcentration` から `SYK.CLT` への一方向とする。CLT 側で共有部分を再定義せず、共有部分が CLT を `import` する循環も作らない。モジュール名とファイル名は `UpperCamelCase` とする。
+依存方向は `SYK.Probability.GaussianConcentration`、`SYK.Model`、`SYK.SuperConcentration` から `SYK.CLT` への一方向とする。CLT 側で共有部分を再定義せず、共有部分が CLT を `import` する循環も作らない。モジュール名とファイル名は `UpperCamelCase` とする。
 
 この依存方向は「共有部分の結果を CLT が利用する」という意味であり、共有部分が CLT をインポートするという意味ではない。大文字のモジュールパスは移行後の名称を含むため、実際のパスは移行状況と照合する。
 
