@@ -151,7 +151,13 @@
 - [x] 通常の `partitionFunction` と、必要な箇所で使う `normalizedTrace` を定義する。
   - `partitionFunction z H = Matrix.trace (exp (-z • H))` とし、`partitionFunction 0 H = Fintype.card d` を証明した。`normalizedTrace` は標準表現の直交性など、次元で規格化する量だけに用いる。
 - [ ] CLT の標準行列表現を構成した後、CLT 固有の規格化分配関数を `normalizedTrace (exp (-z • H))` として定義し、`Z(0)=1` と共有分配関数との対応を証明する。
-- [ ] 整関数性と複素微分を証明し、対数微分には `Z z ≠ 0` を明示する。
+- [x] 整関数性と複素微分を証明し、対数微分には `Z z ≠ 0` を明示する。
+  - `partitionFunction_has_deriv_at` により
+    `Z'(z) = -Tr(H * exp(-zH))` を示し、全点での複素微分可能性から
+    `partitionFunction_analytic_at` を導いた。
+  - `partitionFunction_mul_log_deriv` は `Z z ≠ 0` の下で
+    `Z z * logDeriv Z z = -Tr(H * exp(-zH))` を与える。これは零点のない
+    領域の構成や複素対数の枝の選択を仮定せず、局所的な対数微分だけを記録する。
 - [x] 自己共役な `H` と `β : ℝ≥0` に限定して、通常の分配関数の正値性、密度行列、ギブス期待値、実対数を定義する。
   - 自己共役な `H` に対する分配関数の正値性、通常の分配関数で規格化した密度行列、その Gibbs 期待値、および実対数を整備した。
   - `SuperConcentration` の対数分配関数も通常の規約に統一した。規格化が必要な CLT 側では、後続の局所定義と必要な変換補題で扱う。

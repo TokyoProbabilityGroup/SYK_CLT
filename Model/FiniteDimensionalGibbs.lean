@@ -1,8 +1,10 @@
 import Mathlib.Analysis.CStarAlgebra.Matrix
+import Mathlib.Analysis.Complex.CauchyIntegral
 import Mathlib.Analysis.Calculus.SmoothSeries
 import Mathlib.Analysis.Matrix.Order
 import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.LinearAlgebra.Matrix.Trace
 
 /-!
@@ -10,8 +12,8 @@ import Mathlib.LinearAlgebra.Matrix.Trace
 
 This module collects density matrices and their expectations, the trace of a
 matrix exponential at complex inverse temperature, Gibbs states at nonnegative
-real inverse temperature, and the real derivative of the trace of an affine
-matrix exponential. These constructions depend only on finite-dimensional
+real inverse temperature, and complex and real derivatives of trace
+exponentials. These constructions depend only on finite-dimensional
 complex matrices, not on the SYK model parameters.
 -/
 
@@ -131,6 +133,41 @@ theorem normalizedTrace_one [Nonempty d] :
 theorem partitionFunction_zero (H : Matrix d d ℂ) :
     partitionFunction 0 H = Fintype.card d := by
   simp [partitionFunction]
+
+/-! ## Complex derivatives of the partition function -/
+
+private noncomputable def matrixTraceCLMComplex : Matrix d d ℂ →L[ℂ] ℂ :=
+  LinearMap.toContinuousLinearMap (Matrix.traceLinearMap d ℂ ℂ)
+
+/-- The complex derivative of the finite-dimensional partition function. -/
+theorem partitionFunction_has_deriv_at (H : Matrix d d ℂ) (z : ℂ) :
+    HasDerivAt (fun w : ℂ ↦ partitionFunction w H)
+      (-Matrix.trace (H * gibbsOperator z H)) z := by
+  have hexp := hasDerivAt_exp_smul_const' (-H) z
+  have htrace :=
+    (matrixTraceCLMComplex (d := d)).hasFDerivAt.comp_hasDerivAt z hexp
+  change HasDerivAt
+    (fun w : ℂ ↦ Matrix.trace (NormedSpace.exp (w • -H)))
+    (Matrix.trace (-H * NormedSpace.exp (z • -H))) z at htrace
+  convert htrace using 1 <;> simp [partitionFunction, gibbsOperator]
+
+/-- The finite-dimensional partition function is complex differentiable everywhere. -/
+theorem partitionFunction_differentiable (H : Matrix d d ℂ) :
+    Differentiable ℂ (fun z : ℂ ↦ partitionFunction z H) :=
+  fun z ↦ (partitionFunction_has_deriv_at H z).differentiableAt
+
+/-- The finite-dimensional partition function is entire. -/
+theorem partitionFunction_analytic_at (H : Matrix d d ℂ) (z : ℂ) :
+    AnalyticAt ℂ (fun w : ℂ ↦ partitionFunction w H) z :=
+  (partitionFunction_differentiable H).analyticAt z
+
+/-- At a nonzero partition function, its logarithmic derivative has the usual quotient form. -/
+theorem partitionFunction_mul_log_deriv (H : Matrix d d ℂ) (z : ℂ)
+    (hZ : partitionFunction z H ≠ 0) :
+    partitionFunction z H * logDeriv (fun w : ℂ ↦ partitionFunction w H) z =
+      -Matrix.trace (H * gibbsOperator z H) := by
+  rw [logDeriv_apply, (partitionFunction_has_deriv_at H z).deriv]
+  field_simp
 
 /-! ## Physical Gibbs states at nonnegative real inverse temperature -/
 
