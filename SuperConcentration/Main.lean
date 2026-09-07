@@ -29,9 +29,9 @@ noncomputable def normalizedHamiltonian
     (𝒥 : ℝ) (J : CouplingSpace P.N P.q) : Matrix d d ℂ :=
   hamiltonian P M (fun I => couplingScale P 𝒥 * J I)
 
-/-- The real logarithm of the real part of the partition function. -/
+/-- The real logarithm of the partition function. -/
 noncomputable def logPartition
-    {d : Type*} [Fintype d] [DecidableEq d]
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (J : CouplingSpace P.N P.q) : ℝ :=
   Real.log
@@ -139,7 +139,7 @@ coupling measure. The SYK gradient estimate is supplied in the reusable
 `hLip` hypothesis.
 -/
 theorem logPartition_two_sided_tail
-    {d : Type*} [Fintype d] [DecidableEq d]
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (h𝒥 : 0 < 𝒥) (hβ : (β : ℝ) ≠ 0)
     (hLip : LipschitzWith (simpleLipschitzConstant P β 𝒥)
@@ -387,18 +387,9 @@ theorem logPartition_lipschitz
   refine le_trans (hderiv c) ?_
   rw [dist_eq_norm]
 
-/-- For an empty state space the log-partition function is identically zero. -/
-theorem logPartition_eq_zero_of_isEmpty
-    {d : Type*} [Fintype d] [DecidableEq d] [IsEmpty d]
-    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (𝒥 : ℝ) (J : CouplingSpace P.N P.q) :
-    logPartition P β M 𝒥 J = 0 := by
-  unfold logPartition
-  simp +decide [partitionFunction]
-
 /-- At zero inverse temperature the log-partition function is constant. -/
 theorem logPartition_eq_log_card_of_beta_zero
-    {d : Type*} [Fintype d] [DecidableEq d]
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (hβ : β = 0) (J : CouplingSpace P.N P.q) :
     logPartition P β M 𝒥 J = Real.log (Fintype.card d : ℝ) := by
@@ -406,7 +397,7 @@ theorem logPartition_eq_log_card_of_beta_zero
 
 /-- At zero inverse temperature every positive-deviation tail event is empty. -/
 theorem logPartition_tail_of_beta_zero
-    {d : Type*} [Fintype d] [DecidableEq d]
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (hβ : β = 0) (t : ℝ) (ht : 0 < t) :
     standardGaussianMeasure P.N P.q
@@ -433,7 +424,7 @@ theorem logPartition_tail_of_beta_zero
 
 /-- The same estimate for the product standard Gaussian coupling measure. -/
 theorem logPartition_two_sided_tail_standardGaussian
-    {d : Type*} [Fintype d] [DecidableEq d]
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (h𝒥 : 0 < 𝒥) (hβ : (β : ℝ) ≠ 0)
     (t : ℝ) (ht : 0 < t) :
@@ -444,22 +435,6 @@ theorem logPartition_two_sided_tail_standardGaussian
       ENNReal.ofReal
         (2 * Real.exp
           (-(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2 * 𝒥 ^ 2))) := by
-  rcases isEmpty_or_nonempty d with hd | hd
-  · -- Empty state space: `logPartition` is identically zero, so the tail set
-    -- is empty because `t > 0`.
-    have hconst : ∀ K : CouplingSpace P.N P.q, logPartition P β M 𝒥 K = 0 :=
-      fun K => logPartition_eq_zero_of_isEmpty P β M 𝒥 K
-    have hset :
-        {J : CouplingSpace P.N P.q | |logPartition P β M 𝒥 J -
-            ∫ K, logPartition P β M 𝒥 K
-              ∂standardGaussianMeasure P.N P.q| > t} = ∅ := by
-      ext J
-      simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false,
-        not_lt]
-      simp only [hconst, integral_zero, sub_zero, abs_zero]
-      exact ht.le
-    rw [hset]
-    simp
-  · exact logPartition_two_sided_tail P β M 𝒥 h𝒥 hβ
-      (logPartition_lipschitz P β M 𝒥 h𝒥.le) t ht
+  exact logPartition_two_sided_tail P β M 𝒥 h𝒥 hβ
+    (logPartition_lipschitz P β M 𝒥 h𝒥.le) t ht
 end SYK

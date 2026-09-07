@@ -48,9 +48,10 @@ independent of $N$.
 
 The parameter structure `SYK.Params` assumes that $q$ is positive and even,
 $q\le N$. The explicit inverse temperature has type `ℝ≥0`, and the public
-theorem additionally assumes $\mathcal J>0$ and $\beta\ne0$. Empty matrix index
-types are handled inside the theorem. The zero inverse-temperature case
-$\beta=0$, where the log-partition function is constant, is covered separately by
+theorem additionally assumes $\mathcal J>0$ and $\beta\ne0$. The partition
+function uses the ordinary matrix trace and satisfies $Z(0)=d$, where $d$ is
+the matrix index dimension. The zero inverse-temperature case $\beta=0$,
+where the log-partition function is the constant $\log d$, is covered separately by
 `SYK.logPartition_tail_of_beta_zero`.
 
 All Lean source files in this directory are free of `axiom` declarations and

@@ -103,22 +103,19 @@ theorem density_variance_nonneg
   norm_num [Complex.mul_re, pow_two] at htrace'
   nlinarith
 
-/-! ## Complex inverse temperature and physical Gibbs states -/
+/-! ## Normalized traces and complex partition functions -/
 
-section PhysicalGibbs
+/-- The matrix trace normalized by the dimension of a nonempty index type. -/
+noncomputable def normalizedTrace [Nonempty d] (A : Matrix d d ℂ) : ℂ :=
+  Matrix.trace A / (Fintype.card d : ℂ)
 
 /-- The matrix exponential `exp (-z H)` at complex inverse temperature `z`. -/
 noncomputable def gibbsOperator (z : ℂ) (H : Matrix d d ℂ) : Matrix d d ℂ :=
   NormedSpace.exp (-z • H)
 
-/-- The finite-dimensional partition function `Tr (exp (-z H))`. -/
+/-- The partition function `Tr (exp (-z H))`. -/
 noncomputable def partitionFunction (z : ℂ) (H : Matrix d d ℂ) : ℂ :=
   Matrix.trace (gibbsOperator z H)
-
-/-- Thermal expectation of an observable in the Gibbs state. -/
-noncomputable def gibbsState (β : NNReal) (H O : Matrix d d ℂ) : ℂ :=
-  Matrix.trace (O * gibbsOperator (β : ℂ) H) /
-    partitionFunction (β : ℂ) H
 
 @[simp]
 theorem gibbsOperator_zero (H : Matrix d d ℂ) :
@@ -126,15 +123,35 @@ theorem gibbsOperator_zero (H : Matrix d d ℂ) :
   simp [gibbsOperator]
 
 @[simp]
+theorem normalizedTrace_one [Nonempty d] :
+    normalizedTrace (1 : Matrix d d ℂ) = 1 := by
+  simp [normalizedTrace, Fintype.card_ne_zero]
+
+@[simp]
 theorem partitionFunction_zero (H : Matrix d d ℂ) :
     partitionFunction 0 H = Fintype.card d := by
   simp [partitionFunction]
 
-/-- The normalized Gibbs matrix, using the real positive partition function. -/
-noncomputable def thermalDensity (β : NNReal) (H : Matrix d d ℂ) :
-    Matrix d d ℂ :=
+/-! ## Physical Gibbs states at nonnegative real inverse temperature -/
+
+section PhysicalGibbs
+
+/-- Thermal expectation using the unnormalized trace convention. -/
+noncomputable def gibbsState [Nonempty d]
+    (β : NNReal) (H O : Matrix d d ℂ) : ℂ :=
+  Matrix.trace (O * gibbsOperator (β : ℂ) H) /
+    partitionFunction (β : ℂ) H
+
+/-- The normalized Gibbs matrix, using the positive partition function. -/
+noncomputable def thermalDensity [Nonempty d]
+    (β : NNReal) (H : Matrix d d ℂ) : Matrix d d ℂ :=
   ((partitionFunction (β : ℂ) H).re⁻¹ : ℝ) •
     gibbsOperator (β : ℂ) H
+
+/-- The real logarithm of the partition function at physical temperature. -/
+noncomputable def realLogPartitionFunction
+    (β : NNReal) (H : Matrix d d ℂ) : ℝ :=
+  Real.log (partitionFunction (β : ℂ) H).re
 
 theorem gibbsOperator_posDef (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) : (gibbsOperator (β : ℂ) H).PosDef := by
@@ -192,7 +209,8 @@ theorem partitionFunction_pos [Nonempty d] (β : NNReal)
 theorem thermalDensity_isDensityMatrix [Nonempty d] (β : NNReal)
     {H : Matrix d d ℂ} (hH : star H = H) :
     IsDensityMatrix (thermalDensity β H) := by
-  have hZ : 0 < (partitionFunction β H).re := partitionFunction_pos β hH
+  have hZ : 0 < (partitionFunction (β : ℂ) H).re :=
+    partitionFunction_pos β hH
   constructor
   · exact ((gibbsOperator_posDef β hH).smul (inv_pos.mpr hZ)).posSemidef
   · rw [thermalDensity, Matrix.trace_smul]
@@ -206,7 +224,8 @@ theorem thermalDensity_isDensityMatrix [Nonempty d] (β : NNReal)
 theorem gibbsState_eq_expectation_thermalDensity [Nonempty d]
     (β : NNReal) {H O : Matrix d d ℂ} (hH : star H = H) :
     gibbsState β H O = expectation (thermalDensity β H) O := by
-  have hZ : 0 < (partitionFunction β H).re := partitionFunction_pos β hH
+  have hZ : 0 < (partitionFunction (β : ℂ) H).re :=
+    partitionFunction_pos β hH
   have hreal := partitionFunction_eq_ofReal_re β hH
   rw [gibbsState, expectation, thermalDensity, Matrix.smul_mul,
     Matrix.trace_smul]

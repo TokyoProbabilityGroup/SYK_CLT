@@ -34,7 +34,8 @@ ordered Majorana interaction operators.
 :::
 
 :::definition "partition_function" (parent := "model") (lean := "SYK.partitionFunction")
-The current partition function accepts complex inverse temperature and is the
-matrix trace of the Gibbs operator. The planned normalized API will distinguish
-this raw trace from the normalized trace.
+The partition function accepts complex inverse temperature and uses the
+matrix trace of the Gibbs operator. Its value at zero inverse temperature is
+the dimension of the matrix index type. The separately named normalized trace
+is available when a dimension-normalized quantity is needed.
 :::

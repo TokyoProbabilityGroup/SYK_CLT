@@ -44,9 +44,9 @@
   - `model.txt` は現在の Lean 実装の初期設計案であり、`β >= 0` を
     `SYKParams` に格納し、非規格化 `Tr(exp(-βH))` と `β : ℝ≥0` の
     Gibbs state を提案する。ガウス型の disorder と具体的な行列表現は任意の
-    後続項目で、抽象トレース代数も選択肢としている。この設計は、標準の
-    `partitionFunction` を規格化トレースかつ複素変数にする移行後の目標とは
-    一致しない。
+    後続項目で、抽象トレース代数も選択肢としている。共有模型では通常の
+    トレースと複素変数を採用したため、トレースの規約は一致するが、逆温度を
+    `Params` に格納する点と具体的な表現を後回しにする点は移行後の目標と一致しない。
   - 現行 Lean の `Params` は `N`、偶数で正の `q`、`q ≤ N` に加え
     `β : ℝ` と非負性を保持し、偶数 `N`、標準表現、`σ_N`、ガウス係数は
     表現しない。`MajoranaSystem`、昇順積、位相、および決定論的な
@@ -134,11 +134,11 @@
 - [x] 逆温度を模型パラメータから削除し、解析には `z : ℂ`、物理的な定理には `β : ℝ≥0` を明示引数として渡す。
   - `Params` から `β`・`β_nonneg` を削除し、`Params.inverseTemperature` と
     その型変換補題も削除した。模型パラメータは `N`・`q` と許容条件だけを持つ。
-  - `gibbsOperator` と現段階の非規格化 `partitionFunction` は `z : ℂ` を
+  - `gibbsOperator` と通常のトレースによる `partitionFunction` は `z : ℂ` を
     直接受ける。正値性、熱平衡密度行列、Gibbs 期待値、および
     `SuperConcentration` の物理的結果には `β : ℝ≥0` を明示的に渡す。
   - `SuperConcentration/Main.lean` の分配関数の対数、微分、リプシッツ定数、
-    裾評価を新しい引数に移行した。定数と非規格化トレースは変更していない。
+    裾評価を新しい引数に移行した。通常のトレースによる規約は共有模型に維持する。
   - 移行対象外の `Annealed_FE/main_result.lean` は編集せず、旧 `Params` の
     `β_nonneg` フィールド指定が使えなくなった状態を既知の破損として残した。
   - 変更した Lean ファイルを個別に検査し、`lake build Model SuperConcentration`
@@ -148,10 +148,16 @@
     `Annealed_FE/main_result.lean` が削除済みの `Params.β`・`Params.β_nonneg` を
     指定する既知の2エラーだけで失敗した。後者が成果物を生成できなかったため、
     `lake exe vbp check` は Blueprint manifest がないことを報告した。
-- [ ] `rawPartitionFunction`、`normalizedTrace`、規格化された `partitionFunction` を定義し、`partitionFunction z H = rawPartitionFunction z H / card d` と `Z(0)=1` を証明する。
-- [ ] 行列指数関数の規格化トレースを指数前の行列から定義し、複素分配関数をその特殊な場合にする。
+- [x] 通常の `partitionFunction` と、必要な箇所で使う `normalizedTrace` を定義する。
+  - `partitionFunction z H = Matrix.trace (exp (-z • H))` とし、`partitionFunction 0 H = Fintype.card d` を証明した。`normalizedTrace` は標準表現の直交性など、次元で規格化する量だけに用いる。
+- [ ] CLT の標準行列表現を構成した後、CLT 固有の規格化分配関数を `normalizedTrace (exp (-z • H))` として定義し、`Z(0)=1` と共有分配関数との対応を証明する。
 - [ ] 整関数性と複素微分を証明し、対数微分には `Z z ≠ 0` を明示する。
-- [ ] 自己共役な `H` と `β : ℝ≥0` に限定して、正値性、密度行列、ギブス期待値、実対数を定義し、規格化・非規格化の対応を証明する。
+- [x] 自己共役な `H` と `β : ℝ≥0` に限定して、通常の分配関数の正値性、密度行列、ギブス期待値、実対数を定義する。
+  - 自己共役な `H` に対する分配関数の正値性、通常の分配関数で規格化した密度行列、その Gibbs 期待値、および実対数を整備した。
+  - `SuperConcentration` の対数分配関数も通常の規約に統一した。規格化が必要な CLT 側では、後続の局所定義と必要な変換補題で扱う。
+  - 2026-09-07 に `Model/FiniteDimensionalGibbs.lean`、`SuperConcentration/Main.lean`、`Chapters/Model.lean` を個別に検査し、`lake build Model SuperConcentration` を成功として完了した。既存の linter warning に加え、`Chapters/Model.lean` には公開済み `Params` と `MajoranaSystem` のフィールドにドキュメント文字列がないという warning が残る。
+  - `SYK.partitionFunction_zero`、`SYK.partitionFunction_pos`、`SYK.thermalDensity_isDensityMatrix`、`SYK.logPartition_two_sided_tail_standardGaussian` に対する `#print axioms` は、いずれも `propext`、`Classical.choice`、`Quot.sound` だけを表示した。
+  - `lake build` と `lake exe vbp build` は、移行対象外の `Annealed_FE/main_result.lean` が削除済みの `Params.β`・`Params.β_nonneg` を指定する既知の2エラーだけで失敗した。同ファイルには今回導入していない既存の `sorry` も残る。後者が成果物を生成できなかったため、`lake exe vbp check` は Blueprint manifest がないことを報告した。
 
 ## 段階3：ガウス型相互作用と標準表現
 
