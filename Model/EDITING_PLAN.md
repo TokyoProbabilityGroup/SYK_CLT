@@ -13,7 +13,8 @@
     `Params`（`inverseTemperature` とその型変換に関する補題を含む）、添字の
     `InteractionIndex`・`orderedIndices`・`length_orderedIndices`、抽象代数の
     `MajoranaSystem`（`psiProduct`、`anticommute`、二つの `star_psiProduct`
-    補題）、`phase`、`hamiltonian`・`hamiltonian_self_adjoint`、および行列熱力学の
+    補題）、`phase`、`hamiltonian`・`hamiltonian_self_adjoint`、および有限次元行列の
+    Gibbs 状態・分配関数に関する
     `gibbsOperator`・`partitionFunction`・`gibbsState` とそれぞれの零温度補題である。
   - 直接 `import` しているファイルは `SuperConcentration/Core.lean`、
     `Annealed_FE/main_result.lean`、`Chapters/Model.lean` である。
@@ -73,15 +74,28 @@
   - `SYK_model/model.lean` から `Model/Definitions.lean` への移動、および Lake のビルド対象名の `Model` への改名は完了している。
   - 比較元は Git コミット `1b5a64cc9860f36876cc30b1a13d66ad4bfe8047` とする。旧版は Git 履歴で保持し、現行ファイルを直接改修する。旧 API を並行して維持する別モジュール、別名前空間、互換用の別名は作らない。
   - 既存の定理文、規格化、数学的な証明の着想、検証結果は比較対象として保持する。証明スクリプトは、数学的内容を保ち、変更後の Lean 検査を通す限り、重複の除去、mathlib の利用、可読性の改善のために置き換えてよい。
-  - `IsDensityMatrix` と `expectation` は `Model.MatrixThermodynamics` に置き、反交換族の二乗和評価は `SuperConcentration` に残す。これにより共有模型が利用側を import する循環を作らない。
+  - `IsDensityMatrix` と `expectation` は `Model.FiniteDimensionalGibbs` に置き、反交換族の二乗和評価は `SuperConcentration` に残す。これにより共有模型が利用側を import する循環を作らない。
   - 汎用ガウス集中不等式には、現行の `L > 0` の結果に加え、`L = 0` を定数関数として扱う API を用意する。SYK 専用の MGF と上側・下側・両側の裾評価は、汎用結果とリプシッツ評価を接続して供給する。
 
-## 段階1：比較基準と共有する代数・行列熱力学
+## 段階1：比較基準と共有する代数、および有限次元行列の Gibbs 状態・分配関数
 
-- [ ] `lake build Model SuperConcentration` と主要定理の `#print axioms` を再実行し、実装直前の比較結果を記録する。
-- [ ] `Model.Definitions`、`Model.Majorana`、`Model.MatrixThermodynamics`、`Model.GaussianDisorder` の責務に従って現行宣言を再配置する。
+- [x] `lake build Model SuperConcentration` と主要定理の `#print axioms` を再実行し、実装直前の比較結果を記録する。
+  - 2026-09-07 にワークスペースのルートで `lake build Model SuperConcentration` を実行し、3193 jobs を成功として完了した。エラー、未解決の証明目標、`sorry`、`admit`、追加の `axiom` は報告されなかった。
+  - `SYK.MajoranaSystem.star_psiProduct_of_even`、`SYK.hamiltonian_self_adjoint`、`SYK.partitionFunction_zero` に対する `#print axioms` は、いずれも `propext`、`Classical.choice`、`Quot.sound` だけを表示した。
+  - 既存の linter warning は `SuperConcentration` のガウス集中不等式の補助ファイル、`Core.lean`、`Main.lean` に残る。主には `refine'`、柔軟な `simp`、100 文字超過、未使用の simp 引数、未使用の `DecidableEq` 仮定であり、今回の比較基準の確認では変更しない。
+- [x] `Model.Definitions`、`Model.Majorana`、`Model.FiniteDimensionalGibbs`、`Model.GaussianDisorder` の責務に従って現行宣言を再配置する。
+  - `Definitions.lean` には模型パラメータと相互作用添字、`Majorana.lean` には
+    抽象マヨラナ系、昇順積、位相、位相付き相互作用演算子、確定的な
+    ハミルトニアンを置いた。
+  - `FiniteDimensionalGibbs.lean` には密度行列と期待値、分散の非負性、
+    Gibbs 演算子・分配関数・熱平衡密度行列の性質、および行列指数関数の
+    トレース微分を集約した。重複元の `SuperConcentration/Gibbs.lean` は削除し、
+    集中不等式固有の反交換族評価だけを `SuperConcentration/Core.lean` に残した。
+  - `GaussianDisorder.lean` には相互作用係数空間、その次元、および標準
+    ガウス測度を置いた。`lake build Model SuperConcentration` により移設後の
+    依存関係を検査した。
 - [ ] 相互作用の添字、昇順積、位相、位相付き相互作用演算子、確定的なハミルトニアンを一つの定義系列に統一する。
-- [ ] `IsDensityMatrix`、`expectation`、行列指数関数のトレース微分、物理的なギブス状態を `Model.MatrixThermodynamics` に集約する。
+- [ ] `IsDensityMatrix`、`expectation`、行列指数関数のトレース微分、物理的な Gibbs 状態を `Model.FiniteDimensionalGibbs` に集約する。
 - [ ] 位相・積・可積分性・型変換の重複を一つの補題群ずつ整理する。広範な証明探索に依存する既存部分は、同じ数学的役割を保つ明示的な証明へ置き換える。
 
 ## 段階2：模型の公開 API

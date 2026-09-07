@@ -1,7 +1,8 @@
 import Verso
 import VersoManual
 import VersoBlueprint
-import SYK.Model.Definitions
+import SYK.Model.FiniteDimensionalGibbs
+import SYK.Model.Majorana
 
 set_option linter.mathlibStandardSet false
 

@@ -1,13 +1,13 @@
 import SYK.SuperConcentration.GaussianConcentration.GaussianConcentration
-import SYK.SuperConcentration.Gibbs
+import SYK.SuperConcentration.Core
 
 /-!
 # Superconcentration of the SYK log-partition function
 
 This public module defines the normalized Hamiltonian and proves its
 Lipschitz and Gaussian concentration bounds. Algebraic prerequisites live in
-`SYK.SuperConcentration.Core`; Gibbs and trace calculus live in
-`SYK.SuperConcentration.Gibbs`.
+`SYK.SuperConcentration.Core`; shared finite-dimensional Gibbs states and trace
+calculus live in `SYK.Model.FiniteDimensionalGibbs`.
 -/
 
 open scoped BigOperators ComplexOrder ENNReal NNReal

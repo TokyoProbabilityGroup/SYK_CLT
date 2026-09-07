@@ -67,8 +67,11 @@ L = β / sqrt q,
 
 ## 廃止する構造
 
-- `Core.lean` 内で再定義された相互作用演算子
-- `Gibbs.lean` 内で再定義された、共有すべき行列による熱力学
+- `Core.lean` 内で再定義されていた相互作用演算子は
+  `Model/Majorana.lean` へ移設済みである。
+- `Gibbs.lean` 内で再定義されていた有限次元行列の Gibbs 状態と
+  トレース微分は `Model/FiniteDimensionalGibbs.lean` へ移設し、旧ファイルは
+  削除済みである。
 - `exactLipschitzSq` と `simpleLipschitzConstant` の二重公開
 - 基本定理に含まれる一般のスケール `𝒥`
 - 物理的なヒルベルト空間が空である場合の分岐

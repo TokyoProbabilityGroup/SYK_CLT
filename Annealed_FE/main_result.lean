@@ -1,4 +1,5 @@
-import SYK.Model.Definitions
+import SYK.Model.FiniteDimensionalGibbs
+import SYK.Model.Majorana
 import Mathlib.Analysis.CStarAlgebra.Classes
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.MeasureTheory.Integral.Bochner.Basic

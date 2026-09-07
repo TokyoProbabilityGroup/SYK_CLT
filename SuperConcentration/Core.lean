@@ -1,4 +1,5 @@
-import SYK.Model.Definitions
+import SYK.Model.Majorana
+import SYK.Model.FiniteDimensionalGibbs
 import Mathlib.Analysis.CStarAlgebra.Matrix
 import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.Data.Fintype.Powerset
@@ -7,8 +8,8 @@ import Mathlib.Data.Nat.Choose.Bounds
 /-!
 # Algebraic core for SYK superconcentration
 
-This module contains density-matrix identities, anticommuting-family bounds,
-Majorana interaction algebra, and the exact finite-volume SYK estimate.
+This module contains anticommuting-family bounds, the interaction algebra used
+by the concentration argument, and the exact finite-volume SYK estimate.
 -/
 
 open scoped BigOperators ComplexOrder ENNReal NNReal
@@ -16,87 +17,6 @@ open scoped Matrix.Norms.Operator
 
 namespace SYK
 
-section DensityMatrix
-
-variable {d : Type*} [Fintype d] [DecidableEq d]
-
-/-- A finite-dimensional density matrix. -/
-def IsDensityMatrix (ρ : Matrix d d ℂ) : Prop :=
-  ρ.PosSemidef ∧ Matrix.trace ρ = 1
-
-/-- Expectation of a matrix observable in a density matrix. -/
-noncomputable def expectation (ρ A : Matrix d d ℂ) : ℂ :=
-  Matrix.trace (ρ * A)
-
-omit [DecidableEq d] in
-theorem expectation_star_eq
-    {ρ A : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hA : star A = A) :
-    star (expectation ρ A) = expectation ρ A := by
-  rw [expectation, ← Matrix.trace_conjTranspose, Matrix.conjTranspose_mul]
-  change Matrix.trace (star A * star ρ) = Matrix.trace (ρ * A)
-  have hsρ : star ρ = ρ := by
-    change Matrix.conjTranspose ρ = ρ
-    exact hρ.1.isHermitian.eq
-  rw [hA, hsρ]
-  exact Matrix.trace_mul_comm A ρ
-
-omit [DecidableEq d] in
-theorem expectation_im_eq_zero
-    {ρ A : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hA : star A = A) :
-    (expectation ρ A).im = 0 := by
-  have h := expectation_star_eq hρ hA
-  exact Complex.conj_eq_iff_im.mp h
-
-omit [DecidableEq d] in
-theorem expectation_eq_ofReal_re
-    {ρ A : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hA : star A = A) :
-    ((expectation ρ A).re : ℂ) = expectation ρ A := by
-  apply Complex.ext
-  · simp
-  · simp [expectation_im_eq_zero hρ hA]
-
-theorem density_variance_nonneg
-    {ρ B : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hB : star B = B) :
-    0 ≤ (expectation ρ (B * B)).re - (expectation ρ B).re ^ 2 := by
-  let z : ℂ := expectation ρ B
-  let C : Matrix d d ℂ := B - z • (1 : Matrix d d ℂ)
-  have hzstar : star z = z := by
-    exact expectation_star_eq hρ hB
-  have hC : star C = C := by
-    simp [C, hB, hzstar]
-  have hpos := hρ.1.conjTranspose_mul_mul_same C
-  have htrace : 0 ≤ (Matrix.trace (star C * ρ * C)).re := by
-    have hz : 0 ≤ Matrix.trace (Matrix.conjTranspose C * ρ * C) :=
-      hpos.trace_nonneg
-    exact (RCLike.nonneg_iff.mp hz).1
-  have hcycle : Matrix.trace (star C * ρ * C) =
-      Matrix.trace (ρ * (C * C)) := by
-    rw [hC, Matrix.trace_mul_cycle C ρ C,
-      Matrix.trace_mul_comm (C * C) ρ]
-  have hCC : C * C =
-      B * B - (2 * z) • B + z ^ 2 • 1 := by
-    simp only [C, sub_mul, mul_sub]
-    simp [Algebra.smul_mul_assoc, Algebra.mul_smul_comm]
-    rw [show (2 : ℂ) * z = z + z by ring, add_smul]
-    simp only [smul_smul, pow_two]
-    abel
-  rw [hcycle, hCC] at htrace
-  have htraceρ : Matrix.trace ρ = (1 : ℂ) := hρ.2
-  simp only [Matrix.mul_sub, Matrix.mul_add, Matrix.mul_smul,
-    Matrix.trace_sub, Matrix.trace_add, Matrix.trace_smul,
-    Matrix.mul_one, smul_eq_mul] at htrace
-  have htrace' : 0 ≤
-      (expectation ρ (B * B) - (2 * z) * expectation ρ B +
-        z ^ 2 * Matrix.trace ρ).re := by
-    simpa [expectation] using htrace
-  rw [show expectation ρ B = z from rfl, htraceρ] at htrace'
-  have hzim : z.im = 0 := by
-    exact expectation_im_eq_zero hρ hB
-  dsimp [z] at htrace' hzim ⊢
-  norm_num [Complex.mul_re, pow_two] at htrace'
-  nlinarith
-
-end DensityMatrix
 
 section AnticommutingFamily
 
@@ -201,10 +121,6 @@ namespace MajoranaSystem
 variable {N q : ℕ} {A : Type*}
   [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
   (M : MajoranaSystem N A)
-
-/-- A phase-corrected Majorana interaction observable. -/
-noncomputable def interactionOperator (s : InteractionIndex N q) : A :=
-  phase q • M.psiProduct s
 
 theorem majorana_sq (i : Fin N) : M.ψ i * M.ψ i = 1 := by
   have h := M.majorana_rel i i

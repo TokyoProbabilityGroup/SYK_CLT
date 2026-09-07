@@ -82,11 +82,12 @@ for every density matrix $\rho$.
 
 ## File guide
 
-- `Core.lean` develops density-matrix identities, anticommuting-observable
-  estimates, Majorana interaction algebra, and the model-specific
+- `Core.lean` develops anticommuting-observable estimates, the interaction
+  algebra used by the concentration argument, and the model-specific
   sum-of-squares estimate.
-- `Gibbs.lean` proves positivity and normalization properties of Gibbs states
-  and differentiates traces of affine matrix exponentials.
+- `../Model/FiniteDimensionalGibbs.lean` supplies density-matrix identities,
+  positivity and normalization properties of Gibbs states, and derivatives of
+  traces of affine matrix exponentials.
 - `GaussianConcentration/GaussianConcentrationAux.lean` supplies measure,
   integrability, gradient, and Herbst-method infrastructure.
 - `GaussianConcentration/GaussianCovSmooth.lean` proves the smooth Gaussian

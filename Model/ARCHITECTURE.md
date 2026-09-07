@@ -62,12 +62,12 @@ partitionFunction z H = normalizedTrace (exp (-z • H))
 | --- | --- |
 | `Model.Definitions` | `N`、`q` とその許容条件、相互作用の添字と昇順 |
 | `Model.Majorana` | 抽象的なマヨラナ系、位相付き相互作用演算子、確定的なハミルトニアン |
-| `Model.MatrixThermodynamics` | 密度行列、期待値、規格化・非規格化トレース、複素分配関数、実逆温度のギブス状態 |
+| `Model.FiniteDimensionalGibbs` | 有限次元行列に対する分配関数、Gibbs 状態、期待値、およびトレース指数関数の解析 |
 | `Model.GaussianDisorder` | `CouplingSpace`、標準ガウス測度、`σ_N` を含む標準規格化ハミルトニアン |
 | `Probability.GaussianConcentration` | 有限次元ユークリッド空間上の標準ガウス集中不等式 |
 | `SuperConcentration` | 密度行列の評価、マヨラナ相互作用演算子の二乗和評価、SYK への集中不等式の適用 |
 
-`IsDensityMatrix` と `expectation` はギブス状態の構成にも使うため `Model.MatrixThermodynamics` に置く。反交換族の二乗和評価は `SuperConcentration` に置く。これにより `Model` が `SuperConcentration` を import する循環を防ぐ。
+`IsDensityMatrix` と `expectation` は Gibbs 状態の構成にも使うため `Model.FiniteDimensionalGibbs` に置く。反交換族の二乗和評価は `SuperConcentration` に置く。これにより `Model` が `SuperConcentration` を import する循環を防ぐ。
 
 非零次元・実逆温度で規格化を変更すると `log Z_raw = log Z + log d` となるが、次元は相互作用係数に依存しないため、中心化した対数や相互作用係数による微分ではこの差が消える。一方、`N^(-1) log Z` の極限では `N^(-1) log d` が残り得る。ギブス期待値は分子・分母を同じ規約で規格化すれば変わらない。
 
@@ -136,7 +136,7 @@ SYK/Model/
   Definitions.lean
   Majorana.lean
   StandardRepresentation.lean
-  MatrixThermodynamics.lean
+  FiniteDimensionalGibbs.lean
   GaussianDisorder.lean
 ```
 

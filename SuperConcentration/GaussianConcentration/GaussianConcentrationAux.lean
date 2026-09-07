@@ -1,3 +1,4 @@
+import SYK.Model.GaussianDisorder
 import Mathlib.Analysis.Calculus.Deriv.Pi
 import Mathlib.Analysis.Calculus.Gradient.Basic
 import Mathlib.Analysis.Convex.Deriv
@@ -16,21 +17,6 @@ open MeasureTheory
 open ProbabilityTheory
 
 namespace SYK
-
-/-- The Euclidean space of real SYK couplings. -/
-abbrev CouplingSpace (N q : ℕ) :=
-  EuclideanSpace ℝ ({s : Finset (Fin N) // s.card = q})
-
-@[simp]
-theorem couplingSpace_card (N q : ℕ) :
-    Fintype.card ({s : Finset (Fin N) // s.card = q}) = Nat.choose N q := by
-  simp
-
-/-- The product standard Gaussian measure transported to coupling space. -/
-noncomputable def standardGaussianMeasure (N q : ℕ) :
-    Measure (CouplingSpace N q) :=
-  (Measure.pi fun _ : ({s : Finset (Fin N) // s.card = q}) => gaussianReal 0 1).map
-    (WithLp.toLp 2)
 
 /-- One standard Gaussian measure for every finite Euclidean coordinate type.
 This is the product of standard one-dimensional Gaussians pushed forward to the
