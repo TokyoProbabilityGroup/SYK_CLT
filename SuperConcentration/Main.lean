@@ -225,10 +225,17 @@ theorem abs_beta_expectation_normHam_sq_le_exact
       (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re =
         c * ∑ I : InteractionIndex P.N P.q,
           V I * (expectation ρ (M.interactionOperator I)).re := by
+    classical
     unfold normalizedHamiltonian expectation
-    simp +decide [hamiltonian, mul_assoc, Finset.mul_sum _ _ _]
-    simp +decide [phase, MajoranaSystem.interactionOperator]
-    exact Finset.sum_congr rfl fun _ _ => by ring
+    simp only [hamiltonian]
+    rw [Finset.mul_sum, Matrix.trace_sum, Complex.re_sum,
+      Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    intro I _
+    rw [Matrix.mul_smul, Matrix.trace_smul]
+    simp only [smul_eq_mul, Complex.mul_re, Complex.ofReal_re,
+      Complex.ofReal_im, zero_mul, sub_zero]
+    ring
   have hlinear :
       (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re = c * S := by
     simpa only [S] using hlinear'

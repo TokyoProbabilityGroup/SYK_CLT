@@ -111,7 +111,23 @@
   - この層は SYK の模型パラメータを使わないため、`Model.Definitions` への
     不要な依存を除いた。`Model` と `SuperConcentration` のビルド、および
     主要定理の公理依存を移行後の配置で検査した。
-- [ ] 位相・積・可積分性・型変換の重複を一つの補題群ずつ整理する。広範な証明探索に依存する既存部分は、同じ数学的役割を保つ明示的な証明へ置き換える。
+- [x] 位相・積・可積分性・型変換の重複を一つの補題群ずつ整理する。広範な証明探索に依存する既存部分は、同じ数学的役割を保つ明示的な証明へ置き換える。
+  - 生成元をマヨラナ積の右から左へ移す符号を
+    `MajoranaSystem.listProduct_mul_generator`、位相の絶対値が1であることを
+    `star_phase_mul_self` として `Model.Majorana` で一度だけ証明した。
+    `SuperConcentration.Core` にあった同じ帰納法と位相計算を削除し、これらの
+    共有補題を相互作用演算子の二乗と反交換性の証明から利用する形にした。
+  - 自己共役ハミルトニアンの分配関数を実部から複素数へ戻す変換を
+    `partitionFunction_eq_ofReal_re` にまとめ、熱平衡密度行列と Gibbs 期待値の
+    証明に重複していた `Complex.ext` を置き換えた。方向微分評価での期待値の
+    線形性も、位相と積を再展開する柔軟な `simp` ではなく、有限和・トレース・
+    実数係数の複素埋め込みを列挙した証明に改めた。
+  - 再配置済みの `Model` と直接の接続部である `Core.lean`・`Main.lean` を検索し、
+    可積分性を個別に再証明する重複と `aesop`・`grind`・`apply_rules` が残って
+    いないことを確認した。未移行の汎用ガウス集中不等式に残る可積分性証明と
+    探索タクティクは `SuperConcentration/EDITING_PLAN.md` の段階1で扱う。
+  - 変更した四つの Lean ファイルを個別に検査し、
+    `lake build Model SuperConcentration` と主要定理の `#print axioms` を実行した。
 
 ## 段階2：模型の公開 API
 

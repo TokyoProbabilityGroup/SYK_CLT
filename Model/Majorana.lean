@@ -59,6 +59,16 @@ private theorem listProduct_mul (i : Fin N) (l : List (Fin N))
         _ = ((-1 : ℂ) ^ (l.length + 1)) •
             (M.ψ i * (M.ψ j * (l.map M.ψ).prod)) := by rw [pow_succ]
 
+/-- Moving a generator past a product of distinct other generators contributes
+one minus sign per factor. -/
+theorem listProduct_mul_generator
+    (i : Fin N) (l : List (Fin N)) (hi : i ∉ l) :
+    (l.map M.ψ).prod * M.ψ i =
+      ((-1 : ℂ) ^ l.length) • (M.ψ i * (l.map M.ψ).prod) := by
+  apply M.listProduct_mul
+  intro j hj
+  exact M.anticommute (fun hji ↦ hi (hji ▸ hj))
+
 private theorem reverse_listProduct (l : List (Fin N)) (hl : l.Nodup) :
     (l.reverse.map M.ψ).prod =
       ((-1 : ℂ) ^ l.length.choose 2) • (l.map M.ψ).prod := by
@@ -121,6 +131,18 @@ end MajoranaSystem
 /-- The phase used for an even `q`. -/
 def phase (q : ℕ) : ℂ := Complex.I ^ (q / 2)
 
+private theorem phase_sq (q : ℕ) :
+    phase q * phase q = (-1 : ℂ) ^ (q / 2) := by
+  rw [phase, ← mul_pow]
+  norm_num
+
+/-- The phase has complex norm one. -/
+theorem star_phase_mul_self (q : ℕ) :
+    star (phase q) * phase q = 1 := by
+  change star (Complex.I ^ (q / 2)) * Complex.I ^ (q / 2) = 1
+  rw [star_pow, ← mul_pow]
+  norm_num
+
 namespace MajoranaSystem
 
 variable {N q : ℕ} {A : Type*}
@@ -133,19 +155,11 @@ noncomputable def interactionOperator (s : InteractionIndex N q) : A :=
 
 private theorem star_phase_mul_sign (q : ℕ) :
     star (phase q) * ((-1 : ℂ) ^ (q / 2)) = phase q := by
-  change star (Complex.I ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2)) =
-    Complex.I ^ (q / 2)
-  rw [star_pow, Complex.star_def, Complex.conj_I]
-  rw [neg_pow]
-  have hsign :
-      ((-1 : ℂ) ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2)) = 1 := by
-    rw [← mul_pow]
-    simp
   calc
-    ((-1 : ℂ) ^ (q / 2) * Complex.I ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2)) =
-        (((-1 : ℂ) ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2))) *
-          Complex.I ^ (q / 2) := by ring
-    _ = Complex.I ^ (q / 2) := by rw [hsign, one_mul]
+    star (phase q) * ((-1 : ℂ) ^ (q / 2)) =
+        star (phase q) * (phase q * phase q) := by rw [phase_sq]
+    _ = (star (phase q) * phase q) * phase q := by rw [mul_assoc]
+    _ = phase q := by rw [star_phase_mul_self, one_mul]
 
 theorem interactionOperator_star
     (hq : Even q) (s : InteractionIndex N q) :

@@ -129,30 +129,6 @@ theorem majorana_sq (i : Fin N) : M.ψ i * M.ψ i = 1 := by
   apply smul_right_injective A (show (2 : ℂ) ≠ 0 by norm_num)
   simpa [two_smul] using h
 
-private theorem listProduct_mul_generator
-    (i : Fin N) (l : List (Fin N))
-    (hi : i ∉ l) :
-    (l.map M.ψ).prod * M.ψ i =
-      ((-1 : ℂ) ^ l.length) • (M.ψ i * (l.map M.ψ).prod) := by
-  induction l with
-  | nil => simp
-  | cons j l ih =>
-      have hij : j ≠ i := by
-        intro hji
-        apply hi
-        simp [hji]
-      have hil : i ∉ l := by
-        intro hil
-        exact hi (by simp [hil])
-      simp only [List.map_cons, List.prod_cons, List.length_cons]
-      rw [mul_assoc, ih hil, Algebra.mul_smul_comm, ← mul_assoc,
-        M.anticommute hij, neg_mul, mul_assoc]
-      rw [show ((-1 : ℂ) ^ l.length) •
-          (-(M.ψ i * (M.ψ j * (l.map M.ψ).prod))) =
-          (((-1 : ℂ) ^ l.length) * (-1)) •
-            (M.ψ i * (M.ψ j * (l.map M.ψ).prod)) by simp]
-      rw [pow_succ]
-
 private theorem listProduct_eq_smul_of_perm
     (l₁ l₂ : List (Fin N)) (h : l₁.Perm l₂) :
     ∃ c : ℂ, (l₁.map M.ψ).prod = c • (l₂.map M.ψ).prod := by
@@ -211,11 +187,7 @@ theorem interactionOperator_sq
           rw [interactionOperator, star_smul, smul_mul_smul_comm]
     _ = (star (phase q) * phase q) • (1 : A) := by
           rw [M.psiProduct_star_mul_self]
-  have hp : star (phase q) * phase q = 1 := by
-    change star (Complex.I ^ (q / 2)) * Complex.I ^ (q / 2) = 1
-    rw [star_pow, ← mul_pow]
-    norm_num
-  rw [hp, one_smul]
+  rw [star_phase_mul_self, one_smul]
 
 end MajoranaSystem
 

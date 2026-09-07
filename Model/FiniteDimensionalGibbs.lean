@@ -81,7 +81,8 @@ theorem density_variance_nonneg
   have hCC : C * C =
       B * B - (2 * z) • B + z ^ 2 • 1 := by
     simp only [C, sub_mul, mul_sub]
-    simp [Algebra.smul_mul_assoc, Algebra.mul_smul_comm]
+    simp only [Algebra.smul_mul_assoc, one_mul,
+      Algebra.mul_smul_comm, mul_one]
     rw [show (2 : ℂ) * z = z + z by ring, add_smul]
     simp only [smul_smul, pow_two]
     abel
@@ -172,6 +173,13 @@ theorem partitionFunction_im_eq_zero (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) : (partitionFunction β H).im = 0 :=
   Complex.conj_eq_iff_im.mp (partitionFunction_star_eq β hH)
 
+theorem partitionFunction_eq_ofReal_re (β : NNReal) {H : Matrix d d ℂ}
+    (hH : star H = H) :
+    ((partitionFunction β H).re : ℂ) = partitionFunction β H := by
+  apply Complex.ext
+  · simp
+  · simp [partitionFunction_im_eq_zero β hH]
+
 theorem partitionFunction_pos [Nonempty d] (β : NNReal)
     {H : Matrix d d ℂ} (hH : star H = H) :
     0 < (partitionFunction β H).re := by
@@ -187,11 +195,7 @@ theorem thermalDensity_isDensityMatrix [Nonempty d] (β : NNReal)
   · rw [thermalDensity, Matrix.trace_smul]
     change (((partitionFunction β H).re⁻¹ : ℝ) : ℂ) *
         partitionFunction β H = 1
-    have hreal : ((partitionFunction β H).re : ℂ) =
-        partitionFunction β H := by
-      apply Complex.ext
-      · simp
-      · simp [partitionFunction_im_eq_zero β hH]
+    have hreal := partitionFunction_eq_ofReal_re β hH
     rw [← hreal]
     simp only [Complex.ofReal_re]
     simp [ne_of_gt hZ]
@@ -200,11 +204,7 @@ theorem gibbsState_eq_expectation_thermalDensity [Nonempty d]
     (β : NNReal) {H O : Matrix d d ℂ} (hH : star H = H) :
     gibbsState β H O = expectation (thermalDensity β H) O := by
   have hZ : 0 < (partitionFunction β H).re := partitionFunction_pos β hH
-  have hreal : ((partitionFunction β H).re : ℂ) =
-      partitionFunction β H := by
-    apply Complex.ext
-    · simp
-    · simp [partitionFunction_im_eq_zero β hH]
+  have hreal := partitionFunction_eq_ofReal_re β hH
   rw [gibbsState, expectation, thermalDensity, Matrix.smul_mul,
     Matrix.trace_smul]
   change Matrix.trace (O * gibbsOperator β H) / partitionFunction β H =
