@@ -10,15 +10,6 @@ structure Params where
   q_even : Even q
   q_pos : 0 < q
   q_le_N : q ≤ N
-  β : ℝ
-  β_nonneg : 0 ≤ β
-
-/-- The inverse temperature packaged with its nonnegativity proof. -/
-def Params.inverseTemperature (P : Params) : NNReal := ⟨P.β, P.β_nonneg⟩
-
-@[simp]
-theorem Params.coe_inverseTemperature (P : Params) :
-    (P.inverseTemperature : ℝ) = P.β := rfl
 
 /-- A label for a `q`-body interaction is a `q`-element subset of the fermion labels. -/
 abbrev InteractionIndex (N q : ℕ) := {s : Finset (Fin N) // s.card = q}

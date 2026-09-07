@@ -32,10 +32,10 @@ noncomputable def normalizedHamiltonian
 /-- The real logarithm of the real part of the partition function. -/
 noncomputable def logPartition
     {d : Type*} [Fintype d] [DecidableEq d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (J : CouplingSpace P.N P.q) : ℝ :=
   Real.log
-    (partitionFunction P.inverseTemperature
+    (partitionFunction (β : ℂ)
       (normalizedHamiltonian P M 𝒥 J)).re
 
 theorem normalizedHamiltonian_affine
@@ -70,36 +70,36 @@ theorem normalizedHamiltonian_self_adjoint
 
 theorem hasDerivAt_logPartition_line
     {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (J V : CouplingSpace P.N P.q) (s : ℝ) :
     let Hs := normalizedHamiltonian P M 𝒥 (J + s • V)
-    let Bs := -((P.β : ℂ)) • normalizedHamiltonian P M 𝒥 V
-    HasDerivAt (fun r : ℝ ↦ logPartition P M 𝒥 (J + r • V))
-      ((Matrix.trace (Bs * gibbsOperator P.inverseTemperature Hs)).re /
-        (partitionFunction P.inverseTemperature Hs).re) s := by
+    let Bs := -(β : ℂ) • normalizedHamiltonian P M 𝒥 V
+    HasDerivAt (fun r : ℝ ↦ logPartition P β M 𝒥 (J + r • V))
+      ((Matrix.trace (Bs * gibbsOperator (β : ℂ) Hs)).re /
+        (partitionFunction (β : ℂ) Hs).re) s := by
   dsimp only
   let A : Matrix d d ℂ :=
-    -((P.β : ℂ)) • normalizedHamiltonian P M 𝒥 J
+    -(β : ℂ) • normalizedHamiltonian P M 𝒥 J
   let B : Matrix d d ℂ :=
-    -((P.β : ℂ)) • normalizedHamiltonian P M 𝒥 V
+    -(β : ℂ) • normalizedHamiltonian P M 𝒥 V
   have hexp (r : ℝ) :
-      -(((P.inverseTemperature : ℝ) : ℂ)) •
+      -(β : ℂ) •
           normalizedHamiltonian P M 𝒥 (J + r • V) =
         A + r • B := by
-    rw [P.coe_inverseTemperature, normalizedHamiltonian_affine]
+    rw [normalizedHamiltonian_affine]
     dsimp [A, B]
     module
   have hexp' (r : ℝ) :
-      -((((P.inverseTemperature : ℝ) : ℂ)) •
+      -((β : ℂ) •
           normalizedHamiltonian P M 𝒥 (J + r • V)) =
         A + r • B := by
     rw [← neg_smul]
     exact hexp r
   have htrace := hasDerivAt_trace_exp_affine A B s
   have hre := (hasDerivAt_const s Complex.reCLM).clm_apply htrace
-  have hpos : 0 < (partitionFunction P.inverseTemperature
+  have hpos : 0 < (partitionFunction (β : ℂ)
       (normalizedHamiltonian P M 𝒥 (J + s • V))).re :=
-    partitionFunction_pos _ (normalizedHamiltonian_self_adjoint P M 𝒥 _)
+    partitionFunction_pos β (normalizedHamiltonian_self_adjoint P M 𝒥 _)
   have hpos' : 0 < Complex.reCLM
       (Matrix.trace (NormedSpace.exp (A + s • B))) := by
     have h := hpos
@@ -119,18 +119,19 @@ theorem hasDerivAt_logPartition_line
 The square of the exact finite-volume Lipschitz constant supplied by the
 SYK sum-of-squares estimate.
 -/
-noncomputable def exactLipschitzSq (P : Params) (𝒥 : ℝ) : ℝ :=
-  (P.β * couplingScale P 𝒥) ^ 2 *
+noncomputable def exactLipschitzSq (P : Params) (β : NNReal) (𝒥 : ℝ) : ℝ :=
+  ((β : ℝ) * couplingScale P 𝒥) ^ 2 *
     ((Nat.choose P.N (P.q - 1) : ℝ) / (P.q : ℝ))
 
-theorem exactLipschitzSq_nonneg (P : Params) (𝒥 : ℝ) :
-    0 ≤ exactLipschitzSq P 𝒥 := by
+theorem exactLipschitzSq_nonneg (P : Params) (β : NNReal) (𝒥 : ℝ) :
+    0 ≤ exactLipschitzSq P β 𝒥 := by
   exact mul_nonneg (sq_nonneg _)
     (div_nonneg (Nat.cast_nonneg _) (Nat.cast_nonneg _))
 
 /-- The simplified Lipschitz constant obtained from the finite-volume bound. -/
-noncomputable def simpleLipschitzConstant (P : Params) (𝒥 : ℝ) : ℝ≥0 :=
-  Real.toNNReal (|P.β| * 𝒥 / Real.sqrt (P.q : ℝ))
+noncomputable def simpleLipschitzConstant
+    (P : Params) (β : NNReal) (𝒥 : ℝ) : ℝ≥0 :=
+  Real.toNNReal (|(β : ℝ)| * 𝒥 / Real.sqrt (P.q : ℝ))
 
 /--
 The two-sided superconcentration estimate for the product standard Gaussian
@@ -139,39 +140,39 @@ coupling measure. The SYK gradient estimate is supplied in the reusable
 -/
 theorem logPartition_two_sided_tail
     {d : Type*} [Fintype d] [DecidableEq d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (𝒥 : ℝ) (h𝒥 : 0 < 𝒥) (hβ : P.β ≠ 0)
-    (hLip : LipschitzWith (simpleLipschitzConstant P 𝒥)
-      (logPartition P M 𝒥))
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ) (h𝒥 : 0 < 𝒥) (hβ : (β : ℝ) ≠ 0)
+    (hLip : LipschitzWith (simpleLipschitzConstant P β 𝒥)
+      (logPartition P β M 𝒥))
     (t : ℝ) (ht : 0 < t) :
     standardGaussianMeasure P.N P.q
-        {J | |logPartition P M 𝒥 J -
-          ∫ K, logPartition P M 𝒥 K
+        {J | |logPartition P β M 𝒥 J -
+          ∫ K, logPartition P β M 𝒥 K
             ∂standardGaussianMeasure P.N P.q| > t} ≤
       ENNReal.ofReal
         (2 * Real.exp
-          (-(P.q : ℝ) * t ^ 2 / (2 * P.β ^ 2 * 𝒥 ^ 2))) := by
+          (-(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2 * 𝒥 ^ 2))) := by
   have hq : 0 < (P.q : ℝ) := by exact_mod_cast P.q_pos
   have hsqrt : 0 < Real.sqrt (P.q : ℝ) := Real.sqrt_pos.2 hq
-  let L : ℝ := |P.β| * 𝒥 / Real.sqrt (P.q : ℝ)
+  let L : ℝ := |(β : ℝ)| * 𝒥 / Real.sqrt (P.q : ℝ)
   have hL : 0 < L := div_pos (mul_pos (abs_pos.mpr hβ) h𝒥) hsqrt
-  have hLip' : LipschitzWith L.toNNReal (logPartition P M 𝒥) := by
+  have hLip' : LipschitzWith L.toNNReal (logPartition P β M 𝒥) := by
     simpa [L, simpleLipschitzConstant] using hLip
   have htail :=
     gaussian_lipschitz_concentration P.N P.q
-      (logPartition P M 𝒥) L t hL ht hLip'
+      (logPartition P β M 𝒥) L t hL ht hLip'
   have hq0 : (P.q : ℝ) ≠ 0 := ne_of_gt hq
   have hsqrt0 : Real.sqrt (P.q : ℝ) ≠ 0 := ne_of_gt hsqrt
-  have hβ0 : P.β ^ 2 ≠ 0 := pow_ne_zero 2 hβ
+  have hβ0 : (β : ℝ) ^ 2 ≠ 0 := pow_ne_zero 2 hβ
   have h𝒥0 : 𝒥 ^ 2 ≠ 0 := pow_ne_zero 2 (ne_of_gt h𝒥)
   have hsqrt_sq : Real.sqrt (P.q : ℝ) ^ 2 = (P.q : ℝ) :=
     Real.sq_sqrt hq.le
-  have hLsq : L ^ 2 = P.β ^ 2 * 𝒥 ^ 2 / (P.q : ℝ) := by
+  have hLsq : L ^ 2 = (β : ℝ) ^ 2 * 𝒥 ^ 2 / (P.q : ℝ) := by
     dsimp [L]
     rw [div_pow, mul_pow, sq_abs, hsqrt_sq]
   have hexponent :
       -t ^ 2 / (2 * L ^ 2) =
-        -(P.q : ℝ) * t ^ 2 / (2 * P.β ^ 2 * 𝒥 ^ 2) := by
+        -(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2 * 𝒥 ^ 2) := by
     rw [hLsq]
     field_simp
   rwa [hexponent] at htail
@@ -211,12 +212,12 @@ binomial coefficient and normalization.
 -/
 theorem abs_beta_expectation_normHam_sq_le_exact
     {d : Type*} [Fintype d] [DecidableEq d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ)
     (ρ : Matrix d d ℂ) (hρ : IsDensityMatrix ρ)
     (V : CouplingSpace P.N P.q) :
-    |P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re| ^ 2
-      ≤ exactLipschitzSq P 𝒥 * ‖V‖ ^ 2 := by
+    |(β : ℝ) * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re| ^ 2
+      ≤ exactLipschitzSq P β 𝒥 * ‖V‖ ^ 2 := by
   set c := couplingScale P 𝒥
   set S := ∑ I : InteractionIndex P.N P.q,
     V I * (expectation ρ (M.interactionOperator I)).re
@@ -260,7 +261,7 @@ theorem abs_beta_expectation_normHam_sq_le_exact
     simp only [Real.norm_eq_abs, sq_abs]
     rw [Real.sq_sqrt hsum_nonneg]
     exact le_trans hcs hmul
-  have hscaled := mul_le_mul_of_nonneg_left hdot (sq_nonneg (P.β * c))
+  have hscaled := mul_le_mul_of_nonneg_left hdot (sq_nonneg ((β : ℝ) * c))
   rw [hlinear, sq_abs, exactLipschitzSq]
   dsimp only [c, Q] at hscaled ⊢
   nlinarith only [hscaled]
@@ -268,28 +269,28 @@ theorem abs_beta_expectation_normHam_sq_le_exact
 /-- The exact finite-volume directional bound in unsquared form. -/
 theorem abs_beta_expectation_normHam_le_exact
     {d : Type*} [Fintype d] [DecidableEq d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ)
     (ρ : Matrix d d ℂ) (hρ : IsDensityMatrix ρ)
     (V : CouplingSpace P.N P.q) :
-    |P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re|
-      ≤ Real.sqrt (exactLipschitzSq P 𝒥) * ‖V‖ := by
-  have hsq := abs_beta_expectation_normHam_sq_le_exact P M 𝒥 ρ hρ V
+    |(β : ℝ) * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re|
+      ≤ Real.sqrt (exactLipschitzSq P β 𝒥) * ‖V‖ := by
+  have hsq := abs_beta_expectation_normHam_sq_le_exact P β M 𝒥 ρ hρ V
   calc
-    |P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re| =
+    |(β : ℝ) * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re| =
         Real.sqrt
-          (|P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re| ^ 2) := by
+          (|(β : ℝ) * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re| ^ 2) := by
             rw [Real.sqrt_sq (abs_nonneg _)]
-    _ ≤ Real.sqrt (exactLipschitzSq P 𝒥 * ‖V‖ ^ 2) :=
+    _ ≤ Real.sqrt (exactLipschitzSq P β 𝒥 * ‖V‖ ^ 2) :=
       Real.sqrt_le_sqrt hsq
-    _ = Real.sqrt (exactLipschitzSq P 𝒥) * ‖V‖ := by
-      rw [Real.sqrt_mul (exactLipschitzSq_nonneg P 𝒥), Real.sqrt_sq_eq_abs,
+    _ = Real.sqrt (exactLipschitzSq P β 𝒥) * ‖V‖ := by
+      rw [Real.sqrt_mul (exactLipschitzSq_nonneg P β 𝒥), Real.sqrt_sq_eq_abs,
         abs_of_nonneg (norm_nonneg V)]
 
 theorem sqrt_exactLipschitzSq
-    (P : Params) (𝒥 : ℝ) (h𝒥 : 0 ≤ 𝒥) :
-    Real.sqrt (exactLipschitzSq P 𝒥) =
-      |P.β| * couplingScale P 𝒥 *
+    (P : Params) (β : NNReal) (𝒥 : ℝ) (h𝒥 : 0 ≤ 𝒥) :
+    Real.sqrt (exactLipschitzSq P β 𝒥) =
+      |(β : ℝ)| * couplingScale P 𝒥 *
         Real.sqrt ((Nat.choose P.N (P.q - 1) : ℝ) / (P.q : ℝ)) := by
   rw [exactLipschitzSq, Real.sqrt_mul (sq_nonneg _), Real.sqrt_sq_eq_abs,
     abs_mul]
@@ -303,16 +304,16 @@ directional gradient of the normalized SYK energy by the simplified constant.
 -/
 theorem abs_beta_expectation_normHam_le
     {d : Type*} [Fintype d] [DecidableEq d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (h𝒥 : 0 ≤ 𝒥)
     (ρ : Matrix d d ℂ) (hρ : IsDensityMatrix ρ)
     (V : CouplingSpace P.N P.q) :
-    |P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re|
-      ≤ (|P.β| * 𝒥 / Real.sqrt (P.q : ℝ)) * ‖V‖ := by
-  refine le_trans (abs_beta_expectation_normHam_le_exact P M 𝒥 ρ hρ V) ?_
-  rw [sqrt_exactLipschitzSq P 𝒥 h𝒥]
+    |(β : ℝ) * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re|
+      ≤ (|(β : ℝ)| * 𝒥 / Real.sqrt (P.q : ℝ)) * ‖V‖ := by
+  refine le_trans (abs_beta_expectation_normHam_le_exact P β M 𝒥 ρ hρ V) ?_
+  rw [sqrt_exactLipschitzSq P β 𝒥 h𝒥]
   have hscale := mul_le_mul_of_nonneg_left
-    (couplingScale_mul_sqrt_choose_le P 𝒥 h𝒥) (abs_nonneg P.β)
+    (couplingScale_mul_sqrt_choose_le P 𝒥 h𝒥) (abs_nonneg (β : ℝ))
   have := mul_le_mul_of_nonneg_right hscale (norm_nonneg V)
   convert this using 1 <;> ring
 
@@ -322,14 +323,14 @@ thermal expectation of the (normalized) SYK energy.
 -/
 theorem logPartition_line_deriv_eq
     {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (J V : CouplingSpace P.N P.q) (s : ℝ) :
-    HasDerivAt (fun r : ℝ ↦ logPartition P M 𝒥 (J + r • V))
-      (-P.β * (expectation
-        (thermalDensity P.inverseTemperature
+    HasDerivAt (fun r : ℝ ↦ logPartition P β M 𝒥 (J + r • V))
+      (-(β : ℝ) * (expectation
+        (thermalDensity β
           (normalizedHamiltonian P M 𝒥 (J + s • V)))
         (normalizedHamiltonian P M 𝒥 V)).re) s := by
-  convert hasDerivAt_logPartition_line P M 𝒥 J V s using 1
+  convert hasDerivAt_logPartition_line P β M 𝒥 J V s using 1
   unfold expectation thermalDensity
   simp +decide [Matrix.trace_smul]
   ring_nf
@@ -338,48 +339,48 @@ theorem logPartition_line_deriv_eq
 /-- The SYK log-partition function is Lipschitz with the stated constant. -/
 theorem logPartition_lipschitz
     {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (h𝒥 : 0 ≤ 𝒥) :
-    LipschitzWith (simpleLipschitzConstant P 𝒥)
-      (logPartition P M 𝒥) := by
+    LipschitzWith (simpleLipschitzConstant P β 𝒥)
+      (logPartition P β M 𝒥) := by
   apply LipschitzWith.of_dist_le_mul
   intro x y
   set V : CouplingSpace P.N P.q := x - y
-  set g : ℝ → ℝ := fun r => logPartition P M 𝒥 (y + r • V)
+  set g : ℝ → ℝ := fun r => logPartition P β M 𝒥 (y + r • V)
   have hderiv (r : ℝ) :
       |deriv g r| ≤
-        (|P.β| * 𝒥 / Real.sqrt (P.q : ℝ)) * ‖V‖ := by
-    let ρ := thermalDensity P.inverseTemperature
+        (|(β : ℝ)| * 𝒥 / Real.sqrt (P.q : ℝ)) * ‖V‖ := by
+    let ρ := thermalDensity β
       (normalizedHamiltonian P M 𝒥 (y + r • V))
     have hρ : IsDensityMatrix ρ :=
-      thermalDensity_isDensityMatrix P.inverseTemperature
+      thermalDensity_isDensityMatrix β
         (normalizedHamiltonian_self_adjoint P M 𝒥 _)
-    have hbound := abs_beta_expectation_normHam_le P M 𝒥 h𝒥 ρ hρ V
+    have hbound := abs_beta_expectation_normHam_le P β M 𝒥 h𝒥 ρ hρ V
     have hderiv_eq :
         deriv g r =
-          -P.β * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re := by
-      exact (logPartition_line_deriv_eq P M 𝒥 y V r).deriv
+          -(β : ℝ) * (expectation ρ (normalizedHamiltonian P M 𝒥 V)).re := by
+      exact (logPartition_line_deriv_eq P β M 𝒥 y V r).deriv
     rw [hderiv_eq]
     simpa only [abs_mul, abs_neg] using hbound
   have hmvt : ∃ c ∈ Set.Ioo (0 : ℝ) 1, g 1 - g 0 = deriv g c := by
     have hslope := exists_deriv_eq_slope g zero_lt_one
     have hcontinuous : ContinuousOn g (Set.Icc 0 1) :=
       continuousOn_of_forall_continuousAt fun r _ =>
-        (logPartition_line_deriv_eq P M 𝒥 y V r).differentiableAt.continuousAt
+        (logPartition_line_deriv_eq P β M 𝒥 y V r).differentiableAt.continuousAt
     have hdifferentiable : DifferentiableOn ℝ g (Set.Ioo 0 1) :=
       fun r _ =>
-        (logPartition_line_deriv_eq P M 𝒥 y V r).differentiableAt.differentiableWithinAt
+        (logPartition_line_deriv_eq P β M 𝒥 y V r).differentiableAt.differentiableWithinAt
     obtain ⟨c, hc, hslope_eq⟩ := hslope hcontinuous hdifferentiable
     refine ⟨c, hc, ?_⟩
     norm_num at hslope_eq
     linarith
   obtain ⟨c, _hc, hslope⟩ := hmvt
   have hends :
-      g 1 = logPartition P M 𝒥 x ∧
-        g 0 = logPartition P M 𝒥 y := by
+      g 1 = logPartition P β M 𝒥 x ∧
+        g 0 = logPartition P β M 𝒥 y := by
     constructor <;> simp [g, V]
   have hconstant_nonneg :
-      0 ≤ |P.β| * 𝒥 / Real.sqrt (P.q : ℝ) := by
+      0 ≤ |(β : ℝ)| * 𝒥 / Real.sqrt (P.q : ℝ) := by
     positivity
   rw [dist_eq_norm, Real.norm_eq_abs, ← hends.1, ← hends.2, hslope]
   rw [simpleLipschitzConstant, Real.coe_toNNReal _ hconstant_nonneg]
@@ -389,42 +390,39 @@ theorem logPartition_lipschitz
 /-- For an empty state space the log-partition function is identically zero. -/
 theorem logPartition_eq_zero_of_isEmpty
     {d : Type*} [Fintype d] [DecidableEq d] [IsEmpty d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (𝒥 : ℝ) (J : CouplingSpace P.N P.q) :
-    logPartition P M 𝒥 J = 0 := by
+    logPartition P β M 𝒥 J = 0 := by
   unfold logPartition
   simp +decide [partitionFunction]
 
 /-- At zero inverse temperature the log-partition function is constant. -/
 theorem logPartition_eq_log_card_of_beta_zero
     {d : Type*} [Fintype d] [DecidableEq d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (𝒥 : ℝ) (hβ : P.β = 0) (J : CouplingSpace P.N P.q) :
-    logPartition P M 𝒥 J = Real.log (Fintype.card d : ℝ) := by
-  have hinv : P.inverseTemperature = 0 := by
-    apply NNReal.eq
-    simp [P.coe_inverseTemperature, hβ]
-  simp [logPartition, hinv]
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ) (hβ : β = 0) (J : CouplingSpace P.N P.q) :
+    logPartition P β M 𝒥 J = Real.log (Fintype.card d : ℝ) := by
+  simp [logPartition, hβ]
 
 /-- At zero inverse temperature every positive-deviation tail event is empty. -/
 theorem logPartition_tail_of_beta_zero
     {d : Type*} [Fintype d] [DecidableEq d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (𝒥 : ℝ) (hβ : P.β = 0) (t : ℝ) (ht : 0 < t) :
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ) (hβ : β = 0) (t : ℝ) (ht : 0 < t) :
     standardGaussianMeasure P.N P.q
-        {J | |logPartition P M 𝒥 J -
-          ∫ K, logPartition P M 𝒥 K
+        {J | |logPartition P β M 𝒥 J -
+          ∫ K, logPartition P β M 𝒥 K
             ∂standardGaussianMeasure P.N P.q| > t} = 0 := by
   let a : ℝ := Real.log (Fintype.card d : ℝ)
-  have hconst : ∀ J : CouplingSpace P.N P.q, logPartition P M 𝒥 J = a :=
-    fun J => logPartition_eq_log_card_of_beta_zero P M 𝒥 hβ J
+  have hconst : ∀ J : CouplingSpace P.N P.q, logPartition P β M 𝒥 J = a :=
+    fun J => logPartition_eq_log_card_of_beta_zero P β M 𝒥 hβ J
   have hintegral :
-      ∫ K, logPartition P M 𝒥 K ∂standardGaussianMeasure P.N P.q = a := by
+      ∫ K, logPartition P β M 𝒥 K ∂standardGaussianMeasure P.N P.q = a := by
     simp only [hconst]
     simp
   have hset :
-      {J : CouplingSpace P.N P.q | |logPartition P M 𝒥 J -
-          ∫ K, logPartition P M 𝒥 K
+      {J : CouplingSpace P.N P.q | |logPartition P β M 𝒥 J -
+          ∫ K, logPartition P β M 𝒥 K
             ∂standardGaussianMeasure P.N P.q| > t} = ∅ := by
     ext J
     simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_lt]
@@ -436,24 +434,24 @@ theorem logPartition_tail_of_beta_zero
 /-- The same estimate for the product standard Gaussian coupling measure. -/
 theorem logPartition_two_sided_tail_standardGaussian
     {d : Type*} [Fintype d] [DecidableEq d]
-    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (𝒥 : ℝ) (h𝒥 : 0 < 𝒥) (hβ : P.β ≠ 0)
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ) (h𝒥 : 0 < 𝒥) (hβ : (β : ℝ) ≠ 0)
     (t : ℝ) (ht : 0 < t) :
     standardGaussianMeasure P.N P.q
-        {J | |logPartition P M 𝒥 J -
-          ∫ K, logPartition P M 𝒥 K
+        {J | |logPartition P β M 𝒥 J -
+          ∫ K, logPartition P β M 𝒥 K
             ∂standardGaussianMeasure P.N P.q| > t} ≤
       ENNReal.ofReal
         (2 * Real.exp
-          (-(P.q : ℝ) * t ^ 2 / (2 * P.β ^ 2 * 𝒥 ^ 2))) := by
+          (-(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2 * 𝒥 ^ 2))) := by
   rcases isEmpty_or_nonempty d with hd | hd
   · -- Empty state space: `logPartition` is identically zero, so the tail set
     -- is empty because `t > 0`.
-    have hconst : ∀ K : CouplingSpace P.N P.q, logPartition P M 𝒥 K = 0 :=
-      fun K => logPartition_eq_zero_of_isEmpty P M 𝒥 K
+    have hconst : ∀ K : CouplingSpace P.N P.q, logPartition P β M 𝒥 K = 0 :=
+      fun K => logPartition_eq_zero_of_isEmpty P β M 𝒥 K
     have hset :
-        {J : CouplingSpace P.N P.q | |logPartition P M 𝒥 J -
-            ∫ K, logPartition P M 𝒥 K
+        {J : CouplingSpace P.N P.q | |logPartition P β M 𝒥 J -
+            ∫ K, logPartition P β M 𝒥 K
               ∂standardGaussianMeasure P.N P.q| > t} = ∅ := by
       ext J
       simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false,
@@ -462,6 +460,6 @@ theorem logPartition_two_sided_tail_standardGaussian
       exact ht.le
     rw [hset]
     simp
-  · exact logPartition_two_sided_tail P M 𝒥 h𝒥 hβ
-      (logPartition_lipschitz P M 𝒥 h𝒥.le) t ht
+  · exact logPartition_two_sided_tail P β M 𝒥 h𝒥 hβ
+      (logPartition_lipschitz P β M 𝒥 h𝒥.le) t ht
 end SYK

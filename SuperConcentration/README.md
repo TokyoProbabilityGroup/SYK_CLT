@@ -10,7 +10,8 @@ indexed by the $q$-element subsets of $\{0,\ldots,N-1\}$.
 The public result is
 `SYK.logPartition_two_sided_tail_standardGaussian` in `Main.lean`.
 Let `P : SYK.Params`, let `M` be a finite-dimensional matrix realization of
-the Majorana relations, and let $\mathcal J>0$, $\beta\ne0$, and $t>0$. Then
+the Majorana relations, let `β : ℝ≥0`, and suppose that
+$\mathcal J>0$, $\beta\ne0$, and $t>0$. Then
 
 $$
 \mathbb P\left(
@@ -20,8 +21,9 @@ $$
 2\exp\left(-\frac{q t^2}{2\beta^2\mathcal J^2}\right).
 $$
 
-Here $\beta=P.\beta$, and the probability and expectation are taken with
-respect to the product standard Gaussian measure on the coupling space.
+The inverse temperature is an explicit argument, and the probability and
+expectation are taken with respect to the product standard Gaussian measure on
+the coupling space.
 
 The normalized Hamiltonian uses
 
@@ -45,10 +47,10 @@ concentration gives the stated tail estimate. In particular, its scale is
 independent of $N$.
 
 The parameter structure `SYK.Params` assumes that $q$ is positive and even,
-$q\le N$, and $\beta\ge0$. The public theorem additionally assumes
-$\mathcal J>0$ and $\beta\ne0$. Empty matrix index types are handled inside
-the theorem. The zero inverse-temperature case $\beta=0$, where the log-partition
-function is constant, is covered separately by
+$q\le N$. The explicit inverse temperature has type `ℝ≥0`, and the public
+theorem additionally assumes $\mathcal J>0$ and $\beta\ne0$. Empty matrix index
+types are handled inside the theorem. The zero inverse-temperature case
+$\beta=0$, where the log-partition function is constant, is covered separately by
 `SYK.logPartition_tail_of_beta_zero`.
 
 All Lean source files in this directory are free of `axiom` declarations and

@@ -131,7 +131,23 @@
 
 ## 段階2：模型の公開 API
 
-- [ ] 逆温度を模型パラメータから削除し、解析には `z : ℂ`、物理的な定理には `β : ℝ≥0` を明示引数として渡す。
+- [x] 逆温度を模型パラメータから削除し、解析には `z : ℂ`、物理的な定理には `β : ℝ≥0` を明示引数として渡す。
+  - `Params` から `β`・`β_nonneg` を削除し、`Params.inverseTemperature` と
+    その型変換補題も削除した。模型パラメータは `N`・`q` と許容条件だけを持つ。
+  - `gibbsOperator` と現段階の非規格化 `partitionFunction` は `z : ℂ` を
+    直接受ける。正値性、熱平衡密度行列、Gibbs 期待値、および
+    `SuperConcentration` の物理的結果には `β : ℝ≥0` を明示的に渡す。
+  - `SuperConcentration/Main.lean` の分配関数の対数、微分、リプシッツ定数、
+    裾評価を新しい引数に移行した。定数と非規格化トレースは変更していない。
+  - 移行対象外の `Annealed_FE/main_result.lean` は編集せず、旧 `Params` の
+    `β_nonneg` フィールド指定が使えなくなった状態を既知の破損として残した。
+  - 変更した Lean ファイルを個別に検査し、`lake build Model SuperConcentration`
+    を成功として完了した。主要定理の `#print axioms` は従来どおり
+    `propext`、`Classical.choice`、`Quot.sound` だけを表示した。
+    `lake build` と `lake exe vbp build` は、移行対象外の
+    `Annealed_FE/main_result.lean` が削除済みの `Params.β`・`Params.β_nonneg` を
+    指定する既知の2エラーだけで失敗した。後者が成果物を生成できなかったため、
+    `lake exe vbp check` は Blueprint manifest がないことを報告した。
 - [ ] `rawPartitionFunction`、`normalizedTrace`、規格化された `partitionFunction` を定義し、`partitionFunction z H = rawPartitionFunction z H / card d` と `Z(0)=1` を証明する。
 - [ ] 行列指数関数の規格化トレースを指数前の行列から定義し、複素分配関数をその特殊な場合にする。
 - [ ] 整関数性と複素微分を証明し、対数微分には `Z z ≠ 0` を明示する。

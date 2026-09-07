@@ -8,10 +8,11 @@ import Mathlib.LinearAlgebra.Matrix.Trace
 /-!
 # Finite-dimensional Gibbs states and trace-exponential calculus
 
-This module collects density matrices and their expectations, Gibbs states at
-nonnegative real inverse temperature, and the real derivative of the trace of
-an affine matrix exponential. These constructions depend only on
-finite-dimensional complex matrices, not on the SYK model parameters.
+This module collects density matrices and their expectations, the trace of a
+matrix exponential at complex inverse temperature, Gibbs states at nonnegative
+real inverse temperature, and the real derivative of the trace of an affine
+matrix exponential. These constructions depend only on finite-dimensional
+complex matrices, not on the SYK model parameters.
 -/
 
 open scoped BigOperators ComplexOrder ENNReal NNReal
@@ -102,21 +103,22 @@ theorem density_variance_nonneg
   norm_num [Complex.mul_re, pow_two] at htrace'
   nlinarith
 
-/-! ## Gibbs states at nonnegative real inverse temperature -/
+/-! ## Complex inverse temperature and physical Gibbs states -/
 
 section PhysicalGibbs
 
-/-- The unnormalized Gibbs operator `exp (-β H)`. -/
-noncomputable def gibbsOperator (β : NNReal) (H : Matrix d d ℂ) : Matrix d d ℂ :=
-  NormedSpace.exp (-((β : ℝ) : ℂ) • H)
+/-- The matrix exponential `exp (-z H)` at complex inverse temperature `z`. -/
+noncomputable def gibbsOperator (z : ℂ) (H : Matrix d d ℂ) : Matrix d d ℂ :=
+  NormedSpace.exp (-z • H)
 
-/-- The finite-dimensional partition function `Tr (exp (-β H))`. -/
-noncomputable def partitionFunction (β : NNReal) (H : Matrix d d ℂ) : ℂ :=
-  Matrix.trace (gibbsOperator β H)
+/-- The finite-dimensional partition function `Tr (exp (-z H))`. -/
+noncomputable def partitionFunction (z : ℂ) (H : Matrix d d ℂ) : ℂ :=
+  Matrix.trace (gibbsOperator z H)
 
 /-- Thermal expectation of an observable in the Gibbs state. -/
 noncomputable def gibbsState (β : NNReal) (H O : Matrix d d ℂ) : ℂ :=
-  Matrix.trace (O * gibbsOperator β H) / partitionFunction β H
+  Matrix.trace (O * gibbsOperator (β : ℂ) H) /
+    partitionFunction (β : ℂ) H
 
 @[simp]
 theorem gibbsOperator_zero (H : Matrix d d ℂ) :
@@ -131,10 +133,11 @@ theorem partitionFunction_zero (H : Matrix d d ℂ) :
 /-- The normalized Gibbs matrix, using the real positive partition function. -/
 noncomputable def thermalDensity (β : NNReal) (H : Matrix d d ℂ) :
     Matrix d d ℂ :=
-  ((partitionFunction β H).re⁻¹ : ℝ) • gibbsOperator β H
+  ((partitionFunction (β : ℂ) H).re⁻¹ : ℝ) •
+    gibbsOperator (β : ℂ) H
 
 theorem gibbsOperator_posDef (β : NNReal) {H : Matrix d d ℂ}
-    (hH : star H = H) : (gibbsOperator β H).PosDef := by
+    (hH : star H = H) : (gibbsOperator (β : ℂ) H).PosDef := by
   let A : Matrix d d ℂ := -((β : ℝ) : ℂ) • H
   have hA : star A = A := by
     simp [A, hH]
@@ -160,8 +163,8 @@ theorem gibbsOperator_posDef (β : NNReal) {H : Matrix d d ℂ}
 
 theorem partitionFunction_star_eq (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) :
-    star (partitionFunction β H) = partitionFunction β H := by
-  have hG : star (gibbsOperator β H) = gibbsOperator β H :=
+    star (partitionFunction (β : ℂ) H) = partitionFunction (β : ℂ) H := by
+  have hG : star (gibbsOperator (β : ℂ) H) = gibbsOperator (β : ℂ) H :=
     (gibbsOperator_posDef β hH).isHermitian.eq
   change star (Matrix.trace (gibbsOperator β H)) =
     Matrix.trace (gibbsOperator β H)
@@ -170,19 +173,19 @@ theorem partitionFunction_star_eq (β : NNReal) {H : Matrix d d ℂ}
   rw [hG]
 
 theorem partitionFunction_im_eq_zero (β : NNReal) {H : Matrix d d ℂ}
-    (hH : star H = H) : (partitionFunction β H).im = 0 :=
+    (hH : star H = H) : (partitionFunction (β : ℂ) H).im = 0 :=
   Complex.conj_eq_iff_im.mp (partitionFunction_star_eq β hH)
 
 theorem partitionFunction_eq_ofReal_re (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) :
-    ((partitionFunction β H).re : ℂ) = partitionFunction β H := by
+    ((partitionFunction (β : ℂ) H).re : ℂ) = partitionFunction (β : ℂ) H := by
   apply Complex.ext
   · simp
   · simp [partitionFunction_im_eq_zero β hH]
 
 theorem partitionFunction_pos [Nonempty d] (β : NNReal)
     {H : Matrix d d ℂ} (hH : star H = H) :
-    0 < (partitionFunction β H).re := by
+    0 < (partitionFunction (β : ℂ) H).re := by
   have h := (gibbsOperator_posDef β hH).trace_pos
   exact (RCLike.pos_iff.mp h).1
 
@@ -193,8 +196,8 @@ theorem thermalDensity_isDensityMatrix [Nonempty d] (β : NNReal)
   constructor
   · exact ((gibbsOperator_posDef β hH).smul (inv_pos.mpr hZ)).posSemidef
   · rw [thermalDensity, Matrix.trace_smul]
-    change (((partitionFunction β H).re⁻¹ : ℝ) : ℂ) *
-        partitionFunction β H = 1
+    change (((partitionFunction (β : ℂ) H).re⁻¹ : ℝ) : ℂ) *
+        partitionFunction (β : ℂ) H = 1
     have hreal := partitionFunction_eq_ofReal_re β hH
     rw [← hreal]
     simp only [Complex.ofReal_re]
@@ -207,9 +210,10 @@ theorem gibbsState_eq_expectation_thermalDensity [Nonempty d]
   have hreal := partitionFunction_eq_ofReal_re β hH
   rw [gibbsState, expectation, thermalDensity, Matrix.smul_mul,
     Matrix.trace_smul]
-  change Matrix.trace (O * gibbsOperator β H) / partitionFunction β H =
-    (((partitionFunction β H).re⁻¹ : ℝ) : ℂ) *
-      Matrix.trace (gibbsOperator β H * O)
+  change Matrix.trace (O * gibbsOperator (β : ℂ) H) /
+      partitionFunction (β : ℂ) H =
+    (((partitionFunction (β : ℂ) H).re⁻¹ : ℝ) : ℂ) *
+      Matrix.trace (gibbsOperator (β : ℂ) H * O)
   rw [← hreal]
   simp only [Complex.ofReal_re]
   field_simp
