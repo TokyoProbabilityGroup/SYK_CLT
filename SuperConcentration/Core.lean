@@ -198,28 +198,6 @@ theorem psiProduct_star_mul_self (s : InteractionIndex N q) :
   apply M.star_listProduct_mul_self
   simp [orderedIndices]
 
-private theorem star_phase_mul_sign' (q : ℕ) :
-    star (phase q) * ((-1 : ℂ) ^ (q / 2)) = phase q := by
-  change star (Complex.I ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2)) =
-    Complex.I ^ (q / 2)
-  rw [star_pow, Complex.star_def, Complex.conj_I, neg_pow]
-  have hsign :
-      ((-1 : ℂ) ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2)) = 1 := by
-    rw [← mul_pow]
-    simp
-  calc
-    ((-1 : ℂ) ^ (q / 2) * Complex.I ^ (q / 2)) *
-        ((-1 : ℂ) ^ (q / 2)) =
-      (((-1 : ℂ) ^ (q / 2)) * ((-1 : ℂ) ^ (q / 2))) *
-        Complex.I ^ (q / 2) := by ring
-    _ = Complex.I ^ (q / 2) := by rw [hsign, one_mul]
-
-theorem interactionOperator_star
-    (hq : Even q) (s : InteractionIndex N q) :
-    star (M.interactionOperator s) = M.interactionOperator s := by
-  rw [interactionOperator, star_smul, M.star_psiProduct_of_even s hq,
-    smul_smul, star_phase_mul_sign']
-
 theorem interactionOperator_sq
     (hq : Even q) (s : InteractionIndex N q) :
     M.interactionOperator s * M.interactionOperator s = 1 := by

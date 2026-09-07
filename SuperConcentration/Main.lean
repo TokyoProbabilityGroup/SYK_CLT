@@ -50,10 +50,10 @@ theorem normalizedHamiltonian_affine
   rw [Finset.smul_sum, ← Finset.sum_add_distrib]
   apply Finset.sum_congr rfl
   intro I _hI
-  change (((couplingScale P 𝒥 * (J I + s * V I) : ℝ) : ℂ) * phase P.q) •
-      M.psiProduct I =
-    ((((couplingScale P 𝒥 * J I : ℝ) : ℂ) * phase P.q) • M.psiProduct I) +
-      s • ((((couplingScale P 𝒥 * V I : ℝ) : ℂ) * phase P.q) • M.psiProduct I)
+  change ((couplingScale P 𝒥 * (J I + s * V I) : ℝ) : ℂ) •
+      M.interactionOperator I =
+    ((couplingScale P 𝒥 * J I : ℝ) : ℂ) • M.interactionOperator I +
+      s • (((couplingScale P 𝒥 * V I : ℝ) : ℂ) • M.interactionOperator I)
   rw [← smul_assoc, ← add_smul]
   congr 1
   rw [Complex.real_smul]
@@ -226,7 +226,7 @@ theorem abs_beta_expectation_normHam_sq_le_exact
         c * ∑ I : InteractionIndex P.N P.q,
           V I * (expectation ρ (M.interactionOperator I)).re := by
     unfold normalizedHamiltonian expectation
-    simp +decide [hamiltonian, mul_assoc, mul_left_comm, Finset.mul_sum _ _ _]
+    simp +decide [hamiltonian, mul_assoc, Finset.mul_sum _ _ _]
     simp +decide [phase, MajoranaSystem.interactionOperator]
     exact Finset.sum_congr rfl fun _ _ => by ring
   have hlinear :

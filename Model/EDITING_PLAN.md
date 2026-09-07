@@ -94,7 +94,15 @@
   - `GaussianDisorder.lean` には相互作用係数空間、その次元、および標準
     ガウス測度を置いた。`lake build Model SuperConcentration` により移設後の
     依存関係を検査した。
-- [ ] 相互作用の添字、昇順積、位相、位相付き相互作用演算子、確定的なハミルトニアンを一つの定義系列に統一する。
+- [x] 相互作用の添字、昇順積、位相、位相付き相互作用演算子、確定的なハミルトニアンを一つの定義系列に統一する。
+  - `InteractionIndex` と `orderedIndices` から `MajoranaSystem.psiProduct`、
+    `phase`、`MajoranaSystem.interactionOperator` を順に定め、確定的な
+    `hamiltonian` を実係数による相互作用演算子の有限和として定義した。
+    これは従来の `((J I : ℂ) * phase q) • psiProduct I` という各項の展開と
+    同じ規格化である。
+  - 相互作用演算子の自己共役性を `Model.Majorana` に置き、ハミルトニアンの
+    自己共役性を各項の自己共役性から証明する依存関係に改めた。利用側の
+    `normalizedHamiltonian_affine` も相互作用演算子を用いる証明へ更新した。
 - [ ] `IsDensityMatrix`、`expectation`、行列指数関数のトレース微分、物理的な Gibbs 状態を `Model.FiniteDimensionalGibbs` に集約する。
 - [ ] 位相・積・可積分性・型変換の重複を一つの補題群ずつ整理する。広範な証明探索に依存する既存部分は、同じ数学的役割を保つ明示的な証明へ置き換える。
 

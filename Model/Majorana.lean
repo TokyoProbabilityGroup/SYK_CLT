@@ -121,11 +121,14 @@ end MajoranaSystem
 /-- The phase used for an even `q`. -/
 def phase (q : ℕ) : ℂ := Complex.I ^ (q / 2)
 
+namespace MajoranaSystem
+
+variable {N q : ℕ} {A : Type*}
+  [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
+  (M : MajoranaSystem N A)
+
 /-- A phase-corrected Majorana interaction observable. -/
-noncomputable def MajoranaSystem.interactionOperator
-    {N q : ℕ} {A : Type*}
-    [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
-    (M : MajoranaSystem N A) (s : InteractionIndex N q) : A :=
+noncomputable def interactionOperator (s : InteractionIndex N q) : A :=
   phase q • M.psiProduct s
 
 private theorem star_phase_mul_sign (q : ℕ) :
@@ -144,24 +147,20 @@ private theorem star_phase_mul_sign (q : ℕ) :
           Complex.I ^ (q / 2) := by ring
     _ = Complex.I ^ (q / 2) := by rw [hsign, one_mul]
 
-private theorem star_coupling_mul_sign (r : ℝ) (q : ℕ) :
-    star (((r : ℝ) : ℂ) * phase q) * ((-1 : ℂ) ^ (q / 2)) =
-      ((r : ℝ) : ℂ) * phase q := by
-  rw [star_mul]
-  have hr : star (((r : ℝ) : ℂ)) = ((r : ℝ) : ℂ) := by
-    simp
-  rw [hr]
-  calc
-    (star (phase q) * (r : ℂ)) * ((-1 : ℂ) ^ (q / 2)) =
-        (r : ℂ) * (star (phase q) * ((-1 : ℂ) ^ (q / 2))) := by ring
-    _ = (r : ℂ) * phase q := by rw [star_phase_mul_sign]
+theorem interactionOperator_star
+    (hq : Even q) (s : InteractionIndex N q) :
+    star (M.interactionOperator s) = M.interactionOperator s := by
+  rw [interactionOperator, star_smul, M.star_psiProduct_of_even s hq,
+    smul_smul, star_phase_mul_sign]
+
+end MajoranaSystem
 
 /-- The deterministic SYK Hamiltonian associated to real couplings `J`. -/
 noncomputable def hamiltonian
     {A : Type*} [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
     (P : Params) (M : MajoranaSystem P.N A)
     (J : InteractionIndex P.N P.q → ℝ) : A :=
-  ∑ s, (((J s : ℝ) : ℂ) * phase P.q) • M.psiProduct s
+  ∑ s, ((J s : ℝ) : ℂ) • M.interactionOperator s
 
 /-- The even-`q` phase makes the deterministic SYK Hamiltonian self-adjoint. -/
 theorem hamiltonian_self_adjoint
@@ -173,7 +172,7 @@ theorem hamiltonian_self_adjoint
   rw [hamiltonian, star_sum]
   apply Finset.sum_congr rfl
   intro s _
-  rw [star_smul, M.star_psiProduct_of_even s P.q_even, smul_smul,
-    star_coupling_mul_sign]
+  rw [star_smul, M.interactionOperator_star P.q_even]
+  simp
 
 end SYK
