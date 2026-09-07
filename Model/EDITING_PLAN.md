@@ -103,7 +103,14 @@
   - 相互作用演算子の自己共役性を `Model.Majorana` に置き、ハミルトニアンの
     自己共役性を各項の自己共役性から証明する依存関係に改めた。利用側の
     `normalizedHamiltonian_affine` も相互作用演算子を用いる証明へ更新した。
-- [ ] `IsDensityMatrix`、`expectation`、行列指数関数のトレース微分、物理的な Gibbs 状態を `Model.FiniteDimensionalGibbs` に集約する。
+- [x] `IsDensityMatrix`、`expectation`、行列指数関数のトレース微分、物理的な Gibbs 状態を `Model.FiniteDimensionalGibbs` に集約する。
+  - 密度行列と期待値、非負実逆温度の Gibbs 演算子・分配関数・熱平衡
+    密度行列、およびアフィンな行列指数関数のトレース微分を、同ファイル内の
+    三つの節として整理した。共有宣言が `SuperConcentration` 側に重複して
+    いないことも全利用箇所の検索で確認した。
+  - この層は SYK の模型パラメータを使わないため、`Model.Definitions` への
+    不要な依存を除いた。`Model` と `SuperConcentration` のビルド、および
+    主要定理の公理依存を移行後の配置で検査した。
 - [ ] 位相・積・可積分性・型変換の重複を一つの補題群ずつ整理する。広範な証明探索に依存する既存部分は、同じ数学的役割を保つ明示的な証明へ置き換える。
 
 ## 段階2：模型の公開 API
