@@ -22,10 +22,12 @@ F01–F08・Z01 の後続課題では、実装される主要宣言が確定し�
 
 変更した章をワークスペースのルートから `lake env lean` で個別に検査する。上流の変更が統合された後、`lake exe vbp build` と `lake exe vbp check` で生成と参照の整合性を確認する。章を並行して編集しても、統合検証の担当は一人とする。
 
-対象コミット・差分、コマンド、結果、警告、未解決の参照をこの節に記録する。`Annealed_FE` の既知の失敗によって生成できない場合も成功とは記録せず、個別検査と全体生成のどこまで確認できたかを報告する。
+対象コミット・差分、コマンド、結果、警告、未解決の参照をこの節に記録する。`Annealed_FE` と `Universality` は既定ビルドから一時的に除外されているため、その成功を両ライブラリの検証結果として扱わない。既定範囲については Blueprint の生成と参照検査の成功を必要とする。
 
 2026-09-08 の文書再構成では章の Lean ソースを編集しておらず、Blueprint の生成・参照検査も再実行していない。
 
 W01 では `Model.lean` を個別に検査し、追加した3項目を含めて受理された。既存の `Params` と `MajoranaSystem` のフィールドにドキュメント文字列がないという warning は残る。`lake exe vbp build` は、編集対象外の `Annealed_FE` が旧 `Params.β`・`Params.β_nonneg` を参照する既知の2エラーで失敗した。生成物がないため `lake exe vbp check` も manifest 不在を報告した。いずれも成功とは記録しない。詳細は Model の W01 の検証記録を参照する。
 
 SuperConcentration の移行前基準では、`lake env lean SYK/Chapters/SuperConcentration.lean` が warning なしで成功した。`lake exe vbp build` は `SYK.Chapters.SuperConcentration` と `SYK.Blueprint` の構築には成功したが、その後、編集対象外の `Annealed_FE/main_result.lean` に残る旧 `Params.β`・`Params.β_nonneg` 参照の2エラーで全体として失敗した。`lake exe vbp check` は生成されなかった manifest の不在を報告したため、全体の生成・参照検査は未完了である。
+
+2026-09-08 に `Annealed_FE` と `Universality` を既定ビルドから一時除外した後、`lake exe vbp build` と `lake exe vbp check` は成功した。manifest と HTML cache は各50件で整合した。既存の宣言に対するドキュメント文字列の warning と VersoBlueprint の universe に関する warning は残る。

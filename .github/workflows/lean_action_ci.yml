@@ -32,7 +32,9 @@ jobs:
       - uses: leanprover/lean-action@v1
         with:
           use-github-cache: false
-          build-args: "Model SuperConcentration"
+          # Restore this full target list when the two inactive libraries are ready:
+          # build-args: "Model SuperConcentration CLT Annealed_FE Universality"
+          build-args: "Model SuperConcentration CLT"
 
       - name: Build Blueprint site
         run: lake exe vbp build

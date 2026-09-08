@@ -22,10 +22,10 @@ jobs:
       - name: Compile LaTeX documents
         uses: xu-cheng/latex-action@v4
         with:
-          root_file: |
-            CLT/refs/CLT_SYK.tex
+          root_file: CLT/refs/CLT_SYK.tex
+          work_in_root_file_dir: true
       - name: Upload PDF files
         uses: actions/upload-artifact@v7
         with:
-          path: CLT_SYK.pdf
+          path: CLT/refs/CLT_SYK.pdf
           archive: false

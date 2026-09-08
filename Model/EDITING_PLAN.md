@@ -78,7 +78,7 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 
 - W02 の汎用証明は [Probability/GaussianConcentration の計画](../Probability/GaussianConcentration/EDITING_PLAN.md)、旧配置・利用側の移行と W05 は [SuperConcentration の計画](../SuperConcentration/EDITING_PLAN.md) が管理する。
 - 旧段階2にあった CLT 固有の規格化分配関数は、標準表現と集中不等式の再設計後に行う [W06](../CLT/EDITING_PLAN.md#w06) へ移した。`Z(0)=1` と共有分配関数との対応はそこで証明する。
-- `Annealed_FE` は編集せず、各単位の検証で既知の破損と新規エラーを切り分ける。
+- `Annealed_FE` は編集せず、既知の破損を履歴に残す。現在の既定ビルドには含まれないため、その成功を同ライブラリの検証結果として扱わない。
 - Blueprint の編集細目は [Chapters の計画](../Chapters/EDITING_PLAN.md) が管理する。全体計画に従い、対応する実装単位内で完了する。
 
 <a id="z01"></a>
@@ -99,7 +99,7 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 
 変更ファイルを個別に `lake env lean` で検査し、`lake build Model` と移行済み利用側の最小ビルドを行う。Model と集中不等式の接続を変更した単位では `lake build Model SuperConcentration` を実行する。重要な定理では `#print axioms` と定理文の仮定を確認する。
 
-ワークスペース全体に影響する変更では `lake build`、Blueprint の変更では `lake exe vbp build` と `lake exe vbp check` を実行する。許容済みの失敗は未移行の `Annealed_FE` に限る。そこから生じる Blueprint 生成不能も成功とは記録せず、どこまで確認できたかを報告する。新規の `sorry`、`admit`、`axiom`、未解決の証明目標は許容しない。
+ワークスペース全体に影響する変更では `lake build`、Blueprint の変更では `lake exe vbp build` と `lake exe vbp check` を実行する。現在の既定ビルドから除外されている `Annealed_FE` と `Universality` は個別に検証済みとは扱わない。既定範囲のビルドと Blueprint の生成・参照検査には成功を必要とし、新規の `sorry`、`admit`、`axiom`、未解決の証明目標は許容しない。
 
 検証記録には対象コミット・差分、コマンド、結果、警告、公理依存、残る仮定を記す。新しい検証結果は該当単位の節に追記し、過去の成功を変更後の成功として転記しない。
 
