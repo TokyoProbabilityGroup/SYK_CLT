@@ -9,6 +9,7 @@
 ## 各章の編集細目
 
 - [x] W01：`Model.lean` に整関数性・複素微分・条件付き対数微分の主要宣言と依存関係を反映した。非零性の仮定を、零点のない領域の証明と混同していない。
+- [x] SuperConcentration の移行前基準：`SuperConcentration.lean` に、一般スケール `𝒥` を含む現行実装の定義、二乗和評価、方向微分、勾配評価、Lipschitz 評価、逆温度が零の場合分け、両側集中不等式を記録した。主張の依存関係と証明だけで使う依存関係を分け、未実装の模型固有 MGF・片側評価を実装済みとして扱っていない。
 - [ ] W02：`GaussianConcentration.lean` の import と宣言参照を独立した汎用基盤へ切り替え、MGF・裾の定数と `L=0` の扱いを上流の定理に合わせる。
 - [ ] W03：`Model.lean` と必要な `SuperConcentration.lean` の説明を共有の標準ハミルトニアンに合わせ、一般スケールを含む旧基本 API の参照を残さない。
 - [ ] W04：`Model.lean` に標準表現・次元・基本関係・トレース直交性の主要宣言を反映する。抽象的な系の性質と具体的な表現の性質を区別する。
@@ -26,3 +27,5 @@ F01–F08・Z01 の後続課題では、実装される主要宣言が確定し�
 2026-09-08 の文書再構成では章の Lean ソースを編集しておらず、Blueprint の生成・参照検査も再実行していない。
 
 W01 では `Model.lean` を個別に検査し、追加した3項目を含めて受理された。既存の `Params` と `MajoranaSystem` のフィールドにドキュメント文字列がないという warning は残る。`lake exe vbp build` は、編集対象外の `Annealed_FE` が旧 `Params.β`・`Params.β_nonneg` を参照する既知の2エラーで失敗した。生成物がないため `lake exe vbp check` も manifest 不在を報告した。いずれも成功とは記録しない。詳細は Model の W01 の検証記録を参照する。
+
+SuperConcentration の移行前基準では、`lake env lean SYK/Chapters/SuperConcentration.lean` が warning なしで成功した。`lake exe vbp build` は `SYK.Chapters.SuperConcentration` と `SYK.Blueprint` の構築には成功したが、その後、編集対象外の `Annealed_FE/main_result.lean` に残る旧 `Params.β`・`Params.β_nonneg` 参照の2エラーで全体として失敗した。`lake exe vbp check` は生成されなかった manifest の不在を報告したため、全体の生成・参照検査は未完了である。

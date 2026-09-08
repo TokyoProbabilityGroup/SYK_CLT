@@ -41,7 +41,7 @@
 
 全 W 単位には、対応する [Blueprint の編集](Chapters/EDITING_PLAN.md) と必要な統合検証も含む。
 
-W01 の「未着手」は残っている仕上げ作業についての状態であり、複素微分の証明を作り直す意味ではない。既存の関連ビルド・Blueprint 検証と今回の追加後の検証を混同しない。
+W01 の検証結果と Blueprint 全体生成に残る既知の失敗は、[Model の検証記録](Model/EDITING_PLAN.md#w01) と [Chapters の検証記録](Chapters/EDITING_PLAN.md#検証と記録) を参照する。
 
 W03 を W02 の後に置くのは、ガウス測度の共有方法と `SuperConcentration/Main.lean` の移行を競合させないためであり、数学的な必須順序ではない。W05 は標準表現ではなく抽象的な `MajoranaSystem` を使うので、W04 の完了を待つ必要はない。W06 は共有模型と集中不等式の再設計を完了してから行う。
 
