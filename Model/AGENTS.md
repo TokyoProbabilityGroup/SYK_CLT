@@ -49,4 +49,4 @@
 
 ## 検証
 
-変更した各 Lean ファイルをワークスペースのルートから `lake env lean` で検査し、続いて `lake build Model` と移行済みの利用側の最小のビルド対象を実行する。ワークスペース全体に影響する変更では `lake build` も実行し、`Annealed_FE` に限定された既知の失敗と、許容されない新規エラーを区別して報告する。重要な定理では `#print axioms` を確認する。
+変更した各 Lean ファイルをワークスペースのルートから `lake env lean` で検査し、続いて `lake build Model` と移行済みの利用側の最小のビルド対象を実行する。ワークスペース全体に影響する変更では `lake build` も実行する。現在の既定ビルドから一時的に除外されている `Annealed_FE` と `Universality` は個別に検証済みとは扱わず、その状態は `../EDITING_PLAN.md` に従って報告する。重要な定理では `#print axioms` を確認する。

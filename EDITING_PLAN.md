@@ -41,7 +41,7 @@
 
 全 W 単位には、対応する [Blueprint の編集](Chapters/EDITING_PLAN.md) と必要な統合検証も含む。
 
-W01 の検証結果と Blueprint 全体生成に残る既知の失敗は、[Model の検証記録](Model/EDITING_PLAN.md#w01) と [Chapters の検証記録](Chapters/EDITING_PLAN.md#検証と記録) を参照する。
+W01 当時の検証結果と Blueprint 全体生成の失敗は、[Model の検証記録](Model/EDITING_PLAN.md#w01) と [Chapters の検証記録](Chapters/EDITING_PLAN.md#検証と記録) に履歴として残す。現在の既定ビルド範囲は、この文書の「完了とコミットの区切り」に記す。
 
 W03 を W02 の後に置くのは、ガウス測度の共有方法と `SuperConcentration/Main.lean` の移行を競合させないためであり、数学的な必須順序ではない。W05 は標準表現ではなく抽象的な `MajoranaSystem` を使うので、W04 の完了を待つ必要はない。W06 は共有模型と集中不等式の再設計を完了してから行う。
 
@@ -122,7 +122,11 @@ W02 では「汎用基盤の構成 → Model の測度接続 → 利用側の im
 
 Lean の実装単位は、変更ファイルの個別検査、関連する最小ビルド、主要定理の公理依存・残る仮定の確認、差分確認、必要な文書・Blueprint 更新までを含む。全体の完了は、関係するすべての詳細計画の担当部分と統合検証が揃ってから判定する。正確なコマンドと例外は各作業の `AGENTS.md` と詳細計画に従う。原稿監査は数学的な確認とコンパイル結果を記録し、Lean による検証と区別する。
 
-`Annealed_FE` は移行対象外のままとする。許容済みの既知の失敗は検証記録に明示し、それ以外の新規エラーを許容しない。Blueprint の生成などが既知の失敗で実行できない場合も成功とは記録せず、対象単位で必要な更新・試行・失敗の切り分けを行う。
+`Annealed_FE` と `Universality` は Lake の独立したライブラリ登録を維持しつつ、ルートモジュールと CI の既定ビルドから一時的に除外する。`Annealed_FE` は共有 API への移行と個別ビルド、`Universality` は実装と個別ビルドが完了した後、それぞれの import と CI の対象を復帰させる。復帰後は `lake build`、`lake exe vbp build`、`lake exe vbp check` を再実行する。
+
+除外中の `lake build` と CI の成功は両ライブラリの検証を意味しない。`Annealed_FE` の既知のエラーと未完成の証明は検証記録に残し、既定範囲に新しいエラーや未完成の証明を許容しない。Blueprint は除外中のライブラリに阻害されないため、対象単位の完了には生成と参照検査の成功を必要とする。公開 README は全ライブラリを既定ビルドへ戻した将来の運用を記しており、この暫定状態に合わせて変更しない。
+
+2026-09-08 に両ライブラリを一時除外し、`lake env lean SYK.lean`、`lake build Model SuperConcentration CLT`、`lake build`、`lake exe vbp build`、`lake exe vbp check` が成功した。Blueprint の manifest と HTML cache は各50件で整合した。Model・SuperConcentration・Chapters と VersoBlueprint には既存の linter warning が残るが、エラー、未解決の証明目標、および既定範囲の `sorry`・`admit`・`axiom` は検出されなかった。
 
 一単位を原則一コミット候補とし、独立して検証できる成果が複数ある場合だけ分割する。例えば W04 は「標準表現と基本関係」「トレース直交性」で分けられるが、ユーザーへの指示単位は W04 のままでよい。W02 でも依存層ごとの検証を行うが、検証のたびに作業を終了しない。
 
