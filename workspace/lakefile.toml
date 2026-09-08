@@ -8,6 +8,12 @@ pp.unicode.fun = true # pretty-prints `fun a ↦ b`
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
+experimental.module = true
+
+[[require]]
+name = "VersoBlueprint"
+git = "https://github.com/leanprover/verso-blueprint"
+rev = "v4.32.0"
 
 [[require]]
 name = "mathlib"
@@ -26,20 +32,12 @@ name = "CLT"
 globs = ["SYK.CLT.+"]
 
 [[lean_lib]]
-name = "GibbsMeasure"
-globs = ["SYK.GibbsMeasure.+"]
+name = "SuperConcentration"
+globs = ["SYK.SuperConcentration.+"]
 
 [[lean_lib]]
-name = "SpinGlass"
-globs = ["SYK.SpinGlass.+"]
-
-[[lean_lib]]
-name = "super_concentration"
-globs = ["SYK.super_concentration.+"]
-
-[[lean_lib]]
-name = "SYK_model"
-globs = ["SYK.SYK_model.+"]
+name = "Model"
+globs = ["SYK.Model.+"]
 
 [[lean_lib]]
 name = "Universality"

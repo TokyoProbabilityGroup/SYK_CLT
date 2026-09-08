@@ -1,4 +1,5 @@
-import SYK.SYK_model.model
+import SYK.Model.FiniteDimensionalGibbs
+import SYK.Model.Majorana
 import Mathlib.Analysis.CStarAlgebra.Classes
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.MeasureTheory.Integral.Bochner.Basic
@@ -10,7 +11,7 @@ set_option autoImplicit false
 # Annealed SYK free-energy limit
 
 This file gives a paper-facing adapter for the definitions in
-`SYK.SYK_model.model` and states the main result of `refs/SYK-HT-arxiv.tex`.
+`SYK.Model.Definitions` and states the main result of `refs/SYK-HT-arxiv.tex`.
 All unfinished mathematical arguments occur in theorem proofs. Every
 definition has a complete defining term.
 

@@ -1,0 +1,517 @@
+\documentclass[../CLT_SYK.tex]{subfiles}
+\setcounter{section}{2}
+
+\begin{document}
+
+\section{Proof of the main results}
+
+\subsection{Annealed free energy and coefficient asymptotics}
+
+To identify the deterministic coefficient $A_N(\beta)$ in
+\eqref{eq:finite-N-FTW-coefficient}, we use the annealed free-energy limit
+from \cite{GPSZ2026}.  The required convergence of derivatives follows from
+convexity and is not an additional input.
+
+\begin{lemma} \label{lem:convex-derivatives}
+Let $I\subset\mathbb R$ be open.  Suppose that $h_N:I\to\mathbb R$ are finite,
+differentiable, convex functions and $h_N(x)\to h(x)$ pointwise, where
+$h\in C^1(I)$.  Then $h_N\to h$ and $h_N'\to h'$ locally uniformly on $I$.
+\end{lemma}
+
+\begin{proof}
+Fix a compact interval $[a,b]\subset I$ and choose $u<a<b<v$ in $I$.
+Monotonicity of secant slopes bounds every secant slope of $h_N$ on $[a,b]$
+between quantities formed from $h_N(u),h_N(a),h_N(b),h_N(v)$.  These
+endpoint values converge, so the functions $h_N$ are equi-Lipschitz on
+$[a,b]$.  Pointwise convergence on a finite mesh, followed by mesh
+refinement, gives uniform convergence there.
+
+For $x\in I$ and sufficiently small $s>0$, convexity gives
+\[
+  \frac{h_N(x)-h_N(x-s)}s
+  \leq h_N'(x)\leq
+  \frac{h_N(x+s)-h_N(x)}s.
+\]
+First let $N\to\infty$ and then $s\downarrow0$ to obtain
+$h_N'(x)\to h'(x)$.  Finally, $h_N'$ are nondecreasing.  On a fine partition
+of $[a,b]$, monotonicity traps $h_N'(x)$ between its values at adjacent mesh
+points, while uniform continuity traps $h'(x)$ between the corresponding
+values of $h'$.  Pointwise convergence at the finitely many mesh points then
+gives uniform convergence of the derivatives.
+\end{proof}
+
+\begin{proposition}
+\label{prop:annealed-free-energy}
+There are $\beta_{\rm FE}=\beta_{\rm FE}(q)>0$ and an even real-analytic
+function $\ell_q$ on $(-\beta_{\rm FE},\beta_{\rm FE})$ such that, locally
+uniformly on this interval,
+\begin{align}
+  \frac1N\log \mathbb E Z_N(\beta)&\longrightarrow\ell_q(\beta),
+  \label{eq:annealed-free-energy-limit}\\
+  \frac1N\partial_\beta\log \mathbb E Z_N(\beta)&\longrightarrow\ell_q'(\beta).
+  \label{eq:annealed-derivative-limit}
+\end{align}
+Moreover,
+\begin{equation}\label{eq:ell-small-beta}
+  \ell_q(\beta)=\frac{\beta^2}{2q}+O(\beta^4),
+  \qquad
+  \ell_q'(\beta)=\frac\beta q+O(\beta^3).
+\end{equation}
+In paritcular, $\ell'(\beta)>0$, for every sufficiently
+small real $\beta\neq0$.
+
+\end{proposition}
+
+
+\begin{proof}
+The pointwise convergence in \eqref{eq:annealed-free-energy-limit} is Theorem
+5 of \cite{GPSZ2026}, together with the Gaussian extension stated there.  That
+extension invokes the Gaussian--Rademacher universality result
+\cite{AGK2025}. 
+
+We first record the normalization conversion.  The
+Majoranas of \cite{GPSZ2026} satisfy
+\[
+  \psi_i^{\rm GPSZ}=2^{-1/2}\psi_i,
+  \qquad
+  H_N^{\rm GPSZ}=2^{-q/2}H_N.
+\]
+Set $u=2^{q/2}\beta$.  Gaussian symmetry gives
+\[
+  \E\tr e^{-\beta H_N}
+  =
+  \E\tr e^{+\beta H_N},
+\]
+and $uH_N^{\rm GPSZ}=\beta H_N$.  Thus the sign and normalization conventions
+of \cite{GPSZ2026} give
+\begin{equation}\label{eq:GPSZ-conversion}
+  \frac1N\log \mathbb E Z_N(\beta)=\frac{u}{N}f_{N,q}^{\rm GPSZ}(u),
+\end{equation}
+where $f_{N,q}^{\rm GPSZ}(u)=u^{-1}\log\E Z_N^{\rm GPSZ}(u)$.
+
+We next extract the regularity and the first coefficient from the explicit
+formula in that theorem.  In its notation,
+\[
+  \Phi_u(z)=\sum_{v\geq1}\mu_v(u)z^v,
+  \qquad
+  u f_q^{\rm GPSZ}(u)=\Phi_u(t_*(u))-1-\log t_*(u),
+\]
+where $t_*\partial_z\Phi_u(t_*)=1$.  A contributing hypertree has
+$v=1+(q-1)s$ vertices and its coefficient contains
+\[
+  \rho(u)^{v-1},
+  \qquad
+  \rho(u)^{q-1}=\frac{(q-1)!u^2}{2^{q+1}}.
+\]
+More explicitly, $\mathcal T_v^{\rm sim}$ is empty unless
+$v=1+(q-1)s$ for some $s\geq0$.  For $s\geq1$ we may therefore write
+\[
+  \mu_{1+(q-1)s}(u)=c_{q,s}u^{2s},
+\]
+where
+\[
+  c_{q,s}
+  =
+  \frac1{(1+(q-1)s)!}
+  \left(\frac{(q-1)!}{2^{q+1}}\right)^s
+  \sum_{T\in\mathcal T_{1+(q-1)s}^{\rm sim}}b_T.
+\]
+The bounds used in the proof of Proposition 3 of \cite{GPSZ2026} give
+$|c_{q,s}|\leq C_q^s$.  Hence
+\[
+  \Phi_u(z)
+  =
+  z+\sum_{s\geq1}
+  c_{q,s}u^{2s}z^{1+(q-1)s}
+\]
+converges normally for $(u^2,z)$ in a neighborhood of $(0,1)$.  Thus
+$\Phi_u(z)$ is jointly analytic in $(u^2,z)$ there.  At
+$u=0$, $\Phi_0(z)=z$ and $t_*(0)=1$; the derivative with respect to $t$ of
+$t\partial_z\Phi_u(t)-1$ is $1$ at $(u,t)=(0,1)$.  The analytic implicit
+function theorem makes $t_*$, and hence the limiting right-hand side, analytic
+in $u^2$.
+
+The first nontrivial term is the unique one-edge hypertree on $q$ vertices:
+\[
+  \Phi_u(z)=z+\frac{u^2}{q2^{q+1}}z^q+O(u^4).
+\]
+It follows successively that
+\[
+  t_*(u)=1-\frac{u^2}{2^{q+1}}+O(u^4),
+  \qquad
+  u f_q^{\rm GPSZ}(u)=\frac{u^2}{q2^{q+1}}+O(u^4).
+\]
+Using $u=2^{q/2}\beta$ in \eqref{eq:GPSZ-conversion} gives
+\eqref{eq:ell-small-beta}.
+
+It remains only to justify the two local-uniform assertions.  Let
+$h_N=N^{-1}\log F_N$.  If
+\[
+  \overline\nu_N(B)=\E\,\tr\mathbf1_{\{H_N\in B\}},
+\]
+then $\mathbb E Z_N(\beta)=\int e^{-\beta x}\overline\nu_N(\mathrm dx)$; hence $h_N$
+is finite, differentiable, and convex.  {Differentiation is
+justified by
+$\norm{H_N(G)}\leq\sigma_N\sum_{I\in\calI_N}|g_I|$ and Gaussian
+exponential integrability.}
+The limiting function just obtained is $C^1$.  Lemma
+\ref{lem:convex-derivatives} now proves both local-uniform convergences.
+\end{proof}
+
+By \eqref{eq:finite-N-FTW-coefficient} and
+\eqref{eq:annealed-derivative-limit},
+\begin{equation*}
+  \frac{A_N(\beta)}N\longrightarrow
+  \frac\beta2\ell_q'(\beta).
+\end{equation*}
+
+\begin{proof}[Proof of Theorem~\ref{thm:partition-clt}]
+Let
+\[
+  S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\calI_N}(g_I^2-1).
+\]
+The classical i.i.d.\ central limit theorem gives
+$S_N\Rightarrow\xi\sim\N(0,1)$.
+By Lemma~\ref{lem:exact-second-chaos},
+\begin{equation}\label{eq:Y-decomposition-final}
+  Y_N(\beta)-1
+  =c_N(\beta)S_N+\mathcal R_N(\beta),
+  \qquad
+  c_N(\beta)
+  =\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{\sqrt{2M_N}},
+\end{equation}
+where $\mathcal R_N=\sum_{r\geq3}P_r Y_N$ is orthogonal to $S_N$.
+Since $M_N\sim N^q/q!$, \eqref{eq:annealed-derivative-limit} gives
+\[
+  N^{q/2-1}c_N(\beta)
+  \longrightarrow
+  \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta).
+\]
+Proposition~\ref{prop:higher-chaos-closure} gives
+$N^{q/2-1}\mathcal R_N\to0$ in $L^2$.  This proves
+\eqref{eq:scaled-relative-clt}.  Orthogonality in
+\eqref{eq:Y-decomposition-final} also gives
+\[
+  \Var(Y_N)=c_N(\beta)^2+\norm{\mathcal R_N(\beta)}_2^2.
+\]
+  Finally,
+$\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough give 
+\eqref{eq:standardized-clt}.
+\end{proof}
+
+\begin{lemma}[Gaussian concentration]
+  Write 
+  \begin{equation*}
+    W_N \coloneqq \log Y_N(\beta).
+  \end{equation*}
+  Then, for $\beta\neq0$ and any $\lambda, t > 0$,
+  \begin{align}
+    \mathbb P\!\left(W_N - \E W_N < -t \right)
+    &\leq \exp\left(-\frac{qt^2}{2\beta^2}\right),
+    \label{eq:centered W_N tail}\\
+    \E\exp\!\left(\lambda(W_N - \E W_N)\right) 
+    &\leq \exp\!\left(\frac{\lambda^2 \beta^2}{2q}\right).
+    \label{eq:centered W_N exp}
+  \end{align}
+\end{lemma}
+
+\begin{proof}
+To apply the Gaussian concentration
+  inequality, we view $Z_N(\beta;G)$ as a function of
+  $G = (g_I)_{I \in \calI_N}$ and establish the Lipschitz bound for $W_N$.
+  Fix $I \in \calI_N$.
+  By Duhamel's formula,
+  we deduce that 
+  \begin{align*}
+    \partial_{g_I} Z_N 
+    &= 
+    \tr \partial_{g_I} e^{-\beta H_N(G)}\\
+    &=
+    -\beta     
+    \tr \!\left( \partial_{g_I} H_N(G) \cdot e^{-\beta H_N(G)} \right)\\ 
+    &=
+    -\beta \sigma_N \tr\bigl( e^{-\beta H_N} \psi_I \bigr).
+  \end{align*}
+  Write $\langle \cdot \rangle_G$ 
+  for the expectation with respect to the normalized Gibbs state,
+  i.e.,
+  \begin{equation*}
+    \langle A \rangle_G
+    \coloneqq 
+    \frac{\tr(A e^{-\beta H_N(G)})}{Z_N(\beta;G)}.
+  \end{equation*}
+  Then we obtain 
+  \begin{equation} \label{eq:GC1}
+    \partial_{g_I} W_N = -\beta \sigma_N \langle \psi_I \rangle_G.
+  \end{equation}
+  Fix an arbitrary subset $S \subseteq [N]$ with $|S| = q-1$.
+  Set $A_i \coloneqq \psi_{S \cup \{i\}}$ for each $i \notin S$.
+  Note that, by the relation $\{\psi_i, \psi_j\} = 2\delta_{ij} \I$,
+  it holds that   
+  \begin{equation} \label{eq:A_i relation}
+    A_i^2 = \I,
+    \qquad 
+    A_i A_j + A_j A_i = 0 \quad \text{if}\quad i \neq j.
+  \end{equation}
+  This yields 
+  \begin{equation*}
+    \left(\sum_{i \notin S} \langle A_i \rangle_G A_i\right)^2
+    = 
+    \sum_{i \notin S}  \langle A_i \rangle_G^2 A_i^2
+    +
+    \sum_{\substack{i,j \notin S}\\ i < j}
+    \langle A_i \rangle_G \langle A_j \rangle_G
+    (A_iA_j + A_j A_i) 
+    = 
+    \sum_{i \notin S}  \langle A_i \rangle_G^2 \I.
+  \end{equation*}
+  If we write $\|\cdot\|$ for the operator norm,
+  then, by \eqref{eq:A_i relation},
+  we obtain 
+  \begin{equation*}
+    \left\|\left(\sum_{i \notin S} \langle A_i \rangle_G A_i\right)^2\right\|
+    = 
+    \sum_{i \notin S}  \langle A_i \rangle_G^2.
+  \end{equation*}
+  Since $A_i$ is self-adjoint,
+  it follows that 
+  \begin{equation} \label{eq:GC2}
+    \left\| \sum_{i \notin S} \langle A_i \rangle_G A_i \right\| 
+    = \sqrt{\sum_{i \notin S}  \langle A_i \rangle_G^2}.
+  \end{equation}
+  On the other hand, H\"{o}lder's inequality for Schatten norms yields 
+  \begin{equation} \label{eq:GC3}
+    \left\langle \sum_{i \notin S} \langle A_i \rangle_G A_i \right\rangle_G 
+    \leq
+    \left\| \sum_{i \notin S} \langle A_i \rangle_G A_i \right\|.
+  \end{equation}
+  Since the left-hand side equals $\sum_{i \notin S} \langle A_i \rangle_G^2$,
+  we deduce from \eqref{eq:GC2} and \eqref{eq:GC3} that 
+  \begin{equation} \label{eq:GC4}
+    \sum_{i \notin S} \langle A_i \rangle^2 \leq 1.
+  \end{equation}
+  For each $I \in \calI_N$,
+  there exist exactly $q$ subsets $S \subseteq [N]$ satisfying $I = S \cup \{i\}$.
+  Hence,
+  \begin{equation*}
+    \sum_{\substack{S \subseteq [N]\\ |S| = q-1}} 
+    \sum_{i \notin S} 
+    \langle \psi_{S \cup \{i\}}\rangle_G^2 
+    = 
+    q \sum_{I \in \calI_N} \langle \psi_I\rangle_G^2.
+  \end{equation*} 
+  This, combined with \eqref{eq:GC4}, yields 
+  \begin{equation*}
+    \sum_{I \in \calI_N} \langle \psi_I \rangle_G^2
+    \leq 
+    \frac{1}{q} 
+    \sum_{\substack{S \subseteq [N]\\ |S| = q-1}} 1 
+    = 
+    \frac{1}{q} \binom{N}{q-1}
+    \leq    
+    \frac{N^{q-1}}{q!}.
+  \end{equation*}
+  From this and \eqref{eq:GC1}, we deduce that 
+  \begin{equation*}
+    \left\| \nabla W_N \right\|_2^2 
+    \leq
+    \frac{\beta^2 \sigma_N^2 N^{q-1}}{q!}
+    = 
+    \frac{\beta^2}{q},
+  \end{equation*}
+  where the last equality follows from the definition of $\sigma_N^2$.
+  This implies that $W_N(G)$ is $|\beta|/\sqrt q$-Lipschitz as a function of $G = (g_I)_{I \in \calI_N}$.
+  Hence, the Gaussian concentration inequality gives the desired result.
+\end{proof}
+
+\begin{proof}[Proof of Corollary~\ref{cor:free-energy-clt}]
+The case $\beta=0$ is trivial, so assume $\beta\neq0$.
+Put
+\[
+  a=\frac q2-1,\qquad
+  W_N=\log Y_N(\beta).
+\]
+It then holds that 
+\begin{align*}
+  \log Z_N - \E\log Z_N 
+  &=
+  (\log Z_N - \log \E Z_N) + (\log \E Z_N - \E \log Z_N)\\
+  &=
+  W_N - \E W_N\\
+  &= 
+  \bigl(W_N-(Y_N(\beta)-1)\bigr)
+  +(Y_N(\beta)-1)-\E W_N,
+\end{align*}
+which yields 
+\begin{equation*}
+  N^a(\log Z_N - \E \log Z_N)
+  =
+  N^a\bigl(W_N-(Y_N(\beta)-1)\bigr)
+  +N^a(Y_N(\beta)-1)-N^a \E W_N.
+\end{equation*}
+By Theorem~\ref{thm:partition-clt},
+we have 
+\begin{equation} \label{eq:cor1}
+    N^a(Y_N(\beta)-1)
+    \Longrightarrow
+    \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi.
+\end{equation}
+Let $C_0 \in (0,\infty)$ be such that 
+$|\log (1+x) - x| \leq C_0x^2$ for all $x \in [-1/2, 1/2]$.
+Since $W_N = \log Y_N(\beta)=\log(1+(Y_N(\beta)-1))$,
+it follows that 
+\begin{equation*}
+  \E \bigl[ 1 \wedge (N^a|W_N-(Y_N(\beta)-1)|) \bigr]
+  \leq
+  \E \bigl[ 1 \wedge (C_0 N^a|Y_N(\beta)-1|^2) \bigr]
+  + 
+  \mathbb P(|Y_N(\beta)-1| > 1/2).
+\end{equation*}
+By \eqref{eq:cor1},
+$|Y_N(\beta)-1| \xrightarrow{\mathrm{p}} 0$ and
+$(N^a |Y_N(\beta)-1|)_{N \geq 1}$ is tight.
+Thus, 
+the right-hand side of the above inequality converges to $0$ as $N \to \infty$.
+Hence, $N^a(W_N-(Y_N(\beta)-1)) \xrightarrow{\mathrm{p}} 0$.
+Therefore, it suffices to show that $\E W_N = o(N^{-a})$.
+% To this end,
+% we first establish a Lipschitz bound for $G\mapsto W_N(G)$.  
+% Thus $W_N=\log(1+(Y_N-1))$, and Theorem~\ref{thm:partition-clt} gives
+% We claim that
+% \begin{equation}\label{eq:log-centering-negligible}
+%   \E W_N=o(N^{-(q/2-1)}).
+% \end{equation}
+% Differentiation gives
+% \[
+%   \partial_{g_I}W_N
+%   =-\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
+% \]
+% For each $(q-1)$-set $S$, the operators
+% $(\psi_{S\cup\{i\}})_{i\notin S}$ are pairwise anticommuting Hermitian
+% involutions.  If $A_1,\ldots,A_m$ are any such operators and
+% $a_j=\langle A_j\rangle$ in a state, set $B=\sum_j a_jA_j$ and
+% $s=\sum_j a_j^2$.  Pairwise anticommutation gives
+% \[
+%   B^2=s\I,
+%   \qquad
+%   s=\langle B\rangle\leq\norm{B}=\sqrt{s},
+% \]
+% and hence $s\leq1$.  Applying this observation for each $S$ and noting that
+% every $I\in\calI_N$ is counted exactly $q$ times yields
+% \[
+%   \sum_{I\in\calI_N}|\langle\psi_I\rangle_{\beta,g}|^2
+%   \leq \frac1q\binom N{q-1}.
+% \]
+% Consequently,
+% \[
+%   \sum_{I\in\calI_N}|\partial_{g_I}W_N|^2
+%   \leq
+%   \frac{\beta^2\sigma_N^2}{q}\binom N{q-1}
+%   \leq\frac{\beta^2}{q}.
+% \]
+% Writing $\mu_N=\E W_N$, the Gaussian concentration inequality therefore
+% implies, for every $\lambda\in\mathbb R$,
+% \begin{equation}\label{eq:WN-subgaussian}
+%   \E e^{\lambda(W_N-\mu_N)}
+%   \leq \exp\left(\frac{\lambda^2\beta^2}{2q}\right).
+% \end{equation}
+
+We claim that 
+\begin{equation} \label{eq:EWN range}
+  -\frac{\beta^2}{2q}\leq \E W_N\leq0.
+\end{equation}
+Indeed, the upper bound follows from Jensen's inequality,
+while the lower bound follows from \eqref{eq:centered W_N exp} and the identity $\E e^{W_N}=1$.
+Let $K_\beta=\beta^2/(2q)$ and
+$\delta_N \coloneqq (\E (Y_N(\beta)-1)^2)^{1/2}$.
+By Theorem~\ref{thm:partition-clt},
+\begin{equation} \label{eq:deltaN asymp}
+  \delta_N^2 = \E (Y_N(\beta)-1)^2\asymp N^{-(q-2)}.
+\end{equation}
+Henceforth, we consider sufficiently large $N$ so that $\delta_N \leq e^{-1}$.
+Since $e^{W_N}-1=Y_N(\beta)-1$,
+Markov's inequality gives
+\begin{equation} \label{eq:W_N tail1}
+  \mathbb P(W_N<-t)
+  \leq \frac{\delta_N^2}{(1-e^{-t})^2}
+  \leq C \delta_N^2,
+  \qquad 
+  \forall t \geq 1.
+\end{equation}
+On the other hand, 
+by $\E W_N \geq -K_\beta$ and \eqref{eq:centered W_N tail},
+\begin{equation} \label{eq:W_N tail2}
+  \mathbb P(W_N<-t)
+  \leq
+  \exp\left(-\frac{q(t-K_\beta)^2}{2\beta^2}\right),
+  \qquad 
+  \forall t>K_\beta.
+\end{equation}
+Set
+\[
+  T_N=\max\left\{
+    1,\,
+    K_\beta+\frac{2|\beta|}{\sqrt q}
+    \sqrt{\log(1/\delta_N)}
+  \right\}.
+\]
+By the layer-cake representation,
+we have 
+\[
+  \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
+  =
+  \mathbb P(W_N<-1)+
+  \int_1^\infty\mathbb P(W_N<-t)\,\mathrm dt.
+\]
+Applying \eqref{eq:W_N tail1} to the first term and the integral over $[1,T_N]$
+and applying \eqref{eq:W_N tail2} to the integral over $(T_N, \infty)$,
+we obtain
+\begin{equation*}
+  \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
+  \leq     
+  C T_N \delta_N^2
+  +
+  \int_{T_N}^\infty \exp\left(-\frac{q(t-K_\beta)^2}{2\beta^2}\right) \mathrm dt.
+\end{equation*}
+By the Gaussian tail bound $\int_a^\infty e^{-t^2} \mathrm dt \leq C e^{-a^2}$ for any $a \geq 0$,
+the second term is bounded by $C \delta_N^2$. 
+Consequently,
+\begin{equation}\label{eq:WN-negative-tail}
+  \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
+  \leq C\delta_N^2\sqrt{\log(1/\delta_N)}.
+\end{equation}
+Now set $h(w)=e^w-1-w$.  
+Note that
+\[
+  h(w)\leq C(e^w-1)^2\quad (w\geq-1),
+  \qquad
+  h(w)\leq |w|\quad (w<-1).
+\]
+This, combined with $e^{W_N} - 1 = Y_N(\beta)-1$ and
+\eqref{eq:WN-negative-tail}, yields
+\begin{equation*}
+  \E h(W_N) 
+  \leq    
+  C\E (Y_N(\beta)-1)^2
+  +\E\bigl[|W_N|\, \mathbf1_{\{W_N<-1\}}\bigr]
+  \leq
+  C\delta_N^2\sqrt{\log(1/\delta_N)}.
+\end{equation*}
+Moreover,
+since $h(W_N) = Y_N(\beta)-1-W_N$ and $\E(Y_N(\beta)-1) = 0$,
+we have $-\E W_N = \E h(W_N)$.
+Therefore, by \eqref{eq:EWN range},
+we deduce that 
+\begin{equation*}
+  0 \leq -\E W_N \leq C\delta_N^2\sqrt{\log(1/\delta_N)}.
+\end{equation*}
+From this and \eqref{eq:deltaN asymp},
+it follows that 
+\[\E W_N
+  =O\!\left(N^{2-q}\sqrt{\log N}\right)
+  =o(N^{-(q/2-1)}),
+\]
+which completes the proof.
+\end{proof}
+
+\end{document}
