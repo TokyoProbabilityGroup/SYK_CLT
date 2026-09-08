@@ -9,7 +9,7 @@
 | 内容 | 現状と残作業 |
 | --- | --- |
 | パラメータ・共有代数 | 逆温度の分離、相互作用添字、昇順積、位相、相互作用演算子、確定的ハミルトニアンは移行済み |
-| 有限次元の解析・物理量 | 通常の分配関数、`normalizedTrace`、物理的 Gibbs API、実方向微分は移行済み。追加の整関数性・複素微分・条件付き対数微分は実装あり。仕上げは W01 |
+| 有限次元の解析・物理量 | 通常の分配関数、`normalizedTrace`、物理的 Gibbs API、実方向微分、整関数性・複素微分・条件付き対数微分は実装・検証済み。零点のない領域は Z01 |
 | ガウス型相互作用 | `CouplingSpace`・`couplingSpace_card`・`standardGaussianMeasure` は Model に移設済み。汎用測度との接続は W02、標準スケールとハミルトニアンは W03 |
 | 標準表現 | 未実装。W04 で構成し、直交性を抽象的な `MajoranaSystem` の仮定に追加しない |
 | 利用側 | 集中不等式の移行完了は W05、CLT 固有の規格化分配関数と接続は W06 |
@@ -20,11 +20,21 @@
 
 `partitionFunction_has_deriv_at`、`partitionFunction_differentiable`、`partitionFunction_analytic_at`、`partitionFunction_mul_log_deriv` は追加済みである。これらを二つの実装課題に分け直さず、残る確認・記録を一単位で完了する。
 
-- [ ] 追加済みの定理の型・仮定・符号と通常のトレース規約を照合する。`logDeriv` の商の公式を、複素対数の枝や零点のない領域の構成と混同しない。
-- [ ] `FiniteDimensionalGibbs.lean` を個別に検査し、`lake build Model SuperConcentration` と追加した主要定理の `#print axioms` を確認する。以前の検査を引き継ぐ場合は対象差分との一致を確認する。
-- [ ] 差分、警告、既知の失敗と今回の検証範囲を記録し、構造文書の現在の状態を更新する。
+- [x] 追加済みの定理の型・仮定・符号と通常のトレース規約を照合した。`logDeriv` の商の公式を、複素対数の枝や零点のない領域の構成と混同していない。
+- [x] `FiniteDimensionalGibbs.lean` を個別に検査し、`lake build Model SuperConcentration` と追加した主要定理の `#print axioms` を確認した。
+- [x] 差分、警告、既知の失敗と今回の検証範囲を記録し、構造文書と Blueprint の現在の状態を更新した。
 
 担当部分の完了条件：追加の解析 API と Model 内の対応文書が一致し、上記の検証結果が記録されている。W01 全体では [Chapters の計画](../Chapters/EDITING_PLAN.md) に記す章の更新と Blueprint の確認も必要である。CLT の局所定義や零点のない領域の証明は含めない。
+
+### 検証記録（2026-09-08）
+
+対象実装はコミット `05d64f4` の `FiniteDimensionalGibbs.lean` に追加された4定理である。通常のトレースによる `Z_H(z) = Tr(exp(-zH))` について、複素微分は `Z_H'(z) = -Tr(H * exp(-zH))`、解析性は各 `z : ℂ` での `AnalyticAt`、対数微分の公式は `Z_H(z) ≠ 0` を仮定する点ごとの商公式であることを照合した。自己共役性、実逆温度、零点のない領域、複素対数の枝はこの4定理の仮定・結論に含まれない。
+
+- `lake env lean SYK/Model/FiniteDimensionalGibbs.lean` は成功した。
+- `lake build Model SuperConcentration` は3195 jobsで成功した。今回の対象ファイルには、既存の `density_variance_nonneg` の型にある未使用の `[DecidableEq d]` に関する linter warning が残る。`SuperConcentration/GaussianConcentration/` の既存の `refine'`・柔軟な `simp`・長い行などの warning と `Main.lean` の copyright header warning も残るが、W01 は変更していない。
+- `#print axioms` で `partitionFunction_has_deriv_at`、`partitionFunction_differentiable`、`partitionFunction_analytic_at`、`partitionFunction_mul_log_deriv` を確認した。いずれも `propext`、`Classical.choice`、`Quot.sound` のみへ依存し、`sorry`、`admit`、追加の `axiom` は示されなかった。
+
+Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Model.lean` で個別に検査し、受理された。既存の `Params` と `MajoranaSystem` のフィールドにドキュメント文字列がないという warning は残る。`lake exe vbp build` は編集対象外の `Annealed_FE/main_result.lean` が廃止済みの `Params.β`・`Params.β_nonneg` を参照する既知の2エラーで失敗した。Blueprint の章と `SYK.Blueprint` はその前にビルドされたが、生成物は完成していない。続く `lake exe vbp check` は manifest 不在を報告した。いずれも成功とは記録しない。
 
 <a id="w02"></a>
 

@@ -39,3 +39,25 @@ matrix trace of the Gibbs operator. Its value at zero inverse temperature is
 the dimension of the matrix index type. The separately named normalized trace
 is available when a dimension-normalized quantity is needed.
 :::
+
+:::theorem "partition_function_complex_derivative" (parent := "model") (uses := "partition_function") (lean := "SYK.partitionFunction_has_deriv_at")
+For every finite-dimensional complex matrix $`H` and every $`z \in \mathbb{C}`,
+the partition function $`Z_H(z) = \operatorname{Tr}(\exp(-zH))` has complex
+derivative
+$$`Z_H'(z) = -\operatorname{Tr}(H\exp(-zH)).`
+No self-adjointness or nonvanishing assumption is used.
+:::
+
+:::theorem "partition_function_analytic" (parent := "model") (uses := "partition_function_complex_derivative") (lean := "SYK.partitionFunction_differentiable, SYK.partitionFunction_analytic_at")
+The same partition function is complex differentiable and analytic at every
+$`z \in \mathbb{C}`. This records entire analyticity pointwise; it does not
+assert that the partition function has no zeros.
+:::
+
+:::theorem "partition_function_log_derivative" (parent := "model") (uses := "partition_function_complex_derivative") (lean := "SYK.partitionFunction_mul_log_deriv")
+At a point $`z` satisfying $`Z_H(z) \ne 0`, the logarithmic derivative obeys
+$$`Z_H(z)\,\operatorname{logDeriv}(Z_H)(z)
+= -\operatorname{Tr}(H\exp(-zH)).`
+This is a pointwise quotient formula. It neither constructs a zero-free region
+nor chooses a branch of the complex logarithm.
+:::
