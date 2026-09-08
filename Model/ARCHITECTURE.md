@@ -2,7 +2,7 @@
 
 ## 目的
 
-有限次元 SYK 模型を、複素逆温度に関する解析と、非負の実逆温度におけるギブス状態の理論の双方から利用できる共有 API として再設計する。ディレクトリは `SYK/Model/` へ改名済みであり、複素解析や標準表現を含む後続項目は引き続き未完了である。
+有限次元 SYK 模型を、複素逆温度に関する解析と、非負の実逆温度におけるギブス状態の理論の双方から利用できる共有 API として再設計する。ディレクトリは `SYK/Model/` へ改名済みであり、通常の分配関数の整関数性・複素微分・条件付き対数微分も実装されている。追加解析の検証・文書の仕上げ、標準スケールの共有化、標準表現の構成などは [編集計画](EDITING_PLAN.md) に従う。横断的な実行単位と待ち合わせは [全体計画](../EDITING_PLAN.md) を参照する。
 
 ## 正式な参照元と既知の相違
 
@@ -44,6 +44,9 @@ partitionFunction z H = Matrix.trace (exp (-z • H))
 | 逆温度 | `Params` から分離済みであり、解析には `z : ℂ`、物理的な結果には `β : ℝ≥0` を明示的に渡す。 | 移行済みの型を維持する。 |
 | 分配関数 | `partitionFunction` は `z : ℂ` を受け、通常のトレースを使う。規格化が必要な利用側は `normalizedTrace` から局所的に定義する。 | 実装済み。 |
 | 逆温度0 | `partitionFunction 0 H = Fintype.card d`。 | 実装済み。CLT 側の規格化分配関数は標準表現の構成後に定義する。 |
+| 複素解析 | 整関数性・複素微分・非零点での `logDeriv` の公式は `05d64f4` に実装されている。 | W01 で関連検証と Blueprint・文書の仕上げを行う。 |
+| ガウス型相互作用 | 係数空間と標準ガウス測度は Model に移設済み。標準スケールを含むハミルトニアンは利用側に残る。 | 測度接続は W02、標準ハミルトニアンの共有化は W03。 |
+| 標準行列表現 | 未実装。 | W04 で構成し、トレース直交性まで証明する。 |
 | ビルド対象 | ルートの `lakefile.toml` に `Model` と `SuperConcentration` がある。 | 改名は完了している。API の移行後もこの名称を維持する。 |
 
 この表は現行の定義と移行後の目標を区別する。各項目の検証結果と移行順序は `EDITING_PLAN.md` に記録する。
@@ -73,25 +76,22 @@ partitionFunction z H = Matrix.trace (exp (-z • H))
 
 ```mermaid
 flowchart TD
-    params["模型のパラメータと相互作用の添字"]
-    abstract["抽象的なマヨラナ代数"]
-    concrete["標準的な行列表現"]
-    hamiltonian["ハミルトニアンとガウス型のランダムな相互作用"]
-    analytic["複素変数に対するトレース指数関数の解析"]
-    zeroFree["零点のない領域における解析的結果"]
-    physical["物理的なギブス状態の理論"]
-    consumers["SuperConcentration と CLT"]
-
-    params --> abstract
-    abstract --> concrete
-    abstract --> hamiltonian
-    concrete --> hamiltonian
-    hamiltonian --> analytic
-    analytic --> zeroFree
-    analytic --> physical
-    zeroFree --> consumers
-    physical --> consumers
+    params["模型のパラメータと相互作用の添字"] --> abstract["抽象的なマヨラナ代数"]
+    abstract --> concrete["標準的な行列表現"]
+    abstract --> hamiltonian["ガウス型ハミルトニアン"]
+    disorder["ガウス型の相互作用係数"] --> hamiltonian
+    analytic["有限行列のトレース指数関数の解析"] --> physical["物理的なギブス状態の理論"]
+    analytic --> zeroFree["選定した領域での非零性・正則な対数"]
+    physical --> concentration["抽象的な行列模型への集中評価"]
+    hamiltonian --> concentration
+    concrete --> clt["CLT の有限模型との接続"]
+    hamiltonian --> clt
+    analytic --> clt
+    concentration --> clt
+    zeroFree -.-> complexUse["必要な場合の複素解析への適用"]
 ```
+
+図は数学的な利用関係を表し、実行順序は全体計画に置く。有限行列の解析は具体的な SYK ハミルトニアンの構成を前提としない。集中評価は抽象的な行列マヨラナ系で足り、標準表現の構成を待たない。零点のない領域は別の後続課題であり、実逆温度の集中評価や CLT の有限模型への接続の必須条件ではない。
 
 - 模型のパラメータは `N`、`q` と、それらが許容条件を満たすことの証明だけを持ち、逆温度を持たない。
 - 抽象的な反交換関係と、Jordan–Wigner 変換による標準的な行列表現を分離する。

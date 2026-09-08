@@ -4,6 +4,10 @@
 
 このファイルは `SYK/Probability/GaussianConcentration/` 以下に適用する。ワークスペースのルートにある `AGENTS.md` と `SYK/AGENTS.md` の規則も適用する。このディレクトリは、SYK 模型から独立して、有限次元ユークリッド空間上のガウス集中不等式を提供する共通の基盤部分である。
 
+## 作業計画
+
+このディレクトリの3ファイルの編集細目と検証根拠は [EDITING_PLAN.md](EDITING_PLAN.md)、模型側・利用側への接続を含む全体の順序と状態は [全体計画](../../EDITING_PLAN.md) を確認する。ここでの検証完了と、W02 全体の統合完了を区別する。
+
 ## 独立性
 
 定理文とインポートによる依存関係に `ModelParameters`、`InteractionIndex`、`CouplingSpace`、`N`、`q`、マヨラナ演算子、ハミルトニアン、分配関数を導入しない。座標を添字付ける任意の有限型 `ι` と `EuclideanSpace ℝ ι` を対象に定義や定理を述べる。

@@ -2,7 +2,7 @@
 
 ## 目的
 
-共有 SYK 模型のうち物理的なギブス状態を扱う層と、模型に依存しないガウス集中不等式の基盤部分を接続し、通常のトレースで定義した SYK 分配関数の対数に対する集中不等式を証明する。ディレクトリは `SYK/SuperConcentration/` へ改名済みであり、以下の API とモジュール分割への移行は未完了である。
+共有 SYK 模型のうち物理的なギブス状態を扱う層と、模型に依存しないガウス集中不等式の基盤部分を接続し、通常のトレースで定義した SYK 分配関数の対数に対する集中不等式を証明する。ディレクトリは `SYK/SuperConcentration/` へ改名済みであり、以下の API とモジュール分割への移行は未完了である。実行単位と待ち合わせは [全体計画](../EDITING_PLAN.md)、細目と検証根拠は [編集計画](EDITING_PLAN.md) に集約する。
 
 ## 依存関係
 
@@ -32,7 +32,9 @@ flowchart TD
 
 ## 汎用的な基盤部分の分離
 
-現行の `GaussianConcentrationAux.lean` 冒頭にある `CouplingSpace`、`couplingSpace_card`、`standardGaussianMeasure` と、汎用的な測度との同一性を述べる等式は `Model` へ移す。現行の `GaussianConcentration.lean` 末尾にある `N, q` への特殊化も、共有模型または集中不等式を SYK に適用する側へ移す。
+新基盤の編集・証明の細目は [汎用基盤の計画](../Probability/GaussianConcentration/EDITING_PLAN.md)、旧配置の整理と SYK への適用は [このディレクトリの計画](EDITING_PLAN.md#w02) に記録する。以下は移設の設計理由と境界であり、作業状態の一覧ではない。
+
+`CouplingSpace`、`couplingSpace_card`、`standardGaussianMeasure` は `Model.GaussianDisorder` に移設済みである。現行の `GaussianConcentrationAux.lean` は Model を import し、汎用測度と模型の測度の同一性を述べる等式を持つ。W02 では汎用測度を独立した基盤側に置き、Model の測度をそれに接続する。同一性を述べる結果は模型側または適用側へ移し、汎用部分から Model への依存を除く。現行の `GaussianConcentration.lean` 末尾にある `N, q` への特殊化も、共有模型または集中不等式を SYK に適用する側へ移す。
 
 残る基盤部分では、座標を添字付ける任意の有限型 `ι` だけについて量化し、中心となる結果をモーメント母関数の評価 `HasSubgaussianMGF` として述べる。上側・下側・両側の裾の評価は、mathlib の劣ガウス確率変数に関する API から導く。
 
@@ -77,7 +79,7 @@ L = β / sqrt q,
 - 物理的なヒルベルト空間が空である場合の分岐
 - 証明計画書にある `N^(q/2)` の目標と旧来のファイル構成
 
-抽象的なマヨラナ系に対する証明と、標準的な行列表現への特殊化は区別する。ただし、同じ定義を重複して持たない。
+抽象的なマヨラナ系に対する証明と、標準的な行列表現への特殊化は区別する。ただし、同じ定義を重複して持たない。現行の `syk_sum_sq_expectation_le` と対数分配関数の評価は抽象的な `MajoranaSystem` を使うため、W05 は W04 の標準表現やトレース直交性を待たずに進められる。必要な前提は共有の行列解析・標準ハミルトニアン・汎用ガウス集中である。
 
 ## モジュールと名前空間
 

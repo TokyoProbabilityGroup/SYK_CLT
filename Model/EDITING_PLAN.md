@@ -1,10 +1,103 @@
 # 共有 SYK 模型の編集計画
 
-## 目的
+## 管理範囲と現状
 
-現在の API との互換性は要求せず、規格化トレース、解析に用いる複素逆温度、物理的な非負の実逆温度、およびマヨラナ系の抽象的な定義と具体的な表現を明確に分離する。
+実行する単位とその状態は [全体計画](../EDITING_PLAN.md) で管理する。この文書は Model 内のファイル群について、W01・W02 の測度接続・W03・W04・Z01 の細目と検証根拠を記録する。利用側や Blueprint の編集細目は、その担当ディレクトリの計画書に置く。作業単位内のチェック項目は、個別の承認やコミットの区切りではない。
 
-## 段階0：現状と文書の確認
+2026-09-08、コミット `05d64f4` の配置・宣言を確認した。以下の「実装あり」は、文書再編で新たに Lean を実行したという意味ではない。検証の履歴は末尾に残す。
+
+| 内容 | 現状と残作業 |
+| --- | --- |
+| パラメータ・共有代数 | 逆温度の分離、相互作用添字、昇順積、位相、相互作用演算子、確定的ハミルトニアンは移行済み |
+| 有限次元の解析・物理量 | 通常の分配関数、`normalizedTrace`、物理的 Gibbs API、実方向微分は移行済み。追加の整関数性・複素微分・条件付き対数微分は実装あり。仕上げは W01 |
+| ガウス型相互作用 | `CouplingSpace`・`couplingSpace_card`・`standardGaussianMeasure` は Model に移設済み。汎用測度との接続は W02、標準スケールとハミルトニアンは W03 |
+| 標準表現 | 未実装。W04 で構成し、直交性を抽象的な `MajoranaSystem` の仮定に追加しない |
+| 利用側 | 集中不等式の移行完了は W05、CLT 固有の規格化分配関数と接続は W06 |
+
+<a id="w01"></a>
+
+## W01：共有行列解析の仕上げ
+
+`partitionFunction_has_deriv_at`、`partitionFunction_differentiable`、`partitionFunction_analytic_at`、`partitionFunction_mul_log_deriv` は追加済みである。これらを二つの実装課題に分け直さず、残る確認・記録を一単位で完了する。
+
+- [ ] 追加済みの定理の型・仮定・符号と通常のトレース規約を照合する。`logDeriv` の商の公式を、複素対数の枝や零点のない領域の構成と混同しない。
+- [ ] `FiniteDimensionalGibbs.lean` を個別に検査し、`lake build Model SuperConcentration` と追加した主要定理の `#print axioms` を確認する。以前の検査を引き継ぐ場合は対象差分との一致を確認する。
+- [ ] 差分、警告、既知の失敗と今回の検証範囲を記録し、構造文書の現在の状態を更新する。
+
+担当部分の完了条件：追加の解析 API と Model 内の対応文書が一致し、上記の検証結果が記録されている。W01 全体では [Chapters の計画](../Chapters/EDITING_PLAN.md) に記す章の更新と Blueprint の確認も必要である。CLT の局所定義や零点のない領域の証明は含めない。
+
+<a id="w02"></a>
+
+## W02：汎用ガウス測度への接続
+
+新基盤の測度が確定した後、`GaussianDisorder.lean` の模型側の定義を接続する。受け渡しの順序は全体計画に従う。
+
+- [ ] `standardGaussianMeasure` を、[汎用基盤](../Probability/GaussianConcentration/EDITING_PLAN.md#w02) の有限型に対する測度を使う定義に揃え、積測度を重複定義しない。`CouplingSpace` とその次元の定義は再利用する。
+- [ ] 模型の測度と汎用測度の一致を利用側で扱えることを確認する。同一性の既存結果を移す場合は Model 側に置き、汎用側が Model を import する依存を除く。
+- [ ] `GaussianDisorder.lean` の個別検査と Model のビルドを行い、定義・必要な測度の性質と import を確認する。
+
+担当部分の完了条件：Model が独立した汎用測度を利用し、通常の標準ガウス座標の規約を維持している。利用側の import 切替は [SuperConcentration の W02](../SuperConcentration/EDITING_PLAN.md#w02) で管理する。
+
+<a id="w03"></a>
+
+## W03：ガウス型 SYK ハミルトニアンの共有化
+
+前提は W02。測度の独立化と利用側の import 移行が終わった後に、同じ利用側ファイルの規格化を移行する。
+
+- [ ] 移設済みの `CouplingSpace` と標準ガウス測度を再利用し、`σ_N² = (q-1)! / N^(q-1)` に対応する標準スケールを `Model.GaussianDisorder` に置く。
+- [ ] 標準規格化ハミルトニアンを共有する確定的ハミルトニアンから定義し、線形性・自己共役性など利用側で必要な既存の結果を移す。
+- [ ] Model の基本 API は標準スケールに限定し、一般スケール `𝒥` や互換用の別名を重複して公開しない。移行元の削除と微分・リプシッツ・裾評価の追従は [SuperConcentration の W03](../SuperConcentration/EDITING_PLAN.md#w03) で管理する。
+- [ ] 個別検査、Model と移行済み利用側のビルド、主要定理の公理依存、このディレクトリ内の対応文書の更新を完了する。
+
+担当部分の完了条件：標準の相互作用係数とハミルトニアンが Model の一つの定義系列になる。W03 全体は直接の利用側への移行と統合検証まで含めて完了する。各係数の分散と、ガウス座標 `g_A` に関する評価であることを明記する。
+
+<a id="w04"></a>
+
+## W04：標準行列表現の構成
+
+既存の共有代数を使い、W02・W03 のガウス集中や確率的な規格化の移行とは独立して進められる。実際の同時編集範囲は全体計画で調整する。
+
+- [ ] 偶数 `N` に対する Jordan–Wigner 表現を `StandardRepresentation.lean` に構成し、次元 `2^(N/2)`、反交換関係、自己共役性を証明する。
+- [ ] 規格化トレースの内積について、対象とする相互作用演算子族の直交性を証明する。昇順積と位相が共有定義に一致することを確認する。
+- [ ] 必要な代数補題は Model 内の適切な共有層に置く。`Model` から `SuperConcentration` を import しない。既存補題を移す場合、移設元と利用側の修正は [SuperConcentration の担当部分](../SuperConcentration/EDITING_PLAN.md#w04) と合わせて統合する。
+- [ ] 個別検査、関連ビルド、主要定理の公理依存、次元・仮定の照合、このディレクトリ内の対応文書の更新を完了する。
+
+担当部分の完了条件：具体的な表現と直交性が仮置きの証明なしに検査され、抽象的なマヨラナ系に標準表現の性質を暗黙に追加していない。表現の構成と直交性でコミット候補を分けても、指示単位は W04 のままとする。
+
+## 利用側への接続
+
+- W02 の汎用証明は [Probability/GaussianConcentration の計画](../Probability/GaussianConcentration/EDITING_PLAN.md)、旧配置・利用側の移行と W05 は [SuperConcentration の計画](../SuperConcentration/EDITING_PLAN.md) が管理する。
+- 旧段階2にあった CLT 固有の規格化分配関数は、標準表現と集中不等式の再設計後に行う [W06](../CLT/EDITING_PLAN.md#w06) へ移した。`Z(0)=1` と共有分配関数との対応はそこで証明する。
+- `Annealed_FE` は編集せず、各単位の検証で既知の破損と新規エラーを切り分ける。
+- Blueprint の編集細目は [Chapters の計画](../Chapters/EDITING_PLAN.md) が管理する。全体計画に従い、対応する実装単位内で完了する。
+
+<a id="z01"></a>
+
+## Z01：零点のない領域
+
+これは W01–W06 と別の後続課題であり、必要な領域・一様性の選定前には実装へ進まない。CLT 側は要件をここへ集約し、同じ進捗チェックを持たない。
+
+- [ ] CLT が必要とする円板・帯状領域と、一様性の対象（`N`・ハミルトニアン・逆温度）を精査する。
+- [ ] 固定したハミルトニアンに対する実軸近傍など、最初に証明する具体的な領域を選定する。
+- [ ] 一様な非零性を内部で証明するか、正確な外部結果を入力とするかを決め、必要な承認を得る。
+- [ ] 非零性の定理から条件付き API の `Z z ≠ 0` を供給する。
+- [ ] 正則な対数が必要な場合に限り、単連結性など枝を選ぶ条件を明示して構成する。
+
+全複素平面での非零性や複素逆温度における正値性は目標にしない。完了条件は、選定した領域で必要な仮定を供給でき、外部入力と内部で証明した結果が区別されていることとする。
+
+## 各単位の検証と記録
+
+変更ファイルを個別に `lake env lean` で検査し、`lake build Model` と移行済み利用側の最小ビルドを行う。Model と集中不等式の接続を変更した単位では `lake build Model SuperConcentration` を実行する。重要な定理では `#print axioms` と定理文の仮定を確認する。
+
+ワークスペース全体に影響する変更では `lake build`、Blueprint の変更では `lake exe vbp build` と `lake exe vbp check` を実行する。許容済みの失敗は未移行の `Annealed_FE` に限る。そこから生じる Blueprint 生成不能も成功とは記録せず、どこまで確認できたかを報告する。新規の `sorry`、`admit`、`axiom`、未解決の証明目標は許容しない。
+
+検証記録には対象コミット・差分、コマンド、結果、警告、公理依存、残る仮定を記す。新しい検証結果は該当単位の節に追記し、過去の成功を変更後の成功として転記しない。
+
+## 再編前の実装・検証履歴
+
+以下は旧段階0–2の記録である。「現行」「段階」や旧パスはそれぞれの記録当時を指し、上の現状表や現在の再開順序を上書きしない。`[x]` は当時の個別項目の記録であり、W01 などの単位全体が完了したことを意味しない。旧記述の「零温度」は逆温度0の補題を指す。
+
+### 旧段階0：現状と文書の確認
 
 各項目は移行作業の計画であり、チェックの付いていない項目を実装済みとみなさない。現行と目標の型・規格化・ビルド対象の差は `ARCHITECTURE.md` の対応表を参照する。以下のコマンドで使う新名称は、対象の改名と Lake 設定の更新後に有効になる。
 
@@ -77,7 +170,7 @@
   - `IsDensityMatrix` と `expectation` は `Model.FiniteDimensionalGibbs` に置き、反交換族の二乗和評価は `SuperConcentration` に残す。これにより共有模型が利用側を import する循環を作らない。
   - 汎用ガウス集中不等式には、現行の `L > 0` の結果に加え、`L = 0` を定数関数として扱う API を用意する。SYK 専用の MGF と上側・下側・両側の裾評価は、汎用結果とリプシッツ評価を接続して供給する。
 
-## 段階1：比較基準と共有する代数、および有限次元行列の Gibbs 状態・分配関数
+### 旧段階1：比較基準と共有する代数、および有限次元行列の Gibbs 状態・分配関数
 
 - [x] `lake build Model SuperConcentration` と主要定理の `#print axioms` を再実行し、実装直前の比較結果を記録する。
   - 2026-09-07 にワークスペースのルートで `lake build Model SuperConcentration` を実行し、3193 jobs を成功として完了した。エラー、未解決の証明目標、`sorry`、`admit`、追加の `axiom` は報告されなかった。
@@ -129,7 +222,7 @@
   - 変更した四つの Lean ファイルを個別に検査し、
     `lake build Model SuperConcentration` と主要定理の `#print axioms` を実行した。
 
-## 段階2：模型の公開 API
+### 旧段階2：模型の公開 API
 
 - [x] 逆温度を模型パラメータから削除し、解析には `z : ℂ`、物理的な定理には `β : ℝ≥0` を明示引数として渡す。
   - `Params` から `β`・`β_nonneg` を削除し、`Params.inverseTemperature` と
@@ -150,7 +243,9 @@
     `lake exe vbp check` は Blueprint manifest がないことを報告した。
 - [x] 通常の `partitionFunction` と、必要な箇所で使う `normalizedTrace` を定義する。
   - `partitionFunction z H = Matrix.trace (exp (-z • H))` とし、`partitionFunction 0 H = Fintype.card d` を証明した。`normalizedTrace` は標準表現の直交性など、次元で規格化する量だけに用いる。
-- [ ] CLT の標準行列表現を構成した後、CLT 固有の規格化分配関数を `normalizedTrace (exp (-z • H))` として定義し、`Z(0)=1` と共有分配関数との対応を証明する。
+
+CLT 固有の規格化分配関数の未完了項目は W06 へ移した。
+
 - [x] 整関数性と複素微分を証明し、対数微分には `Z z ≠ 0` を明示する。
   - `partitionFunction_has_deriv_at` により
     `Z'(z) = -Tr(H * exp(-zH))` を示し、全点での複素微分可能性から
@@ -164,29 +259,3 @@
   - 2026-09-07 に `Model/FiniteDimensionalGibbs.lean`、`SuperConcentration/Main.lean`、`Chapters/Model.lean` を個別に検査し、`lake build Model SuperConcentration` を成功として完了した。既存の linter warning に加え、`Chapters/Model.lean` には公開済み `Params` と `MajoranaSystem` のフィールドにドキュメント文字列がないという warning が残る。
   - `SYK.partitionFunction_zero`、`SYK.partitionFunction_pos`、`SYK.thermalDensity_isDensityMatrix`、`SYK.logPartition_two_sided_tail_standardGaussian` に対する `#print axioms` は、いずれも `propext`、`Classical.choice`、`Quot.sound` だけを表示した。
   - `lake build` と `lake exe vbp build` は、移行対象外の `Annealed_FE/main_result.lean` が削除済みの `Params.β`・`Params.β_nonneg` を指定する既知の2エラーだけで失敗した。同ファイルには今回導入していない既存の `sorry` も残る。後者が成果物を生成できなかったため、`lake exe vbp check` は Blueprint manifest がないことを報告した。
-
-## 段階3：ガウス型相互作用と標準表現
-
-- [ ] `CouplingSpace`、標準ガウス測度、`σ_N`、標準規格化ハミルトニアンを `Model.GaussianDisorder` に置く。
-- [ ] 偶数 `N` に対する Jordan–Wigner 変換による標準表現を構成し、次元、反交換関係、自己共役性を証明する。
-- [ ] 規格化トレースから定まる内積について、対象とする相互作用演算子族の直交性を証明する。抽象的な `MajoranaSystem` の仮定には追加しない。
-
-## 段階4：利用側との接続と整理
-
-- [ ] `SuperConcentration` を新 API へ移行し、汎用ガウス集中不等式、SYK のリプシッツ評価、MGF、片側・両側の裾評価を接続する。
-- [ ] CLT との接続部分を `SYK/CLT/ARCHITECTURE.md` と照合する。
-- [ ] `Annealed_FE` は編集せず、既知の破損を正確に記録する。
-- [ ] Blueprint の宣言参照、規格化の説明、依存関係を実装後の API に更新する。
-
-## 後で扱う課題：零点のない領域
-
-- [ ] 固定したハミルトニアンに対する実軸近傍など、最初に証明する具体的な零点のない領域を選定する。
-- [ ] 高温領域に対応する円板または帯状領域で一様な評価が必要か、CLT の要件と照合する。
-- [ ] 零点がないことを示す定理から、対数を扱う条件付き API に必要な仮定を供給する。
-- [ ] 単連結領域上の正則な対数を、必要な場合だけ構成する。
-
-`Z z ≠ 0` を全複素平面で証明することや、複素逆温度におけるギブス演算子の正値性を示すことは目標にしない。
-
-## 検証条件
-
-各変更ファイルを個別に検査し、依存する最小のビルド対象を実行する。段階の完了時には `lake build Model SuperConcentration`、主要定理の `#print axioms`、Blueprint を変更した場合は `lake exe vbp build` と `lake exe vbp check` を実行する。新しい `sorry`、`admit`、`axiom`、未解決の証明目標は許容しない。ワークスペース全体のビルドに失敗する場合、許容する既知の失敗は未移行の `Annealed_FE` に限り、その内容と、規格化の変更による意味上の不整合を報告する。
