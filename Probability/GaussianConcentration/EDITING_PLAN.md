@@ -23,7 +23,7 @@
 
 ## 検証と記録
 
-各ファイルをワークスペースのルートから依存順に `lake env lean` で検査する。公開 MGF のパラメータが正確に `L^2` であること、裾の定数、零の場合の処理、主要定理の `#print axioms` と残る仮定を確認する。新しい `sorry`、`admit`、`axiom` は許容しない。
+各ファイルをワークスペースのルートから依存順に `lake env lean` で検査する。後続ファイルが import するモジュールは、次へ進む前に `lake build +<module>:olean` で成果物を生成する。3ファイルを検査した後に `lake build SYK` を実行する。公開 MGF のパラメータが正確に `L^2` であること、裾の定数、零の場合の処理、主要定理の `#print axioms` と残る仮定を確認する。新しい `sorry`、`admit`、`axiom` は許容しない。
 
 対象コミット・差分、コマンド、結果、警告、未解決事項をこの節に記録する。W02 全体の完了には、接続後の `lake build Model SuperConcentration` と Blueprint の確認も必要であり、この担当部分の検査だけで全体計画を完了にしない。
 

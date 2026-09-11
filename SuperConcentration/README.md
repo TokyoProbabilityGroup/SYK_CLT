@@ -112,10 +112,10 @@ for every density matrix $\rho$.
 The directory is built as the `SuperConcentration` Lean library in the shared
 workspace. The project uses Lean 4.32.2 and Mathlib 4.32.2.
 
-From the repository root, build the complete `SYK` library with:
+From the shared workspace root, build this library with:
 
 ```powershell
-lake build SYK
+lake build SuperConcentration
 ```
 
 To check only the public module, run:

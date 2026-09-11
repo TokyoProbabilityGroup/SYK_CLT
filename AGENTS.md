@@ -18,9 +18,9 @@
 
 ## 暫定的なビルド範囲
 
-`Annealed_FE` と `Universality` は Lake の独立したライブラリとして登録したまま、実装または共有 API への移行が完了するまで、ルートモジュールと CI の既定ビルドから一時的に除外する。復帰箇所は `workspace/SYK.lean` と `.github/workflows/lean_action_ci.yml` にコメントとして保持する。
+`Annealed_FE` と `Universality` は Lake の独立したライブラリとして登録したまま、実装または共有 API への移行が完了するまで、`lakefile.toml` の `defaultTargets` から一時的に除外する。CI も同じ既定対象を使う。復帰用の設定は TOML のコメントに保持し、変更時はワークスペースのルートと `workspace/` の配布用設定を揃える。
 
-現在の `lake build`、CI、および Blueprint の生成・検査の成功は、これら二つのライブラリを検証したことを意味しない。各ライブラリの実装と個別ビルドが成功した後、ルートの import と CI の対象を復帰させ、既定ビルドと Blueprint を改めて検査する。詳しい状態と復帰条件は [全体計画](EDITING_PLAN.md) に記録する。
+現在の `lake build`、CI、および Blueprint の生成・検査の成功は、これら二つのライブラリを検証したことを意味しない。各ライブラリの実装と個別ビルドが成功した後、`defaultTargets` に復帰させ、既定ビルドと Blueprint を改めて検査する。詳しい状態と復帰条件は [全体計画](EDITING_PLAN.md) に記録する。
 
 ## 外部文献の利用
 
@@ -64,4 +64,4 @@ CLT 固有の極限・逆温度条件・証明構造は `CLT/ARCHITECTURE.md`、
 
 モジュール構成の設計理由は `ARCHITECTURE.md`、編集手順・作業単位・検証記録は `EDITING_PLAN.md` に置き、Blueprint に不要な重複を持ち込まない。ただし、数学的な主張と論証の理解に必要な説明は省略しない。
 
-主要な主張の追加、依存関係の変更、または形式化の完了時には、対応する Blueprint の節も更新する。編集後はワークスペースのルートで `lake exe vbp build` と `lake exe vbp check` を実行し、HTML の生成と参照の整合性を確認する。
+主要な主張の追加、依存関係の変更、または形式化の完了時には、対応する Blueprint の節も更新する。編集後はワークスペースのルートで `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` と `lake exe vbp check --site SYK/_out/site` を実行し、HTML の生成と参照の整合性を確認する。生成入口は `BlueprintMain.lean` とし、ルート直下に入口を要求する現行の `lake exe vbp build` は使わない。

@@ -1,7 +1,9 @@
 name = "SYK"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["SYK"]
+# Restore Annealed_FE and Universality when their individual builds are ready.
+defaultTargets = ["Model", "SuperConcentration", "CLT", "SYK"]
+# defaultTargets = ["Model", "SuperConcentration", "CLT", "SYK", "Annealed_FE", "Universality"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -22,6 +24,8 @@ rev = "v4.32.2"
 
 [[lean_lib]]
 name = "SYK"
+# Shared foundations and project documentation; mathematical topics have their own targets.
+globs = ["SYK.Probability.GaussianConcentration.+", "SYK.Blueprint", "SYK.Chapters.+"]
 
 [[lean_lib]]
 name = "Annealed_FE"
