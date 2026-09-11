@@ -2,7 +2,7 @@
 
 ## 担当範囲
 
-この文書は、このディレクトリに配置する `StandardGaussian.lean`、`Smooth.lean`、`Lipschitz.lean` の構成・証明・検証の細目を管理する。Lean の3ファイルは移行先として計画されており、現在は未作成である。数学的規約と公開 API は [AGENTS.md](AGENTS.md) に従う。
+この文書は、このディレクトリの `StandardGaussian.lean`、`Smooth.lean`、`Lipschitz.lean` の構成・証明・検証の細目を管理する。数学的規約と公開 API は [AGENTS.md](AGENTS.md) に従う。
 
 全体の実行順序、状態、ファイル別の非同期実行の可否は [全体計画](../../EDITING_PLAN.md) を参照する。W02 はこの基盤だけでなく、Model の測度接続、SuperConcentration の利用側移行、Blueprint の更新を含む。ここでは他ディレクトリの編集を重複管理しない。
 
@@ -10,14 +10,14 @@
 
 ## W02：独立した汎用基盤の構成
 
-- [ ] 旧ガウス集中モジュールの証明を再利用し、任意の有限型 `ι` に対する結果をこのディレクトリへ移す。名前空間を `SYK.GaussianConcentration` に統一し、利用側を import しない。
-- [ ] `StandardGaussian.lean` に有限次元ユークリッド空間の標準ガウス測度と必要な測度・可積分性の結果を置く。模型の `N`・`q`・`CouplingSpace` を持ち込まない。
-- [ ] `Smooth.lean` に滑らかな関数のガウス部分積分・共分散評価をまとめる。回転不変性、積分交換、勾配の計算の仮定を確認する。
-- [ ] `Lipschitz.lean` に平滑化と極限操作、Herbst の議論を使う公開 MGF・裾評価をまとめる。証明で必要な可積分性を明示し、`StandardGaussian.lean`・`Smooth.lean` の結果を使う。
-- [ ] 可積分性・型変換などの重複と不要な import を整理する。広範な証明探索に依存する既存部分は、数学的役割が明確な証明へ置き換える。
-- [ ] 中心化したリプシッツ関数の `HasSubgaussianMGF` をパラメータ `L^2` で供給する。`L=0` は定数関数として処理する。
-- [ ] 上側・下側・両側の裾評価を mathlib の `HasSubgaussianMGF` API から導き、分母に `L^2` を含む正の定数の公式と `L=0` を区別する。
-- [ ] 公開定理の型・名前・定数を確定し、Model と SuperConcentration の接続に必要な入力として示す。互換用の別名や SYK に限定した特殊化は基盤側に残さない。
+- [x] 旧ガウス集中モジュールの証明を再利用し、任意の有限型 `ι` に対する結果をこのディレクトリへ移す。名前空間を `SYK.GaussianConcentration` に統一し、利用側を import しない。
+- [x] `StandardGaussian.lean` に有限次元ユークリッド空間の標準ガウス測度と必要な測度・可積分性の結果を置く。模型の `N`・`q`・`CouplingSpace` を持ち込まない。
+- [x] `Smooth.lean` に滑らかな関数のガウス部分積分・共分散評価をまとめる。回転不変性、積分交換、勾配の計算の仮定を確認する。
+- [x] `Lipschitz.lean` に平滑化と極限操作、Herbst の議論を使う公開 MGF・裾評価をまとめる。証明で必要な可積分性を明示し、`StandardGaussian.lean`・`Smooth.lean` の結果を使う。
+- [x] 可積分性・型変換などの重複と不要な import を整理する。広範な証明探索に依存する既存部分は、数学的役割が明確な証明へ置き換える。
+- [x] 中心化したリプシッツ関数の `HasSubgaussianMGF` をパラメータ `L^2` で供給する。`L=0` は定数関数として処理する。
+- [x] 上側・下側・両側の裾評価を mathlib の `HasSubgaussianMGF` API から導き、分母に `L^2` を含む正の定数の公式と `L=0` を区別する。
+- [x] 公開定理の型・名前・定数を確定し、Model と SuperConcentration の接続に必要な入力として示す。互換用の別名や SYK に限定した特殊化は基盤側に残さない。
 
 担当部分の完了条件：3ファイルが依存順に検査され、定理文と推移的な import に SYK 固有のデータが現れず、正の `L` と `L=0` の結果が揃っている。独立した外部パッケージや `lean_lib` は作らない。移行元の整理は [SuperConcentration の W02](../../SuperConcentration/EDITING_PLAN.md#w02) が担当する。
 
@@ -38,3 +38,11 @@
 必要な判断は、他課題の設定を保持した共有環境の更新を許可するか、SYK 用の別ワークスペースと依存キャッシュの作成を許可するかである。後者なら共有環境の既存依存を更新せずに、テンプレートどおりの検証が可能になる。いずれも `workspace/AGENTS.md` の依存設定変更・別ワークスペース作成に関する規則により明示的な承認を必要とする。
 
 再開地点：承認された方法で検証環境を整え、`StandardGaussian.lean` の測度・可積分性の抽出から開始する。各層の個別検査を通した後、Model・利用側・Blueprint を移行し、所定のビルド、公理依存、定数と仮定の照合を行う。過去の成功記録を今回の環境での成功として扱わない。
+
+### 2026-09-11：実装と局所検証、統合環境の判断待ち
+
+対象は `580792710437fb4b5c02c80aaaada0fee2acca85`。着手時の作業ツリーは変更なし。旧4ファイルを目標の3ファイルへ移し、名前空間を `SYK.GaussianConcentration` に変更した。汎用3ファイルの import と宣言には Model・SuperConcentration・`N`・`q`・`CouplingSpace` が現れない。公開 MGF 定理は `L ≥ 0` の下でパラメータ `Real.toNNReal (L^2)` を与え、正の `L` では上下・両側の裾を `exp (-t^2/(2L^2))` とその2倍で評価する。`L=0` では関数の定数性を証明し、MGF と上下・両側の空事象を別に処理した。
+
+`StandardGaussian.lean`、`Smooth.lean`、`Lipschitz.lean` は依存順の `lake env lean` に成功し、各 `+SYK.Probability.GaussianConcentration.<module>:olean` も成功した。主要な測度、MGF、正の `L` の両側評価、零の場合の両側評価は `#print axioms` で `propext`、`Classical.choice`、`Quot.sound` のみに依存した。移設元由来の未使用 `simp` 引数、deprecated 名、`ring_nf` の提案などの warning は残る。新しい `sorry`、`admit`、`axiom` はない。
+
+統合用の `lake build SYK` は、親ワークスペースで `lakefile.lean` が `lakefile.toml` より優先されるため、既定範囲外の `Annealed_FE` の既知の旧 `Params.β` 参照と、親環境にない Verso モジュールを含めて失敗した。汎用3層と `SYK.SuperConcentration.Main` の明示的な olean ターゲットは成功している。親の依存・Lake 設定変更には承認が必要なので、Blueprint の個別検査、生成、参照検査と既定対象による統合ビルドは判断待ちである。

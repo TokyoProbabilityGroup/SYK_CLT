@@ -1,4 +1,5 @@
-import SYK.SuperConcentration.GaussianConcentration.GaussianConcentration
+import SYK.Probability.GaussianConcentration.Lipschitz
+import SYK.Model.GaussianDisorder
 import SYK.SuperConcentration.Core
 
 /-!
@@ -17,6 +18,8 @@ open MeasureTheory
 open ProbabilityTheory
 
 namespace SYK
+
+open GaussianConcentration
 
 /-- The normalization multiplying each Gaussian coupling. -/
 noncomputable def couplingScale (P : Params) (𝒥 : ℝ) : ℝ :=
@@ -159,8 +162,8 @@ theorem logPartition_two_sided_tail
   have hLip' : LipschitzWith L.toNNReal (logPartition P β M 𝒥) := by
     simpa [L, simpleLipschitzConstant] using hLip
   have htail :=
-    gaussian_lipschitz_concentration P.N P.q
-      (logPartition P β M 𝒥) L t hL ht hLip'
+    euclidean_lipschitz_gaussian_concentration
+      (ι := InteractionIndex P.N P.q) (logPartition P β M 𝒥) L t hL ht hLip'
   have hq0 : (P.q : ℝ) ≠ 0 := ne_of_gt hq
   have hsqrt0 : Real.sqrt (P.q : ℝ) ≠ 0 := ne_of_gt hsqrt
   have hβ0 : (β : ℝ) ^ 2 ≠ 0 := pow_ne_zero 2 hβ

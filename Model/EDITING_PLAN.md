@@ -42,11 +42,13 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 
 新基盤の測度が確定した後、`GaussianDisorder.lean` の模型側の定義を接続する。受け渡しの順序は全体計画に従う。
 
-- [ ] `standardGaussianMeasure` を、[汎用基盤](../Probability/GaussianConcentration/EDITING_PLAN.md#w02) の有限型に対する測度を使う定義に揃え、積測度を重複定義しない。`CouplingSpace` とその次元の定義は再利用する。
-- [ ] 模型の測度と汎用測度の一致を利用側で扱えることを確認する。同一性の既存結果を移す場合は Model 側に置き、汎用側が Model を import する依存を除く。
+- [x] `standardGaussianMeasure` を、[汎用基盤](../Probability/GaussianConcentration/EDITING_PLAN.md#w02) の有限型に対する測度を使う定義に揃え、積測度を重複定義しない。`CouplingSpace` とその次元の定義は再利用する。
+- [x] 模型の測度と汎用測度の一致を利用側で扱えることを確認する。同一性の既存結果を移す場合は Model 側に置き、汎用側が Model を import する依存を除く。
 - [ ] `GaussianDisorder.lean` の個別検査と Model のビルドを行い、定義・必要な測度の性質と import を確認する。
 
 担当部分の完了条件：Model が独立した汎用測度を利用し、通常の標準ガウス座標の規約を維持している。利用側の import 切替は [SuperConcentration の W02](../SuperConcentration/EDITING_PLAN.md#w02) で管理する。
+
+`GaussianDisorder.lean` の個別検査と `+SYK.Model.GaussianDisorder:olean` は成功した。`standardGaussianMeasure_eq_onEuclidean` の公理依存は `propext`、`Classical.choice`、`Quot.sound` のみである。親ワークスペースが `Model` ターゲットを公開していないため、指定された `lake build Model SuperConcentration` は `unknown target Model` で失敗した。設定変更の承認待ちなので、最後の検証項目は未完了とする。
 
 <a id="w03"></a>
 

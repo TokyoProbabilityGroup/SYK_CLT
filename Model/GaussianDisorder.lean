@@ -1,6 +1,5 @@
 import SYK.Model.Definitions
-import Mathlib.Probability.Distributions.Gaussian.HasGaussianLaw.Independence
-import Mathlib.Probability.Distributions.Gaussian.Real
+import SYK.Probability.GaussianConcentration.StandardGaussian
 
 open scoped ENNReal
 open MeasureTheory
@@ -20,7 +19,15 @@ theorem couplingSpace_card (N q : ℕ) :
 /-- The product standard Gaussian measure transported to coupling space. -/
 noncomputable def standardGaussianMeasure (N q : ℕ) :
     Measure (CouplingSpace N q) :=
-  (Measure.pi fun _ : ({s : Finset (Fin N) // s.card = q}) => gaussianReal 0 1).map
-    (WithLp.toLp 2)
+  GaussianConcentration.standardGaussianMeasureOnEuclidean
+    ({s : Finset (Fin N) // s.card = q})
+
+/-- The coupling-space measure is definitionally the generic finite-dimensional
+standard Gaussian measure. -/
+@[simp]
+theorem standardGaussianMeasure_eq_onEuclidean (N q : ℕ) :
+    standardGaussianMeasure N q =
+      GaussianConcentration.standardGaussianMeasureOnEuclidean
+        ({s : Finset (Fin N) // s.card = q}) := rfl
 
 end SYK

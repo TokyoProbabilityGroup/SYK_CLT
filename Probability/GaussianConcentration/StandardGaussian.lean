@@ -1,4 +1,3 @@
-import SYK.Model.GaussianDisorder
 import Mathlib.Analysis.Calculus.Deriv.Pi
 import Mathlib.Analysis.Calculus.Gradient.Basic
 import Mathlib.Analysis.Convex.Deriv
@@ -16,7 +15,7 @@ open scoped BigOperators ENNReal NNReal
 open MeasureTheory
 open ProbabilityTheory
 
-namespace SYK
+namespace SYK.GaussianConcentration
 
 /-- One standard Gaussian measure for every finite Euclidean coordinate type.
 This is the product of standard one-dimensional Gaussians pushed forward to the
@@ -25,13 +24,6 @@ noncomputable def standardGaussianMeasureOnEuclidean
     (ι : Type*) [Fintype ι] :
     Measure (EuclideanSpace ℝ ι) :=
   (Measure.pi fun _ : ι => gaussianReal 0 1).map (WithLp.toLp 2)
-
-/-- The SYK coupling-space measure is the standard Euclidean Gaussian on the
-interaction-index type. -/
-@[simp]
-theorem standardGaussianMeasure_eq_onEuclidean (N q : ℕ) :
-    standardGaussianMeasure N q =
-      standardGaussianMeasureOnEuclidean ({s : Finset (Fin N) // s.card = q}) := rfl
 
 /-- The standard Euclidean Gaussian is a probability measure. -/
 instance standardGaussianMeasureOnEuclidean_isProbability
@@ -795,4 +787,4 @@ lemma gaussian_ibp_integrable {ι : Type*} [Fintype ι] (g : EuclideanSpace ℝ 
       simp +decide [ EuclideanSpace.norm_eq ];
       exact Real.abs_le_sqrt ( Finset.single_le_sum ( fun i _ => sq_nonneg ( ( gradient g w ).ofLp i ) ) ( Finset.mem_univ i ) )
 
-end SYK
+end SYK.GaussianConcentration

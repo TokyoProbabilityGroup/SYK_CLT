@@ -1,10 +1,10 @@
-import SYK.SuperConcentration.GaussianConcentration.GaussianConcentrationAux
+import SYK.Probability.GaussianConcentration.StandardGaussian
 
 /-!
 # Smooth-case Gaussian covariance bound: supporting lemmas
 
 This file develops the covariance interpolation identity used to prove the sharp
-Gaussian covariance bound `SYK.gaussian_cov_bound_smooth`.
+Gaussian covariance bound `SYK.GaussianConcentration.gaussian_cov_bound_smooth`.
 
 Let `μ = standardGaussianMeasureOnEuclidean ι` and, for a `C¹` function `F` with
 `‖∇F‖ ≤ L`, write `G x = exp (s * F x)`.  The covariance
@@ -18,7 +18,7 @@ open MeasureTheory ProbabilityTheory
 open scoped BigOperators ENNReal NNReal InnerProductSpace
 open intervalIntegral
 
-namespace SYK
+namespace SYK.GaussianConcentration
 
 variable {ι : Type*} [Fintype ι]
 
@@ -288,7 +288,7 @@ lemma integrable_cov_psi (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 �
         · have h_integrable : Integrable (fun p : EuclideanSpace ℝ ι => ‖p‖ * Real.exp (|s| * L * ‖p‖)) (standardGaussianMeasureOnEuclidean ι) := by
             have h_integrable : ∀ c : ℝ, Integrable (fun p : EuclideanSpace ℝ ι => Real.exp (c * ‖p‖)) (standardGaussianMeasureOnEuclidean ι) := by
               intro c
-              apply SYK.integrable_exp_mul_norm;
+              apply integrable_exp_mul_norm;
             have := h_integrable ( |s| * L + 1 );
             refine' this.mono' _ _;
             · exact MeasureTheory.AEStronglyMeasurable.mul ( measurable_norm.aestronglyMeasurable ) ( Real.continuous_exp.comp_aestronglyMeasurable ( measurable_const.mul measurable_norm |> Measurable.aestronglyMeasurable ) );
@@ -738,4 +738,4 @@ lemma gaussian_cov_bound_smooth (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (h
     ring_nf
     norm_num
 
-end SYK
+end SYK.GaussianConcentration

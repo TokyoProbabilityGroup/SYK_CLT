@@ -33,7 +33,7 @@
 | ID | 作業単位・成果 | 前提 | 状態 | 詳細の管理先 |
 | --- | --- | --- | --- | --- |
 | W01 | 共有行列解析の仕上げ。追加済みの整関数性・複素微分・条件付き対数微分を、関連検証と Blueprint・文書更新まで完了した | 現行実装 | 完了 | [Model](Model/EDITING_PLAN.md#w01) |
-| W02 | 汎用ガウス集中不等式の独立化。測度・平滑化・MGF・裾評価と `L=0` の処理、利用側の参照移行 | 現行の汎用証明 | 未着手 | [汎用基盤](Probability/GaussianConcentration/EDITING_PLAN.md#w02)、[Model の接続](Model/EDITING_PLAN.md#w02)、[利用側](SuperConcentration/EDITING_PLAN.md#w02) |
+| W02 | 汎用ガウス集中不等式の独立化。測度・平滑化・MGF・裾評価と `L=0` の処理、利用側の参照移行 | 現行の汎用証明 | 判断待ち | [汎用基盤](Probability/GaussianConcentration/EDITING_PLAN.md#w02)、[Model の接続](Model/EDITING_PLAN.md#w02)、[利用側](SuperConcentration/EDITING_PLAN.md#w02) |
 | W03 | ガウス型 SYK ハミルトニアンの共有化。標準スケールとハミルトニアンを Model に置き、直接の利用側を移行する | W02 | 前提待ち | [Model](Model/EDITING_PLAN.md#w03)、[利用側](SuperConcentration/EDITING_PLAN.md#w03) |
 | W04 | 標準行列表現の構成。Jordan–Wigner 表現、次元、反交換関係、自己共役性、対象演算子族のトレース直交性 | 既存の共有代数 | 未着手 | [Model](Model/EDITING_PLAN.md#w04)、[必要な補題の移設元](SuperConcentration/EDITING_PLAN.md#w04) |
 | W05 | SYK 集中不等式の移行完了。有限サイズ評価、標準規格化でのリプシッツ評価、MGF、上下・両側の裾評価、旧基本 API の整理 | W01・W03 | 前提待ち | [SuperConcentration](SuperConcentration/EDITING_PLAN.md#w05) |
