@@ -122,13 +122,26 @@ W02 では「汎用基盤の構成 → Model の測度接続 → 利用側の im
 
 Lean の実装単位は、変更ファイルの個別検査、関連する最小ビルド、主要定理の公理依存・残る仮定の確認、差分確認、必要な文書・Blueprint 更新までを含む。全体の完了は、関係するすべての詳細計画の担当部分と統合検証が揃ってから判定する。正確なコマンドと例外は各作業の `AGENTS.md` と詳細計画に従う。原稿監査は数学的な確認とコンパイル結果を記録し、Lean による検証と区別する。
 
-`Annealed_FE` と `Universality` は Lake の独立したライブラリ登録を維持しつつ、ルートモジュールと CI の既定ビルドから一時的に除外する。`Annealed_FE` は共有 API への移行と個別ビルド、`Universality` は実装と個別ビルドが完了した後、それぞれの import と CI の対象を復帰させる。復帰後は `lake build`、`lake exe vbp build`、`lake exe vbp check` を再実行する。
+`Annealed_FE` と `Universality` は Lake の独立したライブラリ登録を維持しつつ、`lakefile.toml` の `defaultTargets` から一時的に除外する。CI も同じ既定対象を使う。`Annealed_FE` は共有 API への移行と個別ビルド、`Universality` は実装と個別ビルドが完了した後、ルートと `workspace/` の両設定で `defaultTargets` に復帰させる。復帰後は `lake build`、`lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site`、`lake exe vbp check --site SYK/_out/site` を再実行する。
 
-除外中の `lake build` と CI の成功は両ライブラリの検証を意味しない。`Annealed_FE` の既知のエラーと未完成の証明は検証記録に残し、既定範囲に新しいエラーや未完成の証明を許容しない。Blueprint は除外中のライブラリに阻害されないため、対象単位の完了には生成と参照検査の成功を必要とする。公開 README は全ライブラリを既定ビルドへ戻した将来の運用を記しており、この暫定状態に合わせて変更しない。
+除外中の `lake build` と CI の成功は両ライブラリの検証を意味しない。`Annealed_FE` の既知のエラーと未完成の証明は検証記録に残し、既定範囲に新しいエラーや未完成の証明を許容しない。Blueprint は除外中のライブラリに阻害されないため、対象単位の完了には生成と参照検査の成功を必要とする。公開 README は一般的なビルド手順を記し、この暫定状態や AI 向けの作業規則は載せない。
 
 2026-09-08 に両ライブラリを一時除外し、`lake env lean SYK.lean`、`lake build Model SuperConcentration CLT`、`lake build`、`lake exe vbp build`、`lake exe vbp check` が成功した。Blueprint の manifest と HTML cache は各50件で整合した。Model・SuperConcentration・Chapters と VersoBlueprint には既存の linter warning が残るが、エラー、未解決の証明目標、および既定範囲の `sorry`・`admit`・`axiom` は検出されなかった。
 
 一単位を原則一コミット候補とし、独立して検証できる成果が複数ある場合だけ分割する。例えば W04 は「標準表現と基本関係」「トレース直交性」で分けられるが、ユーザーへの指示単位は W04 のままでよい。W02 でも依存層ごとの検証を行うが、検証のたびに作業を終了しない。
+
+## ビルド入口のプロジェクト内への移設（2026-09-11）
+
+W01–W06 とは独立した構成変更として、コミット `e1ea38d` の配置から次の移行を行った。数学的な定義・定理・証明と依存バージョンは変更していない。
+
+- 生成入口を `BlueprintMain.lean` に移設し、ルートの `SYK.lean`・`SYKMain.lean` と `workspace/` 内の配布用コピーを削除した。一括 import 専用ファイルは置かず、旧内容は Git 履歴に保持する。
+- ルートと `workspace/` の `lakefile.toml` で `defaultTargets` を `["Model", "SuperConcentration", "CLT", "SYK"]` に揃えた。`SYK` の対象は共有基盤の `SYK.Probability.GaussianConcentration.+`、`SYK.Blueprint`、`SYK.Chapters.+` とし、数学の各話題は個別対象で管理する。`lake build` は既定対象全体、`lake build SYK` は共有基盤・Blueprint・章とその依存先を検査する。共有の `.lake/` は引き続き使う。
+- Blueprint は `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` で直接生成する。Lake が import を自動ビルドするため、シェルスクリプトや専用の実行ファイルは追加しない。生成先は Git の対象外とした。README のサーバー起動箇所には、現行の `vbp build --serve` がルート直下しか生成入口を探索しないことと、内蔵サーバーも Python を使うことをコメントで明記した。
+- `README.md`・`workspace/README.md`・`SuperConcentration/README.md` の配置・コピー・ビルド・生成手順、`.github/workflows/lean_action_ci.yml`、`AGENTS.md`、本計画、`Model/EDITING_PLAN.md`・`Chapters/EDITING_PLAN.md` の現行検証手順を更新した。CI のビルド対象一覧は TOML の `defaultTargets` に集約した。過去の検証コマンドは履歴として保持した。
+
+最終構成で `lake build`（3562 jobs）、`lake env lean SYK/BlueprintMain.lean`、上記の `lake lean` による直接生成が成功した。`lake exe vbp check --site SYK/_out/site` は manifest・HTML cache 各50件、エラー0件で成功した。配布用と実際の Lake 設定・manifest・toolchain の一致、および `git diff --check` も確認した。
+
+Model・SuperConcentration・Chapters と VersoBlueprint の既存の警告は残る。`Annealed_FE`・`Universality` の一時除外は維持しており、両ライブラリを検証済みとは扱わない。GitHub 上の CI 実行、任意の PDF 生成、ローカルサーバーの起動は今回の検証には含めていない。
 
 ## 旧計画との対応
 

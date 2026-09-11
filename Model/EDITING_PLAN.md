@@ -99,7 +99,7 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 
 変更ファイルを個別に `lake env lean` で検査し、`lake build Model` と移行済み利用側の最小ビルドを行う。Model と集中不等式の接続を変更した単位では `lake build Model SuperConcentration` を実行する。重要な定理では `#print axioms` と定理文の仮定を確認する。
 
-ワークスペース全体に影響する変更では `lake build`、Blueprint の変更では `lake exe vbp build` と `lake exe vbp check` を実行する。現在の既定ビルドから除外されている `Annealed_FE` と `Universality` は個別に検証済みとは扱わない。既定範囲のビルドと Blueprint の生成・参照検査には成功を必要とし、新規の `sorry`、`admit`、`axiom`、未解決の証明目標は許容しない。
+ワークスペース全体に影響する変更では `lake build`、Blueprint の変更では `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` と `lake exe vbp check --site SYK/_out/site` を実行する。現在の既定ビルドから除外されている `Annealed_FE` と `Universality` は個別に検証済みとは扱わない。既定範囲のビルドと Blueprint の生成・参照検査には成功を必要とし、新規の `sorry`、`admit`、`axiom`、未解決の証明目標は許容しない。
 
 検証記録には対象コミット・差分、コマンド、結果、警告、公理依存、残る仮定を記す。新しい検証結果は該当単位の節に追記し、過去の成功を変更後の成功として転記しない。
 

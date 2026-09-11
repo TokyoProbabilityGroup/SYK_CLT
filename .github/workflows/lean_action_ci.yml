@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - 'main'
+    paths:
+      - '**.lean'
   workflow_dispatch:
 
 concurrency:
@@ -25,19 +27,15 @@ jobs:
           cp SYK/workspace/lakefile.toml      ./lakefile.toml
           cp SYK/workspace/lake-manifest.json ./lake-manifest.json
           cp SYK/workspace/lean-toolchain     ./lean-toolchain
-          cp SYK/workspace/SYK.lean           ./SYK.lean
-          cp SYK/workspace/SYKMain.lean       ./SYKMain.lean
           ls -la
 
       - uses: leanprover/lean-action@v1
+        # Use defaultTargets from the version-controlled Lake configuration.
         with:
           use-github-cache: false
-          # Restore this full target list when the two inactive libraries are ready:
-          # build-args: "Model SuperConcentration CLT Annealed_FE Universality"
-          build-args: "Model SuperConcentration CLT"
 
       - name: Build Blueprint site
-        run: lake exe vbp build
+        run: lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site
 
       - name: Check Blueprint output
-        run: lake exe vbp check
+        run: lake exe vbp check --site SYK/_out/site
