@@ -34,11 +34,11 @@ flowchart TD
 
 新基盤の編集・証明の細目は [汎用基盤の計画](../Probability/GaussianConcentration/EDITING_PLAN.md)、旧配置の整理と SYK への適用は [このディレクトリの計画](EDITING_PLAN.md#w02) に記録する。以下は移設の設計理由と境界であり、作業状態の一覧ではない。
 
-`CouplingSpace`、`couplingSpace_card`、`standardGaussianMeasure` は `Model.GaussianDisorder` に移設済みである。現行の `GaussianConcentrationAux.lean` は Model を import し、汎用測度と模型の測度の同一性を述べる等式を持つ。W02 では汎用測度を独立した基盤側に置き、Model の測度をそれに接続する。同一性を述べる結果は模型側または適用側へ移し、汎用部分から Model への依存を除く。現行の `GaussianConcentration.lean` 末尾にある `N, q` への特殊化も、共有模型または集中不等式を SYK に適用する側へ移す。
+`CouplingSpace`、`couplingSpace_card`、`standardGaussianMeasure` は `Model.GaussianDisorder` に置く。W02 で汎用測度を `Probability/GaussianConcentration/StandardGaussian.lean` に移し、模型の測度をその有限添字型への特殊化として定義した。同一性を述べる `standardGaussianMeasure_eq_onEuclidean` は Model 側に置き、汎用部分から Model への依存と `N, q` への特殊化を除いた。
 
 残る基盤部分では、座標を添字付ける任意の有限型 `ι` だけについて量化し、中心となる結果をモーメント母関数の評価 `HasSubgaussianMGF` として述べる。上側・下側・両側の裾の評価は、mathlib の劣ガウス確率変数に関する API から導く。
 
-移行時には `L > 0` の既存証明を保持しつつ、`L = 0` では関数が定数であることから別に処理する。公開 MGF 定理と裾評価では、分母に `L^2` を含む表示にこの場合を代入しない。
+`L > 0` の既存証明を保持し、`L = 0` では関数が定数であることから別に処理する。公開 MGF 定理は `L ≥ 0` でパラメータ `L^2` を与える。正の `L` に対する裾評価と、零の場合に裾事象の測度が零である定理を分け、分母に `L^2` を含む表示へ零を代入しない。
 
 ## 共通ガウス集中不等式の定数
 

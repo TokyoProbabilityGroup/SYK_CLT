@@ -91,21 +91,18 @@ for every density matrix $\rho$.
 - `../Model/FiniteDimensionalGibbs.lean` supplies density-matrix identities,
   positivity and normalization properties of Gibbs states, and derivatives of
   traces of affine matrix exponentials.
-- `GaussianConcentration/GaussianConcentrationAux.lean` supplies measure,
-  integrability, gradient, and Herbst-method infrastructure.
-- `GaussianConcentration/GaussianCovSmooth.lean` proves the smooth Gaussian
+- `../Probability/GaussianConcentration/StandardGaussian.lean` supplies the
+  standard measure, integrability, gradient, and Herbst-method infrastructure.
+- `../Probability/GaussianConcentration/Smooth.lean` proves the smooth Gaussian
   covariance estimate using integration by parts and rotation invariance.
-- `GaussianConcentration/GaussianCovMollify.lean` extends that estimate from
-  smooth functions to Lipschitz functions by mollification.
-- `GaussianConcentration/GaussianConcentration.lean` packages the
-  moment-generating-function bounds and the one-sided and two-sided Gaussian
-  tail inequalities.
+- `../Probability/GaussianConcentration/Lipschitz.lean` extends that estimate
+  from smooth functions by mollification and packages the moment-generating
+  function and tail bounds, including the zero-Lipschitz case.
 - `Main.lean` defines the normalized Hamiltonian and log-partition
   function, proves the Lipschitz estimate, and states the public theorem.
-- `blueprint_super_concentration.txt` and
-  `GaussianConcentration/blueprint_gaussian_concentration.txt` contain proof
-  plans. The Lean sources are authoritative if a blueprint records an older
-  target.
+- `blueprint_super_concentration.txt` contains an older proof plan. The
+  historical Gaussian-concentration plan remains under
+  `GaussianConcentration/`; the Lean sources are authoritative.
 
 ## Building
 

@@ -14,13 +14,15 @@
 
 移設先の定義・証明・定数の検査は [汎用基盤の W02](../Probability/GaussianConcentration/EDITING_PLAN.md#w02)、模型の測度との接続は [Model の W02](../Model/EDITING_PLAN.md#w02) が管理する。ここでは移設元と直接の利用側を扱う。
 
-- [ ] `GaussianConcentration/` の `GaussianConcentrationAux.lean`、`GaussianCovSmooth.lean`、`GaussianCovMollify.lean`、`GaussianConcentration.lean` について、移設する宣言と残る参照を確認し、新基盤へ既存証明を引き渡す。
-- [ ] `N, q` への特殊化は、実際に必要なものだけを適用側に残す。模型の測度との同一性の結果は Model への移設後に旧定義を除き、不要な特殊化や互換用の別名を残さない。
-- [ ] 新基盤と Model の接続の検査後、`Main.lean` など、このディレクトリ内の直接の利用箇所の import・宣言参照を移行する。この単位では一般スケールを標準スケールに変更しない。
-- [ ] 移設済みの旧4ファイルを整理し、旧配置への参照が残っていないことを確認する。利用する汎用結果の正の `L` と `L=0` の条件を照合する。
-- [ ] 変更ファイルの個別検査と関連ビルドを行い、README・過去の証明計画書の旧パスと証明状態を更新する。過去の資料として残す記述は、その時点を明示する。
+- [x] `GaussianConcentration/` の `GaussianConcentrationAux.lean`、`GaussianCovSmooth.lean`、`GaussianCovMollify.lean`、`GaussianConcentration.lean` について、移設する宣言と残る参照を確認し、新基盤へ既存証明を引き渡す。
+- [x] `N, q` への特殊化は、実際に必要なものだけを適用側に残す。模型の測度との同一性の結果は Model への移設後に旧定義を除き、不要な特殊化や互換用の別名を残さない。
+- [x] 新基盤と Model の接続の検査後、`Main.lean` など、このディレクトリ内の直接の利用箇所の import・宣言参照を移行する。この単位では一般スケールを標準スケールに変更しない。
+- [x] 移設済みの旧4ファイルを整理し、旧配置への参照が残っていないことを確認する。利用する汎用結果の正の `L` と `L=0` の条件を照合する。
+- [x] 変更ファイルの個別検査と関連ビルドを行い、README・過去の証明計画書の旧パスと証明状態を更新する。過去の資料として残す記述は、その時点を明示する。
 
 担当部分の完了条件：独立した汎用基盤を直接利用し、旧配置・重複定義・互換用の別名が残らず、既存の SYK 評価を維持している。W02 全体の完了には新基盤、Model、[Chapters](../Chapters/EDITING_PLAN.md) の担当部分と統合検証も必要である。
+
+`Main.lean` の個別検査と `+SYK.SuperConcentration.Main:olean` は成功し、旧4モジュールへの Lean の参照は残っていない。README、構造文書、過去の証明計画書は新配置と履歴上の位置付けを明記するよう更新した。親ワークスペースへ個別ターゲットを追加した後、`lake build Model SuperConcentration` も成功した。2026-09-12には Blueprint の直接生成と参照検査も成功し、manifest と HTML cache は各52件、エラーは0件であった。詳細は汎用基盤の W02 検証記録を参照する。
 
 <a id="w03"></a>
 
