@@ -11,44 +11,43 @@ The public result is
 `SYK.logPartition_two_sided_tail_standardGaussian` in `Main.lean`.
 Let `P : SYK.Params`, let `M` be a finite-dimensional matrix realization of
 the Majorana relations, let `β : ℝ≥0`, and suppose that
-$\mathcal J>0$, $\beta\ne0$, and $t>0$. Then
+$\beta\ne0$ and $t>0$. Then
 
 $$
 \mathbb P\left(
   \left|\log Z-\mathbb E[\log Z]\right|>t
 \right)
 \le
-2\exp\left(-\frac{q t^2}{2\beta^2\mathcal J^2}\right).
+2\exp\left(-\frac{q t^2}{2\beta^2}\right).
 $$
 
 The inverse temperature is an explicit argument, and the probability and
 expectation are taken with respect to the product standard Gaussian measure on
 the coupling space.
 
-The normalized Hamiltonian uses
+The shared normalized Hamiltonian in `../Model/GaussianDisorder.lean` uses
 
 $$
-\operatorname{couplingScale}(P,\mathcal J)
+\operatorname{couplingScale}(P)
 =
-\mathcal J
 \sqrt{\frac{(q-1)!}{N^{q-1}}}.
 $$
 
 The proof first obtains the exact finite-volume squared Lipschitz bound
 
 $$
-(\beta\,\operatorname{couplingScale}(P,\mathcal J))^2
+(\beta\,\operatorname{couplingScale}(P))^2
 \frac{\binom{N}{q-1}}{q},
 $$
 
 then bounds the Lipschitz constant by
-$|\beta|\mathcal J/\sqrt q$. Applying finite-dimensional Gaussian
+$\beta/\sqrt q$. Applying finite-dimensional Gaussian
 concentration gives the stated tail estimate. In particular, its scale is
 independent of $N$.
 
 The parameter structure `SYK.Params` assumes that $q$ is positive and even,
 $q\le N$. The explicit inverse temperature has type `ℝ≥0`, and the public
-theorem additionally assumes $\mathcal J>0$ and $\beta\ne0$. The partition
+theorem additionally assumes $\beta\ne0$. The partition
 function uses the ordinary matrix trace and satisfies $Z(0)=d$, where $d$ is
 the matrix index dimension. The zero inverse-temperature case $\beta=0$,
 where the log-partition function is the constant $\log d$, is covered separately by
@@ -98,8 +97,11 @@ for every density matrix $\rho$.
 - `../Probability/GaussianConcentration/Lipschitz.lean` extends that estimate
   from smooth functions by mollification and packages the moment-generating
   function and tail bounds, including the zero-Lipschitz case.
-- `Main.lean` defines the normalized Hamiltonian and log-partition
-  function, proves the Lipschitz estimate, and states the public theorem.
+- `../Model/GaussianDisorder.lean` defines the standard scale and Hamiltonian,
+  their linearity, and self-adjointness. Its input is the standard Gaussian
+  coordinate vector; each actual coefficient has variance $(q-1)!/N^{q-1}$.
+- `Main.lean` defines the log-partition function using that shared Hamiltonian,
+  proves the Lipschitz estimate, and states the public theorem.
 - `blueprint_super_concentration.txt` contains an older proof plan. The
   historical Gaussian-concentration plan remains under
   `GaussianConcentration/`; the Lean sources are authoritative.

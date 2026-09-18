@@ -3,6 +3,7 @@ import VersoManual
 import VersoBlueprint
 import SYK.Model.FiniteDimensionalGibbs
 import SYK.Model.Majorana
+import SYK.Model.GaussianDisorder
 
 set_option linter.mathlibStandardSet false
 
@@ -31,6 +32,43 @@ anticommutation relations.
 :::definition "interaction_hamiltonian" (parent := "model") (lean := "SYK.hamiltonian")
 The finite-dimensional Hamiltonian is the prescribed linear combination of
 ordered Majorana interaction operators.
+:::
+
+:::definition "scaled_syk_hamiltonian" (parent := "model") (uses := "interaction_hamiltonian") (lean := "SYK.CouplingSpace, SYK.standardGaussianMeasure, SYK.couplingScale, SYK.normalizedHamiltonian")
+For valid parameters $`(N,q)` and a finite matrix Majorana system, let
+$`g=(g_A)_{|A|=q}` be standard Gaussian coordinates and define
+
+$$`
+\sigma_N=\sqrt{\frac{(q-1)!}{N^{q-1}}},
+\qquad J_A=\sigma_N g_A,
+\qquad H(g)=\sum_{|A|=q}J_A\Psi_A.
+`
+
+Here $`\Psi_A=i^{q/2}\psi_{a_1}\cdots\psi_{a_q}` uses increasing labels.
+Under the product standard Gaussian measure, the actual coefficients $`J_A`
+are independent centered Gaussians, each with variance
+$`\sigma_N^2=(q-1)!/N^{q-1}`. This is the variance of one coefficient,
+not of the whole Hamiltonian. Concentration estimates use the Euclidean norm
+of $`g`, rather than the actual coefficient vector $`J`.
+This matches the lecture notes at `eq:Hqnormalized` and `eq:Jcovariance`,
+and the CLT manuscript at `subsec:SYK-model`; the shared construction does not
+impose the manuscript's additional $`q\ge4` or standard representation.
+:::
+
+:::theorem "standard_hamiltonian_properties" (parent := "model") (uses := "scaled_syk_hamiltonian") (lean := "SYK.couplingScale_nonneg, SYK.couplingScale_sq, SYK.normalizedHamiltonian_zero, SYK.normalizedHamiltonian_add, SYK.normalizedHamiltonian_smul, SYK.normalizedHamiltonian_affine, SYK.normalizedHamiltonian_self_adjoint")
+The standard scale is nonnegative and its square is $`(q-1)!/N^{q-1}`.
+The Hamiltonian is real linear in the Gaussian coordinates and self-adjoint:
+
+$$`
+H(g+s v)=H(g)+sH(v),\qquad H(g)^*=H(g)
+\quad(s\in\mathbb R).
+`
+:::
+
+:::proof "standard_hamiltonian_properties"
+The square identity follows from nonnegativity of the variance and the real
+square-root identity. Linearity follows by expanding the finite sum; real
+coefficients and self-adjoint interaction operators give self-adjointness.
 :::
 
 :::definition "partition_function" (parent := "model") (lean := "SYK.partitionFunction")

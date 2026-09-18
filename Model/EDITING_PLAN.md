@@ -10,7 +10,7 @@
 | --- | --- |
 | パラメータ・共有代数 | 逆温度の分離、相互作用添字、昇順積、位相、相互作用演算子、確定的ハミルトニアンは移行済み |
 | 有限次元の解析・物理量 | 通常の分配関数、`normalizedTrace`、物理的 Gibbs API、実方向微分、整関数性・複素微分・条件付き対数微分は実装・検証済み。零点のない領域は Z01 |
-| ガウス型相互作用 | `CouplingSpace`・`couplingSpace_card`・`standardGaussianMeasure` は Model に移設済み。汎用測度との接続は W02、標準スケールとハミルトニアンは W03 |
+| ガウス型相互作用 | `CouplingSpace`・`couplingSpace_card`・`standardGaussianMeasure` は Model に移設済み。汎用測度との接続は W02、標準スケールとハミルトニアンは W03 で共有化 |
 | 標準表現 | 未実装。W04 で構成し、直交性を抽象的な `MajoranaSystem` の仮定に追加しない |
 | 利用側 | 集中不等式の移行完了は W05、CLT 固有の規格化分配関数と接続は W06 |
 
@@ -56,12 +56,23 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 
 前提は W02。測度の独立化と利用側の import 移行が終わった後に、同じ利用側ファイルの規格化を移行する。
 
-- [ ] 移設済みの `CouplingSpace` と標準ガウス測度を再利用し、`σ_N² = (q-1)! / N^(q-1)` に対応する標準スケールを `Model.GaussianDisorder` に置く。
-- [ ] 標準規格化ハミルトニアンを共有する確定的ハミルトニアンから定義し、線形性・自己共役性など利用側で必要な既存の結果を移す。
-- [ ] Model の基本 API は標準スケールに限定し、一般スケール `𝒥` や互換用の別名を重複して公開しない。移行元の削除と微分・リプシッツ・裾評価の追従は [SuperConcentration の W03](../SuperConcentration/EDITING_PLAN.md#w03) で管理する。
-- [ ] 個別検査、Model と移行済み利用側のビルド、主要定理の公理依存、このディレクトリ内の対応文書の更新を完了する。
+- [x] 移設済みの `CouplingSpace` と標準ガウス測度を再利用し、`σ_N² = (q-1)! / N^(q-1)` に対応する標準スケールを `Model.GaussianDisorder` に置く。
+- [x] 標準規格化ハミルトニアンを共有する確定的ハミルトニアンから定義し、線形性・自己共役性など利用側で必要な既存の結果を移す。
+- [x] Model の基本 API は標準スケールに限定し、一般スケール `𝒥` や互換用の別名を重複して公開しない。移行元の削除と微分・リプシッツ・裾評価の追従は [SuperConcentration の W03](../SuperConcentration/EDITING_PLAN.md#w03) で管理する。
+- [x] 個別検査、Model と移行済み利用側のビルド、主要定理の公理依存、このディレクトリ内の対応文書の更新を完了する。
 
 担当部分の完了条件：標準の相互作用係数とハミルトニアンが Model の一つの定義系列になる。W03 全体は直接の利用側への移行と統合検証まで含めて完了する。各係数の分散と、ガウス座標 `g_A` に関する評価であることを明記する。
+
+### 検証記録（2026-09-18）
+
+対象は着手時コミット `475378724d3c2541711a15b19f3ec6500dbf8b2b` からの未コミット差分。着手時の SYK 作業ツリーは変更なし。`couplingScale P` と `normalizedHamiltonian P M g`、アフィン性・自己共役性を `GaussianDisorder.lean` に移し、スケールの非負性・二乗公式と零・加法・実スカラー倍の性質を追加した。通常のトレース、昇順積、位相、共有 `Params` の条件は変更していない。講義ノートの `eq:Hqnormalized`・`eq:Jcovariance` と CLT 原稿の `subsec:SYK-model` にある標準係数規約を照合した。原稿の偶数 N・標準表現・q≥4・規格化トレースは抽象的な共有 API に追加しない。
+
+- `lake env lean SYK/Model/GaussianDisorder.lean` と `+SYK.Model.GaussianDisorder:olean` は成功し、同ファイルの warning はなかった。
+- `lake build Model SuperConcentration` は3194 jobsで成功した。
+- `couplingScale_sq`、ハミルトニアンのアフィン性・加法・実スカラー倍・自己共役性の `#print axioms` は `propext`、`Classical.choice`、`Quot.sound` のみを示した。
+- 各実係数は `J_A = couplingScale P * g_A`、各係数の分散は `(q-1)!/N^(q-1)`。利用側のノルムと集中評価は標準ガウス座標 `g_A` に関するものである。分散の新しい確率論的定理を追加したという意味ではなく、既存の標準ガウス測度とスケールの二乗公式に基づく規約の確認である。
+
+`lake build` は3561 jobsで成功し、Blueprint の直接生成と `lake exe vbp check --site SYK/_out/site` も成功した。manifest と HTML cache は各63件、エラー0件であった。既存の汎用ガウス集中の linter warning と `density_variance_nonneg` の未使用 `[DecidableEq d]` warning は残る。`Annealed_FE` と `Universality` は今回も編集・個別検証の対象外である。
 
 <a id="w04"></a>
 

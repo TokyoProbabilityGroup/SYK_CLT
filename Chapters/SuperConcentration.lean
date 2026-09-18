@@ -16,41 +16,23 @@ The model-specific argument that turns the algebraic relations of Majorana
 interaction operators into concentration of the finite-dimensional SYK
 log-partition function.
 
-The currently checked declarations retain a real energy scale 𝒥, with
-nonnegativity or positivity imposed by the estimates that need it. The intended
-standard normalization is the specialization 𝒥 = 1. Model-specific
+The checked declarations use the standard Hamiltonian shared by Model and
+measure Lipschitz constants in the standard Gaussian coordinates. Model-specific
 moment-generating-function and separate one-sided tail theorems are not yet
 part of the checked API and are therefore not asserted in this chapter.
-:::
-
-:::definition "scaled_syk_hamiltonian" (parent := "superconcentration") (uses := "interaction_hamiltonian") (lean := "SYK.couplingScale, SYK.normalizedHamiltonian")
-Let $`\mathcal{P} = (N,q)` be valid SYK parameters and let
-$`\mathcal{M}` be a Majorana system. For an energy scale
-$`\mathcal{J} \in \mathbb{R}` and a coupling vector $`J`, set
-
-$$`
-c_{N,q}(\mathcal{J})
-  = \mathcal{J}
-    \sqrt{\frac{(q-1)!}{N^{q-1}}},
-\qquad
-H_{\mathcal{J}}(J)
-  = \sum_{|I|=q} c_{N,q}(\mathcal{J}) J_I \Psi_I .
-`
-
-Here $`\Psi_I` is the interaction operator associated with $`I`.
 :::
 
 :::definition "syk_log_partition" (parent := "superconcentration") (uses := "partition_function, scaled_syk_hamiltonian") (lean := "SYK.logPartition")
 For $`\beta \in \mathbb{R}_{\ge 0}`, define the real log-partition function by
 
 $$`
-F_{\beta,\mathcal{J}}(J)
+F_{\beta}(g)
   = \log \operatorname{Re}
-      \operatorname{Tr} \exp\bigl(-\beta H_{\mathcal{J}}(J)\bigr).
+      \operatorname{Tr} \exp\bigl(-\beta H(g)\bigr).
 `
 
 The matrix representation is finite-dimensional and nonempty. Self-adjointness
-of $`H_{\mathcal{J}}(J)` makes the real part inside the logarithm strictly
+of $`H(g)` makes the real part inside the logarithm strictly
 positive.
 :::
 
@@ -95,23 +77,23 @@ exactly $`q` times, and division by $`q>0` gives the stated bound.
 :::
 
 :::theorem "syk_directional_derivative" (parent := "superconcentration") (uses := "syk_log_partition") (lean := "SYK.logPartition_line_deriv_eq")
-For coupling vectors $`J,V` and $`s \in \mathbb{R}`, the derivative along the
-coupling line is
+For standard Gaussian coordinate vectors $`g,V` and $`s \in \mathbb{R}`,
+the derivative along the coupling line is
 
 $$`
-\frac{d}{dr} F_{\beta,\mathcal{J}}(J+rV)\bigg|_{r=s}
+\frac{d}{dr} F_{\beta}(g+rV)\bigg|_{r=s}
   =
   -\beta \operatorname{Re}
     \operatorname{Tr}\bigl(
-      \rho_{\beta,H_{\mathcal{J}}(J+sV)}
-      H_{\mathcal{J}}(V)
+      \rho_{\beta,H(g+sV)}
+      H(V)
     \bigr),
 `
 
 where $`\rho_{\beta,H}` is the thermal density matrix.
 :::
 
-:::proof "syk_directional_derivative"
+:::proof "syk_directional_derivative" (uses := "standard_hamiltonian_properties")
 Differentiate the trace exponential along the affine coupling line and then
 differentiate the real logarithm, using positivity of the partition function.
 Cyclicity of the trace rewrites the resulting quotient as the thermal
@@ -119,23 +101,23 @@ expectation displayed above.
 :::
 
 :::theorem "syk_directional_gradient_bound" (parent := "superconcentration") (uses := "scaled_syk_hamiltonian") (lean := "SYK.abs_beta_expectation_normHam_sq_le_exact, SYK.abs_beta_expectation_normHam_le")
-If $`\mathcal{J} \ge 0`, then for every density matrix $`\rho` and coupling
+For every density matrix $`\rho` and standard Gaussian coordinate
 direction $`V`,
 
 $$`
 \left|
   \beta \operatorname{Re}
-    \operatorname{Tr}\bigl(\rho H_{\mathcal{J}}(V)\bigr)
+    \operatorname{Tr}\bigl(\rho H(V)\bigr)
 \right|
 \le
-\frac{|\beta|\mathcal{J}}{\sqrt{q}} \lVert V \rVert_2.
+\frac{\beta}{\sqrt{q}} \lVert V \rVert_2.
 `
 
 Before simplifying the finite-volume normalization, the square of the
 left-hand side is bounded by
 
 $$`
-\bigl(\beta c_{N,q}(\mathcal{J})\bigr)^2
+\bigl(\beta \sigma_N\bigr)^2
 \frac{\binom{N}{q-1}}{q}
 \lVert V \rVert_2^2.
 `
@@ -148,25 +130,25 @@ interaction expectations. Cauchy--Schwarz and
 falling-factorial estimate
 
 $$`
-c_{N,q}(\mathcal{J})
+\sigma_N
 \sqrt{\frac{\binom{N}{q-1}}{q}}
-\le \frac{\mathcal{J}}{\sqrt{q}}
+\le \frac{1}{\sqrt{q}}
 `
 
 then gives the simplified constant.
 :::
 
 :::theorem "log_partition_lipschitz" (parent := "superconcentration") (uses := "syk_log_partition") (lean := "SYK.logPartition_lipschitz")
-If $`\mathcal{J} \ge 0`, then $`F_{\beta,\mathcal{J}}` is Lipschitz on the
+$`F_{\beta}` is Lipschitz on the
 Euclidean coupling space with constant
 
 $$`
-L = \frac{|\beta|\mathcal{J}}{\sqrt{q}}.
+L = \frac{\beta}{\sqrt{q}}.
 `
 :::
 
 :::proof "log_partition_lipschitz" (uses := "syk_directional_derivative, syk_directional_gradient_bound")
-Restrict $`F_{\beta,\mathcal{J}}` to the line segment joining two coupling
+Restrict $`F_{\beta}` to the line segment joining two standard Gaussian coordinate
 vectors. The formula {uses "syk_directional_derivative"}[] and the bound
 {uses "syk_directional_gradient_bound"}[] control its derivative by $`L`
 times the length of the segment. The one-dimensional mean value theorem gives
@@ -174,10 +156,10 @@ the Lipschitz estimate.
 :::
 
 :::theorem "log_partition_zero_inverse_temperature" (parent := "superconcentration") (uses := "syk_log_partition") (lean := "SYK.logPartition_eq_log_card_of_beta_zero, SYK.logPartition_tail_of_beta_zero")
-If $`\beta=0`, then for every coupling vector $`J`,
+If $`\beta=0`, then for every standard Gaussian coordinate vector $`g`,
 
 $$`
-F_{0,\mathcal{J}}(J)=\log d,
+F_0(g)=\log d,
 `
 
 where $`d` is the dimension of the matrix representation. Consequently, for
@@ -192,17 +174,17 @@ identically, making every positive-deviation event empty.
 :::
 
 :::theorem "log_partition_concentration" (parent := "superconcentration") (uses := "syk_log_partition") (lean := "SYK.logPartition_two_sided_tail_standardGaussian")
-Let the couplings be independent standard Gaussian variables. If
-$`\mathcal{J}>0`, $`\beta \ne 0`, and $`t>0`, then
+Let the coordinates $`g_A` be independent standard Gaussian variables. If
+$`\beta \ne 0` and $`t>0`, then
 
 $$`
 \mathbb P\left(
-  \left|F_{\beta,\mathcal{J}}
-    - \mathbb{E} F_{\beta,\mathcal{J}}\right|>t
+  \left|F_{\beta}
+    - \mathbb{E} F_{\beta}\right|>t
 \right)
 \le
 2\exp\left(
-  -\frac{q t^2}{2\beta^2\mathcal{J}^2}
+  -\frac{q t^2}{2\beta^2}
 \right).
 `
 :::
@@ -210,7 +192,7 @@ $$`
 :::proof "log_partition_concentration" (uses := "gaussian_two_sided_concentration, log_partition_lipschitz")
 Apply the finite-dimensional Gaussian two-sided concentration theorem to
 {uses "log_partition_lipschitz"}[] with
-$`L=|\beta|\mathcal{J}/\sqrt{q}`, and simplify $`2L^2`.
+$`L=\beta/\sqrt{q}`, and simplify $`2L^2`.
 The separate zero-inverse-temperature case is recorded in
 {bpref "log_partition_zero_inverse_temperature"}[].
 :::
