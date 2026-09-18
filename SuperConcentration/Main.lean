@@ -1,6 +1,6 @@
 import SYK.Probability.GaussianConcentration.Lipschitz
 import SYK.Model.GaussianDisorder
-import SYK.SuperConcentration.Core
+import SYK.SuperConcentration.MajoranaBound
 
 /-!
 # Superconcentration of the SYK log-partition function
@@ -8,7 +8,7 @@ import SYK.SuperConcentration.Core
 This public module uses the standard Hamiltonian from
 `SYK.Model.GaussianDisorder` and proves its Lipschitz and Gaussian concentration
 bounds in the standard Gaussian coordinates. Algebraic prerequisites live in
-`SYK.SuperConcentration.Core`; shared finite-dimensional Gibbs states and trace
+`SYK.SuperConcentration.MajoranaBound`; shared finite-dimensional Gibbs states and trace
 calculus live in `SYK.Model.FiniteDimensionalGibbs`.
 -/
 
@@ -79,65 +79,22 @@ theorem hasDerivAt_logPartition_line
     simp [B, smul_smul, smul_neg]
 
 /--
-The square of the exact finite-volume Lipschitz constant supplied by the
+The finite-volume squared upper bound supplied by the
 SYK sum-of-squares estimate.
 -/
-noncomputable def exactLipschitzSq (P : Params) (β : NNReal) : ℝ :=
+private noncomputable def exactLipschitzSq (P : Params) (β : NNReal) : ℝ :=
   ((β : ℝ) * couplingScale P) ^ 2 *
     ((Nat.choose P.N (P.q - 1) : ℝ) / (P.q : ℝ))
 
-theorem exactLipschitzSq_nonneg (P : Params) (β : NNReal) :
+private theorem exactLipschitzSq_nonneg (P : Params) (β : NNReal) :
     0 ≤ exactLipschitzSq P β := by
   exact mul_nonneg (sq_nonneg _)
     (div_nonneg (Nat.cast_nonneg _) (Nat.cast_nonneg _))
 
 /-- The simplified Lipschitz constant obtained from the finite-volume bound. -/
-noncomputable def simpleLipschitzConstant
+noncomputable def logPartitionLipschitzConstant
     (P : Params) (β : NNReal) : ℝ≥0 :=
   Real.toNNReal (|(β : ℝ)| / Real.sqrt (P.q : ℝ))
-
-/--
-The two-sided superconcentration estimate for the product standard Gaussian
-coupling measure. The SYK gradient estimate is supplied in the reusable
-`hLip` hypothesis.
--/
-theorem logPartition_two_sided_tail
-    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
-    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (hβ : (β : ℝ) ≠ 0)
-    (hLip : LipschitzWith (simpleLipschitzConstant P β)
-      (logPartition P β M))
-    (t : ℝ) (ht : 0 < t) :
-    standardGaussianMeasure P.N P.q
-        {J | |logPartition P β M J -
-          ∫ K, logPartition P β M K
-            ∂standardGaussianMeasure P.N P.q| > t} ≤
-      ENNReal.ofReal
-        (2 * Real.exp
-          (-(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2))) := by
-  have hq : 0 < (P.q : ℝ) := by exact_mod_cast P.q_pos
-  have hsqrt : 0 < Real.sqrt (P.q : ℝ) := Real.sqrt_pos.2 hq
-  let L : ℝ := |(β : ℝ)| / Real.sqrt (P.q : ℝ)
-  have hL : 0 < L := div_pos (abs_pos.mpr hβ) hsqrt
-  have hLip' : LipschitzWith L.toNNReal (logPartition P β M) := by
-    simpa [L, simpleLipschitzConstant] using hLip
-  have htail :=
-    euclidean_lipschitz_gaussian_concentration
-      (ι := InteractionIndex P.N P.q) (logPartition P β M) L t hL ht hLip'
-  have hq0 : (P.q : ℝ) ≠ 0 := ne_of_gt hq
-  have hsqrt0 : Real.sqrt (P.q : ℝ) ≠ 0 := ne_of_gt hsqrt
-  have hβ0 : (β : ℝ) ^ 2 ≠ 0 := pow_ne_zero 2 hβ
-  have hsqrt_sq : Real.sqrt (P.q : ℝ) ^ 2 = (P.q : ℝ) :=
-    Real.sq_sqrt hq.le
-  have hLsq : L ^ 2 = (β : ℝ) ^ 2 / (P.q : ℝ) := by
-    dsimp [L]
-    rw [div_pow, sq_abs, hsqrt_sq]
-  have hexponent :
-      -t ^ 2 / (2 * L ^ 2) =
-        -(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2) := by
-    rw [hLsq]
-    field_simp
-  rwa [hexponent] at htail
 
 /--
 The normalization constant absorbs the sum-of-squares SYK bound:
@@ -169,7 +126,7 @@ theorem couplingScale_mul_sqrt_choose_le
   exact Nat.descFactorial_le_pow _ _
 
 /--
-The exact finite-volume squared directional estimate, before simplifying the
+The finite-volume squared directional estimate, before simplifying the
 binomial coefficient and normalization.
 -/
 theorem abs_beta_expectation_normHam_sq_le_exact
@@ -178,7 +135,8 @@ theorem abs_beta_expectation_normHam_sq_le_exact
     (ρ : Matrix d d ℂ) (hρ : IsDensityMatrix ρ)
     (V : CouplingSpace P.N P.q) :
     |(β : ℝ) * (expectation ρ (normalizedHamiltonian P M V)).re| ^ 2
-      ≤ exactLipschitzSq P β * ‖V‖ ^ 2 := by
+      ≤ (((β : ℝ) * couplingScale P) ^ 2 *
+        ((Nat.choose P.N (P.q - 1) : ℝ) / (P.q : ℝ))) * ‖V‖ ^ 2 := by
   set c := couplingScale P
   set S := ∑ I : InteractionIndex P.N P.q,
     V I * (expectation ρ (M.interactionOperator I)).re
@@ -223,12 +181,12 @@ theorem abs_beta_expectation_normHam_sq_le_exact
     rw [Real.sq_sqrt hsum_nonneg]
     exact le_trans hcs hmul
   have hscaled := mul_le_mul_of_nonneg_left hdot (sq_nonneg ((β : ℝ) * c))
-  rw [hlinear, sq_abs, exactLipschitzSq]
+  rw [hlinear, sq_abs]
   dsimp only [c, Q] at hscaled ⊢
   nlinarith only [hscaled]
 
 /-- The exact finite-volume directional bound in unsquared form. -/
-theorem abs_beta_expectation_normHam_le_exact
+private theorem abs_beta_expectation_normHam_le_exact
     {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (ρ : Matrix d d ℂ) (hρ : IsDensityMatrix ρ)
@@ -247,7 +205,7 @@ theorem abs_beta_expectation_normHam_le_exact
       rw [Real.sqrt_mul (exactLipschitzSq_nonneg P β), Real.sqrt_sq_eq_abs,
         abs_of_nonneg (norm_nonneg V)]
 
-theorem sqrt_exactLipschitzSq
+private theorem sqrt_exactLipschitzSq
     (P : Params) (β : NNReal) :
     Real.sqrt (exactLipschitzSq P β) =
       |(β : ℝ)| * couplingScale P *
@@ -299,7 +257,7 @@ theorem logPartition_line_deriv_eq
 theorem logPartition_lipschitz
     {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ)) :
-    LipschitzWith (simpleLipschitzConstant P β)
+    LipschitzWith (logPartitionLipschitzConstant P β)
       (logPartition P β M) := by
   apply LipschitzWith.of_dist_le_mul
   intro x y
@@ -341,7 +299,7 @@ theorem logPartition_lipschitz
       0 ≤ |(β : ℝ)| / Real.sqrt (P.q : ℝ) := by
     positivity
   rw [dist_eq_norm, Real.norm_eq_abs, ← hends.1, ← hends.2, hslope]
-  rw [simpleLipschitzConstant, Real.coe_toNNReal _ hconstant_nonneg]
+  rw [logPartitionLipschitzConstant, Real.coe_toNNReal _ hconstant_nonneg]
   refine le_trans (hderiv c) ?_
   rw [dist_eq_norm]
 
@@ -380,7 +338,89 @@ theorem logPartition_tail_of_beta_zero
   rw [hset]
   simp
 
-/-- The same estimate for the product standard Gaussian coupling measure. -/
+/--
+The upper-tail concentration estimate for the product standard Gaussian
+coupling measure, with the SYK Lipschitz bound proved internally.
+-/
+theorem logPartition_upper_tail_standardGaussian
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (hβ : (β : ℝ) ≠ 0)
+    (t : ℝ) (ht : 0 < t) :
+    standardGaussianMeasure P.N P.q
+        {J | logPartition P β M J -
+          ∫ K, logPartition P β M K
+            ∂standardGaussianMeasure P.N P.q > t} ≤
+      ENNReal.ofReal
+        (Real.exp
+          (-(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2))) := by
+  have hq : 0 < (P.q : ℝ) := by exact_mod_cast P.q_pos
+  have hsqrt : 0 < Real.sqrt (P.q : ℝ) := Real.sqrt_pos.2 hq
+  let L : ℝ := |(β : ℝ)| / Real.sqrt (P.q : ℝ)
+  have hL : 0 < L := div_pos (abs_pos.mpr hβ) hsqrt
+  have hLip' : LipschitzWith L.toNNReal (logPartition P β M) := by
+    simpa [L, logPartitionLipschitzConstant] using (logPartition_lipschitz P β M)
+  have htail :=
+    product_standardGaussian_upper_tail
+      (ι := InteractionIndex P.N P.q) (logPartition P β M) L t hL ht hLip'
+  have hq0 : (P.q : ℝ) ≠ 0 := ne_of_gt hq
+  have hsqrt0 : Real.sqrt (P.q : ℝ) ≠ 0 := ne_of_gt hsqrt
+  have hβ0 : (β : ℝ) ^ 2 ≠ 0 := pow_ne_zero 2 hβ
+  have hsqrt_sq : Real.sqrt (P.q : ℝ) ^ 2 = (P.q : ℝ) :=
+    Real.sq_sqrt hq.le
+  have hLsq : L ^ 2 = (β : ℝ) ^ 2 / (P.q : ℝ) := by
+    dsimp [L]
+    rw [div_pow, sq_abs, hsqrt_sq]
+  have hexponent :
+      -t ^ 2 / (2 * L ^ 2) =
+        -(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2) := by
+    rw [hLsq]
+    field_simp
+  rwa [hexponent] at htail
+
+/--
+The lower-tail concentration estimate for the product standard Gaussian
+coupling measure, with the SYK Lipschitz bound proved internally.
+-/
+theorem logPartition_lower_tail_standardGaussian
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (hβ : (β : ℝ) ≠ 0)
+    (t : ℝ) (ht : 0 < t) :
+    standardGaussianMeasure P.N P.q
+        {J | (∫ K, logPartition P β M K
+            ∂standardGaussianMeasure P.N P.q) - logPartition P β M J > t} ≤
+      ENNReal.ofReal
+        (Real.exp
+          (-(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2))) := by
+  have hq : 0 < (P.q : ℝ) := by exact_mod_cast P.q_pos
+  have hsqrt : 0 < Real.sqrt (P.q : ℝ) := Real.sqrt_pos.2 hq
+  let L : ℝ := |(β : ℝ)| / Real.sqrt (P.q : ℝ)
+  have hL : 0 < L := div_pos (abs_pos.mpr hβ) hsqrt
+  have hLip' : LipschitzWith L.toNNReal (logPartition P β M) := by
+    simpa [L, logPartitionLipschitzConstant] using (logPartition_lipschitz P β M)
+  have htail :=
+    product_standardGaussian_lower_tail
+      (ι := InteractionIndex P.N P.q) (logPartition P β M) L t hL ht hLip'
+  have hq0 : (P.q : ℝ) ≠ 0 := ne_of_gt hq
+  have hsqrt0 : Real.sqrt (P.q : ℝ) ≠ 0 := ne_of_gt hsqrt
+  have hβ0 : (β : ℝ) ^ 2 ≠ 0 := pow_ne_zero 2 hβ
+  have hsqrt_sq : Real.sqrt (P.q : ℝ) ^ 2 = (P.q : ℝ) :=
+    Real.sq_sqrt hq.le
+  have hLsq : L ^ 2 = (β : ℝ) ^ 2 / (P.q : ℝ) := by
+    dsimp [L]
+    rw [div_pow, sq_abs, hsqrt_sq]
+  have hexponent :
+      -t ^ 2 / (2 * L ^ 2) =
+        -(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2) := by
+    rw [hLsq]
+    field_simp
+  rwa [hexponent] at htail
+
+/--
+The two-sided superconcentration estimate for the product standard Gaussian
+coupling measure, with the SYK Lipschitz bound proved internally.
+-/
 theorem logPartition_two_sided_tail_standardGaussian
     {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
@@ -393,6 +433,77 @@ theorem logPartition_two_sided_tail_standardGaussian
       ENNReal.ofReal
         (2 * Real.exp
           (-(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2))) := by
-  exact logPartition_two_sided_tail P β M hβ
-    (logPartition_lipschitz P β M) t ht
+  have hq : 0 < (P.q : ℝ) := by exact_mod_cast P.q_pos
+  have hsqrt : 0 < Real.sqrt (P.q : ℝ) := Real.sqrt_pos.2 hq
+  let L : ℝ := |(β : ℝ)| / Real.sqrt (P.q : ℝ)
+  have hL : 0 < L := div_pos (abs_pos.mpr hβ) hsqrt
+  have hLip' : LipschitzWith L.toNNReal (logPartition P β M) := by
+    simpa [L, logPartitionLipschitzConstant] using (logPartition_lipschitz P β M)
+  have htail :=
+    euclidean_lipschitz_gaussian_concentration
+      (ι := InteractionIndex P.N P.q) (logPartition P β M) L t hL ht hLip'
+  have hq0 : (P.q : ℝ) ≠ 0 := ne_of_gt hq
+  have hsqrt0 : Real.sqrt (P.q : ℝ) ≠ 0 := ne_of_gt hsqrt
+  have hβ0 : (β : ℝ) ^ 2 ≠ 0 := pow_ne_zero 2 hβ
+  have hsqrt_sq : Real.sqrt (P.q : ℝ) ^ 2 = (P.q : ℝ) :=
+    Real.sq_sqrt hq.le
+  have hLsq : L ^ 2 = (β : ℝ) ^ 2 / (P.q : ℝ) := by
+    dsimp [L]
+    rw [div_pow, sq_abs, hsqrt_sq]
+  have hexponent :
+      -t ^ 2 / (2 * L ^ 2) =
+        -(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2) := by
+    rw [hLsq]
+    field_simp
+  rwa [hexponent] at htail
+
+/-- Sub-Gaussian MGF with parameter β²/q, including β = 0. -/
+theorem logPartition_hasSubgaussianMGF
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ)) :
+    HasSubgaussianMGF
+      (fun J => logPartition P β M J -
+        ∫ K, logPartition P β M K ∂standardGaussianMeasure P.N P.q)
+      (Real.toNNReal ((β : ℝ) ^ 2 / (P.q : ℝ)))
+      (standardGaussianMeasure P.N P.q) := by
+  have hsq : (|(β : ℝ)| / Real.sqrt (P.q : ℝ)) ^ 2 =
+      (β : ℝ) ^ 2 / (P.q : ℝ) := by
+    rw [div_pow, sq_abs, Real.sq_sqrt (Nat.cast_nonneg _)]
+  have h := product_standardGaussian_hasSubgaussianMGF
+    (logPartition P β M) (|(β : ℝ)| / Real.sqrt (P.q : ℝ))
+    (by positivity) (logPartition_lipschitz P β M)
+  simpa only [standardGaussianMeasure_eq_onEuclidean, hsq] using h
+
+/-- At β = 0 the centered log-partition function vanishes pointwise. -/
+theorem logPartition_centered_of_beta_zero
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (hβ : β = 0) (J : CouplingSpace P.N P.q) :
+    logPartition P β M J -
+      ∫ K, logPartition P β M K ∂standardGaussianMeasure P.N P.q = 0 := by
+  simp only [logPartition_eq_log_card_of_beta_zero P β M hβ]
+  simp
+
+/-- Every positive upper deviation has probability zero at β = 0. -/
+theorem logPartition_upper_tail_of_beta_zero
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (hβ : β = 0) (t : ℝ) (ht : 0 < t) :
+    standardGaussianMeasure P.N P.q
+      {J | logPartition P β M J -
+        ∫ K, logPartition P β M K ∂standardGaussianMeasure P.N P.q > t} = 0 := by
+  simp only [logPartition_eq_log_card_of_beta_zero P β M hβ]
+  simp [not_lt.mpr ht.le]
+
+/-- Every positive lower deviation has probability zero at β = 0. -/
+theorem logPartition_lower_tail_of_beta_zero
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (hβ : β = 0) (t : ℝ) (ht : 0 < t) :
+    standardGaussianMeasure P.N P.q
+      {J | (∫ K, logPartition P β M K ∂standardGaussianMeasure P.N P.q) -
+        logPartition P β M J > t} = 0 := by
+  simp only [logPartition_eq_log_card_of_beta_zero P β M hβ]
+  simp [not_lt.mpr ht.le]
+
 end SYK

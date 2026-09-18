@@ -17,9 +17,9 @@ interaction operators into concentration of the finite-dimensional SYK
 log-partition function.
 
 The checked declarations use the standard Hamiltonian shared by Model and
-measure Lipschitz constants in the standard Gaussian coordinates. Model-specific
-moment-generating-function and separate one-sided tail theorems are not yet
-part of the checked API and are therefore not asserted in this chapter.
+measure Lipschitz constants in the standard Gaussian coordinates. The
+density-matrix estimate lives in `DensityMatrix`, the finite-size Majorana
+bound in `MajoranaBound`, and the MGF and tail applications in `Main`.
 :::
 
 :::definition "syk_log_partition" (parent := "superconcentration") (uses := "partition_function, scaled_syk_hamiltonian") (lean := "SYK.logPartition")
@@ -155,7 +155,7 @@ times the length of the segment. The one-dimensional mean value theorem gives
 the Lipschitz estimate.
 :::
 
-:::theorem "log_partition_zero_inverse_temperature" (parent := "superconcentration") (uses := "syk_log_partition") (lean := "SYK.logPartition_eq_log_card_of_beta_zero, SYK.logPartition_tail_of_beta_zero")
+:::theorem "log_partition_zero_inverse_temperature" (parent := "superconcentration") (uses := "syk_log_partition") (lean := "SYK.logPartition_eq_log_card_of_beta_zero, SYK.logPartition_centered_of_beta_zero, SYK.logPartition_tail_of_beta_zero")
 If $`\beta=0`, then for every standard Gaussian coordinate vector $`g`,
 
 $$`
@@ -171,6 +171,45 @@ measure zero.
 At $`\beta=0`, the Gibbs operator is the identity, so its trace is the
 dimension $`d`. The centered log-partition function therefore vanishes
 identically, making every positive-deviation event empty.
+:::
+
+:::theorem "log_partition_mgf" (parent := "superconcentration") (uses := "syk_log_partition") (lean := "SYK.logPartition_hasSubgaussianMGF")
+For every nonnegative inverse temperature and every real $`s`, the centered
+log-partition function $`X=F_\beta-\mathbb E F_\beta` satisfies
+
+$$`
+\mathbb E e^{sX} \le \exp\left(\frac{s^2\beta^2}{2q}\right).
+`
+
+The `HasSubgaussianMGF` parameter is $`\beta^2/q`, including zero inverse
+temperature. This is an upper bound parameter, not an assertion of equality
+for the variance or of optimality. Expectation is with respect to the product
+standard Gaussian coordinate measure.
+:::
+
+:::proof "log_partition_mgf" (uses := "gaussian_subgaussian_mgf, log_partition_lipschitz")
+Apply the Gaussian Lipschitz MGF theorem with $`L=\beta/\sqrt q` and simplify
+$`L^2=\beta^2/q`. Its zero-Lipschitz branch includes $`\beta=0`.
+:::
+
+:::theorem "log_partition_one_sided_concentration" (parent := "superconcentration") (uses := "syk_log_partition") (lean := "SYK.logPartition_upper_tail_standardGaussian, SYK.logPartition_lower_tail_standardGaussian")
+For $`\beta>0` and $`t>0`, both one-sided deviations satisfy
+
+$$`
+\mathbb P(F_\beta-\mathbb E F_\beta>t)
+\le e^{-qt^2/(2\beta^2)},\qquad
+\mathbb P(\mathbb E F_\beta-F_\beta>t)
+\le e^{-qt^2/(2\beta^2)}.
+`
+
+The declarations supply the SYK Lipschitz estimate internally. At zero inverse
+temperature both positive-deviation events are empty, by
+{bpref "log_partition_zero_inverse_temperature"}[].
+:::
+
+:::proof "log_partition_one_sided_concentration" (uses := "log_partition_lipschitz")
+Apply the Gaussian upper and lower tail theorems with $`L=\beta/\sqrt q`.
+Simplifying their exponent gives the stated bound.
 :::
 
 :::theorem "log_partition_concentration" (parent := "superconcentration") (uses := "syk_log_partition") (lean := "SYK.logPartition_two_sided_tail_standardGaussian")

@@ -13,7 +13,7 @@
 - [x] W02：`GaussianConcentration.lean` の import と宣言参照を独立した汎用基盤へ切り替え、MGF・裾の定数と `L=0` の扱いを上流の定理に合わせる。
 - [x] W03：`Model.lean` と必要な `SuperConcentration.lean` の説明を共有の標準ハミルトニアンに合わせ、一般スケールを含む旧基本 API の参照を残さない。
 - [x] W04：`Model.lean` に標準表現・次元・基本関係・トレース直交性の主要宣言を反映する。抽象的な系の性質と具体的な表現の性質を区別する。
-- [ ] W05：`SuperConcentration.lean` の参照と依存関係を新配置に合わせ、標準規格化の MGF・片側・両側の裾評価を公開宣言へ対応付ける。
+- [x] W05：`SuperConcentration.lean` の参照と依存関係を新配置に合わせ、標準規格化の MGF・片側・両側の裾評価を公開宣言へ対応付ける。
 - [ ] W06：`CLT.lean` に有限模型の規格化と共有結果との対応を反映する。有限模型の接続を最終 CLT の証明完了として表現しない。
 
 F01–F08・Z01 の後続課題では、実装される主要宣言が確定した時点で対応する章の編集細目をここに追加する。現時点で仮の宣言参照は作らない。
@@ -54,3 +54,9 @@ W02 では `GaussianConcentration.lean` の import と宣言参照を新しい�
 - `lake build` は3562 jobsで成功した。既存のガウス基盤などの linter warning と VersoBlueprint の universe warning は残る。`Annealed_FE` と `Universality` は既定対象から除外されたままで、今回も検証していない。
 - `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` は成功した。
 - `lake exe vbp check --site SYK/_out/site` は manifest と HTML cache が各89件、エラー0件で成功した。生成済みの Model 章 HTML に追加した5項目と標準表現・直交性の Lean 宣言リンクがあることを確認した。未解決参照はない。
+
+### W05 の検証記録（2026-09-18）
+
+対象は着手時コミット `9c8f0354a8429e7f943a34abd5415b1e8845c5dc` からの未コミット差分。SuperConcentration 章の配置説明を `DensityMatrix`・`MajoranaBound`・`Main` に合わせ、MGF と上下の裾の2項目を追加し、零逆温度の点ごとの中心化を公開宣言に対応付けた。MGF パラメータ `β²/q`、片側の指数 `-q t²/(2β²)`、両側の係数2、通常トレース・標準ガウス座標・非空の有限行列表現・逆温度の範囲は Lean の定理文と照合した。最良定数や分散の等式は主張していない。
+
+`lake env lean SYK/Chapters/SuperConcentration.lean` は warning なしで成功した。宣言名と依存名を保存された章・数学ソースで照合し、未定義名は検出されなかった。上流の `lake build Model SuperConcentration CLT` と主要15定理の公理依存確認も成功した。Verso の休止に従い、HTML の生成・参照検査は実行しておらず、その成功は主張しない。
