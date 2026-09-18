@@ -70,7 +70,8 @@ W03 で標準スケールとハミルトニアンを `Model.GaussianDisorder` �
 ## 廃止する構造
 
 - `Core.lean` 内で再定義されていた相互作用演算子は
-  `Model/Majorana.lean` へ移設済みである。
+  `Model/Majorana.lean` へ移設済みである。W04 では生成子の二乗、語の並べ替え・
+  随伴との積、相互作用の二乗の補題も同じ共有層へ移した。
 - `Gibbs.lean` 内で再定義されていた有限次元行列の Gibbs 状態と
   トレース微分は `Model/FiniteDimensionalGibbs.lean` へ移設し、旧ファイルは
   削除済みである。

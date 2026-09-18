@@ -53,12 +53,18 @@ W02 で汎用ガウス集中は独立基盤へ移行済み。W03 で `Main.lean`
 
 [Model の W04](../Model/EDITING_PLAN.md#w04) で `Core.lean` の既存代数補題を必要とする場合だけ行う。標準表現そのものの証明をここで重複管理しない。
 
-- [ ] 必要な補題が Model に移設・検証された後、`Core.lean` の元の宣言を除き、利用箇所を共有宣言へ接続する。移設が不要なら、その確認を記録してこの担当部分を完了とする。
-- [ ] 移設した場合は変更ファイルと関連ビルドを検査し、二乗和評価の仮定と定数を保っていることを確認する。W05 の再配置との受け渡しは全体計画に従う。
+- [x] 必要な補題が Model に移設・検証された後、`Core.lean` の元の宣言を除き、利用箇所を共有宣言へ接続する。移設が不要なら、その確認を記録してこの担当部分を完了とする。
+- [x] 移設した場合は変更ファイルと関連ビルドを検査し、二乗和評価の仮定と定数を保っていることを確認する。W05 の再配置との受け渡しは全体計画に従う。
 
 担当部分の完了条件：標準表現が集中不等式側へ逆向きに依存せず、既存の集中評価も同じ共有補題を利用できる。
 
 <a id="w05"></a>
+
+### W04 の検証記録（2026-09-18）
+
+着手時コミットは `4a27dd8e77e99784683f460d2d5d826adac166e3`。`Core.lean` の `majorana_sq`、`listProduct_eq_smul_of_perm`、語の随伴との積、`psiProduct_star_mul_self`、`interactionOperator_sq` の証明を `Model.Majorana` へ移し、元の宣言を削除した。利用側は同じ共有宣言を直接使い、二乗和評価の仮定・有限サイズの定数は保った。
+
+`lake env lean SYK/SuperConcentration/Core.lean` は warning なしで成功し、`lake build Model SuperConcentration` は3195 jobsで成功した。`syk_sum_sq_expectation_le` と `logPartition_two_sided_tail_standardGaussian` の公理依存は `propext`・`Classical.choice`・`Quot.sound` のみ。W05 のファイル再配置と MGF・片側評価の追加は未着手のまま残す。
 
 ## W05：SYK 集中不等式の移行完了
 

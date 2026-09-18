@@ -4,6 +4,7 @@ import VersoBlueprint
 import SYK.Model.FiniteDimensionalGibbs
 import SYK.Model.Majorana
 import SYK.Model.GaussianDisorder
+import SYK.Model.StandardRepresentation
 
 set_option linter.mathlibStandardSet false
 
@@ -27,6 +28,95 @@ separately to analytic and physical constructions.
 :::definition "majorana_system" (parent := "model") (lean := "SYK.MajoranaSystem")
 A Majorana system is a family of self-adjoint operators satisfying the canonical
 anticommutation relations.
+:::
+
+:::definition "standard_representation" (parent := "model") (uses := "majorana_system") (lean := "SYK.StandardBasis, SYK.jordanWignerPauli, SYK.jordanWignerZ, SYK.jordanWigner, SYK.jordanWignerSystem, SYK.standardMajoranaSystem")
+For $`m` qubits, the computational basis is defined recursively by
+$`D_0=\{\ast\}` and $`D_{m+1}=\{0,1\}\times D_m`.
+Let $`X,Y,Z` be the Pauli matrices, with
+
+$$`
+Y=\begin{pmatrix}0&-i\\i&0\end{pmatrix}.
+`
+
+With zero-based site labels $`0\le a<m`, the Jordan--Wigner generators are
+
+$$`
+\psi_{2a}=Z^{\otimes a}\otimes X\otimes I^{\otimes(m-a-1)},\qquad
+\psi_{2a+1}=Z^{\otimes a}\otimes Y\otimes I^{\otimes(m-a-1)}.
+`
+
+The implementation uses Kronecker products with the first site outermost.
+The zero-based label $`j` corresponds to label $`j+1` in the lecture notes'
+Jordan--Wigner subsection and `eq:majoranaCAR`. For even $`N`, setting
+$`m=N/2` gives a matrix realization with exactly $`N` generators.
+The same representation and trace normalization are used in the CLT manuscript
+at `subsec:SYK-model`.
+:::
+
+:::theorem "standard_representation_dimension" (parent := "model") (uses := "standard_representation") (lean := "SYK.standardBasis_card")
+The computational basis satisfies $`|D_m|=2^m`. Thus the standard matrix
+realization for even $`N` has dimension $`2^{N/2}`.
+:::
+
+:::proof "standard_representation_dimension"
+The empty tensor product has one basis vector, and each new qubit doubles the
+cardinality of the basis.
+:::
+
+:::theorem "standard_majorana_relations" (parent := "model") (uses := "standard_representation") (lean := "SYK.jordanWigner_sq, SYK.jordanWigner_self_adjoint, SYK.jordanWigner_anticommute, SYK.jordanWigner_zero, SYK.jordanWigner_succ")
+Every Jordan--Wigner generator is self-adjoint and squares to the identity.
+Distinct site/type pairs anticommute, so the standard realization obeys
+
+$$`
+\psi_i^*=\psi_i,\qquad
+\psi_i\psi_j+\psi_j\psi_i=2\delta_{ij}I.
+`
+:::
+
+:::proof "standard_majorana_relations"
+Check the two-by-two Pauli identities directly. Induction on the number of
+sites uses $`(A\otimes B)(C\otimes D)=AC\otimes BD` and the adjoint rule
+for Kronecker products. At different sites, the X/Y factor at the earlier
+site anticommutes with the later generator's parity-string Z factor.
+:::
+
+:::theorem "interaction_involutions" (parent := "model") (uses := "majorana_system") (lean := "SYK.MajoranaSystem.majorana_sq, SYK.MajoranaSystem.psiProduct_star_mul_self, SYK.MajoranaSystem.interactionOperator_star, SYK.MajoranaSystem.interactionOperator_sq")
+For any complex star-algebra Majorana system and even $`q`, let
+$`A=\{a_1<\cdots<a_q\}` and
+$`\Psi_A=i^{q/2}\psi_{a_1}\cdots\psi_{a_q}`. Then
+$`\Psi_A^*=\Psi_A` and $`\Psi_A^2=I`. For the unphased increasing word $`W_A`, $`W_A^*W_A=I` as well.
+These are proved from the abstract relations.
+:::
+
+:::proof "interaction_involutions"
+The Majorana relation with equal indices gives $`\psi_i^2=I`. Reverse the
+word under the adjoint and cancel the pairs of equal generators. The shared
+phase has modulus one, and its even-degree adjoint rule gives the square
+identity for the phase-corrected interaction.
+:::
+
+:::theorem "standard_interaction_orthonormality" (parent := "model") (uses := "standard_representation, partition_function") (lean := "SYK.standardInteraction_orthonormal")
+For even $`N` and even $`q`, the shared interaction operators of the standard
+representation, indexed by $`q`-element subsets $`A,B`, satisfy
+
+$$`
+\operatorname{tr}(\Psi_A^*\Psi_B)=\delta_{A,B},\qquad
+\operatorname{tr}(T)=\frac{\operatorname{Tr}(T)}{2^{N/2}}.
+`
+
+The increasing order and phase are those of the shared `interactionOperator`.
+Orthogonality is a proved conclusion, with no extra field in `MajoranaSystem`.
+:::
+
+:::proof "standard_interaction_orthonormality" (uses := "standard_majorana_relations, interaction_involutions")
+If $`A=B`, the square identity and $`\operatorname{tr}(I)=1` give one.
+Otherwise equal cardinalities provide $`i\in A\setminus B`. At even degree,
+$`\Psi_A` anticommutes with $`\psi_i` and $`\Psi_B` commutes with it.
+Conjugation by $`\psi_i` therefore changes the sign of $`\Psi_A\Psi_B`,
+while cyclicity of the finite matrix trace leaves its trace unchanged.
+The trace is zero. This fixed-degree argument uses the Majorana relations and
+cyclicity; it does not require a separate irreducibility assumption.
 :::
 
 :::definition "interaction_hamiltonian" (parent := "model") (lean := "SYK.hamiltonian")

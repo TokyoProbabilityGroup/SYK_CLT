@@ -87,6 +87,8 @@ for every density matrix $\rho$.
 - `Core.lean` develops anticommuting-observable estimates, the interaction
   algebra used by the concentration argument, and the model-specific
   sum-of-squares estimate.
+- `../Model/Majorana.lean` supplies the shared ordered interaction operators,
+  word-reordering lemmas, and Majorana and interaction square identities.
 - `../Model/FiniteDimensionalGibbs.lean` supplies density-matrix identities,
   positivity and normalization properties of Gibbs states, and derivatives of
   traces of affine matrix exponentials.

@@ -35,7 +35,7 @@
 | W01 | 共有行列解析の仕上げ。追加済みの整関数性・複素微分・条件付き対数微分を、関連検証と Blueprint・文書更新まで完了した | 現行実装 | 完了 | [Model](Model/EDITING_PLAN.md#w01) |
 | W02 | 汎用ガウス集中不等式の独立化。測度・平滑化・MGF・裾評価と `L=0` の処理、利用側の参照移行 | 現行の汎用証明 | 完了 | [汎用基盤](Probability/GaussianConcentration/EDITING_PLAN.md#w02)、[Model の接続](Model/EDITING_PLAN.md#w02)、[利用側](SuperConcentration/EDITING_PLAN.md#w02) |
 | W03 | ガウス型 SYK ハミルトニアンの共有化。標準スケールとハミルトニアンを Model に置き、直接の利用側を移行する | W02 | 完了 | [Model](Model/EDITING_PLAN.md#w03)、[利用側](SuperConcentration/EDITING_PLAN.md#w03) |
-| W04 | 標準行列表現の構成。Jordan–Wigner 表現、次元、反交換関係、自己共役性、対象演算子族のトレース直交性 | 既存の共有代数 | 未着手 | [Model](Model/EDITING_PLAN.md#w04)、[必要な補題の移設元](SuperConcentration/EDITING_PLAN.md#w04) |
+| W04 | 標準行列表現の構成。Jordan–Wigner 表現、次元、反交換関係、自己共役性、対象演算子族のトレース直交性 | 既存の共有代数 | 完了 | [Model](Model/EDITING_PLAN.md#w04)、[必要な補題の移設元](SuperConcentration/EDITING_PLAN.md#w04) |
 | W05 | SYK 集中不等式の移行完了。有限サイズ評価、標準規格化でのリプシッツ評価、MGF、上下・両側の裾評価、旧基本 API の整理 | W01・W03 | 未着手（前提充足） | [SuperConcentration](SuperConcentration/EDITING_PLAN.md#w05) |
 | W06 | CLT の有限模型との接続。局所的な規格化分配関数、`Z(0)=1`、共有分配関数との対応、中心化した対数への集中評価の移送 | W04・W05 | 前提待ち | [CLT](CLT/EDITING_PLAN.md#w06) |
 
@@ -54,7 +54,7 @@ flowchart LR
     W05 --> W06
 ```
 
-W01 は2026-09-08、W02 は2026-09-12、W03 は2026-09-18に完了した。W03 は Model・利用側の個別検査と関連ビルド、主要定理の公理依存確認、既定ビルド、Blueprint の直接生成・参照検査まで成功した。詳細は各担当計画の W03 検証記録に置く。W05 の前提は満たされた。次は W04 と W05 が候補だが、共有補題の移設と文書の競合に注意する。ただし、並行作業を依頼されていない場合は、一覧順で前提が満たされた最初の未完了単位を一つ選ぶ。指定した単位が前提待ちなら、無断で前提の実装まで範囲を広げない。単位の完了時には、依存する単位の前提と状態も更新する。
+W01 は2026-09-08、W02 は2026-09-12、W03・W04 は2026-09-18に完了した。W04 は Jordan–Wigner 表現と同じ偶数次数の相互作用の規格化トレース直交性を証明し、必要な共有代数補題を Model へ移設した。個別検査、関連・既定ビルド、公理依存確認、Blueprint の直接生成・参照検査まで成功した。詳細は各担当計画の検証記録に置く。次の候補は前提が満たされた W05。W06 の W04 側の前提は満たされたが、W05 の完了を待つ。並行作業を依頼されていない場合は、一覧順で前提が満たされた最初の未完了単位を一つ選ぶ。指定した単位が前提待ちなら、無断で前提の実装まで範囲を広げない。単位の完了時には、依存する単位の前提と状態も更新する。
 
 ## 原稿監査と後続の形式化
 
@@ -92,7 +92,7 @@ Z01 の詳細は [Model](Model/EDITING_PLAN.md#z01) で管理する。実逆温�
 | --- | --- | --- |
 | `Model/FiniteDimensionalGibbs.lean` | W01、W04 のトレース補題、F04 の共有解析 | 同じファイルの変更は直列。W01 完了後、W04 と W02 の別ファイル作業は並行可能 |
 | `Model/Majorana.lean` | W04、W05 で必要になる共有補題 | ガウス基盤のファイルとは並行可能。`Core.lean` からの補題移設は担当を一人に固定する |
-| `Model/StandardRepresentation.lean`（作成予定） | W04 | 共有代数の入力が安定していれば W02 と並行可能 |
+| `Model/StandardRepresentation.lean` | W04 | 共有代数の入力が安定していれば W02 と並行可能 |
 | `Model/GaussianDisorder.lean` | W02 の測度接続、W03 | 直列。W02 の汎用測度の確定後に接続し、W02 の統合完了後に W03 を行う |
 | `Probability/GaussianConcentration/StandardGaussian.lean`（移行先） | W02 | W04 と並行可能。測度・可積分性の API を後続ファイルの着手前に固定する |
 | 同 `Smooth.lean`（移行先） | W02 | `StandardGaussian.lean` の必要な宣言が検証・固定済みなら別作業と並行可能 |
