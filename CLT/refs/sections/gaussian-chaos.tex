@@ -1,0 +1,708 @@
+\documentclass[../CLT_SYK.tex]{subfiles}
+\setcounter{section}{1}
+
+\begin{document}
+
+\section{Gaussian-chaos decomposition}
+\label{sec:chaos-decomposition}
+  We use the probabilists' Hermite polynomials
+\begin{equation*}
+  H_\alpha(G)=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
+  \qquad
+  \E[H_\alpha H_\eta]
+  =\alpha!\,\mathbf 1_{\{\alpha=\eta\}},
+\end{equation*}
+where $\alpha!=\prod_I\alpha_I!$.  Since the $H_\alpha$ form a complete
+orthogonal basis of $L^2(\gamma_{|\mathcal I_N|})$, where
+$\gamma_{|\mathcal I_N|}$ denotes standard Gaussian measure on
+$\mathbb R^{|\mathcal I_N|}$, we have
+\begin{align}\label{eq: chaos}
+Z_N(\beta:G) = \sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\mathbb E[Z_N(\beta:G')H_\alpha(G')]}{\alpha!} H_\alpha(G),    
+\end{align}
+where the second sum runs over all multi-index $\alpha$ such that $\sum_{I} \alpha_I = k$, and the expectation is taken over $G'$ independent copy of $G.$  Let $P_r$ denote the orthogonal projection in
+$L^2(\gamma_{|\mathcal I_N|})$ onto the $r$-th homogeneous Gaussian chaos:
+Then, we can write
+\[
+  P_r Z_N(\beta;G)
+  =\sum_{|\alpha|=r}
+  \frac{\mathbb E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!}H_\alpha(G).
+\]
+Since $\mathbb E Z_N(\beta)$ is deterministic, we also have
+\[
+  P_rY_N(\beta)=\frac{P_rZ_N(\beta)}{\mathbb E Z_N(\beta)}.
+\]
+
+
+By the same orthogonality and Lemma~\ref{lem:Gaussian-Hermite-IBP}, for every
+sufficiently regular random variable $X=X(G)$,
+\begin{equation*}
+  \norm{P_rX}_2^2
+  =
+  \sum_{|\alpha|=r}
+  \frac{|\E\,\partial_g^\alpha X|^2}{\alpha!}.
+\end{equation*}
+
+
+Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \mathbb E Z_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
+ The next lemma proves the exact radial decomposition
+\begin{equation*}
+  Y_N(\beta)-1=A_N(\beta)Q_N+\mathcal R_N(\beta),
+  \qquad
+  \mathcal R_N=\sum_{r\geq3}P_r Y_N.
+\end{equation*}
+
+
+\subsection{Exact finite-size radial projection}
+
+Call a multi-index $\alpha$ \emph{even} if
+\begin{equation}\label{eq:even-multi-index}
+  \sum_{I\ni x}\alpha_I\equiv0\pmod2
+  \qquad\text{for every }x\in[N].
+\end{equation}
+Otherwise, we call $\alpha$ odd. 
+\begin{lemma}\label{lem: parity rule lemma}
+    For $s=(s_1,\ldots,s_N)\in\{\pm1\}^N$, define
+$\chi_s(I)=\prod_{x\in I}s_x$.  We have 
+\begin{equation}\label{eq:sign-gauge-invariance}
+  Z_N(\beta;G)=Z_N\bigl(\beta;(\chi_s(I)g_I)_I\bigr).
+\end{equation}
+
+    In particular, if $\alpha$ is odd, then
+    \[
+      \mathbb E[Z_N(\beta;G)H_\alpha(G)]=0.
+    \]
+\end{lemma}
+\begin{proof}
+To make the Clifford symmetry explicit, let
+\[
+  \Gamma
+  := 
+  \psi_1\cdots\psi_N.
+\]
+Note that $\Gamma^*\Gamma$ is identity map, so $\Gamma$ is unitary. Since $N$ is even, moving $\psi_j$ through the other $N-1$ Majorana
+generators produces the sign $(-1)^{N-1}=-1$.  Hence
+\[
+  \Gamma\psi_j\Gamma^*=-\psi_j
+  \qquad (j\in[N]).
+\]
+For each $x\in[N]$, put $U_x=\Gamma\psi_x$.  This is unitary, and conjugation
+by $U_x$ is the composition of conjugation by $\psi_x$ and conjugation by
+$\Gamma$.  The Clifford relations give
+\[
+  \psi_x\psi_j\psi_x
+  =
+  \begin{cases}
+    \psi_x,&j=x,\\
+    -\psi_j,&j\neq x.
+  \end{cases}
+\]
+Combining the last two displays, we obtain
+\[
+  U_x\psi_jU_x^*
+  =
+  \begin{cases}
+    -\psi_x,&j=x,\\
+    \psi_j,&j\neq x.
+  \end{cases}
+\]
+Thus conjugation by $U_x$ changes the sign of precisely the generator
+$\psi_x$.
+
+Let $S_s=\{x\in[N]:s_x=-1\}$ and let $U_s$ be the product of the unitaries
+$U_x$ over $x\in S_s$, in any fixed order.  Successively applying the
+preceding conjugation rule yields
+\[
+  U_s\psi_jU_s^*=s_j\psi_j
+  \qquad (j\in[N]).
+\]
+If $I=\{i_1<\cdots<i_q\}$, then conjugation is multiplicative, so the
+definition $\psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}$ gives
+\begin{align*}
+  U_s\psi_IU_s^*
+  &=
+  \mathrm i^{q/2}
+  (U_s\psi_{i_1}U_s^*)\cdots
+  (U_s\psi_{i_q}U_s^*)\\
+  &=
+  \left(\prod_{x\in I}s_x\right)\psi_I
+  =\chi_s(I)\psi_I.
+\end{align*}
+Writing $g^{(s)}=(\chi_s(I)g_I)_I$, we therefore have
+\begin{align*}
+  H_N(g^{(s)})
+  &=\sigma_N\sum_{I\in\calI_N}\chi_s(I)g_I\psi_I\\
+  &=\sigma_N\sum_{I\in\calI_N}g_IU_s\psi_IU_s^*
+    =U_sH_N(G)U_s^*.
+\end{align*}
+The power-series definition of the exponential then implies
+\[
+  e^{-\beta H_N(g^{(s)})}
+  =U_se^{-\beta H_N(G)}U_s^*.
+\]
+Finally, the normalized trace is invariant under unitary conjugation.
+Consequently
+\[
+  Z_N(\beta;g^{(s)})
+  =\tr\!\left(U_se^{-\beta H_N(G)}U_s^*\right)
+  =\tr e^{-\beta H_N(G)}
+  =Z_N(\beta;G),
+\]
+which proves \eqref{eq:sign-gauge-invariance}.
+
+Assume that $\alpha$ is odd, i.e. we can take $x$ such that
+$\sum_{I:x\in I}\alpha_I$ is odd.  We take $s$ such that $s_y=1$ for
+$y\neq x$ and $s_x=-1$.  Then,
+ \[
+  H_\alpha((\chi_s(I)g_I)_I)
+  =
+  \left(
+    \prod_{x=1}^N
+    s_x^{\sum_{I\ni x}\alpha_I}
+  \right)H_\alpha(G) = -H_\alpha(G).
+\]
+Hence, we have 
+\begin{align*}
+    \mathbb E[Z_N(G') H_\alpha(G')] =     \mathbb E[Z_N(\chi_s G') H_\alpha(\chi_s G')] = -
+    \mathbb E[Z_N(G') H_\alpha(G')], 
+\end{align*}
+which gives the second claim. 
+\end{proof}
+
+\subsection{Gaussian integration by parts}
+\begin{lemma}\label{lem:Gaussian-Hermite-IBP}
+Let $f:\mathbb R^{|\mathcal I_N|}\to\mathbb R$ be of class $C^{|\alpha|}$,
+and suppose that $f$ and its mixed partial derivatives up to order $\alpha$
+have at most exponential growth in $\norm{G}$.  Then
+\begin{equation}\label{eq:Gaussian-Hermite-IBP}
+  \mathbb E\!\left[H_\alpha(G)f(G)\right]
+  =\mathbb E\!\left[\partial_g^\alpha f(G)\right].
+\end{equation}
+In particular, \eqref{eq:Gaussian-Hermite-IBP} holds for
+$f(G)=Z_N(\beta;G)$.
+\end{lemma}
+\begin{proof}
+Recall that the one-dimensional integration-by-parts identity yields 
+\[
+\mathbb{E}\!\left[\operatorname{He}_k(g)f(g)\right] = \mathbb{E}\!\left[f^{(k)}(g)\right], \qquad g\sim N(0,1),
+\]
+for every function $f\in C^k(\mathbb R)$ satisfying the stated growth
+condition.  Applying this identity successively to the independent Gaussian
+coordinates $(g_I)_{I\in\mathcal I_N}$ and using
+\[
+H_\alpha(G)
+=\prod_{I\in\mathcal I_N}\operatorname{He}_{\alpha_I}(g_I),
+\]
+gives
+\begin{align*}
+\mathbb{E}\!\left[
+H_\alpha(G)f(G)
+\right]
+&=
+\mathbb{E}\!\left[
+\left(
+\prod_{I\in\mathcal I_N}
+\operatorname{He}_{\alpha_I}(g_I)
+\right)
+f(G)
+\right] \\
+&=
+\mathbb{E}\!\left[
+\left(
+\prod_{I\in\mathcal I_N}
+\partial_{g_I}^{\alpha_I}
+\right)
+f(G)
+\right] \\
+&=
+\mathbb{E}\!\left[
+\partial_g^\alpha f(G)
+\right].
+\end{align*}
+
+The growth assumption justifies all integrations by parts.  Finally, for fixed
+$N$ and $\beta$, the partition function $Z_N(\beta;G)$ is a smooth function
+of finitely many Gaussian coordinates, and all of its derivatives have at
+most exponential growth in $\norm{G}$.  Thus it satisfies the assumption.
+\end{proof}
+\subsection{First and second moment}
+
+\begin{lemma}\label{lem:exact-second-chaos}
+For every real $\beta$,
+\[
+  P_1Y_N(\beta)=0
+\]
+and
+\begin{equation}\label{eq:P2Y-exact}
+  P_2 Y_N(\beta)
+  =
+  \frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{2M_N}
+  \sum_{I\in\calI_N}(g_I^2-1).
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+  This parity rule above kills
+ the first chaos.  In the second chaos it also kills every off-diagonal
+monomial $g_Ig_J$, since the parity condition for such a monomial forces
+$I=J$.
+Permutation symmetry shows that the remaining diagonal coefficients agree.
+Consequently
+\[
+  P_2Z_N(\beta)=b_N(\beta)\sum_I(g_I^2-1)
+\]
+for a deterministic scalar $b_N$.
+
+It remains to compute the coefficient.  For each fixed $I$, the
+probabilists' second Hermite polynomial is $g_I^2-1$, with
+\[
+  \E(g_I^2-1)^2=2.
+\]
+Since $P_2$ is an orthogonal projection and the variables $g_I$ are
+independent, taking the inner product of the preceding formula for $P_2Z_N$
+with $g_I^2-1$ gives
+\[
+  2b_N(\beta)
+  =\E\bigl[Z_N(\beta)(g_I^2-1)\bigr].
+\]
+Applying Gaussian integration by parts twice, conditionally on all
+coordinates other than $g_I$, yields
+\[
+  \E\bigl[Z_N(\beta)(g_I^2-1)\bigr]
+  =\E\,g_I \partial_{g_I} Z_N(\beta).
+\]
+Summing over the $\mathcal I_N$ choices of $I$ therefore gives the first equality
+below.  A further conditional Gaussian integration by parts gives the second:
+\begin{align*}
+  2M_Nb_N(\beta)
+  & =\sum_I\E\bigl[g_I\partial_{g_I}Z_N(\beta)\bigr]\\
+  &=\beta\,\partial_\beta\E Z_N(\beta)
+    =\beta F_N'(\beta).
+\end{align*}
+
+The last equality follows pointwise from the exact scaling identity
+\[
+  Z_N(\beta;tG)
+  =\tr e^{-\beta H_N(tG)}
+  =\tr e^{-t\beta H_N(G)}
+  =Z_N(t\beta;G),
+\]
+where we used $H_N(tG)=tH_N(G)$.  Differentiating at $t=1$ gives
+\[
+  \sum_Ig_I\partial_{g_I}Z_N(\beta;G)
+  =\beta\,\partial_\beta Z_N(\beta;G).
+\]
+This proves \eqref{eq:P2Y-exact}.
+\end{proof}
+
+{
+\subsection{Direct Rademacher control of all higher chaoses}
+\label{sec:Rademacher-remainder}
+}
+
+\begin{lemma}
+\label{lem:Z-derivative-bound}
+For real $\beta$, every multi-index $\alpha$ of total order $r$ satisfies
+\begin{equation}\label{eq:Z-derivative-bound}
+  \left|\partial_g^\alpha Z_N(\beta;G)\right|
+  \leq (|\beta|\sigma_N)^r Z_N(\beta;G).
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+The case $r=0$ is immediate, so assume $r\geq1$.  Write $H_N=H_N(G)$ for
+brevity.  We first derive the equality
+\begin{align}
+	&\partial_{g_{I_r}}\cdots\partial_{g_{I_1}}Z_N(\beta;G)
+	\notag\\
+	&\quad=(-\beta\sigma_N)^r
+	\sum_{\pi\in S_r}\int_{\Delta_r}
+	\tr\!\left(
+	e^{-t_0\beta H_N}\psi_{I_{\pi(1)}}e^{-t_1\beta H_N}
+	\cdots
+	\psi_{I_{\pi(r)}}e^{-t_r\beta H_N}
+	\right)\,\mathrm dt_1\cdots\mathrm dt_r
+	\label{eq:iterated-Duhamel-formula}
+\end{align}
+where
+\[\Delta_r=\left\{(t_j)_{j=1}^r: t_j\ge0,\quad \sum_{j=1}^r t_j\le 1\right\},\qquad t_0=1-\sum_{i=1}^r t_j. \]
+For a differentiable matrix-valued function $A(\theta)$, the one-variable
+Duhamel formula is
+\begin{equation}\label{eq:one-variable-Duhamel-formula}
+  \frac{\mathrm d}{\mathrm d\theta}e^{A(\theta)}
+  =\int_0^1
+    e^{sA(\theta)}A'(\theta)e^{(1-s)A(\theta)}\,\mathrm ds.
+\end{equation}
+By the definition of $H_N$ in Subsection~\ref{subsec:SYK-model},
+\[
+  \partial_{g_I}H_N=\sigma_N\psi_I.
+\]
+Applying \eqref{eq:one-variable-Duhamel-formula} to
+$A=-t\beta H_N$ gives, for $t\geq0$,
+\begin{align}
+  \partial_{g_I}e^{-t\beta H_N}
+  &=-t\beta\sigma_N\int_0^1
+    e^{-st\beta H_N}\psi_I
+    e^{-(1-s)t\beta H_N}\,\mathrm ds \notag\\
+  &=-\beta\sigma_N\int_0^t
+    e^{-u\beta H_N}\psi_I
+    e^{-(t-u)\beta H_N}\,\mathrm du.
+  \label{eq:Duhamel-interval-splitting}
+\end{align}
+Here, \eqref{eq:Duhamel-interval-splitting} with $t=1$ yields
+\eqref{eq:iterated-Duhamel-formula} for $r=1$.  Suppose inductively that the
+formula holds at order $r-1$.  Then
+\begin{align}
+	&\partial_{g_{I_r}}\cdots\partial_{g_{I_1}}Z_N(\beta;G)
+	\notag\\
+	&\quad=(-\beta\sigma_N)^{r-1}
+	\sum_{\pi\in S_{r-1}}\int_{\Delta_{r-1}}\partial_{g_{I_r}}
+	\tr\!\left(
+	e^{-t_0\beta H_N}\psi_{I_{\pi(1)}}e^{-t_1\beta H_N}
+	\cdots
+	\psi_{I_{\pi(r-1)}}e^{-t_{r-1}\beta H_N}
+	\right)\,\mathrm dt_1\cdots\mathrm dt_{r-1}.
+	\label{eq:iterated-Duhamel-formula-induction}
+\end{align}
+For fixed $\pi\in S_{r-1}$ and $j\in\{1,\ldots,r\}$, differentiating the
+factor $e^{-t_{j-1}\beta H_N}$ replaces it, by
+\eqref{eq:Duhamel-interval-splitting}, with
+\[
+  -\beta\sigma_N\int_0^{t_{j-1}}
+  e^{-u\beta H_N}\psi_{I_r}
+  e^{-(t_{j-1}-u)\beta H_N}\,\mathrm du.
+\]
+Splitting $t_{j-1}$ into $u$ and $t_{j-1}-u$ and relabeling the resulting
+simplex variables, the corresponding term in the Leibniz rule becomes
+\begin{align*}
+  -\beta\sigma_N\int_{\Delta_r}
+  \tr\!\left(
+    e^{-t_0\beta H_N}\psi_{I_{\sigma_{\pi,j}(1)}}e^{-t_1\beta H_N}
+    \cdots
+    \psi_{I_{\sigma_{\pi,j}(r)}}e^{-t_r\beta H_N}
+  \right)\,\mathrm dt_1\cdots\mathrm dt_r,
+\end{align*}
+where
+\[\sigma_{\pi,j}(k)=\begin{cases}
+	\pi(k) & (k<j)\\
+	r &(k=j)\\
+	\pi(k-1) & (k>j)
+\end{cases}. \]
+Since $(\pi,j)\mapsto\sigma_{\pi,j}$ is a bijection from
+$S_{r-1}\times\{1,\ldots,r\}$ onto $S_r$, summing the Leibniz-rule terms in
+\eqref{eq:iterated-Duhamel-formula-induction} proves
+\eqref{eq:iterated-Duhamel-formula}.
+
+It remains to estimate each integrand in
+\eqref{eq:iterated-Duhamel-formula}.  Here and below the Schatten norms are
+defined using the normalized trace:
+\[
+  \norm{A}_p=(\tr|A|^p)^{1/p},
+  \qquad
+  \norm{A}_\infty=\norm{A}.
+\]
+For $t_j>0$,
+\[
+  \norm{e^{-t_j\beta H_N}}_{1/t_j}
+  =
+  \bigl(\tr e^{-\beta H_N}\bigr)^{t_j},
+\]
+with the usual $p=\infty$ interpretation when $t_j=0$.  By
+Subsection~\ref{subsec:SYK-model}, $\norm{\psi_I}_\infty=1$.
+Noncommutative H\"older, with Schatten exponents $1/t_j$, therefore gives,
+for every $\pi\in S_r$ and
+$t\in\Delta_r$,
+\begin{align}
+  &\left|
+  \tr\!\left(
+    e^{-t_0\beta H_N}\psi_{I_{\pi(1)}}e^{-t_1\beta H_N}
+    \cdots
+    \psi_{I_{\pi(r)}}e^{-t_r\beta H_N}
+  \right)
+  \right| \notag\\
+  &\quad\leq
+  \prod_{j=0}^r\norm{e^{-t_j\beta H_N}}_{1/t_j}
+  \prod_{k=1}^r\norm{\psi_{I_{\pi(k)}}}_\infty \notag\\
+  &\quad\leq
+  \prod_{j=0}^r
+  \left(\tr e^{-\beta H_N}\right)^{t_j}
+  =\tr e^{-\beta H_N}
+  =Z_N(\beta;G),
+  \label{eq:Duhamel-integrand-Holder-bound}
+\end{align}
+where we used $\sum_{j=0}^rt_j=1$.  
+Combining \eqref{eq:iterated-Duhamel-formula} and 
+\eqref{eq:Duhamel-integrand-Holder-bound}, we obtain
+\begin{align*}
+ \left|
+  \partial_{g_{I_r}}\cdots\partial_{g_{I_1}}Z_N(\beta;G)
+  \right|
+  &\leq
+  (|\beta|\sigma_N)^r
+  \sum_{\pi\in S_r}\int_{\Delta_r}Z_N(\beta;G)
+  \,\mathrm dt_1\cdots\mathrm dt_r\\
+  &=
+  (|\beta|\sigma_N)^rZ_N(\beta;G)|S_r|\int_{\Delta_r}\mathrm dt_1\cdots\mathrm dt_r\\
+  &=
+  (|\beta|\sigma_N)^rZ_N(\beta;G),
+\end{align*}
+which proves \eqref{eq:Z-derivative-bound}.
+\end{proof}
+
+\begingroup
+
+Recall that Lemma~\ref{lem: parity rule lemma} shows that
+only even multi-indices have nonzero Hermite coefficients.
+
+Let $(\varepsilon_x)_{x=1}^N$ be independent Rademacher variables on an
+auxiliary probability space, and write $\E_\varepsilon$ for expectation on
+this space.  Set
+\begin{equation}\label{eq:Rademacher-chaos-definition}
+  S_{N,q}
+  =\sum_{I\in\calI_N}\varepsilon_I,
+  \qquad
+  \varepsilon_I=\prod_{x\in I}\varepsilon_x.
+\end{equation}
+Thus $S_{N,q}$ is the degree-$q$ elementary symmetric polynomial in the
+Rademacher signs.
+
+\begin{lemma}
+\label{lem:Rademacher-encoding}
+For every integer $r\geq0$,
+\begin{equation}\label{eq:even-sum-Rademacher-moment}
+  \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
+  \frac1{\alpha!}
+  =\frac1{r!}\E_\varepsilon\!\left[S_{N,q}^r\right].
+\end{equation}
+Moreover, there are constants $c_q>0$ and $C_q<\infty$, depending only on
+$q$, such that
+\begin{equation}\label{eq:Rademacher-exponential-moment}
+  \E_\varepsilon\!\left[
+    |S_{N,q}|^3e^{t|S_{N,q}|}
+  \right]
+  \leq C_qN^{3q/2}
+\end{equation}
+for every $N$ and every $0\leq t\leq c_qN^{-(q-1)}$.
+\end{lemma}
+
+\begin{proof}
+Starting from the definition \eqref{eq:Rademacher-chaos-definition} and
+applying the multinomial formula gives
+\begin{equation}\label{eq:Rademacher-multinomial-expansion}
+  \frac1{r!}\E_\varepsilon\!\left[S_{N,q}^r\right]
+  =\frac1{r!}\E_\varepsilon\!\left[
+    \sum_{|\alpha|=r}r!
+    \prod_{I\in\calI_N}\frac{\varepsilon_I^{\alpha_I}}{\alpha_I!}
+  \right]
+  =
+  \sum_{|\alpha|=r}\frac1{\alpha!}
+  \E_\varepsilon\!\left[
+    \prod_{I\in\calI_N}\varepsilon_I^{\alpha_I}
+  \right].
+\end{equation}
+For a fixed $\alpha$, the product inside the expectation is
+\begin{equation*}
+  \prod_{x=1}^N
+  \varepsilon_x^{\sum_{I: x\in I}\alpha_I}.
+\end{equation*}
+By independence of the Rademacher variables and the definition of an even
+multi-index in \eqref{eq:even-multi-index}, its expectation is one if
+$\alpha$ is even and zero otherwise.  Substitution into
+\eqref{eq:Rademacher-multinomial-expansion} proves
+\eqref{eq:even-sum-Rademacher-moment}.
+
+We next prove a deterministic bound for $S_{N,q}$.  For every $N\geq1$
+and every integer $m\geq0$, let $e_m^{(N)}$ denote the $m$th elementary
+symmetric polynomial in $N$ variables, that is,
+\begin{equation*}
+  e_m^{(N)}(z_1,\ldots,z_N)
+  :=\sum_{\substack{I\subset[N]\\ |I|=m}}
+  \prod_{x\in I}z_x,
+  \qquad e_0^{(N)}(z_1,\ldots,z_N)=1.
+\end{equation*}
+For the rest of the proof, we use the abbreviation
+\[
+  e_m:=e_m^{(N)}(\varepsilon_1,\ldots,\varepsilon_N).
+\]
+In particular, $e_1=\sum_{x=1}^N\varepsilon_x$, and
+\eqref{eq:Rademacher-chaos-definition} gives $S_{N,q}=e_q$.
+Newton's identities state that
+\begin{equation}\label{eq:Newton-identities}
+  m e_m
+  =\sum_{j=1}^m(-1)^{j-1}e_{m-j}p_j,
+\end{equation}
+where $p_j:=\sum_{x=1}^N\varepsilon_x^j$.  Since
+$\varepsilon_x\in\{\pm1\}$, we have
+\begin{equation*}
+  p_j
+  =
+  \begin{cases}
+    e_1,&j\text{ odd},\\
+    N,&j\text{ even}.
+  \end{cases}
+\end{equation*}
+An induction on $m$, using \eqref{eq:Newton-identities}, shows that there is a constant $C_m<\infty$ such that
+\begin{equation*}
+	|e_m|
+	\le C_m\left(N^{m/2}+|e_1|^m\right).
+\end{equation*}
+Indeed, suppose that the estimate is known below order $m$ and set
+\[
+X_N:=\frac{e_1}{\sqrt N}.
+\]
+For every $j\ge1$,
+\[
+|p_j|\le N^{j/2}(1+|X_N|^j).
+\]
+Hence, with $C_0=1$,
+\[
+\begin{aligned}
+	|e_{m-j}p_j|
+	&\le
+	C_{m-j}N^{m/2}
+	(1+|X_N|^{m-j})(1+|X_N|^j)\\
+	&\le
+	2C_{m-j}N^{m/2}(1+|X_N|^m),
+\end{aligned}
+\]
+where we used $1+|X|^m-|X|^{m-j}-|X|^j
+=(1-|X|^j)(1-|X|^{m-j})\ge0.$
+Substitution into \eqref{eq:Newton-identities} proves the induction step.
+Taking $m=q$ and using \eqref{eq:Rademacher-chaos-definition}, we obtain
+\begin{equation}\label{eq:Rademacher-chaos-deterministic-bound}
+  |S_{N,q}|
+  \leq C_q\left(N^{q/2}+|e_1|^q\right).
+\end{equation}
+
+Since $q\geq4$ by Subsection~\ref{subsec:SYK-model} and
+$|X_N|\leq\sqrt N$,
+\eqref{eq:Rademacher-chaos-deterministic-bound} implies that,
+for $0\leq t\leq c_qN^{-(q-1)}$,
+\begin{align}
+  t|S_{N,q}|
+  &\leq C_qc_qN^{-(q/2-1)}\left(1+|X_N|^q\right) \notag\\
+  &\leq C_qc_q\left(1+|X_N|^2\right).
+  \label{eq:Rademacher-exponent-reduction}
+\end{align}
+Indeed,
+\begin{equation*}
+  N^{-(q/2-1)}|X_N|^q
+  =|X_N|^2
+  \left(\frac{|X_N|}{\sqrt N}\right)^{q-2}
+  \leq |X_N|^2.
+\end{equation*}
+Choose $c_q$ small enough that the last member of
+\eqref{eq:Rademacher-exponent-reduction} is bounded by
+$(1+|X_N|^2)/4$.
+
+Hoeffding's inequality gives
+\begin{equation}\label{eq:Hoeffding-Rademacher-sum}
+  \mathbb P_\varepsilon(|X_N|\geq u)
+  \leq2e^{-u^2/2}
+  \qquad (u\geq0).
+\end{equation}
+Consequently, integration of the tail in
+\eqref{eq:Hoeffding-Rademacher-sum} yields
+\begin{equation}\label{eq:uniform-Rademacher-integrability}
+  \sup_{N\geq1}
+  \E_\varepsilon\!\left[
+    \left(1+|X_N|^{3q}\right)e^{|X_N|^2/4}
+  \right]
+  <\infty.
+\end{equation}
+Finally, \eqref{eq:Rademacher-chaos-deterministic-bound},
+\eqref{eq:Rademacher-exponent-reduction}, and
+\eqref{eq:uniform-Rademacher-integrability} give
+\begin{align*}
+  \E_\varepsilon\!\left[
+    |S_{N,q}|^3e^{t|S_{N,q}|}
+  \right]
+  &\leq
+  C_qN^{3q/2}
+  \E_\varepsilon\!\left[
+    \left(1+|X_N|^{3q}\right)
+    e^{(1+|X_N|^2)/4}
+  \right] \\
+  &\leq C_qN^{3q/2},
+\end{align*}
+which proves \eqref{eq:Rademacher-exponential-moment}.
+\end{proof}
+
+\begin{proposition} \label{prop:higher-chaos-closure}
+There exists $\beta_{\rm Rad}=\beta_{\rm Rad}(q)>0$ such that, for every
+fixed real $\beta$ with $|\beta|<\beta_{\rm Rad}$,
+\begin{equation*}
+  \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
+  =O\!\left(N^{-3(q/2-1)}\right)
+  =o(N^{2-q}).
+\end{equation*}
+\end{proposition}
+
+\begin{proof}
+Put
+\begin{equation*}
+  t_N=\beta^2\sigma_N^2
+  =\beta^2(q-1)!N^{-(q-1)}.
+\end{equation*}
+By the Hermite expansion \eqref{eq: chaos} and its orthogonality relation,
+the squared norm of the $r$th projection is the sum of the squared Hermite
+coefficients.  Lemma~\ref{lem: parity rule lemma} eliminates every odd
+multi-index, while Lemma~\ref{lem:Gaussian-Hermite-IBP} replaces each
+remaining Hermite coefficient by the corresponding expected derivative.
+Consequently, Lemma~\ref{lem:Z-derivative-bound} and $\mathbb E Z_N(\beta)>0$ give
+\begin{align}
+  \norm{P_r Y_N(\beta)}_2^2
+  &=\frac1{\mathbb E Z_N(\beta)^2}
+    \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
+    \frac1{\alpha!}
+    \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \notag\\
+  &\leq t_N^r
+    \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
+    \frac1{\alpha!}.
+  \label{eq:Hermite-Rademacher-bound}
+\end{align}
+By the first assertion of Lemma~\ref{lem:Rademacher-encoding}, namely
+\eqref{eq:even-sum-Rademacher-moment}, summing
+\eqref{eq:Hermite-Rademacher-bound} over all $r\geq3$ yields
+\begin{align}
+  \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
+  &\leq
+  \sum_{r\geq3}\frac{t_N^r}{r!}
+  \E_\varepsilon\!\left[S_{N,q}^r\right] \notag\\
+  &\leq
+  \E_\varepsilon\!\left[
+    \sum_{r\geq3}\frac{(t_N|S_{N,q}|)^r}{r!}
+  \right] \notag\\
+  &\leq
+  \frac{t_N^3}{6}
+  \E_\varepsilon\!\left[
+    |S_{N,q}|^3e^{t_N|S_{N,q}|}
+  \right].
+  \label{eq:all-higher-chaoses-at-once}
+\end{align}
+Here the second inequality uses
+$|\E_\varepsilon[S_{N,q}^r]|\leq
+\E_\varepsilon[|S_{N,q}|^r]$, and the last one uses
+$\sum_{r\geq3}u^r/r!\leq u^3e^u/6$ for $u\geq0$.
+Choose
+\begin{equation*}
+  \beta_{\rm Rad}
+  =\sqrt{\frac{c_q}{(q-1)!}},
+\end{equation*}
+where $c_q$ is the constant in Lemma~\ref{lem:Rademacher-encoding}.  If
+$|\beta|<\beta_{\rm Rad}$, then
+$t_N\leq c_qN^{-(q-1)}$.  Therefore the second assertion of
+Lemma~\ref{lem:Rademacher-encoding}, namely
+\eqref{eq:Rademacher-exponential-moment}, together with
+\eqref{eq:all-higher-chaoses-at-once} imply
+\begin{align*}
+  \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
+  &\leq C_{q,\beta}
+  N^{-3(q-1)}N^{3q/2} \\
+  &=C_{q,\beta}N^{-3(q/2-1)}.
+\end{align*}
+Since $q\geq4$, we have $3(q/2-1)>q-2$, which completes the proof.
+\end{proof}
+
+\endgroup
+
+\end{document}
