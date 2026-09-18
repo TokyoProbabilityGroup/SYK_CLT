@@ -150,6 +150,8 @@ Model・SuperConcentration・Chapters と VersoBlueprint の既存の警告は�
 
 ## 旧計画との対応
 
+2026-09-18：一般 `MajoranaSystem` に対する `CLT/Main.lean` の設定と二種類の CLT の定理文を、`sorry` を許可する明示的な依頼に従って追加する作業を実施した。実数の `|β|` 条件を今回の宣言に採用し、共有模型や原稿は変更しない。これは W06・F06・F07 の完了ではなく、証明付き形式化に先立つ定理文の追加である。詳細・検証は [CLT の記録](CLT/EDITING_PLAN.md#main-statements-2026-09-18) に集約する。
+
 | 旧計画 | 新しい管理先 |
 | --- | --- |
 | Model 段階0・1、段階2の実装済み部分 | Model の実装状況・履歴。追加解析の仕上げは W01 |
