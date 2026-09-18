@@ -6,7 +6,7 @@
 
 2026-09-08、コミット `05d64f4` のソースを確認した。ディレクトリと Lake のビルド対象の改名は完了している。`Core.lean` は共有の相互作用演算子・密度行列・Gibbs 解析を import しており、旧 `Gibbs.lean` は削除済み。`CouplingSpace` と標準ガウス測度も Model に移設済みである。これらを新規の実装課題として繰り返さない。
 
-一方、汎用のガウス集中モジュールは旧配置にあり Model を import する。`Main.lean` には一般スケール `𝒥`、規格化ハミルトニアン、微分・リプシッツ評価・両側の裾評価が存在する。これらを標準規格化へ移行し、MGF と片側の裾を SYK の公開結果として接続する作業が残る。文書再編では Lean を再検証していない。
+W02 で汎用ガウス集中は独立基盤へ移行済み。W03 で `Main.lean` のハミルトニアンを Model の共有定義へ接続し、微分・リプシッツ評価・両側の裾評価を標準規格化へ移行した。MGF・片側の裾の追加公開と集中評価の再配置は W05 に残る。2026-09-08 の文書再編自体では Lean を再検証していない。
 
 <a id="w02"></a>
 
@@ -30,11 +30,22 @@
 
 [Model の W03](../Model/EDITING_PLAN.md#w03) で共有定義が確定してから、`Main.lean` の利用側を更新する。
 
-- [ ] `couplingScale`・`normalizedHamiltonian` とその基本性質の移設済み部分を除き、Model の標準スケールとハミルトニアンを使う。重複定義や互換用の別名を残さない。
-- [ ] 既存のアフィン性・自己共役性・対数微分・リプシッツ評価・裾評価を共有定義へ接続する。基本 API から一般スケール `𝒥` を分離し、標準ガウス座標 `g_A` に関する定数と零の場合を照合する。
-- [ ] `Main.lean` の個別検査、`lake build Model SuperConcentration`、変更した主要定理の公理依存の確認、およびこのディレクトリ内の対応文書の更新を行う。
+- [x] `couplingScale`・`normalizedHamiltonian` とその基本性質の移設済み部分を除き、Model の標準スケールとハミルトニアンを使う。重複定義や互換用の別名を残さない。
+- [x] 既存のアフィン性・自己共役性・対数微分・リプシッツ評価・裾評価を共有定義へ接続する。基本 API から一般スケール `𝒥` を分離し、標準ガウス座標 `g_A` に関する定数と零の場合を照合する。
+- [x] `Main.lean` の個別検査、`lake build Model SuperConcentration`、変更した主要定理の公理依存の確認、およびこのディレクトリ内の対応文書の更新を行う。
 
 担当部分の完了条件：共有ハミルトニアンを直接使い、既存の評価が標準規格化で検査されている。MGF・片側の裾の追加公開と集中評価の再配置は W05 に残す。
+
+### 検証記録（2026-09-18）
+
+着手時コミットは `475378724d3c2541711a15b19f3ec6500dbf8b2b`。Model の個別検査と olean 構築後に、移設元の重複定義を削除し、`Main.lean` の全 API から一般スケール `𝒥` とその符号仮定を除いた。有限サイズの二乗和評価、通常のトレースによる分配関数、方向微分の符号は保った。標準ガウス座標に関してリプシッツ定数は `β / sqrt q`、`β ≠ 0`・`t > 0` の両側の裾は `2 exp(-q t²/(2β²))` である。`β = 0` の `log Z = log card d` と裾の測度0も再検査した。`exactLipschitzSq` と `simpleLipschitzConstant` の配置・公開範囲の整理は W05 に残す。
+
+- `lake env lean SYK/SuperConcentration/Main.lean` は warning なしで成功した。標準化により変わった平方根・二項係数の証明を調整し、未解決目標は残っていない。
+- `lake build Model SuperConcentration` は3194 jobsで成功した。
+- トレース商の方向微分、有限サイズの二乗評価、簡約された方向評価、熱期待値による方向微分、リプシッツ性、`β=0` の裾、公開両側の裾の `#print axioms` は `propext`、`Classical.choice`、`Quot.sound` のみであった。
+- README・構造文書・過去の証明計画の位置付けを更新した。汎用基盤への SYK 依存や共有模型から集中評価への逆向き import、互換用の別名は追加していない。
+
+`lake build` は3561 jobsで成功し、Blueprint の直接生成と `lake exe vbp check --site SYK/_out/site` も成功した。manifest と HTML cache は各63件、エラー0件であった。MGF と片側の裾の新しい模型固有定理はこの単位では追加していない。
 
 <a id="w04"></a>
 
@@ -42,12 +53,18 @@
 
 [Model の W04](../Model/EDITING_PLAN.md#w04) で `Core.lean` の既存代数補題を必要とする場合だけ行う。標準表現そのものの証明をここで重複管理しない。
 
-- [ ] 必要な補題が Model に移設・検証された後、`Core.lean` の元の宣言を除き、利用箇所を共有宣言へ接続する。移設が不要なら、その確認を記録してこの担当部分を完了とする。
-- [ ] 移設した場合は変更ファイルと関連ビルドを検査し、二乗和評価の仮定と定数を保っていることを確認する。W05 の再配置との受け渡しは全体計画に従う。
+- [x] 必要な補題が Model に移設・検証された後、`Core.lean` の元の宣言を除き、利用箇所を共有宣言へ接続する。移設が不要なら、その確認を記録してこの担当部分を完了とする。
+- [x] 移設した場合は変更ファイルと関連ビルドを検査し、二乗和評価の仮定と定数を保っていることを確認する。W05 の再配置との受け渡しは全体計画に従う。
 
 担当部分の完了条件：標準表現が集中不等式側へ逆向きに依存せず、既存の集中評価も同じ共有補題を利用できる。
 
 <a id="w05"></a>
+
+### W04 の検証記録（2026-09-18）
+
+着手時コミットは `4a27dd8e77e99784683f460d2d5d826adac166e3`。`Core.lean` の `majorana_sq`、`listProduct_eq_smul_of_perm`、語の随伴との積、`psiProduct_star_mul_self`、`interactionOperator_sq` の証明を `Model.Majorana` へ移し、元の宣言を削除した。利用側は同じ共有宣言を直接使い、二乗和評価の仮定・有限サイズの定数は保った。
+
+`lake env lean SYK/SuperConcentration/Core.lean` は warning なしで成功し、`lake build Model SuperConcentration` は3195 jobsで成功した。`syk_sum_sq_expectation_le` と `logPartition_two_sided_tail_standardGaussian` の公理依存は `propext`・`Classical.choice`・`Quot.sound` のみ。W05 のファイル再配置と MGF・片側評価の追加は未着手のまま残す。
 
 ## W05：SYK 集中不等式の移行完了
 

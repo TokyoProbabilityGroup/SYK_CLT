@@ -11,8 +11,8 @@
 - [x] W01：`Model.lean` に整関数性・複素微分・条件付き対数微分の主要宣言と依存関係を反映した。非零性の仮定を、零点のない領域の証明と混同していない。
 - [x] SuperConcentration の移行前基準：`SuperConcentration.lean` に、一般スケール `𝒥` を含む現行実装の定義、二乗和評価、方向微分、勾配評価、Lipschitz 評価、逆温度が零の場合分け、両側集中不等式を記録した。主張の依存関係と証明だけで使う依存関係を分け、未実装の模型固有 MGF・片側評価を実装済みとして扱っていない。
 - [x] W02：`GaussianConcentration.lean` の import と宣言参照を独立した汎用基盤へ切り替え、MGF・裾の定数と `L=0` の扱いを上流の定理に合わせる。
-- [ ] W03：`Model.lean` と必要な `SuperConcentration.lean` の説明を共有の標準ハミルトニアンに合わせ、一般スケールを含む旧基本 API の参照を残さない。
-- [ ] W04：`Model.lean` に標準表現・次元・基本関係・トレース直交性の主要宣言を反映する。抽象的な系の性質と具体的な表現の性質を区別する。
+- [x] W03：`Model.lean` と必要な `SuperConcentration.lean` の説明を共有の標準ハミルトニアンに合わせ、一般スケールを含む旧基本 API の参照を残さない。
+- [x] W04：`Model.lean` に標準表現・次元・基本関係・トレース直交性の主要宣言を反映する。抽象的な系の性質と具体的な表現の性質を区別する。
 - [ ] W05：`SuperConcentration.lean` の参照と依存関係を新配置に合わせ、標準規格化の MGF・片側・両側の裾評価を公開宣言へ対応付ける。
 - [ ] W06：`CLT.lean` に有限模型の規格化と共有結果との対応を反映する。有限模型の接続を最終 CLT の証明完了として表現しない。
 
@@ -35,3 +35,22 @@ SuperConcentration の移行前基準では、`lake env lean SYK/Chapters/SuperC
 2026-09-11 の生成入口移設後の検証は、全体計画の「ビルド入口のプロジェクト内への移設」に記録する。章の本文・宣言参照は変更していない。
 
 W02 では `GaussianConcentration.lean` の import と宣言参照を新しい名前空間へ切り替え、正の `L` の定数と零の場合の別定理を記録した。`SYK.Chapters.GaussianConcentration` の olean 構築と `lake build SYK` は成功した。2026-09-12、Windows で Verso 4.32.0 の同梱検索資産の相対接頭辞が残る問題に対し、`BlueprintMain.lean` に Windows 限定の準備とコピーを追加した。所定の直接生成コマンドは成功し、`lake exe vbp check --site SYK/_out/site` は manifest と HTML cache が各52件、エラー0件で成功した。既存の docstring と universe の warning は残る。
+
+### W03 の検証記録（2026-09-18）
+
+対象は着手時コミット `475378724d3c2541711a15b19f3ec6500dbf8b2b` からの未コミット差分。標準スケール・ハミルトニアンの定義ノードを同じ ID のまま Model 章へ移し、スケールの二乗・実線形性・自己共役性の宣言を追加した。各実係数の分散と標準座標 `g_A` を区別し、講義ノートの `eq:Hqnormalized`・`eq:Jcovariance` と CLT 原稿の `subsec:SYK-model` との対応を記した。集中評価の章では一般スケールの引数・仮定を除き、方向微分、有限サイズ評価、リプシッツ定数 `β / sqrt q`、`β = 0` と両側の裾 `2 exp(-q t²/(2β²))` を現在の宣言に合わせた。MGF・片側の裾の模型固有定理は未公開のまま区別した。
+
+- 初回の `lake env lean SYK/Chapters/Model.lean` はこのワークスペースの Verso olean が未構築のため失敗した。その後 `lake build` で既存依存を構築し、再検査した。
+- `lake build` は3561 jobsで成功した。`Annealed_FE` と `Universality` は既定対象から除外されたままであり、この結果は両ライブラリの検証ではない。
+- `lake env lean SYK/Chapters/Model.lean` と `lake env lean SYK/Chapters/SuperConcentration.lean` は成功した。Model 章には既存の `Params`・`MajoranaSystem` のフィールドの docstring warning が残り、SuperConcentration 章に warning はなかった。
+- `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` は成功した。
+- `lake exe vbp check --site SYK/_out/site` は初回の検査用実行ファイルの構築後に成功した。manifest と HTML cache は各63件、エラー0件であった。生成済み HTML に Model 章の標準ハミルトニアン定義・基本性質・Lean 宣言リンクがあることも確認した。新たな未解決参照はない。
+
+### W04 の検証記録（2026-09-18）
+
+対象は着手時コミット `4a27dd8e77e99784683f460d2d5d826adac166e3` からの未コミット差分。Model 章に標準表現・次元・生成子の基本関係・共有相互作用の自己共役性と二乗・規格化トレース直交性の5項目を追加した。Jordan–Wigner の Pauli Y の符号、テンソルの順序、0始まりの添字と講義ノートの1始まりの添字の対応を明記し、講義ノートの `eq:majoranaCAR` と CLT 原稿の `subsec:SYK-model` との対応を記した。同じ偶数次数の直交性は構成済みの標準表現に対する結論として記し、抽象構造への追加仮定や異なる次数を混ぜた族の主張は置いていない。
+
+- `lake env lean SYK/Chapters/Model.lean` は成功した。既存の `Params`・`MajoranaSystem` のフィールドの docstring warning は残る。
+- `lake build` は3562 jobsで成功した。既存のガウス基盤などの linter warning と VersoBlueprint の universe warning は残る。`Annealed_FE` と `Universality` は既定対象から除外されたままで、今回も検証していない。
+- `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` は成功した。
+- `lake exe vbp check --site SYK/_out/site` は manifest と HTML cache が各89件、エラー0件で成功した。生成済みの Model 章 HTML に追加した5項目と標準表現・直交性の Lean 宣言リンクがあることを確認した。未解決参照はない。

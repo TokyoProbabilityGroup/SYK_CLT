@@ -10,8 +10,8 @@
 | --- | --- |
 | パラメータ・共有代数 | 逆温度の分離、相互作用添字、昇順積、位相、相互作用演算子、確定的ハミルトニアンは移行済み |
 | 有限次元の解析・物理量 | 通常の分配関数、`normalizedTrace`、物理的 Gibbs API、実方向微分、整関数性・複素微分・条件付き対数微分は実装・検証済み。零点のない領域は Z01 |
-| ガウス型相互作用 | `CouplingSpace`・`couplingSpace_card`・`standardGaussianMeasure` は Model に移設済み。汎用測度との接続は W02、標準スケールとハミルトニアンは W03 |
-| 標準表現 | 未実装。W04 で構成し、直交性を抽象的な `MajoranaSystem` の仮定に追加しない |
+| ガウス型相互作用 | `CouplingSpace`・`couplingSpace_card`・`standardGaussianMeasure` は Model に移設済み。汎用測度との接続は W02、標準スケールとハミルトニアンは W03 で共有化 |
+| 標準表現 | W04 で Jordan–Wigner 表現と同じ偶数次数の相互作用の直交性を構成・検証済み。抽象的な `MajoranaSystem` の仮定は追加していない |
 | 利用側 | 集中不等式の移行完了は W05、CLT 固有の規格化分配関数と接続は W06 |
 
 <a id="w01"></a>
@@ -56,12 +56,23 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 
 前提は W02。測度の独立化と利用側の import 移行が終わった後に、同じ利用側ファイルの規格化を移行する。
 
-- [ ] 移設済みの `CouplingSpace` と標準ガウス測度を再利用し、`σ_N² = (q-1)! / N^(q-1)` に対応する標準スケールを `Model.GaussianDisorder` に置く。
-- [ ] 標準規格化ハミルトニアンを共有する確定的ハミルトニアンから定義し、線形性・自己共役性など利用側で必要な既存の結果を移す。
-- [ ] Model の基本 API は標準スケールに限定し、一般スケール `𝒥` や互換用の別名を重複して公開しない。移行元の削除と微分・リプシッツ・裾評価の追従は [SuperConcentration の W03](../SuperConcentration/EDITING_PLAN.md#w03) で管理する。
-- [ ] 個別検査、Model と移行済み利用側のビルド、主要定理の公理依存、このディレクトリ内の対応文書の更新を完了する。
+- [x] 移設済みの `CouplingSpace` と標準ガウス測度を再利用し、`σ_N² = (q-1)! / N^(q-1)` に対応する標準スケールを `Model.GaussianDisorder` に置く。
+- [x] 標準規格化ハミルトニアンを共有する確定的ハミルトニアンから定義し、線形性・自己共役性など利用側で必要な既存の結果を移す。
+- [x] Model の基本 API は標準スケールに限定し、一般スケール `𝒥` や互換用の別名を重複して公開しない。移行元の削除と微分・リプシッツ・裾評価の追従は [SuperConcentration の W03](../SuperConcentration/EDITING_PLAN.md#w03) で管理する。
+- [x] 個別検査、Model と移行済み利用側のビルド、主要定理の公理依存、このディレクトリ内の対応文書の更新を完了する。
 
 担当部分の完了条件：標準の相互作用係数とハミルトニアンが Model の一つの定義系列になる。W03 全体は直接の利用側への移行と統合検証まで含めて完了する。各係数の分散と、ガウス座標 `g_A` に関する評価であることを明記する。
+
+### 検証記録（2026-09-18）
+
+対象は着手時コミット `475378724d3c2541711a15b19f3ec6500dbf8b2b` からの未コミット差分。着手時の SYK 作業ツリーは変更なし。`couplingScale P` と `normalizedHamiltonian P M g`、アフィン性・自己共役性を `GaussianDisorder.lean` に移し、スケールの非負性・二乗公式と零・加法・実スカラー倍の性質を追加した。通常のトレース、昇順積、位相、共有 `Params` の条件は変更していない。講義ノートの `eq:Hqnormalized`・`eq:Jcovariance` と CLT 原稿の `subsec:SYK-model` にある標準係数規約を照合した。原稿の偶数 N・標準表現・q≥4・規格化トレースは抽象的な共有 API に追加しない。
+
+- `lake env lean SYK/Model/GaussianDisorder.lean` と `+SYK.Model.GaussianDisorder:olean` は成功し、同ファイルの warning はなかった。
+- `lake build Model SuperConcentration` は3194 jobsで成功した。
+- `couplingScale_sq`、ハミルトニアンのアフィン性・加法・実スカラー倍・自己共役性の `#print axioms` は `propext`、`Classical.choice`、`Quot.sound` のみを示した。
+- 各実係数は `J_A = couplingScale P * g_A`、各係数の分散は `(q-1)!/N^(q-1)`。利用側のノルムと集中評価は標準ガウス座標 `g_A` に関するものである。分散の新しい確率論的定理を追加したという意味ではなく、既存の標準ガウス測度とスケールの二乗公式に基づく規約の確認である。
+
+`lake build` は3561 jobsで成功し、Blueprint の直接生成と `lake exe vbp check --site SYK/_out/site` も成功した。manifest と HTML cache は各63件、エラー0件であった。既存の汎用ガウス集中の linter warning と `density_variance_nonneg` の未使用 `[DecidableEq d]` warning は残る。`Annealed_FE` と `Universality` は今回も編集・個別検証の対象外である。
 
 <a id="w04"></a>
 
@@ -69,12 +80,23 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 
 既存の共有代数を使い、W02・W03 のガウス集中や確率的な規格化の移行とは独立して進められる。実際の同時編集範囲は全体計画で調整する。
 
-- [ ] 偶数 `N` に対する Jordan–Wigner 表現を `StandardRepresentation.lean` に構成し、次元 `2^(N/2)`、反交換関係、自己共役性を証明する。
-- [ ] 規格化トレースの内積について、対象とする相互作用演算子族の直交性を証明する。昇順積と位相が共有定義に一致することを確認する。
-- [ ] 必要な代数補題は Model 内の適切な共有層に置く。`Model` から `SuperConcentration` を import しない。既存補題を移す場合、移設元と利用側の修正は [SuperConcentration の担当部分](../SuperConcentration/EDITING_PLAN.md#w04) と合わせて統合する。
-- [ ] 個別検査、関連ビルド、主要定理の公理依存、次元・仮定の照合、このディレクトリ内の対応文書の更新を完了する。
+- [x] 偶数 `N` に対する Jordan–Wigner 表現を `StandardRepresentation.lean` に構成し、次元 `2^(N/2)`、反交換関係、自己共役性を証明する。
+- [x] 規格化トレースの内積について、対象とする相互作用演算子族の直交性を証明する。昇順積と位相が共有定義に一致することを確認する。
+- [x] 必要な代数補題は Model 内の適切な共有層に置く。`Model` から `SuperConcentration` を import しない。既存補題を移す場合、移設元と利用側の修正は [SuperConcentration の担当部分](../SuperConcentration/EDITING_PLAN.md#w04) と合わせて統合する。
+- [x] 個別検査、関連ビルド、主要定理の公理依存、次元・仮定の照合、このディレクトリ内の対応文書の更新を完了する。
 
 担当部分の完了条件：具体的な表現と直交性が仮置きの証明なしに検査され、抽象的なマヨラナ系に標準表現の性質を暗黙に追加していない。表現の構成と直交性でコミット候補を分けても、指示単位は W04 のままとする。
+
+### W04 の検証記録（2026-09-18）
+
+対象は着手時コミット `4a27dd8e77e99784683f460d2d5d826adac166e3` からの未コミット差分。`StandardRepresentation.lean` に再帰的な基底 `StandardBasis m` と Jordan–Wigner 生成子を構成し、偶数 N に対する `standardMajoranaSystem` を実装した。次元は `2^(N/2)`、生成子は自己共役で共有のマヨラナ関係を満たす。講義ノートの `eq:majoranaCAR` と CLT 原稿の `subsec:SYK-model` に照合し、Pauli Y の符号、先行サイトの Z、0始まりの添字と原稿の1始まりの添字の対応を確認した。
+
+`standardInteraction_orthonormal` は、共有の昇順積・位相をそのまま使い、同じ偶数次数 q の相互作用族について `normalizedTrace (star Ψ_A * Ψ_B) = if A = B then 1 else 0` を証明する。非対角成分は添字集合の差にある生成子による共役とトレースの巡回性から消える。この固定次数の証明に既約性の追加仮定は不要であり、異なる次数を混ぜた族の直交性は主張していない。抽象構造のフィールドや仮定は変更していない。
+
+- `majorana_sq`、語の並べ替え・随伴との積、相互作用の二乗の既存証明を `SuperConcentration.Core` から `Model.Majorana` へ移設した。生成子が添字集合に含まれる場合・含まれない場合の交換則を共有層に追加し、逆向きの import は作っていない。
+- `lake env lean SYK/Model/Majorana.lean`、`lake env lean SYK/Model/StandardRepresentation.lean`、`lake env lean SYK/SuperConcentration/Core.lean` は warning なしで成功した。`lake build +SYK.Model.Majorana:olean` と `lake build Model SuperConcentration`（3195 jobs）も成功した。関連ビルドには既存のガウス基盤・密度行列の linter warning が残る。
+- 基底の次元、生成子の二乗・自己共役性・反交換関係、二つの系の構成、トレース直交性、移設・追加した共有補題、および既存の二乗和・両側集中評価に対する `#print axioms` は、すべて `propext`・`Classical.choice`・`Quot.sound` のみだった。仮置きの証明や新たな公理はない。
+- 全体ビルドと Blueprint の生成・参照検査は [Chapters の W04 記録](../Chapters/EDITING_PLAN.md) に記録する。`Annealed_FE` と `Universality` は既定対象から除外されたままで、今回も検証していない。
 
 ## 利用側への接続
 
