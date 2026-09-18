@@ -58,7 +58,7 @@ lake build
 ```
 
 `defaultTargets` in `lakefile.toml` selects the libraries built by `lake build`.
-The mathematical topics have individual targets such as `Model`, `SuperConcentration`, and `CLT`; the `SYK` target checks shared foundations under `SYK/Probability/`, `SYK.Blueprint`, the modules under `SYK/Chapters/`, and their dependencies.
+The mathematical topics have individual targets such as `Model`, `SuperConcentration`, and `CLT`; the `SYK` target currently checks shared foundations under `SYK/Probability/` and their dependencies. Blueprint and chapter modules are temporarily excluded.
 There is no aggregate Lean import file: Lake manages the build targets directly.
 All project-specific Lean sources remain inside the repository; only the shared Lake configuration, dependency manifest, and toolchain file are copied to the workspace root.
 To build one library separately, run a command such as `lake build Model`.
@@ -71,15 +71,17 @@ lake env lean SYK/Model/Definitions.lean
 
 ## Blueprint
 
+Verso is temporarily disabled to reduce GitHub Actions work. The source files remain intact; generation and validation commands below are commented out. See [restoration instructions](workspace/README.md#restoring-verso).
+
 The formalization blueprint is written in `Blueprint.lean` and `Chapters/`.
 To generate the HTML site and validate its manifest, run from the workspace root:
 
 ```bash
-lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site
-lake exe vbp check --site SYK/_out/site
+# lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site
+# lake exe vbp check --site SYK/_out/site
 ```
 
-Run both commands after changing `Blueprint.lean`, `BlueprintMain.lean`, a file under `Chapters/`, or a Lean declaration name referenced by the Blueprint.
+After restoring Verso, run both commands after changing `Blueprint.lean`, `BlueprintMain.lean`, a file under `Chapters/`, or a Lean declaration name referenced by the Blueprint.
 `lake lean` builds the entry point's imports and runs the renderer directly. No shell script or separately compiled renderer executable is required.
 `vbp check` verifies the consistency of the generated manifest, HTML cache, and internal references.
 
