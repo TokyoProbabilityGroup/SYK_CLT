@@ -35,7 +35,7 @@ latexmk -pdf introduction.tex
 
 Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-references and citations whose definitions lie in other subfiles remain unresolved in a standalone build; the complete manuscript build resolves them.
 
-Once Lean files are added, each modified file should be checked from the shared workspace root:
+The Lean module skeleton is present. After modifying a Lean file, check it from the shared workspace root:
 
 ```bash
 lake env lean SYK/CLT/path/to/File.lean

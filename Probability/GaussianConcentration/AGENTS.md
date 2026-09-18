@@ -26,7 +26,7 @@
 
 ファイル名は `StandardGaussian.lean`、`Smooth.lean`、`Lipschitz.lean` とし、モジュールのパスは `SYK.Probability.GaussianConcentration.*`、宣言を置く名前空間は `SYK.GaussianConcentration` とする。定理、定義、ファイルの命名は、`SYK/AGENTS.md` を通じて適用される mathlib に沿った命名規則に従う。
 
-この配置は抽出・移行後の目標である。旧実装から移す内容と利用側との境界は `SYK/SuperConcentration/ARCHITECTURE.md` に記録し、この文書だけで移行や証明の完了を判断しない。
+この配置への移行は W02 で完了した。旧実装から移した内容と利用側との境界は `SYK/SuperConcentration/ARCHITECTURE.md` に記録する。
 
 移行元の証明は Git コミット `1b5a64cc9860f36876cc30b1a13d66ad4bfe8047` に保持する。新しい基盤部分では、定理文と定数を保つ限り、既存の証明スクリプトをそのまま移す必要はない。可積分性評価や型変換の重複を整理し、mathlib の既存結果を仮定まで照合して利用してよい。
 
