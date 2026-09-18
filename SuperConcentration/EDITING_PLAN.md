@@ -6,7 +6,7 @@
 
 2026-09-08、コミット `05d64f4` のソースを確認した。ディレクトリと Lake のビルド対象の改名は完了している。`Core.lean` は共有の相互作用演算子・密度行列・Gibbs 解析を import しており、旧 `Gibbs.lean` は削除済み。`CouplingSpace` と標準ガウス測度も Model に移設済みである。これらを新規の実装課題として繰り返さない。
 
-W02 で汎用ガウス集中は独立基盤へ移行済み。W03 で `Main.lean` のハミルトニアンを Model の共有定義へ接続し、微分・リプシッツ評価・両側の裾評価を標準規格化へ移行した。MGF・片側の裾の追加公開と集中評価の再配置は W05 に残る。2026-09-08 の文書再編自体では Lean を再検証していない。
+W02 で汎用ガウス集中は独立基盤へ移行済み。W03 で `Main.lean` のハミルトニアンを Model の共有定義へ接続し、微分・リプシッツ評価・両側の裾評価を標準規格化へ移行した。W05 では `Core.lean` を `DensityMatrix.lean`・`MajoranaBound.lean` に分割し、MGF・上下の裾を追加公開する。2026-09-08 の文書再編自体では Lean を再検証していない。
 
 <a id="w02"></a>
 
@@ -58,28 +58,44 @@ W02 で汎用ガウス集中は独立基盤へ移行済み。W03 で `Main.lean`
 
 担当部分の完了条件：標準表現が集中不等式側へ逆向きに依存せず、既存の集中評価も同じ共有補題を利用できる。
 
-<a id="w05"></a>
-
 ### W04 の検証記録（2026-09-18）
 
 着手時コミットは `4a27dd8e77e99784683f460d2d5d826adac166e3`。`Core.lean` の `majorana_sq`、`listProduct_eq_smul_of_perm`、語の随伴との積、`psiProduct_star_mul_self`、`interactionOperator_sq` の証明を `Model.Majorana` へ移し、元の宣言を削除した。利用側は同じ共有宣言を直接使い、二乗和評価の仮定・有限サイズの定数は保った。
 
 `lake env lean SYK/SuperConcentration/Core.lean` は warning なしで成功し、`lake build Model SuperConcentration` は3195 jobsで成功した。`syk_sum_sq_expectation_le` と `logPartition_two_sided_tail_standardGaussian` の公理依存は `propext`・`Classical.choice`・`Quot.sound` のみ。W05 のファイル再配置と MGF・片側評価の追加は未着手のまま残す。
 
+<a id="w05"></a>
+
 ## W05：SYK 集中不等式の移行完了
 
 前提は W01・W03（従って W02）。現行の二乗和評価は抽象的な `MajoranaSystem` に対する結果なので、W04 の標準表現の構成を待つ必要はない。
 
-- [ ] `Core.lean` の内容を目標配置の `DensityMatrix.lean` と `MajoranaBound.lean` に整理する。共有済みの密度行列の定義・Gibbs 解析は Model から使い、集中不等式固有の評価だけをこの層に残す。
-- [ ] 相互作用演算子の有限サイズの二乗和評価 `∑_A |Tr(ρ Ψ_A)|^2 ≤ choose(N,q-1)/q` を保持し、必要な代数補題の移設は W04 と競合しないよう調整する。
-- [ ] `β : ℝ≥0` と共有ハミルトニアンに対して既存の対数微分・方向微分の証明を再利用し、標準ガウス座標に関するリプシッツ定数 `β / sqrt q` を導く。
-- [ ] 中心化した対数分配関数に対し、パラメータ `β^2/q` の `HasSubgaussianMGF` を供給する。
-- [ ] 下側・上側・両側の裾評価を導く。`β>0`・`t>0` では片側が `exp(-q t^2/(2β^2))`、両側がその2倍となる定数を保持する。
-- [ ] `β=0` では通常のトレースによる `log Z=log d` が相互作用係数に依存しないことから、中心化した量が0となる場合を直接処理する。
-- [ ] 新 API の検証後、重複した定義、途中計算だけに使う公開定数、一般スケール `𝒥` を含む不要な旧基本 API を整理する。互換用の別名は作らない。
-- [ ] 個別検査、関連ビルド、主要定理の公理依存と定数の照合、README・過去の証明計画書の整合を完了する。
+- [x] `Core.lean` の内容を目標配置の `DensityMatrix.lean` と `MajoranaBound.lean` に整理する。共有済みの密度行列の定義・Gibbs 解析は Model から使い、集中不等式固有の評価だけをこの層に残す。
+- [x] 相互作用演算子の有限サイズの二乗和評価 `∑_A |Tr(ρ Ψ_A)|^2 ≤ choose(N,q-1)/q` を保持し、必要な代数補題の移設は W04 と競合しないよう調整する。
+- [x] `β : ℝ≥0` と共有ハミルトニアンに対して既存の対数微分・方向微分の証明を再利用し、標準ガウス座標に関するリプシッツ定数 `β / sqrt q` を導く。
+- [x] 中心化した対数分配関数に対し、パラメータ `β^2/q` の `HasSubgaussianMGF` を供給する。
+- [x] 下側・上側・両側の裾評価を導く。`β>0`・`t>0` では片側が `exp(-q t^2/(2β^2))`、両側がその2倍となる定数を保持する。
+- [x] `β=0` では通常のトレースによる `log Z=log d` が相互作用係数に依存しないことから、中心化した量が0となる場合を直接処理する。
+- [x] 新 API の検証後、重複した定義、途中計算だけに使う公開定数、一般スケール `𝒥` を含む不要な旧基本 API を整理する。互換用の別名は作らない。
+- [x] 個別検査、関連ビルド、主要定理の公理依存と定数の照合、README・過去の証明計画書の整合を完了する。
 
 担当部分の完了条件：CLT が必要とする MGF と片側の裾を、定数を悪化させず、利用側が SYK のリプシッツ評価を仮定として補う必要のない形で供給できる。最良定数の同定は主張しない。対応する Blueprint の編集は Chapters の計画に従い、同じ W05 内で完了する。
+
+### W05 の検証記録（2026-09-18）
+
+着手時コミットは `9c8f0354a8429e7f943a34abd5415b1e8845c5dc`、着手時の作業ツリーは clean。対象はそこからの W05 の未コミット差分であり、コミットは作成していない。
+
+`Core.lean` の反交換族の評価を `DensityMatrix.lean`、拡張相互作用・二重計数・有限サイズ評価を `MajoranaBound.lean` に分割し、旧ファイルを削除した。両ファイルの証明本体が元の対応箇所と完全に一致することを比較した。密度行列の定義・分散の非負性・Gibbs 解析は Model の宣言を直接使い、有限サイズの上界は `choose(N,q-1)/q` のままである。
+
+`Main.lean` の単一の公開定数は `logPartitionLipschitzConstant`。有限サイズの途中計算用定数とその補助定理を `private` にし、公開二乗評価には定数の式を直接記した。リプシッツ性を仮定として要求する旧両側裾の重複 API は削除し、互換用の別名は作っていない。
+
+新しい `logPartition_hasSubgaussianMGF` は、中心化した通常トレースの対数分配関数に `Real.toNNReal (β²/q)` のパラメータを与え、`β=0` を含む。上下の裾はそれぞれ `exp(-q t²/(2β²))`、両側はその2倍であり、裾の表示は `β≠0`・`t>0` に限定する。零逆温度では `log Z=log card d`、中心化した量の点ごとの零、および上下・両側の正の偏差の測度0を直接証明した。模型固有のリプシッツ仮定を利用側に要求しない。
+
+- 共有ワークスペースのルートで、最終ソースの `lake env lean SYK/SuperConcentration/DensityMatrix.lean`・`MajoranaBound.lean`・`Main.lean` はすべて warning なしで成功した。初回の `Main.lean` 検査は W03 より古い `GaussianDisorder` の olean により識別子不明で失敗したが、共有模型を再構築した後の検査は成功した。
+- `lake build Model SuperConcentration` は3196 jobs、`lake build Model SuperConcentration CLT` は3202 jobsで成功した。汎用ガウス基盤の既存の linter warning は残り、変更した数学ファイルに新規 warning はない。親ワークスペースの既定対象は別研究の `RSATMain` なので、対象を明示して検証した。親の依存設定・既定対象は変更していない。
+- 反交換族・有限サイズ二乗和・トレース商の方向微分・二乗方向評価・簡約方向評価・熱期待値の方向微分・リプシッツ性・MGF・零逆温度の中心化と上下両側の裾・正温度の上下両側の裾の計15定理を `#print axioms` で確認し、すべて `propext`・`Classical.choice`・`Quot.sound` のみであった。一時監査ファイルは削除した。
+- Model・SuperConcentration・Probability・CLT の Lean ソースに `sorry`・`admit`・`axiom` は検出されず、旧 Core の import や旧公開定数・重複裾 API の利用箇所は残っていない。README・構造文書・歴史的証明計画の冒頭と Blueprint 原稿を更新し、`git diff --check` は成功した。
+- `lake env lean SYK/Chapters/SuperConcentration.lean` は warning なしで成功した。Blueprint 原稿の宣言名・依存名もソースと照合した。Verso 休止中の生成・参照検査は実行していない。`Annealed_FE`・`Universality` は今回も検証していない。
 
 ## 各単位の検証と記録
 
