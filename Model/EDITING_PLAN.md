@@ -24,7 +24,7 @@
 - [x] `FiniteDimensionalGibbs.lean` を個別に検査し、`lake build Model SuperConcentration` と追加した主要定理の `#print axioms` を確認した。
 - [x] 差分、警告、既知の失敗と今回の検証範囲を記録し、構造文書と Blueprint の現在の状態を更新した。
 
-担当部分の完了条件：追加の解析 API と Model 内の対応文書が一致し、上記の検証結果が記録されている。W01 全体では [Chapters の計画](../Chapters/EDITING_PLAN.md) に記す章の更新と Blueprint の確認も必要である。CLT の局所定義や零点のない領域の証明は含めない。
+担当部分の完了条件：追加の解析 API と Model 内の対応文書が一致し、上記の検証結果が記録されている。W01 全体では [Chapters の計画](../Chapters/EDITING_PLAN.md) に記す章の更新と宣言参照の照合も含む。Verso の機械的検証は休止中は要求しない。CLT の局所定義や零点のない領域の証明は含めない。
 
 ### 検証記録（2026-09-08）
 
@@ -123,7 +123,7 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 
 変更ファイルを個別に `lake env lean` で検査し、`lake build Model` と移行済み利用側の最小ビルドを行う。Model と集中不等式の接続を変更した単位では `lake build Model SuperConcentration` を実行する。重要な定理では `#print axioms` と定理文の仮定を確認する。
 
-ワークスペース全体に影響する変更では `lake build`、Blueprint の変更では `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` と `lake exe vbp check --site SYK/_out/site` を実行する。現在の既定ビルドから除外されている `Annealed_FE` と `Universality` は個別に検証済みとは扱わない。既定範囲のビルドと Blueprint の生成・参照検査には成功を必要とし、新規の `sorry`、`admit`、`axiom`、未解決の証明目標は許容しない。
+ワークスペース全体に影響する変更では `lake build` を実行する。Blueprint の変更では本文と宣言参照を照合し、Verso 復帰後に `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` と `lake exe vbp check --site SYK/_out/site` を実行する。現在の既定ビルドから除外されている `Annealed_FE` と `Universality` は個別に検証済みとは扱わない。既定範囲には新規の `sorry`、`admit`、`axiom`、未解決の証明目標を許容しない。
 
 検証記録には対象コミット・差分、コマンド、結果、警告、公理依存、残る仮定を記す。新しい検証結果は該当単位の節に追記し、過去の成功を変更後の成功として転記しない。
 
