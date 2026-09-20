@@ -7,20 +7,20 @@
 \label{sec:chaos-decomposition}
   We use the probabilists' Hermite polynomials
 \begin{equation*}
-  H_\alpha(G)=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
+  H_\alpha(G):=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
   \qquad
   \E[H_\alpha H_\eta]
   =\alpha!\,\mathbf 1_{\{\alpha=\eta\}},
 \end{equation*}
-where $\alpha!=\prod_I\alpha_I!$.  Since the $H_\alpha$ form a complete
-orthogonal basis of $L^2(\gamma_{|\mathcal I_N|})$, where
-$\gamma_{|\mathcal I_N|}$ denotes standard Gaussian measure on
-$\mathbb R^{|\mathcal I_N|}$, we have
+where $\alpha!:=\prod_I\alpha_I!$.  Since the $H_\alpha$ form a complete
+orthogonal basis of $L^2(\gamma_{\mathcal I_N})$, where
+$\gamma_{\mathcal I_N}$ denotes standard Gaussian measure on
+$\mathbb R^{\mathcal I_N}$, we have
 \begin{align}\label{eq: chaos}
-Z_N(\beta:G) = \sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\mathbb E[Z_N(\beta:G')H_\alpha(G')]}{\alpha!} H_\alpha(G),    
+Z_N(\beta:G) = \sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\mathbb E[Z_N(\beta:G')H_\alpha(G')]}{\alpha!} H_\alpha(G),  
 \end{align}
 where the second sum runs over all multi-index $\alpha$ such that $\sum_{I} \alpha_I = k$, and the expectation is taken over $G'$ independent copy of $G.$  Let $P_r$ denote the orthogonal projection in
-$L^2(\gamma_{|\mathcal I_N|})$ onto the $r$-th homogeneous Gaussian chaos:
+$L^2(\gamma_{\mathcal I_N})$ onto the $r$-th homogeneous Gaussian chaos:
 Then, we can write
 \[
   P_r Z_N(\beta;G)
@@ -34,35 +34,34 @@ Since $\mathbb E Z_N(\beta)$ is deterministic, we also have
 
 
 By the same orthogonality and Lemma~\ref{lem:Gaussian-Hermite-IBP}, for every
-sufficiently regular random variable $X=X(G)$,
+ random variable $X=X(G)$,
 \begin{equation*}
   \norm{P_rX}_2^2
   =
   \sum_{|\alpha|=r}
-  \frac{|\E\,\partial_g^\alpha X|^2}{\alpha!}.
+  \frac{|\E\,\partial_g^\alpha X|^2}{\alpha!},
 \end{equation*}
-
+whenever the expectations make senses. 
 
 Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \mathbb E Z_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
  The next lemma proves the exact radial decomposition
 \begin{equation*}
   Y_N(\beta)-1=A_N(\beta)Q_N+\mathcal R_N(\beta),
   \qquad
-  \mathcal R_N=\sum_{r\geq3}P_r Y_N.
+  \mathcal R_N:=\sum_{r\geq3}P_r Y_N.
 \end{equation*}
 
 
 \subsection{Exact finite-size radial projection}
 
-Call a multi-index $\alpha$ \emph{even} if
+Call a multi-index $\alpha$ \emph{even} if \text{for every }$x\in[N],$
 \begin{equation}\label{eq:even-multi-index}
-  \sum_{I\ni x}\alpha_I\equiv0\pmod2
-  \qquad\text{for every }x\in[N].
+  \sum_{I\ni x}\alpha_I\equiv0\pmod2.
 \end{equation}
 Otherwise, we call $\alpha$ odd. 
 \begin{lemma}\label{lem: parity rule lemma}
     For $s=(s_1,\ldots,s_N)\in\{\pm1\}^N$, define
-$\chi_s(I)=\prod_{x\in I}s_x$.  We have 
+$\chi_s(I):=\prod_{x\in I}s_x$.  We have 
 \begin{equation}\label{eq:sign-gauge-invariance}
   Z_N(\beta;G)=Z_N\bigl(\beta;(\chi_s(I)g_I)_I\bigr).
 \end{equation}
@@ -73,21 +72,20 @@ $\chi_s(I)=\prod_{x\in I}s_x$.  We have
     \]
 \end{lemma}
 \begin{proof}
-To make the Clifford symmetry explicit, let
+We define the Clifford volume element: 
 \[
   \Gamma
   := 
   \psi_1\cdots\psi_N.
 \]
 Note that $\Gamma^*\Gamma$ is identity map, so $\Gamma$ is unitary. Since $N$ is even, moving $\psi_j$ through the other $N-1$ Majorana
-generators produces the sign $(-1)^{N-1}=-1$.  Hence
+generators produces the sign $(-1)^{N-1}=-1$.  Hence, for any $j\in[N],$
 \[
-  \Gamma\psi_j\Gamma^*=-\psi_j
-  \qquad (j\in[N]).
+  \Gamma\psi_j\Gamma^*=  -\psi_j \Gamma \Gamma^* =-\psi_j.
 \]
-For each $x\in[N]$, put $U_x=\Gamma\psi_x$.  This is unitary, and conjugation
-by $U_x$ is the composition of conjugation by $\psi_x$ and conjugation by
-$\Gamma$.  The Clifford relations give
+For each $x\in[N]$, consider a single-coordinate reflection
+$$U_x:=\Gamma\psi_x.$$
+This is unitary because $U_x^* U_x=\Gamma\psi_x \psi_x^* \Gamma^* =\mathbb I$.  The Clifford relations \eqref{eq: clifford relation}  give
 \[
   \psi_x\psi_j\psi_x
   =
@@ -96,27 +94,26 @@ $\Gamma$.  The Clifford relations give
     -\psi_j,&j\neq x.
   \end{cases}
 \]
-Combining the last two displays, we obtain
-\[
-  U_x\psi_jU_x^*
+Hence, we obtain
+\begin{align}\label{eq: conjugation rule}
+      U_x\psi_jU_x^*
   =
   \begin{cases}
     -\psi_x,&j=x,\\
     \psi_j,&j\neq x.
   \end{cases}
-\]
-Thus conjugation by $U_x$ changes the sign of precisely the generator
-$\psi_x$.
+\end{align}
 
-Let $S_s=\{x\in[N]:s_x=-1\}$ and let $U_s$ be the product of the unitaries
-$U_x$ over $x\in S_s$, in any fixed order.  Successively applying the
-preceding conjugation rule yields
+
+
+Let $S_s:=\{x\in[N]:s_x=-1\}$ and let $U_s$ be the product of the unitaries
+$U_x$ over $x\in S_s$:
+$$U_s:= \prod_{x\in S_s} U_x,$$
+where the product is in any fixed order.  Applying \eqref{eq: conjugation rule} successively yields that for any $j\in[N],$
 \[
-  U_s\psi_jU_s^*=s_j\psi_j
-  \qquad (j\in[N]).
+  U_s\psi_jU_s^*=s_j\psi_j.
 \]
-If $I=\{i_1<\cdots<i_q\}$, then conjugation is multiplicative, so the
-definition $\psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}$ gives
+Recall that $\psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}$ for  $I=\{i_1<\cdots<i_q\}$. Hence, the above identity yields 
 \begin{align*}
   U_s\psi_IU_s^*
   &=
@@ -127,20 +124,19 @@ definition $\psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}$ gives
   \left(\prod_{x\in I}s_x\right)\psi_I
   =\chi_s(I)\psi_I.
 \end{align*}
-Writing $g^{(s)}=(\chi_s(I)g_I)_I$, we therefore have
+Writing $g^{(s)}:=(\chi_s(I)g_I)_I$, we therefore have
 \begin{align*}
   H_N(g^{(s)})
   &=\sigma_N\sum_{I\in\calI_N}\chi_s(I)g_I\psi_I\\
   &=\sigma_N\sum_{I\in\calI_N}g_IU_s\psi_IU_s^*
     =U_sH_N(G)U_s^*.
 \end{align*}
-The power-series definition of the exponential then implies
+Using the unitary equivariance of the matrix exponential, we have 
 \[
   e^{-\beta H_N(g^{(s)})}
   =U_se^{-\beta H_N(G)}U_s^*.
 \]
-Finally, the normalized trace is invariant under unitary conjugation.
-Consequently
+Finally, since the trace is invariant under unitary conjugation, we conclude 
 \[
   Z_N(\beta;g^{(s)})
   =\tr\!\left(U_se^{-\beta H_N(G)}U_s^*\right)
@@ -149,7 +145,7 @@ Consequently
 \]
 which proves \eqref{eq:sign-gauge-invariance}.
 
-Assume that $\alpha$ is odd, i.e. we can take $x$ such that
+Assume that $\alpha$ is odd so that  we can take $x$ such that
 $\sum_{I:x\in I}\alpha_I$ is odd.  We take $s$ such that $s_y=1$ for
 $y\neq x$ and $s_x=-1$.  Then,
  \[
@@ -170,7 +166,7 @@ which gives the second claim.
 
 \subsection{Gaussian integration by parts}
 \begin{lemma}\label{lem:Gaussian-Hermite-IBP}
-Let $f:\mathbb R^{|\mathcal I_N|}\to\mathbb R$ be of class $C^{|\alpha|}$,
+Let $f:\mathbb R^{\mathcal I_N}\to\mathbb R$ be of class $C^{|\alpha|}$,
 and suppose that $f$ and its mixed partial derivatives up to order $\alpha$
 have at most exponential growth in $\norm{G}$.  Then
 \begin{equation}\label{eq:Gaussian-Hermite-IBP}
@@ -183,7 +179,7 @@ $f(G)=Z_N(\beta;G)$.
 \begin{proof}
 Recall that the one-dimensional integration-by-parts identity yields 
 \[
-\mathbb{E}\!\left[\operatorname{He}_k(g)f(g)\right] = \mathbb{E}\!\left[f^{(k)}(g)\right], \qquad g\sim N(0,1),
+\mathbb{E}\!\left[\operatorname{He}_k(G)f(G)\right] = \mathbb{E}\!\left[f^{(k)}(G)\right],
 \]
 for every function $f\in C^k(\mathbb R)$ satisfying the stated growth
 condition.  Applying this identity successively to the independent Gaussian
@@ -227,7 +223,7 @@ most exponential growth in $\norm{G}$.  Thus it satisfies the assumption.
 \subsection{First and second moment}
 
 \begin{lemma}\label{lem:exact-second-chaos}
-For every real $\beta$,
+For every $\beta\in \mathbb R$,
 \[
   P_1Y_N(\beta)=0
 \]
@@ -241,56 +237,34 @@ and
 \end{lemma}
 
 \begin{proof}
-  This parity rule above kills
- the first chaos.  In the second chaos it also kills every off-diagonal
-monomial $g_Ig_J$, since the parity condition for such a monomial forces
-$I=J$.
-Permutation symmetry shows that the remaining diagonal coefficients agree.
-Consequently
+For multi-index $\alpha$ with $|\alpha|=1$, since $\alpha$ is always odd, the first claim follows from Lemma~\ref{lem: parity rule lemma}. 
+   
+  In the second chaos it also kills every 
+monomial $g_Ig_J$ with $I\neq J$, since the corresponding multi-index is also odd.  Consequently, since ${\rm He}_2(x)=x^2-1$, 
 \[
-  P_2Z_N(\beta)=b_N(\beta)\sum_I(g_I^2-1)
+  P_2Z_N(\beta)=\frac{1}{2} \sum_I \mathbb E[Z_N(\beta;G') ((g'_I)^2-1) ] (g_I^2-1).
 \]
-for a deterministic scalar $b_N$.
 
-It remains to compute the coefficient.  For each fixed $I$, the
-probabilists' second Hermite polynomial is $g_I^2-1$, with
-\[
-  \E(g_I^2-1)^2=2.
-\]
-Since $P_2$ is an orthogonal projection and the variables $g_I$ are
-independent, taking the inner product of the preceding formula for $P_2Z_N$
-with $g_I^2-1$ gives
-\[
-  2b_N(\beta)
-  =\E\bigl[Z_N(\beta)(g_I^2-1)\bigr].
-\]
-Applying Gaussian integration by parts twice, conditionally on all
-coordinates other than $g_I$, yields
+
+It remains to compute the coefficient $$b_N(\beta):= \frac{1}{2}\mathbb E[Z_N(\beta;G) (g_I^2-1)].$$ Applying Gaussian integration by parts  yields
 \[
   \E\bigl[Z_N(\beta)(g_I^2-1)\bigr]
   =\E\,g_I \partial_{g_I} Z_N(\beta).
 \]
-Summing over the $\mathcal I_N$ choices of $I$ therefore gives the first equality
-below.  A further conditional Gaussian integration by parts gives the second:
-\begin{align*}
-  2M_Nb_N(\beta)
-  & =\sum_I\E\bigl[g_I\partial_{g_I}Z_N(\beta)\bigr]\\
-  &=\beta\,\partial_\beta\E Z_N(\beta)
-    =\beta F_N'(\beta).
-\end{align*}
-
-The last equality follows pointwise from the exact scaling identity
-\[
+On the other hand,  since $
   Z_N(\beta;tG)
-  =\tr e^{-\beta H_N(tG)}
-  =\tr e^{-t\beta H_N(G)}
   =Z_N(t\beta;G),
-\]
-where we used $H_N(tG)=tH_N(G)$.  Differentiating at $t=1$ gives
+$ 
+ differentiating at $t=1$ gives
 \[
   \sum_Ig_I\partial_{g_I}Z_N(\beta;G)
   =\beta\,\partial_\beta Z_N(\beta;G).
 \]
+Hence, we have 
+\begin{align*}
+  2M_Nb_N(\beta)
+  & =\sum_I\E\bigl[g_I\partial_{g_I}Z_N(\beta)\bigr]=\beta\,\partial_\beta\E Z_N(\beta).
+\end{align*}
 This proves \eqref{eq:P2Y-exact}.
 \end{proof}
 
@@ -301,7 +275,7 @@ This proves \eqref{eq:P2Y-exact}.
 
 \begin{lemma}
 \label{lem:Z-derivative-bound}
-For real $\beta$, every multi-index $\alpha$ of total order $r$ satisfies
+For any $\beta\in \mathbb R$ and for any multi-index $\alpha$  with  $|\alpha|=r$ satisfies
 \begin{equation}\label{eq:Z-derivative-bound}
   \left|\partial_g^\alpha Z_N(\beta;G)\right|
   \leq (|\beta|\sigma_N)^r Z_N(\beta;G).
@@ -309,7 +283,7 @@ For real $\beta$, every multi-index $\alpha$ of total order $r$ satisfies
 \end{lemma}
 
 \begin{proof}
-The case $r=0$ is immediate, so assume $r\geq1$.  Write $H_N=H_N(G)$ for
+The case $r=0$ is immediate, so assume $r\geq1$.  Write $H_N:=H_N(G)$ for
 brevity.  We first derive the equality
 \begin{align}
 	&\partial_{g_{I_r}}\cdots\partial_{g_{I_1}}Z_N(\beta;G)
@@ -393,7 +367,7 @@ $S_{r-1}\times\{1,\ldots,r\}$ onto $S_r$, summing the Leibniz-rule terms in
 \eqref{eq:iterated-Duhamel-formula}.
 
 It remains to estimate each integrand in
-\eqref{eq:iterated-Duhamel-formula}.  Here and below the Schatten norms are
+\eqref{eq:iterated-Duhamel-formula}.  From now on  the Schatten norms are
 defined using the normalized trace:
 \[
   \norm{A}_p=(\tr|A|^p)^{1/p},
@@ -458,9 +432,9 @@ auxiliary probability space, and write $\E_\varepsilon$ for expectation on
 this space.  Set
 \begin{equation}\label{eq:Rademacher-chaos-definition}
   S_{N,q}
-  =\sum_{I\in\calI_N}\varepsilon_I,
+  :=\sum_{I\in\calI_N}\varepsilon_I,
   \qquad
-  \varepsilon_I=\prod_{x\in I}\varepsilon_x.
+  \varepsilon_I:=\prod_{x\in I}\varepsilon_x.
 \end{equation}
 Thus $S_{N,q}$ is the degree-$q$ elementary symmetric polynomial in the
 Rademacher signs.
@@ -640,7 +614,7 @@ fixed real $\beta$ with $|\beta|<\beta_{\rm Rad}$,
 \begin{proof}
 Put
 \begin{equation*}
-  t_N=\beta^2\sigma_N^2
+  t_N:=\beta^2\sigma_N^2
   =\beta^2(q-1)!N^{-(q-1)}.
 \end{equation*}
 By the Hermite expansion \eqref{eq: chaos} and its orthogonality relation,
@@ -686,7 +660,7 @@ $\sum_{r\geq3}u^r/r!\leq u^3e^u/6$ for $u\geq0$.
 Choose
 \begin{equation*}
   \beta_{\rm Rad}
-  =\sqrt{\frac{c_q}{(q-1)!}},
+  :=\sqrt{\frac{c_q}{(q-1)!}},
 \end{equation*}
 where $c_q$ is the constant in Lemma~\ref{lem:Rademacher-encoding}.  If
 $|\beta|<\beta_{\rm Rad}$, then
