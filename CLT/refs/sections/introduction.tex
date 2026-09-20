@@ -9,16 +9,11 @@
 
 
 \subsection{The SYK model}\label{subsec:SYK-model}
-The Sachdev–Ye–Kitaev (SYK) model is a quantum-mechanical model of \(N\) fermionic degrees of freedom with random, all-to-all interactions. It originates from the work of Sachdev and Ye on random quantum magnets in 1993. A related Majorana-fermion model was introduced by Kitaev in 2015 in the context of quantum holography and is now known as the SYK model. Subsequent work, notably by Maldacena and Stanford, clarified its large-\(N\) structure and its connections to quantum chaos and nearly two-dimensional gravity.
-The SYK model is strongly interacting, yet it remains analytically tractable in the large-\(N\) limit. Depending on how the inverse temperature \(\beta = \beta_N\) scales as \(N \to \infty\), the model exhibits several distinct asymptotic regimes.
- It is quite rare for a strongly interacting quantum system to exhibit such a rich hierarchy of asymptotic regimes while still remaining analytically accessible. This combination makes the SYK model an important testing ground for both mathematics and physics. In particular, many physicists study these regimes in order to understand more precisely how strongly interacting quantum systems behave across different scales, and to identify which mathematical structures and physical mechanisms persist in more realistic models. In this sense, the SYK model serves as a relatively simple prototype from which one can develop tools and ideas for the study of more complicated quantum many-body systems, disordered systems, quantum chaos, and models of quantum gravity.
+The Sachdev–Ye–Kitaev (SYK) model is a quantum-mechanical model of \(N\) fermions with random interactions between all pairs of particles \cite{SachdevYe1993}. It comes from the work of Sachdev and Ye on random quantum magnets and from Kitaev’s later model using Majorana fermions, with later work by Maldacena, Stanford, and others explaining its large-\(N\) behavior and its links to quantum chaos and two-dimensional quantum gravity \cite{MaldacenaStanford2016}. Although the model has strong interactions, it can still be studied mathematically when \(N\) is large, which makes it a useful model for studying quantum many-body systems, disorder, quantum chaos, and quantum gravity.
 
- 
-(i) Fixed-temperature large-\(N\) regime ($\beta:\text{ fixed}$):  This is the basic mathematical large-\(N\) limit of the SYK model. It suppresses finite-size and disorder fluctuations and provides a tractable framework for studying finite-temperature observables and the emergence of the lower-temperature physical regimes.
-(ii) Conformal scaling regime \((1\ll \beta \ll N)\): The system is strongly interacting and approximately conformal, while finite-\(N\) effects remain small. In this regime, the SYK model realizes a non-Fermi liquid, in which conventional quasiparticle excitations are absent and the low-energy behavior is governed instead by collective scale-invariant dynamics.
-(iv) Quantum-Schwarzian regime \((N\ll \beta)\): Quantum fluctuations of the Schwarzian mode become strong, and finite-\(N\) effects are essential. In this regime, the SYK model probes the fully quantum dynamics of the same Schwarzian degree of freedom that appears in nearly-\(\mathrm{AdS}_2\) gravity.
-(vi) Finite-size / discrete-spectrum regime ($\liminf_N \log (\beta_N)/N > 0$): Individual energy levels become relevant, and hence, Random matrix theory are applied.
+The behavior of the SYK model depends strongly on how the inverse temperature \(\beta=\beta_N\) scales with \(N\). For fixed \(\beta\), one obtains the standard finite-temperature large-\(N\) regime; when \(1\ll \beta\ll N\), the system enters the conformal regime, characterized by strong interactions, approximate scale invariance, and non-Fermi-liquid behavior. At lower temperatures, \(N\ll \beta\), the quantum-Schwarzian regime emerges, where finite-\(N\) effects and quantum fluctuations of the Schwarzian mode become essential. Finally, when \(\beta\) is exponentially large in \(N\), the partition function is mainly determined by the eigenvalues near the edge of the spectrum. In this regime, individual energy levels become important, and random matrix theory (RMT) describes their fluctuations. 
 
+Previous mathematical work has extensively studied the limiting free energy of the SYK model \cite{GPSZ2026,He2026}. Moreover, Anschuetz, Gamarnik, and Kiani \cite{AGK2025} established a universality result showing that the limiting free energy is the same for a broad class of interaction distributions.  This naturally leads us to ask what changes when the interaction distribution is varied, which motivates us to study fluctuations of the free energy.  In this paper, we study these fluctuations and show that, for sufficiently small \(\beta\), the suitably rescaled free energy converges to a Gaussian distribution.
 
 Fix an even integer $q\geq4$, and let $N$ be even.  Write
 \[
@@ -89,24 +84,14 @@ With the same $\beta_p$ as in Theorem~\ref{thm:partition-clt}, for any $\beta\in
 
 \subsection{Previous work}
 
-Rigorous results have recently identified the high-temperature annealed and
-quenched free-energy limits \cite{GPSZ2026}.  The purpose of
-this paper is to determine the leading distributional fluctuations in the
-same high-temperature regime. 
+Rigorous results on the high-temperature annealed and quenched free-energy limits were recently obtained in \cite{GPSZ2026}. More recently, He \cite{He2026} identified the fixed-temperature free-energy limit of the Gaussian SYK model with the Schwinger--Dyson pressure and used this result to determine the spectral edge. These works focus on the leading-order behavior of the free energy, while the purpose of the present paper is to study its leading fluctuations in the high-temperature regime.
 
-
-Feng, Tian, and Wei \cite{FTW2018} proved a central limit theorem for linear
-eigenvalue statistics of the Gaussian SYK Hamiltonian.  Their theorem treats
-a fixed test function $f$ under regularity assumptions on $f$ and $f'$.
-In the normalization used in that paper, however, the partition function
-corresponds to
+Feng, Tian, and Wei \cite{FTW2018} proved a central limit theorem for linear eigenvalue statistics of the Gaussian SYK Hamiltonian. Their result applies to a fixed test function \(f\), under suitable regularity assumptions on \(f\) and \(f'\). In their normalization, however, the partition function corresponds to
 \[
-  f_{N,\beta}(x)=e^{-\beta\tau_Nx},
-  \qquad \tau_N\asymp\sqrt N,
+f_{N,\beta}(x)=e^{-\beta\tau_N x},
+\qquad \tau_N\asymp\sqrt{N},
 \]
-so both the test function and its derivative vary with $N$.  Hence, their 
-fixed-test-function theorem therefore does not apply directly to
-$Z_N(\beta)$.
+so both the test function and its derivative depend on \(N\). Therefore, their fixed-test-function theorem does not apply directly to \(Z_N(\beta)\).
 
 
 \subsection{Outline of the proof}
