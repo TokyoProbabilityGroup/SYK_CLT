@@ -9,11 +9,11 @@
 
 
 \subsection{The SYK model}\label{subsec:SYK-model}
-The Sachdev–Ye–Kitaev (SYK) model is a quantum-mechanical model of \(N\) fermions with random interactions between all pairs of particles \cite{SachdevYe1993}. It comes from the work of Sachdev and Ye on random quantum magnets and from Kitaev’s later model using Majorana fermions, with later work by Maldacena, Stanford, and others explaining its large-\(N\) behavior and its links to quantum chaos and two-dimensional quantum gravity \cite{MaldacenaStanford2016}. Although the model has strong interactions, it can still be studied mathematically when \(N\) is large, which makes it a useful model for studying quantum many-body systems, disorder, quantum chaos, and quantum gravity.
+The Sachdev–Ye–Kitaev (SYK) model is a quantum-mechanical model of \(N\) fermions with random interactions between all pairs of particles. It originates in the work of Sachdev and Ye on random quantum magnets \cite{SachdevYe1993} and in Kitaev’s subsequent formulation in terms of Majorana fermions \cite{Kitaev2015}. Later work by Maldacena, Stanford, and others clarified its large-\(N\) behavior and revealed deep connections to quantum chaos and two-dimensional quantum gravity \cite{MaldacenaStanford2016}. Although the model has strong interactions, it can still be tractable mathematically, which makes it a useful model for studying quantum many-body systems, disorder, quantum chaos, and quantum gravity.
 
-The behavior of the SYK model depends strongly on how the inverse temperature \(\beta=\beta_N\) scales with \(N\). For fixed \(\beta\), one obtains the standard finite-temperature large-\(N\) regime; when \(1\ll \beta\ll N\), the system enters the conformal regime, characterized by strong interactions, approximate scale invariance, and non-Fermi-liquid behavior. At lower temperatures, \(N\ll \beta\), the quantum-Schwarzian regime emerges, where finite-\(N\) effects and quantum fluctuations of the Schwarzian mode become essential. Finally, when \(\beta\) is exponentially large in \(N\), the partition function is mainly determined by the eigenvalues near the edge of the spectrum. In this regime, individual energy levels become important, and random matrix theory (RMT) describes their fluctuations. 
+The behavior of the SYK model depends strongly on how the inverse temperature \(\beta=\beta_N\) scales with \(N\). For fixed \(\beta\), one obtains the standard finite-temperature large-\(N\) regime; when \(1\ll \beta\ll N\), the system enters the conformal regime, characterized by strong interactions and non-Fermi-liquid behavior. At lower temperatures, \(N\ll \beta\), the quantum-Schwarzian regime emerges, where finite-\(N\) effects and quantum fluctuations of the Schwarzian mode become essential. Finally, when \(\beta\) is exponentially large in \(N\), the partition function is mainly determined by the eigenvalues near the edge of the spectrum. In this regime, individual energy levels become important, and random matrix theory (RMT) describes their fluctuations. 
 
-Previous mathematical work has extensively studied the limiting free energy of the SYK model \cite{GPSZ2026,He2026}. Moreover, Anschuetz, Gamarnik, and Kiani \cite{AGK2025} established a universality result showing that the limiting free energy is the same for a broad class of interaction distributions.  This naturally leads us to ask what changes when the interaction distribution is varied, which motivates us to study fluctuations of the free energy.  In this paper, we study these fluctuations and show that, for sufficiently small \(\beta\), the suitably rescaled free energy converges to a Gaussian distribution.
+Previous mathematical work has extensively studied the limiting free energy of the SYK model \cite{GPSZ2026,He2026}. Moreover, Anschuetz, Gamarnik, and Kiani \cite{AGK2025} established a universality result showing that the limiting free energy is the same for a broad class of interaction distributions.  This naturally leads us to ask how physical quantities change as the interaction distribution is varied. Motivated by this question, we study fluctuations of the free energy and show that, for sufficiently small \(\beta\), the suitably rescaled free energy converges to a Gaussian distribution.
 
 Fix an even integer $q\geq4$, and let $N$ be even.  Write
 \[
@@ -38,7 +38,7 @@ particular, $Z_N(0;G)=1$.  This normalization does not affect the
 relative fluctuations studied below. We sometime write $Z_N(\beta) = Z_N(\beta;G)$ for brevity. 
 For real $\beta$, set
 \[
-  Y_N(\beta;G):=\frac{Z_N(\beta;G)}{\mathbb E Z_N(\beta)}.
+ Y_N(\beta):=  Y_N(\beta;G):=\frac{Z_N(\beta;G)}{\mathbb E Z_N(\beta)}.
 \]
 Thus $\E Y_N(\beta)=1$.
 Throughout, all limits are taken as $N\to\infty$ through even integers.
@@ -96,7 +96,7 @@ so both the test function and its derivative depend on \(N\). Therefore, their f
 
 \subsection{Outline of the proof}
 
-Recall that $\frac{Z_N(\beta)}{\mathbb E Z_N(\beta)}$. 
+Recall that $Y_n(\beta)= {Z_N(\beta)}/{\mathbb E Z_N(\beta)}$.  
 By applying the chaos expansion, since Clifford sign-gauge symmetry eliminates the first Gaussian chaos and
 identifies the second chaos exactly, we have the following:
 \[
@@ -110,7 +110,7 @@ identifies the second chaos exactly, we have the following:
     Q_N=\frac1{|\mathcal I_N|}\sum_I(g_I^2-1).
     \end{equation}
 Here $\mathcal R_N$ is the sum of the Gaussian chaoses of $Y_N$ of orders at least
-three.  Thus the leading random term is a normalized sum of $\mathcal I_N$
+three.  Thus the leading  term is a normalized sum of $\mathcal I_N$
 independent centered variables.  The main task is to prove
 \[
   \norm{\mathcal R_N(\beta)}_2^2=o(N^{-(q-2)}).
@@ -135,8 +135,22 @@ Moreover, the annealed free-energy input and convexity imply
   \frac{A_N(\beta)}N
   \longrightarrow \frac{\beta}{2}\ell_q'(\beta).
 \]
-Since $M_N\sim N^q/q!$, the classical central limit theorem for $Q_N$, the
-remainder estimate  gives the claimed limit for
-$Y_N$.
+Since $M_N\sim N^q/q!$, the classical central limit theorem for $Q_N$   gives the first claim. 
 
+To obtain the second claim, the logarithmic fluctuation, observe that
+\begin{align*}
+    &N^{q/2-1}\bigl(\log Z_N(\beta)-\E\log Z_N(\beta)\bigr)\\
+  &=N^{q/2-1}\bigl(\log Y_N(\beta)-(Y_N(\beta)-1)\bigr)
+   +N^{q/2-1}(Y_N(\beta)-1)-N^{q/2-1}\E\log Y_N(\beta).
+\end{align*}
+The Taylor expansion $\log(1+x)-x=O(x^2)$, together with the
+first claim, shows that the first term  on the right-hand side converges to zero in probability. 
+The Gaussian concentration estimates
+\eqref{eq:centered W_N tail} and \eqref{eq:centered W_N exp} control the
+ tails of $\log Y_N(\beta)$. Moreover,  these estimats give
+\[
+  \E\log Y_N(\beta)=O\!\left(N^{2-q}\sqrt{\log N}\right)
+  =o\!\left(N^{1-q/2}\right).
+\]
+Therefore, we conclude the second claim. 
 \end{document}
