@@ -7,12 +7,12 @@
 \label{sec:chaos-decomposition}
   We use the probabilists' Hermite polynomials
 \begin{equation*}
-  H_\alpha(G)=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
+  H_\alpha(G):=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
   \qquad
   \E[H_\alpha H_\eta]
   =\alpha!\,\mathbf 1_{\{\alpha=\eta\}},
 \end{equation*}
-where $\alpha!=\prod_I\alpha_I!$.  Since the $H_\alpha$ form a complete
+where $\alpha!:=\prod_I\alpha_I!$.  Since the $H_\alpha$ form a complete
 orthogonal basis of $L^2(\gamma_{\mathcal I_N})$, where
 $\gamma_{\mathcal I_N}$ denotes standard Gaussian measure on
 $\mathbb R^{\mathcal I_N}$, we have
@@ -48,7 +48,7 @@ Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \mathbb E Z_N(\beta)$ fr
 \begin{equation*}
   Y_N(\beta)-1=A_N(\beta)Q_N+\mathcal R_N(\beta),
   \qquad
-  \mathcal R_N=\sum_{r\geq3}P_r Y_N.
+  \mathcal R_N:=\sum_{r\geq3}P_r Y_N.
 \end{equation*}
 
 
@@ -61,7 +61,7 @@ Call a multi-index $\alpha$ \emph{even} if \text{for every }$x\in[N],$
 Otherwise, we call $\alpha$ odd. 
 \begin{lemma}\label{lem: parity rule lemma}
     For $s=(s_1,\ldots,s_N)\in\{\pm1\}^N$, define
-$\chi_s(I)=\prod_{x\in I}s_x$.  We have 
+$\chi_s(I):=\prod_{x\in I}s_x$.  We have 
 \begin{equation}\label{eq:sign-gauge-invariance}
   Z_N(\beta;G)=Z_N\bigl(\beta;(\chi_s(I)g_I)_I\bigr).
 \end{equation}
@@ -124,7 +124,7 @@ Recall that $\psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}$ for  $I=\{i_1<\cd
   \left(\prod_{x\in I}s_x\right)\psi_I
   =\chi_s(I)\psi_I.
 \end{align*}
-Writing $g^{(s)}=(\chi_s(I)g_I)_I$, we therefore have
+Writing $g^{(s)}:=(\chi_s(I)g_I)_I$, we therefore have
 \begin{align*}
   H_N(g^{(s)})
   &=\sigma_N\sum_{I\in\calI_N}\chi_s(I)g_I\psi_I\\
@@ -283,7 +283,7 @@ For any $\beta\in \mathbb R$ and for any multi-index $\alpha$  with  $|\alpha|=r
 \end{lemma}
 
 \begin{proof}
-The case $r=0$ is immediate, so assume $r\geq1$.  Write $H_N=H_N(G)$ for
+The case $r=0$ is immediate, so assume $r\geq1$.  Write $H_N:=H_N(G)$ for
 brevity.  We first derive the equality
 \begin{align}
 	&\partial_{g_{I_r}}\cdots\partial_{g_{I_1}}Z_N(\beta;G)
@@ -432,9 +432,9 @@ auxiliary probability space, and write $\E_\varepsilon$ for expectation on
 this space.  Set
 \begin{equation}\label{eq:Rademacher-chaos-definition}
   S_{N,q}
-  =\sum_{I\in\calI_N}\varepsilon_I,
+  :=\sum_{I\in\calI_N}\varepsilon_I,
   \qquad
-  \varepsilon_I=\prod_{x\in I}\varepsilon_x.
+  \varepsilon_I:=\prod_{x\in I}\varepsilon_x.
 \end{equation}
 Thus $S_{N,q}$ is the degree-$q$ elementary symmetric polynomial in the
 Rademacher signs.
@@ -614,7 +614,7 @@ fixed real $\beta$ with $|\beta|<\beta_{\rm Rad}$,
 \begin{proof}
 Put
 \begin{equation*}
-  t_N=\beta^2\sigma_N^2
+  t_N:=\beta^2\sigma_N^2
   =\beta^2(q-1)!N^{-(q-1)}.
 \end{equation*}
 By the Hermite expansion \eqref{eq: chaos} and its orthogonality relation,
@@ -660,7 +660,7 @@ $\sum_{r\geq3}u^r/r!\leq u^3e^u/6$ for $u\geq0$.
 Choose
 \begin{equation*}
   \beta_{\rm Rad}
-  =\sqrt{\frac{c_q}{(q-1)!}},
+  :=\sqrt{\frac{c_q}{(q-1)!}},
 \end{equation*}
 where $c_q$ is the constant in Lemma~\ref{lem:Rademacher-encoding}.  If
 $|\beta|<\beta_{\rm Rad}$, then

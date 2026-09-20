@@ -104,7 +104,7 @@ Majoranas of \cite{GPSZ2026} satisfy
   \qquad
   H_N^{\rm GPSZ}=2^{-q/2}H_N.
 \]
-Set $u=2^{q/2}\beta$ so that $uH_N^{\rm GPSZ}=\beta H_N$.  Thus the  normalization conventions
+Set $u:=2^{q/2}\beta$ so that $uH_N^{\rm GPSZ}=\beta H_N$.  Thus the  normalization conventions
 of \cite{GPSZ2026} give
 \begin{equation}\label{eq:GPSZ-conversion}
   \frac1N\log \mathbb E Z_N(\beta)=\frac{u}{N}f_{N,q}^{\rm GPSZ}(u),
@@ -167,7 +167,7 @@ Using $u=2^{q/2}\beta$ in \eqref{eq:GPSZ-conversion} gives
 \eqref{eq:ell-small-beta}.
 
 It remains only to justify the two local-uniform assertions.  Let
-$h_N=N^{-1}\log F_N$.  If
+$h_N:=N^{-1}\log F_N$.  If
 \[
   \overline\nu_N(B)=\E\,\tr\mathbf1_{\{H_N\in B\}},
 \]
@@ -190,7 +190,7 @@ By \eqref{eq:finite-N-FTW-coefficient} and
 \begin{proof}[Proof of Theorem~\ref{thm:partition-clt}]
 Let
 \[
-  S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\calI_N}(g_I^2-1).
+  S_N:=\frac1{\sqrt{2M_N}}\sum_{I\in\calI_N}(g_I^2-1).
 \]
 The classical i.i.d.\ central limit theorem gives
 $S_N\Rightarrow\xi\sim\N(0,1)$.
@@ -200,9 +200,9 @@ By Lemma~\ref{lem:exact-second-chaos},
   =c_N(\beta)S_N+\mathcal R_N(\beta),
   \qquad
   c_N(\beta)
-  =\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{\sqrt{2M_N}},
+  :=\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{\sqrt{2M_N}},
 \end{equation}
-where $\mathcal R_N=\sum_{r\geq3}P_r Y_N$ is orthogonal to $S_N$.
+where $\mathcal R_N:=\sum_{r\geq3}P_r Y_N$ is orthogonal to $S_N$.
 Since $M_N\sim N^q/q!$, \eqref{eq:annealed-derivative-limit} gives
 \[
   N^{q/2-1}c_N(\beta)
@@ -225,9 +225,9 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
 \begin{proof}[Proof of Corollary~\ref{cor:free-energy-clt}]
 The case $\beta=0$ is trivial, so assume $\beta\neq0$.  Set
 \[
-a=\frac q2-1,
+a:=\frac q2-1,
 \qquad
-W_N=\log Y_N(\beta).
+W_N:=\log Y_N(\beta).
 \]
 Then
 \begin{align*}
@@ -321,7 +321,7 @@ e^{-\beta\tr H_N(G)}
 
 Define
 \[
-h(y)=y-1-\log y,
+h(y):=y-1-\log y,
 \qquad y>0.
 \]
 Since $\E Y_N=1$,
@@ -394,8 +394,8 @@ N^{q/2-1}
 \right).
 \]
 \end{proof}
-
-\begin{lemma}
+{\color{blue} 
+\begin{lemma}\footnote{SN: I think we can remove the blue.}
   Write 
   \begin{equation*}
     W_N \coloneqq \log Y_N(\beta).
@@ -414,7 +414,7 @@ N^{q/2-1}
 \begin{proof}
 To apply the Gaussian concentration
   inequality, we view $Z_N(\beta;G)$ as a function of
-  $G = (g_I)_{I \in \calI_N}$ and establish the Lipschitz bound for $W_N$.
+  $G := (g_I)_{I \in \calI_N}$ and establish the Lipschitz bound for $W_N$.
   Fix $I \in \calI_N$.
   By the one-variable Duhamel formula \eqref{eq:one-variable-Duhamel-formula},
   we deduce that 
@@ -524,8 +524,8 @@ To apply the Gaussian concentration
 The case $\beta=0$ is trivial, so assume $\beta\neq0$.
 Put
 \[
-  a=\frac q2-1,\qquad
-  W_N=\log Y_N(\beta).
+  a:=\frac q2-1,\qquad
+  W_N:=\log Y_N(\beta).
 \]
 It then holds that 
 \begin{align*}
@@ -670,7 +670,7 @@ Consequently,
   \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
   \leq C\delta_N^2\sqrt{\log(1/\delta_N)}.
 \end{equation}
-Now set $h(w)=e^w-1-w$.  
+Now set $h(w):=e^w-1-w$.  
 Note that
 \[
   h(w)\leq C(e^w-1)^2\quad (w\geq-1),
@@ -703,5 +703,5 @@ it follows that
 \]
 which completes the proof.
 \end{proof}
-
+}
 \end{document}

@@ -17,25 +17,25 @@ Previous mathematical work has extensively studied the limiting free energy of t
 
 Fix an even integer $q\geq4$, and let $N$ be even.  Write
 \[
-  \calI_N=\{I\subset[N]:|I|=q\},\qquad
-  \sigma_N^2=\frac{(q-1)!}{N^{q-1}},
+  \calI_N:=\{I\subset[N]:|I|=q\},\qquad
+  \sigma_N^2:=\frac{(q-1)!}{N^{q-1}},
 \]
-and let $G= (g_I)_{I\in\calI_N}$ be independent standard Gaussian random
+and let $G:= (g_I)_{I\in\calI_N}$ be independent standard Gaussian random
 variables.  Let $\psi_1,\ldots,\psi_N$ be Majorana matrices satisfying
 $\{\psi_i,\psi_j\}=2\delta_{ij}\I$.  For
 $I=\{i_1<\cdots<i_q\}$ set
 \[
-  \psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}.
+  \psi_I:=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}.
 \]
 Then $\psi_I$ is Hermitian, $\psi_I^2=\I$, and $\norm{\psi_I}=1$.  Define
 \[
-  H_N(G)=\sigma_N\sum_{I\in\calI_N}g_I\psi_I,
+  H_N(G):=\sigma_N\sum_{I\in\calI_N}g_I\psi_I,
   \qquad
-  Z_N(z;G)=\tr e^{-zH_N(G)}.
+  Z_N(z;G):=\tr e^{-zH_N(G)}.
 \]
-Here $\tr=2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
+Here $\tr:=2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
 particular, $Z_N(0;G)=1$.  This normalization does not affect the
-relative fluctuations studied below. We sometime write $Z_N(\beta) = Z_N(\beta;G)$ for brevity. 
+relative fluctuations studied below. We sometime write $Z_N(\beta) := Z_N(\beta;G)$ for brevity. 
 For real $\beta$, set
 \[
  Y_N(\beta):=  Y_N(\beta;G):=\frac{Z_N(\beta;G)}{\mathbb E Z_N(\beta)}.
@@ -88,7 +88,7 @@ Rigorous results on the high-temperature annealed and quenched free-energy limit
 
 Feng, Tian, and Wei \cite{FTW2018} proved a central limit theorem for linear eigenvalue statistics of the Gaussian SYK Hamiltonian. Their result applies to a fixed test function \(f\), under suitable regularity assumptions on \(f\) and \(f'\). In their normalization, however, the partition function corresponds to
 \[
-f_{N,\beta}(x)=e^{-\beta\tau_N x},
+f_{N,\beta}(x):=e^{-\beta\tau_N x},
 \qquad \tau_N\asymp\sqrt{N},
 \]
 so both the test function and its derivative depend on \(N\). Therefore, their fixed-test-function theorem does not apply directly to \(Z_N(\beta)\).
@@ -96,7 +96,7 @@ so both the test function and its derivative depend on \(N\). Therefore, their f
 
 \subsection{Outline of the proof}
 
-Recall that $Y_n(\beta)= {Z_N(\beta)}/{\mathbb E Z_N(\beta)}$.  
+Recall that $Y_n(\beta):= {Z_N(\beta)}/{\mathbb E Z_N(\beta)}$.  
 By applying the chaos expansion, since Clifford sign-gauge symmetry eliminates the first Gaussian chaos and
 identifies the second chaos exactly, we have the following:
 \[
@@ -105,9 +105,9 @@ identifies the second chaos exactly, we have the following:
   \]
   where
   \begin{equation}\label{eq:finite-N-FTW-coefficient}
-          A_N(\beta)=\frac{\beta}{2}\partial_\beta\log \mathbb E Z_N(\beta),
+        A_N(\beta):=\frac{\beta}{2}\partial_\beta\log \mathbb E Z_N(\beta),
     \qquad
-    Q_N=\frac1{|\mathcal I_N|}\sum_I(g_I^2-1).
+      Q_N:=\frac1{|\mathcal I_N|}\sum_I(g_I^2-1).
     \end{equation}
 Here $\mathcal R_N$ is the sum of the Gaussian chaoses of $Y_N$ of orders at least
 three.  Thus the leading  term is a normalized sum of $\mathcal I_N$
