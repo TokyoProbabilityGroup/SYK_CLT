@@ -32,17 +32,6 @@ Since $\mathbb E Z_N(\beta)$ is deterministic, we also have
   P_rY_N(\beta)=\frac{P_rZ_N(\beta)}{\mathbb E Z_N(\beta)}.
 \]
 
-
-By the same orthogonality and Lemma~\ref{lem:Gaussian-Hermite-IBP}, for every
- random variable $X=X(G)$,
-\begin{equation*}
-  \norm{P_rX}_2^2
-  =
-  \sum_{|\alpha|=r}
-  \frac{|\E\,\partial_g^\alpha X|^2}{\alpha!},
-\end{equation*}
-whenever the expectations make senses. 
-
 Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \mathbb E Z_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
  The next lemma proves the exact radial decomposition
 \begin{equation*}
@@ -56,7 +45,8 @@ Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \mathbb E Z_N(\beta)$ fr
 
 Call a multi-index $\alpha$ \emph{even} if \text{for every }$x\in[N],$
 \begin{equation}\label{eq:even-multi-index}
-  \sum_{I\ni x}\alpha_I\equiv0\pmod2.
+  \sum_{I\colon x \in I}
+  \alpha_I\equiv0\pmod2.
 \end{equation}
 Otherwise, we call $\alpha$ odd. 
 \begin{lemma}\label{lem: parity rule lemma}
@@ -165,10 +155,17 @@ which gives the second claim.
 \end{proof}
 
 \subsection{Gaussian integration by parts}
+
+For a multi-index $\alpha \in \{0,1,\ldots\}^{\mathcal I_N}$, we denote the associated multi-index partial derivative of a function $f\colon \mathbb R^{\mathcal I_N} \to \mathbb R$ as $\partial^\alpha f$.
+
 \begin{lemma}\label{lem:Gaussian-Hermite-IBP}
-Let $f:\mathbb R^{\mathcal I_N}\to\mathbb R$ be of class $C^{|\alpha|}$,
-and suppose that $f$ and its mixed partial derivatives up to order $\alpha$
-have at most exponential growth in $\norm{G}$.  Then
+Let $f\colon\mathbb R^{\mathcal I_N}\to\mathbb R$ be of class $C^{|\alpha|}$,
+and suppose that $f$ and its multi-index partial derivatives up to order $\alpha$
+have at most exponential growth in $\norm{G}$:
+\begin{equation*}
+  [\text{Some expression is required}]
+\end{equation*}
+Then
 \begin{equation}\label{eq:Gaussian-Hermite-IBP}
   \mathbb E\!\left[H_\alpha(G)f(G)\right]
   =\mathbb E\!\left[\partial_g^\alpha f(G)\right].
@@ -182,7 +179,7 @@ Recall that the one-dimensional integration-by-parts identity yields
 \mathbb{E}\!\left[\operatorname{He}_k(G)f(G)\right] = \mathbb{E}\!\left[f^{(k)}(G)\right],
 \]
 for every function $f\in C^k(\mathbb R)$ satisfying the stated growth
-condition.  Applying this identity successively to the independent Gaussian
+condition~\cite[Equation~(2.3.15)]{S2023}.  Applying this identity successively to the independent Gaussian
 coordinates $(g_I)_{I\in\mathcal I_N}$ and using
 \[
 H_\alpha(G)
