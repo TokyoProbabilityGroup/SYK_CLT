@@ -147,6 +147,22 @@ R02・R03 と必要な集中評価の確定後に進める。分布収束だけ�
 
 検証記録は対象コミット・差分、コマンド、結果、警告、未解決事項を該当単位に残す。最終的には大数則、相対 CLT、標準化 CLT、対数 CLT の各宣言が、原稿の正確な主張・外部入力・残る仮定と対応し、仮置きの証明なしに検査されていることを確認する。
 
+<a id="main-statements-2026-09-18"></a>
+
+## 2026-09-18：設定と主結果の定理文
+
+今回の明示的な依頼は、一般 `MajoranaSystem` による分配関数の設定と、十分小さい `|β|` での分配関数・対数分配関数の CLT を `Main.lean` に記し、証明に `sorry` を許可するものである。通常の証明・非負逆温度に関する規則よりこの指示を優先した。原稿と共有模型は変更していない。
+
+`partitionFunction` は共有の `normalizedHamiltonian`・`gibbsOperator`・`normalizedTrace` を用いる。一般表現では実際の次元で割り、標準表現の `2^(N/2)` と区別する。`Setting q` は `q ≥ 4`・偶数次数・偶数の系サイズ・`q ≤ N`・サイズの発散・非空有限次元表現を明示する。各サイズの確率空間は共有ガウス係数空間で、分布収束には mathlib の `TendstoInDistribution` を用いる。
+
+共通の半径・微分可能なアニール極限・両 CLT を `partition_and_log_partition_clt` にまとめ、分散は `(q!/2) β² (deriv ℓ β)²` とする。`β = 0` は相対・対数 CLT の退化したガウス極限に含め、標準化は非零の `β` に限って有限模型と極限の分散正値性を明示する。個別の `partition_clt`・`log_partition_clt` は共同定理から射影する。
+
+未証明の宣言は実逆温度での実数性・正値性、必要なモーメント、共同 CLT である。アニール極限の外部入力・カオス評価・古典的 CLT・対数への移行の証明は未実装であり、W06・F01–F08 や原稿監査を完了扱いにしない。大数則は今回の範囲外。Blueprint の CLT 節にも正確な設定・式・未証明状態を反映する。Verso 休止中のため生成・参照検査は行わない。
+
+検証：`lake env lean SYK/CLT/Main.lean` と `lake build CLT` は成功し、追加した4宣言の `sorry` 警告が残る。上流の `StandardGaussian.lean` に既存の linter 警告・タクティク案内がある。共同 CLT・個別の両 CLT の `#print axioms` は `[propext, sorryAx, Classical.choice, Quot.sound]`、`partitionFunction_zero` と通常トレースとの一致は `[propext, Classical.choice, Quot.sound]` であった。公理検査用の一時ファイルは削除した。章の宣言参照は `SYK.CLT.Main` の import により解決する。今回の差分は作業開始時のコミットからの未コミット変更で、コミットは作成していない。
+
+最終の `lake build CLT` は成功し、`lake env lean SYK/Chapters/CLT.lean` は警告なしで成功した。`git diff --check` は成功した。Git の LF/CRLF 変換案内は数学的・Lean 的な警告とは区別する。
+
 ## Z01：複素平面上の零点のない領域
 
 細目と進捗は [Model の Z01](../Model/EDITING_PLAN.md#z01) に集約する。CLT 側は必要な円板・帯状領域、一様性、内部証明か外部入力かの要件を供給する。領域が確定する前に、実逆温度の集中不等式や W06 の接続を待たせない。
