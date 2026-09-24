@@ -108,15 +108,15 @@ on $[a,b]$.
         \qquad
         p_{N,q}^{\rm He}(s):=\frac1N\log\E\tr e^{sH_N^{\rm He}}.
     \end{equation*}
-    Both papers use the normalized trace.  Since $G$ and $-G$ have the
+   Note that the paper also uses the normalized trace.  Since $G$ and $-G$ have the
     same law and $H_N(-G)=-H_N(G)$, for every $\beta\in\mathbb R$,
     \begin{equation} \label{eq:He-normalization-conversion}
         \frac1N\log\E Z_N(\beta)
         =\frac1N\log\E\tr e^{|\beta|H_N}
         =p_{N,q}^{\rm He}(2^{q/2}|\beta|).
     \end{equation}
-    Write $p_q:=p_{{\rm SD},q}$ for the Schwinger--Dyson pressure in
-    \cite{He2026}.  Theorem~1.1 and Proposition~3.3 of that paper give
+    Writing $p_q:=p_{{\rm SD},q}$ for the Schwinger--Dyson pressure in
+    \cite{He2026}, \cite[Theorem~1.1 and Proposition~3.3]{He2026} give
     \begin{equation*}
         p_{N,q}^{\rm He}(s)\longrightarrow p_q(s)
         \quad (s>0),
@@ -138,10 +138,9 @@ on $[a,b]$.
     proves pointwise convergence in \eqref{eq:annealed-free-energy-limit}.
 
     We next use the derivative formula in
-    \cite[Proposition~3.3]{He2026}:
+    \cite[Proposition~3.3]{He2026}: for any $s>0$, 
     \begin{equation} \label{eq:He-pressure-derivative}
-        p_q'(s)=\frac{s}{q}\int_0^1G_{s,q}(u)^q\,\mathrm du,
-        \qquad s>0.
+        p_q'(s)=\frac{s}{q}\int_0^1G_{s,q}(u)^q\,\mathrm du.
     \end{equation}
     By the positive Lehmann representation and
     \cite[Theorem~2.5]{He2026}, there is a probability measure $\nu_s$
@@ -183,14 +182,14 @@ on $[a,b]$.
         &\leq\frac12\left(\frac{x^2}{4}-x^2(1/2-u)^2\right)
         =\frac{x^2}{2}u(1-u).
     \end{align*}
-    Exponentiating and using $1-e^{-a}\leq a$ for $a\geq0$, we obtain
+   Using $1-e^{-a}\leq a$ for $a\geq0$, we obtain
     \begin{equation*}
         0\leq
         1-\frac{\cosh(x(1/2-u))}{\cosh(x/2)}
         \leq1-e^{-x^2u(1-u)/2}
         \leq\frac{x^2}{2}u(1-u).
     \end{equation*}
-    Integration with respect to $\nu_{2^{q/2}\beta}$ in
+    Integrating with respect to $\nu_{2^{q/2}\beta}$ in
     \eqref{eq:ell-kernel-representation} therefore gives
     \begin{equation} \label{eq:ell-kernel-bounds}
         0<K_\beta(u)\leq1,
@@ -213,23 +212,22 @@ on $[a,b]$.
         =\frac{\beta^3}{3}.
     \end{align*}
     This proves \eqref{eq:ell-derivative-bounds}.  Integrating from
-    $\varepsilon>0$ to $\beta$ and then letting $\varepsilon\downarrow0$,
-    using $\ell_q(\varepsilon)\to0$, gives
+    $0$ to $\beta$ with  $\ell_q(0)= 0$, gives
     \begin{equation*}
         0\leq\frac{\beta^2}{2q}-\ell_q(\beta)
         =\int_0^\beta\left(\frac{s}{q}-\ell_q'(s)\right)\,\mathrm ds
         \leq\int_0^\beta\frac{s^3}{3}\,\mathrm ds
         =\frac{\beta^4}{12}.
     \end{equation*}
-    Evenness extends this bound to all $\beta\in\mathbb R$, proving
-    \eqref{eq:ell-quadratic-error}.
+This proves 
+    \eqref{eq:ell-quadratic-error} for $\beta>0$. Since $\ell_q$ is even as we proved,  we have the claim for all $\beta\in\mathbb R$.
 
     The bound \eqref{eq:ell-quadratic-error} implies
     \begin{equation*}
         \lim_{\beta\to0}
         \frac{\ell_q(\beta)-\ell_q(0)}{\beta}=0.
     \end{equation*}
-    Hence $\ell_q'(0)=0$.  On $\mathbb R\setminus\{0\}$, the derivative
+    Hence $\ell_q'(0)=0$.  On $\mathbb R\setminus\{0\}$, the derivative $\ell_q'$ 
     is continuous by $p_q\in C^1((0,\infty))$ and the chain rule, and is odd
     by evenness of $\ell_q$.  By \eqref{eq:ell-derivative-bounds},
     \begin{equation*}
@@ -254,12 +252,7 @@ on $[a,b]$.
         F_N(\beta)=\int_{\mathbb R}e^{-\beta x}\,
         \overline\nu_N(\mathrm dx).
     \end{equation*}
-    The bound
-    \begin{equation*}
-        \norm{H_N(G)}\leq\sigma_N\sum_{I\in\calI_N}|g_I|
-    \end{equation*}
-    and Gaussian exponential integrability justify differentiation under
-    the integral on every compact interval of $\beta$.  In particular,
+ In particular,
     $h_N$ is finite and twice continuously differentiable.  With the
     probability measure
     \begin{equation*}
@@ -282,121 +275,6 @@ on $[a,b]$.
     \eqref{eq:annealed-derivative-limit} locally uniformly on $\mathbb R$.
 \end{proof}
 
-\begingroup
-\color{blue}
-% Original statement and proof, retained for comparison.
-% Only the theorem environment and internal labels have been changed.
-\theoremstyle{plain}
-\newtheorem*{previousannealedproposition}
-    {Proposition~\ref*{prop:annealed-free-energy} (previous version)}
-\begin{previousannealedproposition}
-There are $\beta_{\rm FE}=\beta_{\rm FE}(q)>0$ and an even real-analytic
-function $\ell_q$ on $(-\beta_{\rm FE},\beta_{\rm FE})$ such that, locally
-uniformly on this interval,
-\begin{align}
-  \frac1N\log \mathbb E Z_N(\beta)&\longrightarrow\ell_q(\beta),
-  \label{eq:annealed-free-energy-limit-previous}\\
-  \frac1N\partial_\beta\log \mathbb E Z_N(\beta)&\longrightarrow\ell_q'(\beta).
-  \label{eq:annealed-derivative-limit-previous}
-\end{align}
-Moreover,
-\begin{equation}\label{eq:ell-small-beta-previous}
-  \ell_q(\beta)=\frac{\beta^2}{2q}+O(\beta^4),
-  \qquad
-  \ell_q'(\beta)=\frac\beta q+O(\beta^3).
-\end{equation}
-In paritcular, $\ell'(\beta)>0$, for every sufficiently
-small real $\beta\neq0$.
-
-\end{previousannealedproposition}
-
-
-\begin{proof}
-The pointwise convergence in \eqref{eq:annealed-free-energy-limit-previous} follows from  Theorem
-5 of \cite{GPSZ2026}, together with the universality 
-\cite{AGK2025}. To make it more precise,  we record the normalization conversion.  The
-Majoranas of \cite{GPSZ2026} satisfy
-\[
-  \psi_i^{\rm GPSZ}=2^{-1/2}\psi_i,
-  \qquad
-  H_N^{\rm GPSZ}=2^{-q/2}H_N.
-\]
-Set $u:=2^{q/2}\beta$ so that $uH_N^{\rm GPSZ}=\beta H_N$.  Thus the  normalization conventions
-of \cite{GPSZ2026} give
-\begin{equation}\label{eq:GPSZ-conversion-previous}
-  \frac1N\log \mathbb E Z_N(\beta)=\frac{u}{N}f_{N,q}^{\rm GPSZ}(u),
-\end{equation}
-where $f_{N,q}^{\rm GPSZ}(u)=u^{-1}\log\E Z_N^{\rm GPSZ}(u)$.
-
-We next extract the regularity and the first coefficient from the explicit
-formula in that theorem.  In its notation,
-\[
-  \Phi_u(z)=\sum_{v\geq1}\mu_v(u)z^v,
-  \qquad
-  u f_q^{\rm GPSZ}(u)=\Phi_u(t_*(u))-1-\log t_*(u),
-\]
-where $t_*\partial_z\Phi_u(t_*)=1$.  A contributing hypertree has
-$v=1+(q-1)s$ vertices and its coefficient contains
-\[
-  \rho(u)^{v-1},
-  \qquad
-  \rho(u)^{q-1}=\frac{(q-1)!u^2}{2^{q+1}}.
-\]
-More explicitly, $\mathcal T_v^{\rm sim}$ is empty unless
-$v=1+(q-1)s$ for some $s\geq0$.  For $s\geq1$ we may therefore write
-\[
-  \mu_{1+(q-1)s}(u)=c_{q,s}u^{2s},
-\]
-where
-\[
-  c_{q,s}
-  =
-  \frac1{(1+(q-1)s)!}
-  \left(\frac{(q-1)!}{2^{q+1}}\right)^s
-  \sum_{T\in\mathcal T_{1+(q-1)s}^{\rm sim}}b_T.
-\]
-The bounds used in the proof of Proposition 3 of \cite{GPSZ2026} give
-$|c_{q,s}|\leq C_q^s$.  Hence
-\[
-  \Phi_u(z)
-  =
-  z+\sum_{s\geq1}
-  c_{q,s}u^{2s}z^{1+(q-1)s}
-\]
-converges normally for $(u^2,z)$ in a neighborhood of $(0,1)$.  Thus
-$\Phi_u(z)$ is jointly analytic in $(u^2,z)$ there.  At
-$u=0$, $\Phi_0(z)=z$ and $t_*(0)=1$; the derivative with respect to $t$ of
-$t\partial_z\Phi_u(t)-1$ is $1$ at $(u,t)=(0,1)$.  The analytic implicit
-function theorem makes $t_*$, and hence the limiting right-hand side, analytic
-in $u^2$.
-
-The first nontrivial term is the unique one-edge hypertree on $q$ vertices:
-\[
-  \Phi_u(z)=z+\frac{u^2}{q2^{q+1}}z^q+O(u^4).
-\]
-It follows successively that
-\[
-  t_*(u)=1-\frac{u^2}{2^{q+1}}+O(u^4),
-  \qquad
-  u f_q^{\rm GPSZ}(u)=\frac{u^2}{q2^{q+1}}+O(u^4).
-\]
-Using $u=2^{q/2}\beta$ in \eqref{eq:GPSZ-conversion-previous} gives
-\eqref{eq:ell-small-beta-previous}.
-
-It remains only to justify the two local-uniform assertions.  Let
-$h_N:=N^{-1}\log F_N$.  If
-\[
-  \overline\nu_N(B)=\E\,\tr\mathbf1_{\{H_N\in B\}},
-\]
-then $\mathbb E Z_N(\beta)=\int e^{-\beta x}\overline\nu_N(\mathrm dx)$; hence $h_N$
-is finite, differentiable, and convex.  {Differentiation is
-justified by
-$\norm{H_N(G)}\leq\sigma_N\sum_{I\in\calI_N}|g_I|$ and Gaussian
-exponential integrability.}
-The limiting function just obtained is $C^1$.  Lemma
-\ref{lem:convex-derivatives} now proves both local-uniform convergences.
-\end{proof}
-\endgroup
 
 By \eqref{eq:finite-N-FTW-coefficient} and
 \eqref{eq:annealed-derivative-limit}, locally uniformly for
