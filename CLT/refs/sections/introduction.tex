@@ -22,7 +22,11 @@ Fix an even integer $q\geq4$, and let $N$ be even.  Write
 \]
 and let $G:= (g_I)_{I\in\calI_N}$ be independent standard Gaussian random
 variables.  Let $\psi_1,\ldots,\psi_N$ be Majorana matrices satisfying
-$\{\psi_i,\psi_j\}=2\delta_{ij}\I$.  For
+\begin{equation}
+  \label{eq: clifford relation}
+  \{\psi_i,\psi_j\}=2\delta_{ij}\I
+\end{equation}
+For
 $I=\{i_1<\cdots<i_q\}$ set
 \[
   \psi_I:=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}.
@@ -45,7 +49,7 @@ Throughout, all limits are taken as $N\to\infty$ through even integers.
 
 \subsection{Main results}
 It is studied the limiting behavior of the logarithmic partition function in high-temperature regime:
-\begin{theorem}
+\begin{theorem}\label{thm: input}
 There exists $\tilde{\beta}_q>0$ such that for any $\beta\in [-\tilde{\beta}_q,\tilde{\beta}_q]$, there exists  $\ell_q(\beta)$ such that
 \begin{align*}
     \lim_{N\to \infty} N^{-1} \log Z_N=     \lim_{N\to \infty} N^{-1} \log \mathbb E[Z_N] =\ell_p(\beta)\qquad \text{ a.s.}
