@@ -5,7 +5,10 @@
 
 \section{Gaussian-chaos decomposition}
 \label{sec:chaos-decomposition}
-  We use the probabilists' Hermite polynomials
+We call $\alpha=(\alpha_I)_{I\in\mathcal I_N} \in (\mathbb N\cup\{0\})^{|\mathcal I_N|}$  a multi-index. 
+ We define the order of $\alpha$ as $|\alpha| := \sum_{I\in\mathcal I_N} \alpha_I $.
+ 
+ We use the probabilists' Hermite polynomials
 \begin{equation*}
   H_\alpha(G):=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
   \qquad
@@ -42,7 +45,7 @@ Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \mathbb E Z_N(\beta)$ fr
 
 
 \subsection{Exact finite-size radial projection}
-
+ 
 Call a multi-index $\alpha$ \emph{even} if \text{for every }$x\in[N],$
 \begin{equation}\label{eq:even-multi-index}
   \sum_{I\colon x \in I}
@@ -161,9 +164,9 @@ For a multi-index $\alpha \in \{0,1,\ldots\}^{\mathcal I_N}$, we denote the asso
 \begin{lemma}\label{lem:Gaussian-Hermite-IBP}
 Let $f\colon\mathbb R^{\mathcal I_N}\to\mathbb R$ be of class $C^{|\alpha|}$,
 and suppose that $f$ and its multi-index partial derivatives up to order $\alpha$
-have at most exponential growth in $\norm{G}$:
+have at most exponential growth in $\norm{G}$: for any multi-index $\eta=(\eta_I)_{I\in\mathcal I_N}$ with $\eta_I\leq \alpha_I$, there exists a  constant $C_\eta>0$ such that
 \begin{equation*}
-  [\text{Some expression is required}]
+  |(\partial^\eta f)(G)| \leq C_\eta e^{C_\eta \|G\|}.
 \end{equation*}
 Then
 \begin{equation}\label{eq:Gaussian-Hermite-IBP}

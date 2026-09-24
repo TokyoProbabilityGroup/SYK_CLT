@@ -11,7 +11,7 @@
 \subsection{The SYK model}\label{subsec:SYK-model}
 The Sachdev–Ye–Kitaev (SYK) model is a quantum-mechanical model of \(N\) fermions with random interactions between all pairs of particles. It originates in the work of Sachdev and Ye on random quantum magnets \cite{SachdevYe1993} and in Kitaev’s subsequent formulation in terms of Majorana fermions \cite{Kitaev2015}. Later work by Maldacena, Stanford, and others clarified its large-\(N\) behavior and revealed deep connections to quantum chaos and two-dimensional quantum gravity \cite{MaldacenaStanford2016}. These features make the SYK model a useful setting for studying strongly interacting quantum many-body systems, quantum chaos, and quantum gravity.
 
-Depending on how the inverse temperature \(\beta=\beta_N\) scales with \(N\), the model exhibits several distinct regimes. For fixed \(\beta\), one obtains the standard finite-temperature large-\(N\) regime; when \(1\ll \beta\ll N\), the system enters the conformal regime, characterized by strong interactions and non-Fermi liquid behavior. At lower temperatures, \(N\ll \beta\), the quantum-Schwarzian regime emerges, in which finite-\(N\) effects and quantum fluctuations of the Schwarzian mode play a central role. Finally, when \(\beta\) is exponentially large in \(N\), the partition function is mainly determined by the eigenvalues near the edge of the spectrum. In this regime, random matrix theory (RMT) describes their fluctuations. Such a range of crossover phenomena is rare in a strongly interacting model that remains analytically tractable in suitable limits.
+Depending on how the inverse temperature \(\beta=\beta_N\) scales with \(N\), the model exhibits several distinct regimes. For fixed \(\beta\), one obtains the standard finite-temperature large-\(N\) regime; when \(1\ll \beta\ll N\), the system enters the conformal regime, characterized by strong interactions and non-Fermi liquid behavior. At lower temperatures, \(N\ll \beta\), the quantum-Schwarzian regime emerges, in which finite-\(N\) effects and quantum fluctuations of the Schwarzian mode play a central role. Finally, when \(\beta\) is exponentially large in \(N\), the partition function is mainly determined by the eigenvalues near the edge of the spectrum. In this regime, random matrix theory (RMT) describes their fluctuations. The appearance of such diverse crossover phenomena is rare in a strongly interacting model that remains analytically tractable in suitable limits.
 
 Previous mathematical work has extensively studied the limiting free energy of the SYK model for fixed $\beta$ \cite{GPSZ2026,He2026}. Moreover, Anschuetz, Gamarnik, and Kiani \cite{AGK2025} established a universality result showing that the limiting free energy is the same for a broad class of interaction distributions.  This naturally raises the question of how physical quantities depend on the interactions. Motivated by this question, we study fluctuations of the free energy and show that, for sufficiently small \(\beta\), the suitably rescaled free energy converges to a Gaussian distribution.
 
@@ -49,12 +49,12 @@ Throughout, all limits are taken as $N\to\infty$ through even integers.
 
 \subsection{Main results}
 It is studied the limiting behavior of the logarithmic partition function in high-temperature regime:
-\begin{theorem}\label{thm: input}
-There exists $\tilde{\beta}_q>0$ such that for any $\beta\in [-\tilde{\beta}_q,\tilde{\beta}_q]$, there exists  $\ell_q(\beta)$ such that
+\begin{theorem}[\cite{He2026}]\label{thm: input}
+For any $\beta\in \mathbb R$, there exists  $\ell_q(\beta)$ such that
 \begin{align*}
     \lim_{N\to \infty} N^{-1} \log Z_N=     \lim_{N\to \infty} N^{-1} \log \mathbb E[Z_N] =\ell_p(\beta)\qquad \text{ a.s.}
 \end{align*}
-Moreover, $\ell_p(\beta)$ is differentiable over $(-\tilde{\beta}_q,\tilde{\beta}_q)$. 
+Moreover, $\ell_p(\beta)$ is differentiable over $\mathbb R$. 
 \end{theorem}
 Our main result is the following fluctuation resutls:
 \begin{theorem}
@@ -86,12 +86,9 @@ With the same $\beta_p$ as in Theorem~\ref{thm:partition-clt}, for any $\beta\in
 \]
 \end{corollary}
 \begin{remark}
-The high-temperature threshold $\beta_q$ in
-Theorem~\ref{thm:partition-clt} need not coincide with the threshold
-$\tilde{\beta}_q$ in Theorem~\ref{thm: input}.
-  In fact, our proof needs small $|\beta|$ to control
+Our proof needs small $|\beta|$ to control
 the combinatorial terms arising in higher chaos. 
-  We do not pursue such an extension here, nor do we
+  We do not pursue an extension  to the whole $\beta\in \mathbb R$ here, nor do we
 conjecture whether the same fluctuation results hold at all
 temperatures.
 \end{remark}
@@ -120,30 +117,17 @@ identifies the second chaos exactly, we have the following:
   \begin{equation}\label{eq:finite-N-FTW-coefficient}
         A_N(\beta):=\frac{\beta}{2}\partial_\beta\log \mathbb E Z_N(\beta),
     \qquad
-      Q_N:=\frac1{|\mathcal I_N|}\sum_I(g_I^2-1).
+      Q_N:=\frac1{|\mathcal I_N|}\sum_{I\in\mathcal I_N}(g_I^2-1).
     \end{equation}
 Here $\mathcal R_N$ is the sum of the Gaussian chaoses of $Y_N$ of orders at least
 three.  Thus the leading  term is a normalized sum of $\mathcal I_N$
 independent centered variables.  The main task is to prove
 \[
-  \norm{\mathcal R_N(\beta)}_2^2=o(N^{-(q-2)}).
+  \norm{\mathcal R_N(\beta)}_2^2=o(N^{-(q-2)}),
 \]
+which is done in Section~\ref{sec:Rademacher-remainder}.  The proof uses a combinatorial argument to bound the number of terms in the higher-order chaoses, together with a Duhamel derivative bound to control the size of each term.  
 
-{
-Indeed, a Duhamel derivative bound and the sign-gauge
-parity rule give
-\begin{equation*}
-  \sum_{r\geq3}\lVert P_r Y_N(\beta)\rVert_2^2
-  \leq
-  \sum_{r\geq3}(\beta\sigma_N)^{2r}
-  \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
-  \frac{1}{\alpha!}.
-\end{equation*}
-Using a combinatorial argument, we have that the higher-order chaoses are 
-bounded by  $O(N^{-3(q/2-1)})=o(N^{-(q-2)})$.
-}
-
-Moreover, the annealed free-energy input and convexity imply
+Moreover, the annealed free-energy results proved in \cite{He2026} and convexity imply
 \[
   \frac{A_N(\beta)}N
   \longrightarrow \frac{\beta}{2}\ell_q'(\beta).
