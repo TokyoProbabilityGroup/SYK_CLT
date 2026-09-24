@@ -1,6 +1,8 @@
 import SYK.Annealed_FE.main_result
+import SYK.Annealed_FE.main_result
 import SYK.Model.GaussianDisorder
 import SYK.Model.FiniteDimensionalGibbs
+import Mathlib.Analysis.Asymptotics.Lemmas
 import Mathlib.Analysis.Asymptotics.Lemmas
 import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
 import Mathlib.Probability.Moments.Variance
@@ -86,10 +88,25 @@ theorem partitionFunction_im_eq_zero (P : Params)
   simpa [partitionFunction, normalizedTrace, SYK.partitionFunction,
     gibbsOperator, smul_smul, Complex.div_natCast_im] using
     congrArg (fun x : ℝ ↦ x / (Fintype.card d : ℝ)) h
+  have hH : star ((β : ℂ) • normalizedHamiltonian P M g) =
+      (β : ℂ) • normalizedHamiltonian P M g := by
+    simp [normalizedHamiltonian_self_adjoint]
+  have h := SYK.partitionFunction_im_eq_zero (1 : ℝ≥0) hH
+  simpa [partitionFunction, normalizedTrace, SYK.partitionFunction,
+    gibbsOperator, smul_smul, Complex.div_natCast_im] using
+    congrArg (fun x : ℝ ↦ x / (Fintype.card d : ℝ)) h
 
 theorem realPartitionFunction_pos (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ)
     (g : CouplingSpace P.N P.q) : 0 < realPartitionFunction P M β g := by
+  have hH : star ((β : ℂ) • normalizedHamiltonian P M g) =
+      (β : ℂ) • normalizedHamiltonian P M g := by
+    simp [normalizedHamiltonian_self_adjoint]
+  have h := SYK.partitionFunction_pos (1 : ℝ≥0) hH
+  have hd : (0 : ℝ) < Fintype.card d := Nat.cast_pos.mpr Fintype.card_pos
+  simpa [realPartitionFunction, partitionFunction, normalizedTrace,
+    SYK.partitionFunction, gibbsOperator, smul_smul, Complex.div_natCast_re] using
+    div_pos h hd
   have hH : star ((β : ℂ) • normalizedHamiltonian P M g) =
       (β : ℂ) • normalizedHamiltonian P M g := by
     simp [normalizedHamiltonian_self_adjoint]
@@ -205,6 +222,15 @@ noncomputable def standardizedFluctuation (β : ℝ) (n : ℕ)
 noncomputable def annealedFreeEnergy (β : ℝ) (n : ℕ) : ℝ :=
   Real.log (S.meanZ β n) / (S.N n : ℝ)
 
+/-- At `β = 0` the denominator of the standardized
+fluctuation vanishes, so its standard Gaussian limit must exclude zero. -/
+@[simp]
+theorem varianceZ_zero (n : ℕ) : S.varianceZ 0 n = 0 := by
+  have hz : S.Z 0 n = fun _ ↦ (1 : ℝ) := by
+    funext g
+    exact realPartitionFunction_zero (S.params n) (S.majorana n) g
+  simp [varianceZ, hz, variance, evariance]
+
 /-- Finite Gaussian models have the moments needed for these centerings. -/
 theorem partition_moments (β : ℝ) (n : ℕ) :
     MemLp (S.Z β n) 2 (standardGaussianMeasure (S.N n) q) ∧
@@ -294,8 +320,8 @@ radius and annealed limit for every general matrix Majorana family.
 The limit is the identity random variable on `ℝ` with law
 `gaussianReal 0 (limitVariance q ℓ β)`. Thus the conclusion expresses weak
 convergence of probability laws, including the Dirac law at zero variance.
-The annealed limit identifies `ℓ`, so the variance is not an arbitrary
-parameter. Positivity is explicit wherever standardization is used.
+The limiting function is the one supplied by the annealed proposition.
+Positivity is a conclusion wherever standardization is used.
 
 The proof placeholders cover the annealed input, Gaussian chaos estimates,
 classical CLT, and transfer to the centered logarithm. -/
@@ -304,13 +330,17 @@ theorem partition_and_log_partition_clt (q : ℕ) (_hq : Even q) (_h4 : 4 ≤ q)
     ∃ βq : ℝ, 0 < βq ∧ βq ≤ hFE.βFE ∧
       ∀ (S : Setting q) (β : ℝ), |β| < βq →
         Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) ∧
+        Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) ∧
         TendstoInDistribution (S.relativeFluctuation β) atTop (fun x : ℝ ↦ x)
           (fun n ↦ standardGaussianMeasure (S.N n) q)
+          (gaussianReal 0 (limitVariance q hFE.ℓ β)) ∧
           (gaussianReal 0 (limitVariance q hFE.ℓ β)) ∧
         TendstoInDistribution (S.logFluctuation β) atTop (fun x : ℝ ↦ x)
           (fun n ↦ standardGaussianMeasure (S.N n) q)
           (gaussianReal 0 (limitVariance q hFE.ℓ β)) ∧
+          (gaussianReal 0 (limitVariance q hFE.ℓ β)) ∧
         (β ≠ 0 →
+          0 < limitVariance q hFE.ℓ β ∧ (∀ n, 0 < S.varianceZ β n) ∧
           0 < limitVariance q hFE.ℓ β ∧ (∀ n, 0 < S.varianceZ β n) ∧
           TendstoInDistribution (S.standardizedFluctuation β) atTop (fun x : ℝ ↦ x)
             (fun n ↦ standardGaussianMeasure (S.N n) q) (gaussianReal 0 1)) := by
@@ -323,6 +353,7 @@ theorem partition_clt (q : ℕ) (hq : Even q) (h4 : 4 ≤ q)
     ∃ βq : ℝ, 0 < βq ∧ βq ≤ hFE.βFE ∧
       ∀ (S : Setting q) (β : ℝ), |β| < βq →
         Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) ∧
+        Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) ∧
         TendstoInDistribution (S.relativeFluctuation β) atTop (fun x : ℝ ↦ x)
           (fun n ↦ standardGaussianMeasure (S.N n) q)
           (gaussianReal 0 (limitVariance q hFE.ℓ β)) ∧
@@ -332,7 +363,15 @@ theorem partition_clt (q : ℕ) (hq : Even q) (h4 : 4 ≤ q)
             (fun n ↦ standardGaussianMeasure (S.N n) q) (gaussianReal 0 1)) := by
   obtain ⟨βq, hβq, hle, h⟩ := partition_and_log_partition_clt q hq h4 hFE
   refine ⟨βq, hβq, hle, ?_⟩
+          (gaussianReal 0 (limitVariance q hFE.ℓ β)) ∧
+        (β ≠ 0 →
+          0 < limitVariance q hFE.ℓ β ∧ (∀ n, 0 < S.varianceZ β n) ∧
+          TendstoInDistribution (S.standardizedFluctuation β) atTop (fun x : ℝ ↦ x)
+            (fun n ↦ standardGaussianMeasure (S.N n) q) (gaussianReal 0 1)) := by
+  obtain ⟨βq, hβq, hle, h⟩ := partition_and_log_partition_clt q hq h4 hFE
+  refine ⟨βq, hβq, hle, ?_⟩
   intro S β hβ
+  exact ⟨(h S β hβ).1, (h S β hβ).2.1, (h S β hβ).2.2.2⟩
   exact ⟨(h S β hβ).1, (h S β hβ).2.1, (h S β hβ).2.2.2⟩
 
 /-- The centered log-partition CLT of `cor:free-energy-clt`.
@@ -340,10 +379,17 @@ The joint theorem supplies the same radius and variance for both CLTs. -/
 theorem log_partition_clt (q : ℕ) (hq : Even q) (h4 : 4 ≤ q)
     (hFE : AnnealedInput q) :
     ∃ βq : ℝ, 0 < βq ∧ βq ≤ hFE.βFE ∧
+theorem log_partition_clt (q : ℕ) (hq : Even q) (h4 : 4 ≤ q)
+    (hFE : AnnealedInput q) :
+    ∃ βq : ℝ, 0 < βq ∧ βq ≤ hFE.βFE ∧
       ∀ (S : Setting q) (β : ℝ), |β| < βq →
+        Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) ∧
         Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) ∧
         TendstoInDistribution (S.logFluctuation β) atTop (fun x : ℝ ↦ x)
           (fun n ↦ standardGaussianMeasure (S.N n) q)
+          (gaussianReal 0 (limitVariance q hFE.ℓ β)) := by
+  obtain ⟨βq, hβq, hle, h⟩ := partition_and_log_partition_clt q hq h4 hFE
+  refine ⟨βq, hβq, hle, ?_⟩
           (gaussianReal 0 (limitVariance q hFE.ℓ β)) := by
   obtain ⟨βq, hβq, hle, h⟩ := partition_and_log_partition_clt q hq h4 hFE
   refine ⟨βq, hβq, hle, ?_⟩
