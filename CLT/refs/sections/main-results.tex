@@ -9,8 +9,8 @@
 
 To identify the deterministic coefficient $A_N(\beta)$ in
 \eqref{eq:finite-N-FTW-coefficient}, we use the annealed free-energy limit
-from \cite{GPSZ2026}.  The required convergence of derivatives directly follows from its 
-convexity.
+from \cite{He2026}, which holds at every fixed inverse temperature.
+Convexity then gives locally uniform convergence of the first derivatives.
 
 The following is a standard convergence theorem for convex functions; see
 \cite[Theorems~10.8 and~25.7]{Rockafellar1970}.
@@ -71,19 +71,236 @@ Therefore, $h_N'\to h'$ uniformly on $[a,b]$.
 By the mean value theorem, we also have that $h_N\to h$ uniformly
 on $[a,b]$.
 \end{proof}
-\begin{proposition}
-\label{prop:annealed-free-energy}
+\begin{proposition} \label{prop:annealed-free-energy}
+    There exists an even convex function $\ell_q\in C^1(\mathbb R)$ such that,
+    locally uniformly for $\beta\in\mathbb R$,
+    \begin{align}
+        \frac1N\log \mathbb E Z_N(\beta)
+        &\longrightarrow \ell_q(\beta),
+        \label{eq:annealed-free-energy-limit}\\
+        \frac1N\partial_\beta\log \mathbb E Z_N(\beta)
+        &\longrightarrow \ell_q'(\beta).
+        \label{eq:annealed-derivative-limit}
+    \end{align}
+    Moreover, for every $\beta>0$,
+    \begin{equation} \label{eq:ell-derivative-bounds}
+        0<\ell_q'(\beta)\leq\frac\beta q,
+        \qquad
+        0\leq\frac\beta q-\ell_q'(\beta)\leq\frac{\beta^3}{3},
+    \end{equation}
+    and, for every $\beta\in\mathbb R$,
+    \begin{equation} \label{eq:ell-quadratic-error}
+        0\leq\frac{\beta^2}{2q}-\ell_q(\beta)\leq\frac{\beta^4}{12}.
+    \end{equation}
+    In particular, as $\beta\to0$,
+    \begin{equation} \label{eq:ell-small-beta}
+        \ell_q(\beta)=\frac{\beta^2}{2q}+O(\beta^4),
+        \qquad
+        \ell_q'(\beta)=\frac\beta q+O(|\beta|^3).
+    \end{equation}
+    Furthermore, $\beta\ell_q'(\beta)>0$ for every $\beta\neq0$.
+\end{proposition}
+
+\begin{proof}
+    We first record the normalization used in \cite{He2026}.  Set
+    \begin{equation*}
+        H_N^{\rm He}:=2^{-q/2}H_N,
+        \qquad
+        p_{N,q}^{\rm He}(s):=\frac1N\log\E\tr e^{sH_N^{\rm He}}.
+    \end{equation*}
+    Both papers use the normalized trace.  Since $G$ and $-G$ have the
+    same law and $H_N(-G)=-H_N(G)$, for every $\beta\in\mathbb R$,
+    \begin{equation} \label{eq:He-normalization-conversion}
+        \frac1N\log\E Z_N(\beta)
+        =\frac1N\log\E\tr e^{|\beta|H_N}
+        =p_{N,q}^{\rm He}(2^{q/2}|\beta|).
+    \end{equation}
+    Write $p_q:=p_{{\rm SD},q}$ for the Schwinger--Dyson pressure in
+    \cite{He2026}.  Theorem~1.1 and Proposition~3.3 of that paper give
+    \begin{equation*}
+        p_{N,q}^{\rm He}(s)\longrightarrow p_q(s)
+        \quad (s>0),
+        \qquad
+        p_q\in C^1((0,\infty)),
+        \qquad
+        \lim_{s\downarrow0}p_q(s)=0.
+    \end{equation*}
+    Define
+    \begin{equation*}
+        \ell_q(\beta):=
+        \begin{cases}
+            p_q(2^{q/2}|\beta|),&\beta\neq0,\\
+            0,&\beta=0.
+        \end{cases}
+    \end{equation*}
+    Then $\ell_q$ is even and continuous on $\mathbb R$, and
+    \eqref{eq:He-normalization-conversion}, together with $Z_N(0)=1$,
+    proves pointwise convergence in \eqref{eq:annealed-free-energy-limit}.
+
+    We next use the derivative formula in
+    \cite[Proposition~3.3]{He2026}:
+    \begin{equation} \label{eq:He-pressure-derivative}
+        p_q'(s)=\frac{s}{q}\int_0^1G_{s,q}(u)^q\,\mathrm du,
+        \qquad s>0.
+    \end{equation}
+    By the positive Lehmann representation and
+    \cite[Theorem~2.5]{He2026}, there is a probability measure $\nu_s$
+    on $[0,\infty)$ such that
+    \begin{equation*}
+        G_{s,q}(u)
+        =\int_0^\infty
+        \frac{\cosh(x(1/2-u))}{2\cosh(x/2)}\,\nu_s(\mathrm dx),
+        \qquad
+        \int_0^\infty x^2\,\nu_s(\mathrm dx)=2^{2-q}s^2.
+    \end{equation*}
+    For $\beta>0$, put
+    \begin{equation*}
+        K_\beta(u):=2G_{2^{q/2}\beta,q}(u).
+    \end{equation*}
+    The chain rule and
+    \eqref{eq:He-pressure-derivative} yield
+    \begin{equation} \label{eq:ell-kernel-derivative}
+        \ell_q'(\beta)
+        =2^{q/2}p_q'(2^{q/2}\beta)
+        =\frac{2^q\beta}{q}\int_0^1G_{2^{q/2}\beta,q}(u)^q\,\mathrm du
+        =\frac\beta q\int_0^1K_\beta(u)^q\,\mathrm du.
+    \end{equation}
+    Moreover,
+    \begin{equation} \label{eq:ell-kernel-representation}
+        K_\beta(u)
+        =\int_0^\infty
+        \frac{\cosh(x(1/2-u))}{\cosh(x/2)}\,\nu_{2^{q/2}\beta}(\mathrm dx),
+        \qquad
+        \int_0^\infty x^2\,\nu_{2^{q/2}\beta}(\mathrm dx)=4\beta^2.
+    \end{equation}
+
+    For $x\geq0$ and $u\in[0,1]$, the inequality $\tanh v\leq v$
+    for $v\geq0$ gives
+    \begin{align*}
+        0
+        &\leq\log\cosh(x/2)-\log\cosh(x(1/2-u))\\
+        &=\int_{x|1/2-u|}^{x/2}\tanh v\,\mathrm dv\\
+        &\leq\frac12\left(\frac{x^2}{4}-x^2(1/2-u)^2\right)
+        =\frac{x^2}{2}u(1-u).
+    \end{align*}
+    Exponentiating and using $1-e^{-a}\leq a$ for $a\geq0$, we obtain
+    \begin{equation*}
+        0\leq
+        1-\frac{\cosh(x(1/2-u))}{\cosh(x/2)}
+        \leq1-e^{-x^2u(1-u)/2}
+        \leq\frac{x^2}{2}u(1-u).
+    \end{equation*}
+    Integration with respect to $\nu_{2^{q/2}\beta}$ in
+    \eqref{eq:ell-kernel-representation} therefore gives
+    \begin{equation} \label{eq:ell-kernel-bounds}
+        0<K_\beta(u)\leq1,
+        \qquad
+        0\leq1-K_\beta(u)\leq2\beta^2u(1-u).
+    \end{equation}
+    The first inequality and \eqref{eq:ell-kernel-derivative} imply
+    $0<\ell_q'(\beta)\leq\beta/q$.  For the remaining bound, use
+    \begin{equation*}
+        1-a^q=(1-a)\sum_{j=0}^{q-1}a^j\leq q(1-a),
+        \qquad 0\leq a\leq1,
+    \end{equation*}
+    to deduce that
+    \begin{align*}
+        0
+        &\leq\frac\beta q-\ell_q'(\beta)\\
+        &=\frac\beta q\int_0^1\bigl(1-K_\beta(u)^q\bigr)\,\mathrm du\\
+        &\leq\beta\int_0^1\bigl(1-K_\beta(u)\bigr)\,\mathrm du\\
+        &\leq2\beta^3\int_0^1u(1-u)\,\mathrm du
+        =\frac{\beta^3}{3}.
+    \end{align*}
+    This proves \eqref{eq:ell-derivative-bounds}.  Integrating from
+    $\varepsilon>0$ to $\beta$ and then letting $\varepsilon\downarrow0$,
+    using $\ell_q(\varepsilon)\to0$, gives
+    \begin{equation*}
+        0\leq\frac{\beta^2}{2q}-\ell_q(\beta)
+        =\int_0^\beta\left(\frac{s}{q}-\ell_q'(s)\right)\,\mathrm ds
+        \leq\int_0^\beta\frac{s^3}{3}\,\mathrm ds
+        =\frac{\beta^4}{12}.
+    \end{equation*}
+    Evenness extends this bound to all $\beta\in\mathbb R$, proving
+    \eqref{eq:ell-quadratic-error}.
+
+    The bound \eqref{eq:ell-quadratic-error} implies
+    \begin{equation*}
+        \lim_{\beta\to0}
+        \frac{\ell_q(\beta)-\ell_q(0)}{\beta}=0.
+    \end{equation*}
+    Hence $\ell_q'(0)=0$.  On $\mathbb R\setminus\{0\}$, the derivative
+    is continuous by $p_q\in C^1((0,\infty))$ and the chain rule, and is odd
+    by evenness of $\ell_q$.  By \eqref{eq:ell-derivative-bounds},
+    \begin{equation*}
+        |\ell_q'(\beta)|\leq\frac{|\beta|}{q},
+    \end{equation*}
+    so it is also continuous at zero.  Thus $\ell_q\in C^1(\mathbb R)$.
+    Equations \eqref{eq:ell-derivative-bounds} and
+    \eqref{eq:ell-quadratic-error} give \eqref{eq:ell-small-beta}, and
+    oddness of $\ell_q'$ gives $\beta\ell_q'(\beta)>0$ for $\beta\neq0$.
+
+    It remains to prove convexity and the two local-uniform convergences.
+    Set
+    \begin{equation*}
+        F_N(\beta):=\E Z_N(\beta),
+        \qquad
+        h_N(\beta):=\frac1N\log F_N(\beta),
+        \qquad
+        \overline\nu_N(B):=\E\tr\mathbf1_B(H_N).
+    \end{equation*}
+    Then $\overline\nu_N$ is a probability measure and
+    \begin{equation*}
+        F_N(\beta)=\int_{\mathbb R}e^{-\beta x}\,
+        \overline\nu_N(\mathrm dx).
+    \end{equation*}
+    The bound
+    \begin{equation*}
+        \norm{H_N(G)}\leq\sigma_N\sum_{I\in\calI_N}|g_I|
+    \end{equation*}
+    and Gaussian exponential integrability justify differentiation under
+    the integral on every compact interval of $\beta$.  In particular,
+    $h_N$ is finite and twice continuously differentiable.  With the
+    probability measure
+    \begin{equation*}
+        \overline\nu_{N,\beta}(\mathrm dx)
+        :=\frac{e^{-\beta x}}{F_N(\beta)}\,
+        \overline\nu_N(\mathrm dx),
+    \end{equation*}
+    we have
+    \begin{equation*}
+        h_N''(\beta)
+        =\frac1N\left(
+            \int_{\mathbb R}x^2\,\overline\nu_{N,\beta}(\mathrm dx)
+            -\left(\int_{\mathbb R}x\,
+            \overline\nu_{N,\beta}(\mathrm dx)\right)^2
+        \right)\geq0.
+    \end{equation*}
+    Thus each $h_N$ is convex, and so is its pointwise limit $\ell_q$.
+    Applying Lemma~\ref{lem:convex-derivatives} with $I=\mathbb R$ proves
+    both \eqref{eq:annealed-free-energy-limit} and
+    \eqref{eq:annealed-derivative-limit} locally uniformly on $\mathbb R$.
+\end{proof}
+
+\begingroup
+\color{blue}
+% Original statement and proof, retained for comparison.
+% Only the theorem environment and internal labels have been changed.
+\theoremstyle{plain}
+\newtheorem*{previousannealedproposition}
+    {Proposition~\ref*{prop:annealed-free-energy} (previous version)}
+\begin{previousannealedproposition}
 There are $\beta_{\rm FE}=\beta_{\rm FE}(q)>0$ and an even real-analytic
 function $\ell_q$ on $(-\beta_{\rm FE},\beta_{\rm FE})$ such that, locally
 uniformly on this interval,
 \begin{align}
   \frac1N\log \mathbb E Z_N(\beta)&\longrightarrow\ell_q(\beta),
-  \label{eq:annealed-free-energy-limit}\\
+  \label{eq:annealed-free-energy-limit-previous}\\
   \frac1N\partial_\beta\log \mathbb E Z_N(\beta)&\longrightarrow\ell_q'(\beta).
-  \label{eq:annealed-derivative-limit}
+  \label{eq:annealed-derivative-limit-previous}
 \end{align}
 Moreover,
-\begin{equation}\label{eq:ell-small-beta}
+\begin{equation}\label{eq:ell-small-beta-previous}
   \ell_q(\beta)=\frac{\beta^2}{2q}+O(\beta^4),
   \qquad
   \ell_q'(\beta)=\frac\beta q+O(\beta^3).
@@ -91,11 +308,11 @@ Moreover,
 In paritcular, $\ell'(\beta)>0$, for every sufficiently
 small real $\beta\neq0$.
 
-\end{proposition}
+\end{previousannealedproposition}
 
 
 \begin{proof}
-The pointwise convergence in \eqref{eq:annealed-free-energy-limit} follows from  Theorem
+The pointwise convergence in \eqref{eq:annealed-free-energy-limit-previous} follows from  Theorem
 5 of \cite{GPSZ2026}, together with the universality 
 \cite{AGK2025}. To make it more precise,  we record the normalization conversion.  The
 Majoranas of \cite{GPSZ2026} satisfy
@@ -106,7 +323,7 @@ Majoranas of \cite{GPSZ2026} satisfy
 \]
 Set $u:=2^{q/2}\beta$ so that $uH_N^{\rm GPSZ}=\beta H_N$.  Thus the  normalization conventions
 of \cite{GPSZ2026} give
-\begin{equation}\label{eq:GPSZ-conversion}
+\begin{equation}\label{eq:GPSZ-conversion-previous}
   \frac1N\log \mathbb E Z_N(\beta)=\frac{u}{N}f_{N,q}^{\rm GPSZ}(u),
 \end{equation}
 where $f_{N,q}^{\rm GPSZ}(u)=u^{-1}\log\E Z_N^{\rm GPSZ}(u)$.
@@ -163,8 +380,8 @@ It follows successively that
   \qquad
   u f_q^{\rm GPSZ}(u)=\frac{u^2}{q2^{q+1}}+O(u^4).
 \]
-Using $u=2^{q/2}\beta$ in \eqref{eq:GPSZ-conversion} gives
-\eqref{eq:ell-small-beta}.
+Using $u=2^{q/2}\beta$ in \eqref{eq:GPSZ-conversion-previous} gives
+\eqref{eq:ell-small-beta-previous}.
 
 It remains only to justify the two local-uniform assertions.  Let
 $h_N:=N^{-1}\log F_N$.  If
@@ -179,9 +396,11 @@ exponential integrability.}
 The limiting function just obtained is $C^1$.  Lemma
 \ref{lem:convex-derivatives} now proves both local-uniform convergences.
 \end{proof}
+\endgroup
 
 By \eqref{eq:finite-N-FTW-coefficient} and
-\eqref{eq:annealed-derivative-limit},
+\eqref{eq:annealed-derivative-limit}, locally uniformly for
+$\beta\in\mathbb R$,
 \begin{equation*}
   \frac{A_N(\beta)}N\longrightarrow
   \frac\beta2\ell_q'(\beta).
@@ -216,9 +435,9 @@ $N^{q/2-1}\mathcal R_N\to0$ in $L^2$.  This proves
 \[
   \Var(Y_N)=c_N(\beta)^2+\norm{\mathcal R_N(\beta)}_2^2.
 \]
-  Finally,
-$\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough give 
-\eqref{eq:standardized-clt}.
+Finally, for $\beta\neq0$, the identity
+$\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$ and the strict positivity
+$\beta\ell_q'(\beta)>0$ give \eqref{eq:standardized-clt}.
 \end{proof}
 
 \footnote{SN: The following is a revised proof}
