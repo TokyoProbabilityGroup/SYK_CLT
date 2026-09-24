@@ -5,7 +5,10 @@
 
 \section{Gaussian-chaos decomposition}
 \label{sec:chaos-decomposition}
-  We use the probabilists' Hermite polynomials
+We call $\alpha=(\alpha_I)_{I\in\mathcal I_N} \in (\mathbb N\cup\{0\})^{|\mathcal I_N|}$  a multi-index. 
+ We define the order of $\alpha$ as $|\alpha| := \sum_{I\in\mathcal I_N} \alpha_I $.
+ 
+ We use the probabilists' Hermite polynomials
 \begin{equation*}
   H_\alpha(G):=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
   \qquad
@@ -42,7 +45,7 @@ Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \mathbb E Z_N(\beta)$ fr
 
 
 \subsection{Exact finite-size radial projection}
-
+ 
 Call a multi-index $\alpha$ \emph{even} if \text{for every }$x\in[N],$
 \begin{equation}\label{eq:even-multi-index}
   \sum_{I\colon x \in I}
