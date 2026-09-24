@@ -1,10 +1,11 @@
 name: Lean Action CI
 
 on:
-  # push:
-  #   branches:
-  #     - 'main'
-  #     - 'maintenance-codes'
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**.lean'
   workflow_dispatch:
 
 concurrency:
@@ -29,6 +30,13 @@ jobs:
           ls -la
 
       - uses: leanprover/lean-action@v1
+        # Use defaultTargets from the version-controlled Lake configuration.
         with:
           use-github-cache: false
-          build-args: "SYK_model super_concentration"
+
+      # Verso is temporarily disabled to reduce CI work. Preserve for restoration.
+      # - name: Build Blueprint site
+      #   run: lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site
+      #
+      # - name: Check Blueprint output
+      #   run: lake exe vbp check --site SYK/_out/site

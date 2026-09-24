@@ -1,0 +1,623 @@
+Historical proof plan (superseded before W03)
+=============================================
+
+The snapshot below is retained as a past design, not the current API.
+W03 shares `couplingScale P` and `normalizedHamiltonian P M g` in
+`SYK.Model.GaussianDisorder`, with no general energy-scale argument.
+The checked standard-coordinate Lipschitz bound is β / sqrt(q), and the
+existing two-sided tail has bound 2 exp(-q t² / (2 β²)) for β ≠ 0, t > 0.
+The zero-inverse-temperature case β = 0 is treated separately.
+W05 splits the concentration argument into DensityMatrix, MajoranaBound, and
+Main. Its public MGF parameter is β²/q for all β ≥ 0; each one-sided tail is
+exp(-q t² / (2 β²)) for β ≠ 0, t > 0. The Lipschitz estimate is proved internally.
+The Lean sources and public Blueprint chapter are authoritative; the
+existential constants and N^(q/2) target below are abandoned goals.
+
+LEAN BLUEPRINT: super-Gaussian concentration for logPartition
+==============================================================
+
+TARGET DEFINITION
+-----------------
+
+noncomputable def superConcentrationScale
+    (P : Params) (coupling C : ℝ) : ℝ≥0 :=
+  Real.toNNReal
+    ((P.β * couplingScale P coupling) ^ 2 * C *
+      (P.N : ℝ) ^ (P.q / 2))
+
+
+TARGET THEOREM
+--------------
+
+theorem logPartition_two_sided_tail_standardGaussian
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (𝒥 : ℝ) :
+    ∃ C : ℝ, 1 < C ∧ ∀ t : ℝ, 0 < t →
+      standardGaussianMeasure P.N P.q
+          {J | |logPartition P M 𝒥 J -
+            ∫ K, logPartition P M 𝒥 K
+              ∂standardGaussianMeasure P.N P.q| > t} ≤
+        ENNReal.ofReal
+          (2 * Real.exp
+            (-t ^ 2 /
+              (2 * (superConcentrationScale P 𝒥 C : ℝ)))) := by
+  ...
+
+
+================================================================
+0. PROOF-CRITICAL PREREQUISITE
+================================================================
+
+The existential quantifier on C removes the obstruction present in the earlier
+fixed-C formulation. The proof may choose C large enough to dominate the
+finite-volume estimate already proved in core.lean.
+
+The concentration proof needs a bound of the form
+
+    ∀ J,
+      ‖fderiv ℝ (logPartition P M 𝒥) J‖ ^ 2
+        ≤ (superConcentrationScale P 𝒥 C : ℝ)
+
+or an equivalent coordinate bound implying it.
+
+At the matrix/state level, the needed input is morally
+
+    ∑ I : InteractionIndex P.N P.q,
+      ‖expectation ρ (M.interactionOperator I)‖ ^ 2
+      ≤ C * (P.N : ℝ) ^ (P.q / 2).
+
+The current core theorem
+
+    syk_sum_sq_expectation_le
+
+instead gives
+
+    ∑ I, ‖expectation ρ (M.interactionOperator I)‖ ^ 2
+      ≤ Nat.choose P.N (P.q - 1) / P.q.
+
+Set
+
+    Q := Nat.choose P.N (P.q - 1) / P.q,
+    R := (P.N : ℝ) ^ (P.q / 2),
+    C := Q / R + 2.
+
+The parameter assumptions imply R > 0, while Q ≥ 0. Hence C > 1 and
+
+    Q ≤ C * R.
+
+Combining this inequality with syk_sum_sq_expectation_le supplies the required
+thermal-state moment bound for every coupling J. No moment hypothesis is
+needed in the public theorem.
+
+
+================================================================
+1. RECOMMENDED ARCHITECTURE
+================================================================
+
+Do not prove Chernoff/Markov estimates inside the SYK theorem.
+
+Use one generic Gaussian concentration theorem whose interface is already
+tail-form. Then the SYK theorem only has to establish a Lipschitz constant.
+
+Recommended dependency chain:
+
+    SYK moment estimate
+        ↓
+    coordinate derivative formula for logPartition
+        ↓
+    squared fderiv/operator-norm bound
+        ↓
+    LipschitzWith sqrt(superConcentrationScale)
+        ↓
+    standard Gaussian two-sided concentration
+        ↓
+    target theorem
+
+
+================================================================
+2. GENERIC GAUSSIAN BLACK-BOX THEOREM
+================================================================
+
+Have one theorem, in a probability/concentration file, with an interface
+morally like this:
+
+    theorem standardGaussian_two_sided_tail_of_lipschitz
+        {ι : Type*} [Fintype ι] [DecidableEq ι]
+        (f : (ι → ℝ) → ℝ)
+        (L : ℝ≥0)
+        (hf : LipschitzWith L f)
+        (t : ℝ) (ht : 0 < t) :
+        standardGaussianOn ι
+            {x | |f x - ∫ y, f y ∂standardGaussianOn ι| > t}
+          ≤ ENNReal.ofReal
+              (2 * Real.exp (-t ^ 2 / (2 * (L : ℝ) ^ 2))) := by
+      ...
+
+For your project, specialize the measure name to
+
+    standardGaussianMeasure P.N P.q
+
+and the coupling space to whatever type that measure already lives on.
+
+If you already have a theorem using a real Lipschitz constant instead of
+ℝ≥0, use it directly. Avoid re-proving Gaussian concentration in the SYK
+file.
+
+
+================================================================
+3. POSITIVITY AND COERCION LEMMAS FOR THE SCALE
+================================================================
+
+Because superConcentrationScale uses Real.toNNReal, prove these immediately.
+
+3.1. Positivity of couplingScale
+
+You need an existing or new lemma such as
+
+    lemma couplingScale_pos
+        (P : Params) {𝒥 : ℝ} (h𝒥 : 0 < 𝒥) :
+        0 < couplingScale P 𝒥 := by
+      ...
+
+If couplingScale is explicitly positive for positive 𝒥, prove that once in
+the model file.
+
+3.2. Positivity of the raw real expression
+
+    lemma superConcentrationScale_raw_pos
+        (P : Params) (𝒥 C : ℝ)
+        (h𝒥 : 0 < 𝒥) (hβ : P.β ≠ 0) (hC : 0 < C)
+        [whatever is needed to know 0 < P.N if Params does not encode it] :
+        0 <
+          (P.β * couplingScale P 𝒥) ^ 2 * C *
+            (P.N : ℝ) ^ (P.q / 2) := by
+      have hcs : 0 < couplingScale P 𝒥 := couplingScale_pos P h𝒥
+      have hbcs : P.β * couplingScale P 𝒥 ≠ 0 :=
+        mul_ne_zero hβ (ne_of_gt hcs)
+      have hsq :
+          0 < (P.β * couplingScale P 𝒥) ^ 2 := sq_pos_of_ne_zero hbcs
+      have hNpow :
+          0 < (P.N : ℝ) ^ (P.q / 2) := by
+        positivity
+      positivity
+
+NOTE:
+If P.N may equal 0, then hNpow fails when exponent = 0/positive depending on
+the exact case. Ideally Params already contains N > 0. Reuse that field.
+
+3.3. Coercion of Real.toNNReal back to ℝ
+
+This is essential for simp to recognize the variance proxy.
+
+    lemma coe_superConcentrationScale
+        (P : Params) (𝒥 C : ℝ)
+        (h𝒥 : 0 < 𝒥) (hβ : P.β ≠ 0) (hC : 0 < C) :
+        (superConcentrationScale P 𝒥 C : ℝ) =
+          (P.β * couplingScale P 𝒥) ^ 2 * C *
+            (P.N : ℝ) ^ (P.q / 2) := by
+      rw [superConcentrationScale]
+      exact Real.coe_toNNReal
+        (le_of_lt (superConcentrationScale_raw_pos P 𝒥 C h𝒥 hβ hC))
+
+Depending on simp-normal form, the proof may instead be:
+
+      simp [superConcentrationScale,
+        le_of_lt (superConcentrationScale_raw_pos P 𝒥 C h𝒥 hβ hC)]
+
+3.4. Strict positivity of the NNReal scale
+
+    lemma superConcentrationScale_pos
+        ...
+        :
+        0 < superConcentrationScale P 𝒥 C := by
+      rw [← NNReal.coe_pos]
+      rw [coe_superConcentrationScale P 𝒥 C h𝒥 hβ hC]
+      exact superConcentrationScale_raw_pos P 𝒥 C h𝒥 hβ hC
+
+This is useful because the Gaussian tail denominator contains the scale.
+
+
+================================================================
+4. PACKAGE THE LOG-PARTITION FUNCTION
+================================================================
+
+Inside the proof, set
+
+    let X : CouplingSpace P.N P.q → ℝ :=
+      fun J => logPartition P M 𝒥 J
+
+or use the exact domain of standardGaussianMeasure.
+
+Then create local abbreviations:
+
+    let μ := standardGaussianMeasure P.N P.q
+    let ε : ℝ≥0 := superConcentrationScale P 𝒥 C
+
+This keeps all subsequent goals readable.
+
+
+================================================================
+5. DERIVATIVE FORMULA NEEDED
+================================================================
+
+The cleanest coordinate statement is something like
+
+    lemma deriv_logPartition_coord
+        (I : InteractionIndex P.N P.q)
+        (J : CouplingSpace P.N P.q) :
+        (fderiv ℝ X J) (Pi.single I 1)
+          =
+        -(P.β * couplingScale P 𝒥) *
+          (expectation (gibbsState P M 𝒥 J)
+            (M.interactionOperator I)).re := by
+      ...
+
+The exact observable may already be real-valued in your model. If so, avoid
+`.re`.
+
+The sign is irrelevant for the norm estimate.
+
+If you already have a Frechet derivative formula as a finite sum, prefer it:
+
+    fderiv ℝ X J h
+      =
+      -(P.β * couplingScale P 𝒥) *
+        ∑ I, h I * m_I(J).
+
+That form is best for applying Cauchy-Schwarz directly.
+
+
+================================================================
+6. FROM THE MOMENT BOUND TO THE FDERIV NORM BOUND
+================================================================
+
+Let
+
+    a := P.β * couplingScale P 𝒥
+
+and let
+
+    m J I := ...
+
+Assume the sharp state estimate
+
+    hm :
+      ∀ J,
+        ∑ I, (m J I) ^ 2
+          ≤ C * (P.N : ℝ) ^ (P.q / 2).
+
+For arbitrary direction h:
+
+    |fderiv ℝ X J h|
+      = |a| * |∑ I, h I * m J I|
+      ≤ |a| * ‖h‖ * sqrt(∑ I, (m J I)^2).
+
+Therefore
+
+    ‖fderiv ℝ X J‖
+      ≤ |a| * sqrt(C * N^(q/2)).
+
+Squaring gives
+
+    ‖fderiv ℝ X J‖^2
+      ≤ a^2 * C * N^(q/2)
+      = (superConcentrationScale P 𝒥 C : ℝ).
+
+RECOMMENDED EXPORTED LEMMA:
+
+    theorem logPartition_fderiv_norm_sq_le_superConcentrationScale
+        {d : Type*} [Fintype d] [DecidableEq d]
+        (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+        (𝒥 C : ℝ) (h𝒥 : 0 < 𝒥) (hβ : P.β ≠ 0) (hC : 0 < C)
+        (J : CouplingSpace P.N P.q) :
+        ‖fderiv ℝ (logPartition P M 𝒥) J‖ ^ 2
+          ≤ (superConcentrationScale P 𝒥 C : ℝ) := by
+      ...
+
+This should be the ONLY SYK-specific quantitative fact used by the final
+concentration theorem.
+
+
+================================================================
+7. CONVERT THE SQUARED NORM BOUND TO A NORM BOUND
+================================================================
+
+Prove a generic helper:
+
+    lemma norm_le_sqrt_of_sq_le
+        {x ε : ℝ} (hx : 0 ≤ x) (hε : 0 ≤ ε)
+        (h : x ^ 2 ≤ ε) :
+        x ≤ Real.sqrt ε := by
+      have hsqrt : 0 ≤ Real.sqrt ε := Real.sqrt_nonneg ε
+      have hsqrt_sq : (Real.sqrt ε) ^ 2 = ε := by
+        simpa using Real.sq_sqrt hε
+      nlinarith
+
+Then obtain
+
+    have hgrad :
+        ∀ J,
+          ‖fderiv ℝ X J‖
+            ≤ Real.sqrt (ε : ℝ) := by
+      intro J
+      apply norm_le_sqrt_of_sq_le
+      · exact norm_nonneg _
+      · exact_mod_cast (show 0 ≤ ε from ε.2)
+      · exact logPartition_fderiv_norm_sq_le_superConcentrationScale
+          P M 𝒥 C h𝒥 hβ hC J
+
+
+================================================================
+8. FDERIV BOUND -> LIPSCHITZ
+================================================================
+
+Use an existing mathlib mean-value theorem if convenient.
+
+The desired helper theorem is:
+
+    lemma lipschitzWith_of_fderiv_norm_le
+        {E : Type*}
+        [NormedAddCommGroup E] [NormedSpace ℝ E]
+        (f : E → ℝ)
+        (L : ℝ≥0)
+        (hf : Differentiable ℝ f)
+        (hderiv : ∀ x, ‖fderiv ℝ f x‖ ≤ (L : ℝ)) :
+        LipschitzWith L f := by
+      ...
+
+If mathlib already has this result under a slightly different name, use it.
+Do not re-prove it inside the final theorem.
+
+For X = logPartition:
+
+    let L : ℝ≥0 := NNReal.sqrt ε
+
+or
+
+    let L : ℝ≥0 := ⟨Real.sqrt (ε : ℝ), Real.sqrt_nonneg _⟩
+
+Then:
+
+    have hLip : LipschitzWith L X := by
+      apply lipschitzWith_of_fderiv_norm_le
+      · exact logPartition_differentiable ...
+      · intro J
+        simpa [L] using hgrad J
+
+You need the identity
+
+    (L : ℝ)^2 = (ε : ℝ).
+
+If L is defined as NNReal.sqrt ε, use the corresponding NNReal sqrt-square
+lemma. If coercion simp becomes painful, define L manually from Real.sqrt.
+
+
+================================================================
+9. BEST OPTION: GENERIC GAUSSIAN THEOREM DIRECTLY IN TERMS OF SQUARED
+   FDERIV BOUND
+================================================================
+
+To minimize plumbing, introduce a wrapper theorem ONCE:
+
+    theorem standardGaussian_two_sided_tail_of_fderiv_sq_le
+        {ι : Type*} [Fintype ι] [DecidableEq ι]
+        (f : (ι → ℝ) → ℝ)
+        (ε : ℝ≥0)
+        (hf : Differentiable ℝ f)
+        (hgrad :
+          ∀ x, ‖fderiv ℝ f x‖ ^ 2 ≤ (ε : ℝ))
+        (t : ℝ) (ht : 0 < t) :
+        standardGaussianOn ι
+            {x | |f x - ∫ y, f y ∂standardGaussianOn ι| > t}
+          ≤ ENNReal.ofReal
+              (2 * Real.exp (-t ^ 2 / (2 * (ε : ℝ)))) := by
+
+      -- 1. ε ≥ 0
+      have hε : 0 ≤ (ε : ℝ) := ε.2
+
+      -- 2. derive ‖Df‖ ≤ sqrt ε
+      have hnorm :
+          ∀ x, ‖fderiv ℝ f x‖ ≤ Real.sqrt (ε : ℝ) := by
+        intro x
+        exact norm_le_sqrt_of_sq_le
+          (norm_nonneg _) hε (hgrad x)
+
+      -- 3. make Lipschitz constant L = sqrt ε
+      let L : ℝ≥0 :=
+        ⟨Real.sqrt (ε : ℝ), Real.sqrt_nonneg _⟩
+
+      have hLip : LipschitzWith L f := by
+        apply lipschitzWith_of_fderiv_norm_le
+        · exact hf
+        · intro x
+          simpa [L] using hnorm x
+
+      -- 4. invoke standard Gaussian concentration
+      have htail :=
+        standardGaussian_two_sided_tail_of_lipschitz
+          f L hLip t ht
+
+      -- 5. simplify L² = ε
+      have hLsq : (L : ℝ) ^ 2 = (ε : ℝ) := by
+        dsimp [L]
+        simpa using Real.sq_sqrt hε
+
+      simpa [hLsq] using htail
+
+This wrapper is strongly recommended. Then the final SYK theorem is nearly
+trivial.
+
+
+================================================================
+10. FINAL THEOREM PROOF SKELETON
+================================================================
+
+Keep a fixed-C helper whose hypothesis says that the core bound fits below the
+requested scale:
+
+    theorem logPartition_two_sided_tail_standardGaussian_of_core_bound
+        ...
+        (C : ℝ)
+        (hCbound : (Nat.choose P.N (P.q - 1) : ℝ) / P.q ≤
+          C * (P.N : ℝ) ^ (P.q / 2))
+        (t : ℝ) (ht : 0 < t) :
+        ...
+
+The public theorem chooses C and quantifies over all positive t:
+
+    theorem logPartition_two_sided_tail_standardGaussian
+        {d : Type*} [Fintype d] [DecidableEq d]
+        (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+        (𝒥 : ℝ) :
+        ∃ C : ℝ, 1 < C ∧ ∀ t : ℝ, 0 < t →
+          standardGaussianMeasure P.N P.q
+              {J | |logPartition P M 𝒥 J -
+                ∫ K, logPartition P M 𝒥 K
+                  ∂standardGaussianMeasure P.N P.q| > t} ≤
+            ENNReal.ofReal
+              (2 * Real.exp
+                (-t ^ 2 /
+                  (2 * (superConcentrationScale P 𝒥 C : ℝ)))) := by
+
+      let Q : ℝ := (Nat.choose P.N (P.q - 1) : ℝ) / P.q
+      let R : ℝ := (P.N : ℝ) ^ (P.q / 2)
+      let C : ℝ := Q / R + 2
+      refine ⟨C, by positivity, ?_⟩
+      intro t ht
+      apply logPartition_two_sided_tail_standardGaussian_of_core_bound
+      · show Q ≤ C * R
+        -- use R > 0 and Q ≥ 0
+        ...
+      · exact ht
+
+
+================================================================
+11. IF YOUR GAUSSIAN THEOREM IS MGF-FORM INSTEAD OF TAIL-FORM
+================================================================
+
+If the available black box is
+
+    E exp(s(f - Ef)) ≤ exp(s² L² / 2),
+
+then prove the two-sided tail generically once:
+
+Upper tail:
+for s > 0,
+
+    P(f - Ef > t)
+      ≤ exp(-s t) E exp(s(f-Ef))
+      ≤ exp(-s t + s² ε/2).
+
+Choose
+
+    s = t / ε.
+
+Then
+
+    P(f - Ef > t) ≤ exp(-t²/(2ε)).
+
+Apply the same argument to -f:
+
+    P(f - Ef < -t) ≤ exp(-t²/(2ε)).
+
+Union bound:
+
+    P(|f-Ef| > t)
+      ≤ 2 exp(-t²/(2ε)).
+
+Important Lean point:
+because the final theorem divides by ε, you need
+
+    0 < (ε : ℝ).
+
+For the target ε = superConcentrationScale P 𝒥 C, derive this from
+h𝒥, hβ, hC and positivity of N/couplingScale.
+
+Again: keep all Markov/Chernoff/ENNReal coercion work in the generic
+probability file, not in the SYK theorem.
+
+
+================================================================
+12. EXACT CHECKLIST OF HELPER RESULTS
+================================================================
+
+[Scale]
+1. couplingScale_pos
+2. superConcentrationScale_raw_pos
+3. coe_superConcentrationScale
+4. superConcentrationScale_pos
+
+[logPartition calculus]
+5. logPartition_differentiable
+6. logPartition_fderiv formula or coordinate derivative formula
+
+[SYK estimate]
+7. core moment estimate and numerical domination:
+       sum expectations² ≤ choose N (q - 1) / q ≤ C * N^(q/2)
+8. logPartition_fderiv_norm_sq_le_superConcentrationScale
+
+[Generic analysis]
+9. norm_le_sqrt_of_sq_le
+10. lipschitzWith_of_fderiv_norm_le
+
+[Generic probability]
+11. standardGaussian_two_sided_tail_of_lipschitz
+12. standardGaussian_two_sided_tail_of_fderiv_sq_le
+
+[Final]
+13. logPartition_two_sided_tail_standardGaussian
+
+
+================================================================
+13. WHAT core.lean ALREADY CONTRIBUTES
+================================================================
+
+The attached core already establishes:
+- density-matrix expectation identities;
+- the anticommuting-family square-sum bound;
+- Majorana interaction self-adjointness and involution properties;
+- the fixed-core anticommutation argument;
+- the exact finite-volume estimate
+
+    syk_sum_sq_expectation_le :
+      ∑ I,
+        ‖expectation ρ (M.interactionOperator I)‖ ^ 2
+      ≤ Nat.choose N (q - 1) / q.
+
+This estimate is sufficient for the existential target. Choose C > 1 so that
+
+    Nat.choose N (q - 1) / q ≤ C * N^(q/2).
+
+The fixed-C helper consumes this numerical comparison and constructs the
+thermal-state moment bound internally. The public theorem then chooses such a
+C explicitly, so it has no moment hypothesis.
+
+
+================================================================
+14. RECOMMENDED FINAL FILE SPLIT
+================================================================
+
+SYK/core.lean
+    existing algebraic core
+
+SYK/superconcentration_gradient.lean
+    superConcentrationScale
+    positivity/coercion lemmas
+    logPartition derivative formula
+    core moment bound -> fderiv² ≤ superConcentrationScale
+
+SYK/gaussian_concentration.lean
+    generic Gaussian Lipschitz concentration interface
+    norm_le_sqrt_of_sq_le
+    fderiv bound -> Lipschitz
+    two-sided Gaussian tail wrapper
+
+SYK/superconcentration.lean
+    imports the previous two files
+    contains only:
+
+    theorem logPartition_two_sided_tail_standardGaussian ...
+
+The final theorem should be a short application theorem, not the place where
+matrix algebra, derivative calculations, or Chernoff bounds are unfolded.

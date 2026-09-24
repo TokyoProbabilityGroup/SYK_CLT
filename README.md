@@ -1,6 +1,6 @@
 # SYK
 
-Research on Sachdev–Ye–Kitaev (SYK) model from a point of view of Probability Theory.
+Research on the Sachdev–Ye–Kitaev (SYK) model from the perspective of probability theory.
 
 ## Abstract
 
@@ -11,11 +11,11 @@ Research on Sachdev–Ye–Kitaev (SYK) model from a point of view of Probabilit
 
 ## Setup instructions
 
-To save storage space mostly used by [mathlib](https://github.com/leanprover-community/mathlib4), we recommend that you should clone this repository into a working directory and copy configuration files in `SYK/workspace` into the same level as the cloned repository.
+To avoid duplicating the disk space used by [mathlib](https://github.com/leanprover-community/mathlib4), clone this repository into a workspace directory and copy the configuration files from `SYK/workspace/` to the workspace root, alongside the cloned `SYK/` directory.
 Specifically, please run the following commands:
 
 ```bash
-cd <working directory>  # Replace the working directory name with that you prefer.
+cd <working directory>  # Replace <working directory> with a path of your choice.
 git clone git@github.com:TokyoProbabilityGroup/SYK.git
 cp SYK/workspace/lakefile.toml .
 cp SYK/workspace/lake-manifest.json .
@@ -23,7 +23,7 @@ cp SYK/workspace/lean-toolchain .
 lake exe cache get
 ```
 
-Then, we arrive at the directory structure
+This produces the following directory structure:
 
 ```
 <working directory>/
@@ -31,6 +31,9 @@ Then, we arrive at the directory structure
 │   ├── .git/
 │   ├── .github/
 │   ├── Annealed_FE/
+│   ├── Blueprint.lean
+│   ├── BlueprintMain.lean
+│   ├── Chapters/
 │   ├── ...
 │   ├── Universality/
 │   ├── workspace/
@@ -45,16 +48,57 @@ Then, we arrive at the directory structure
 └── lean-toolchain
 ```
 
-## Minimal Usage
+## Building and testing
 
-To build all libraries, run
+To build the workspace's default targets, run:
 
 ```bash
 cd <working directory>
-lake exe mk_all
 lake build
 ```
 
-The command `lake exe mk_all` generates a Lean source file on which the `import` statement is written.
-It is required to build all math libraries as the default target (See also the `lakefile.toml` file).
-When you would like to build each library individually, for example, you should just run `lake build SYK_model`.
+`defaultTargets` in `lakefile.toml` selects the libraries built by `lake build`.
+The mathematical topics have individual targets such as `Model`, `SuperConcentration`, and `CLT`; the `SYK` target currently checks shared foundations under `SYK/Probability/` and their dependencies. Blueprint and chapter modules are temporarily excluded.
+There is no aggregate Lean import file: Lake manages the build targets directly.
+All project-specific Lean sources remain inside the repository; only the shared Lake configuration, dependency manifest, and toolchain file are copied to the workspace root.
+To build one library separately, run a command such as `lake build Model`.
+After modifying a Lean source file, first check that file directly from the workspace root.
+For example:
+
+```bash
+lake env lean SYK/Model/Definitions.lean
+```
+
+## Blueprint
+
+Verso is temporarily disabled to reduce GitHub Actions work. The source files remain intact; generation and validation commands below are commented out. See [restoration instructions](workspace/README.md#restoring-verso).
+
+The formalization blueprint is written in `Blueprint.lean` and `Chapters/`.
+To generate the HTML site and validate its manifest, run from the workspace root:
+
+```bash
+# lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site
+# lake exe vbp check --site SYK/_out/site
+```
+
+After restoring Verso, run both commands after changing `Blueprint.lean`, `BlueprintMain.lean`, a file under `Chapters/`, or a Lean declaration name referenced by the Blueprint.
+`lake lean` builds the entry point's imports and runs the renderer directly. No shell script or separately compiled renderer executable is required.
+`vbp check` verifies the consistency of the generated manifest, HTML cache, and internal references.
+
+The generated site is written to `SYK/_out/site/html-multi/` and is excluded from Git.
+To build a PDF as well, append `--pdf` to the renderer command above.
+This requires `lualatex`, or a compatible engine, to be available on `PATH`.
+To inspect the generated site locally, run:
+
+```bash
+# The installed vbp build --serve only discovers generators at the workspace root.
+# Our generator is SYK/BlueprintMain.lean, so serve the generated site directly.
+# The built-in vbp server also uses Python's HTTP server internally.
+python3 -m http.server 8000 --bind 127.0.0.1 --directory SYK/_out/site/html-multi
+```
+
+Then open `http://localhost:8000/`. Serving the generated site requires Python 3.
+
+## References
+
+- [Spin glass by Lean](https://github.com/or4nge19/SpinGlass)
