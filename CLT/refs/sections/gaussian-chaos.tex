@@ -164,9 +164,9 @@ For a multi-index $\alpha \in \{0,1,\ldots\}^{\mathcal I_N}$, we denote the asso
 \begin{lemma}\label{lem:Gaussian-Hermite-IBP}
 Let $f\colon\mathbb R^{\mathcal I_N}\to\mathbb R$ be of class $C^{|\alpha|}$,
 and suppose that $f$ and its multi-index partial derivatives up to order $\alpha$
-have at most exponential growth in $\norm{G}$:
+have at most exponential growth in $\norm{G}$: for any multi-index $\eta=(\eta_I)_{I\in\mathcal I_N}$ with $\eta_I\leq \alpha_I$, there exists a  constant $C_\eta>0$ such that
 \begin{equation*}
-  [\text{Some expression is required}]
+  |(\partial^\eta f)(G)| \leq C_\eta e^{C_\eta \|G\|}.
 \end{equation*}
 Then
 \begin{equation}\label{eq:Gaussian-Hermite-IBP}
