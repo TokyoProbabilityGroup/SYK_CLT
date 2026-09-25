@@ -2,9 +2,11 @@
 
 ## 担当範囲
 
-この文書は、このディレクトリの `Model.lean`、`GaussianConcentration.lean`、`SuperConcentration.lean`、`CLT.lean` に記す主要な主張と Lean 宣言の対応を管理する。全体の実行順序・状態・非同期実行の可否は [全体計画](../EDITING_PLAN.md)、守る条件は [SYK の作業規則](../AGENTS.md) の Blueprint の節を参照する。
+この文書は、このディレクトリの `Model.lean`、`GaussianConcentration.lean`、`SuperConcentration.lean`、`AnnealedFE.lean`、`CLT.lean` に記す主要な主張と Lean 宣言の対応を管理する。全体の実行順序・状態・非同期実行の可否は [全体計画](../EDITING_PLAN.md)、守る条件は [SYK の作業規則](../AGENTS.md) の Blueprint の節を参照する。
 
 各章の更新は対応する実装単位に含める。ここでは上流の数学的な証明を再実装せず、未実装の宣言を実装済みとして参照しない。本文は公開用の英語で記述する。
+
+CLT・Annealed_FE の共同実装中は、既存の未形式化ノードを計画として残す。担当ブランチ上の提案や未統合の宣言を根拠に章を先行編集しない。統合担当が Lean コードを取り込み、個別検査・関連ビルド・主要宣言の公理依存と定理文の照合を終えた時点で、その実装済み範囲に限って証明状態・宣言参照・依存関係を編集する。Lean に残る外部仮定と `sorryAx` を、Blueprint 上でも内部証明と区別する。
 
 ## 各章の編集細目
 
@@ -14,13 +16,18 @@
 - [x] W03：`Model.lean` と必要な `SuperConcentration.lean` の説明を共有の標準ハミルトニアンに合わせ、一般スケールを含む旧基本 API の参照を残さない。
 - [x] W04：`Model.lean` に標準表現・次元・基本関係・トレース直交性の主要宣言を反映する。抽象的な系の性質と具体的な表現の性質を区別する。
 - [x] W05：`SuperConcentration.lean` の参照と依存関係を新配置に合わせ、標準規格化の MGF・片側・両側の裾評価を公開宣言へ対応付ける。
-- [ ] W06：`CLT.lean` に有限模型の規格化と共有結果との対応を反映する。有限模型の接続を最終 CLT の証明完了として表現しない。
+- [x] 2026-09-25 の現行ソース照合：`AnnealedFE.lean` を追加し、Rademacher 原稿の極限と CLT のガウス入力構造を分けた。`CLT.lean` に実装済みの有限模型・条件付き漸近、未完了のモーメント・最終 CLT、改訂原稿の対数 CLT 経路を反映した。`thm: input` の概収束は原典からの追加論証が必要と記録した。Verso の機械的検査は休止中。
+- [ ] W06 の実装完了時：`CLT.lean` のモーメント・トレース零・`Z≥1`・対数の恒等式を、実際に完成した宣言へ対応付け、証明状態を更新する。現行の `AnnealedInput` と原稿の外部結果の差を維持し、旧集中評価を必須依存に戻さない。
 
-F01–F08・Z01 の後続課題では、実装される主要宣言が確定した時点で対応する章の編集細目をここに追加する。現時点で仮の宣言参照は作らない。
+今回の章更新では `Blueprint.lean` に `AnnealedFE.lean` を組み込み、既存の長文設計案 `Annealed_FE/annealed_blueprint.txt` の冒頭に現行配置と未完成状態を明記した。`CLT/ARCHITECTURE.md` も新しい章構成に合わせた。原稿、CLT・Annealed_FE の数学 Lean ソース、および共有 Lake 設定は変更していない。
+
+F01–F08・Z01 の後続課題では、主要宣言が実装・統合・検証された時点で対応する章の編集細目をここに追加する。現時点で仮の宣言参照は作らない。
 
 ## 検証と記録
 
 Verso 休止中は、変更した章の数学的主張・Lean 宣言名・依存名をソース上で照合する。Verso を必要とする `lake env lean`、生成入口の実行、`vbp check` は復帰後に休止中の変更を含めてまとめて行う。章を並行して編集しても、統合検証の担当は一人とする。以下の過去の検証記録にある旧コマンドと出力先は当時のものであり、現在の手順とは区別する。
+
+2026-09-25：現行の親原稿が読み込む CLT の有効な節と `Annealed_FE/refs/SYK-HT-arxiv.tex`、対応する Lean ソースを照合した。`lake env lean --stdin` で新しい両章の `lean :=` が指す宣言をすべて解決した。全章の 50 ノード・121 件の親子・利用・参照関係に ID 重複、参照切れ、依存循環は検出されなかった。`#print axioms` により CLT の有限模型・条件付きアニール補題と凸性補題は通常公理のみ、`Setting.partition_moments` と最終 CLT は `sorryAx` を含むことを確認した。Annealed_FE の Rademacher 模型の `paperHamiltonian` と主たる極限定理は `sorryAx` を含む。Verso が休止中のため、章自体の Lean 検査と HTML・参照検査は行っていない。
 
 2026-09-18：明示的に `sorry` を許可された `CLT/Main.lean` の定理文追加に合わせ、`CLT.lean` に一般の非空有限次元 Majorana 表現・次元による規格化・アニール極限・両 CLT の式と共同半径・非零逆温度での標準化条件を記した。Lean 宣言への対応を付け、未証明状態を明示した。W06・F06・F07 の完了記録ではない。Verso の生成・参照検査は休止中のため行わない。関連検証は [CLT の記録](../CLT/EDITING_PLAN.md#main-statements-2026-09-18) に集約する。
 

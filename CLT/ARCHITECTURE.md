@@ -1,257 +1,165 @@
 # SYK 中心極限定理の証明構造
 
-## 目的と役割
+## 基準と正式な参照元
 
-この文書は、`refs/CLT_SYK.tex` と `refs/sections/` にある Theorem 1.1–1.2 と Corollary 1.3 について、意図した証明の依存関係と現在の証明状態を記録する。正確な定理文については、これらを合わせた原稿を正式な参照元とする。
+2026-09-24、コミット `6621fedfb214cef1b1c3dead0951efdff6bb3e2d` の原稿と手作業を含む Lean 実装に基づき、W06 の再計画に必要な依存関係を更新した。今回の照合はソースの確認であり、外部文献の監査・Lean の再検証・原稿のコンパイルではない。
 
-文書を必要以上に増やさないため、証明状態だけを記録する `proof_status.md` は作成せず、この文書に併記する。実行単位とその状態は [全体計画](../EDITING_PLAN.md)、数学的な細目と検証根拠は [編集計画](EDITING_PLAN.md) に置く。原稿の証明状態と Lean 形式化の進捗を区別する。
+同日の後続依頼で、関連ビルド・CLT と Annealed_FE の個別検査・26宣言の公理依存を再検証した。有限模型6定理、条件付き漸近5定理、凸関数3補題、共有基盤6宣言は通常公理のみであり、残る6宣言には `sorryAx` がある。正確な対象・仮定・警告は [編集計画の W06 検証記録](EDITING_PLAN.md#w06) に記す。外部入力そのものと最終 CLT は未証明のままである。
 
-## 基本設定
+正確な原稿の主張は `refs/CLT_SYK.tex` と、そこから読み込む `introduction.tex`・`gaussian-chaos.tex`・`higher-chaoses.tex`・`main-results.tex` を参照する。実装の型と証明項は Lean ソース、横断的な状態は [全体計画](../EDITING_PLAN.md)、残作業・検証根拠は [編集計画](EDITING_PLAN.md) に置く。原稿内の証明、外部結果、Lean の検証済み証明を区別する。
 
-2026-09-18 の明示的な依頼により、`Main.lean` に一般の有限次元行列 `MajoranaSystem` に対する設定と主結果の定理文を追加した。今回の宣言は実数 `β` と `|β| < βq` を用い、下記の非負逆温度への移行方針より今回の指示を優先する。共有模型の定義・規約は変更していない。`Setting q` は偶数の系サイズが無限大へ発散する族を表し、次元に既約性や標準表現の条件を課さず、トレースを実際の次元で規格化する。
+`main-results.tex` の対数 CLT には有効な新証明と `\iffalse` 内の旧証明がある。現在の依存関係は新証明を基準とし、旧集中評価を必須入力に数えない。旧本文の削除はこの再計画に含めない。
 
-`partition_and_log_partition_clt` は共通の半径・微分可能なアニール極限・相対 CLT・中心化した対数 CLT・非零逆温度での標準化 CLT を同時に述べる。`partition_clt` と `log_partition_clt` はその射影である。証明には依頼で許可された `sorry` を残しており、W06・F06・F07 の証明完了を意味しない。検証記録は [編集計画](EDITING_PLAN.md#main-statements-2026-09-18) に記す。
+## 模型・型・規格化
 
-この文書では原稿の現在の証明状態と、今後の形式化の目標を併記する。「原稿内に証明あり」は Lean による検証済みを意味しない。非負逆温度への統一、複素分配関数の API、大文字のモジュールパスは移行方針であり、原稿・実装に残る差は `EDITING_PLAN.md` で管理する。
-
-偶数 `q >= 4` と偶数 `N` に対して、論文では `M_N = binomial(N,q)`、`sigma_N^2 = (q-1)!/N^(q-1)`、規格化トレースで定義した `Z_N`、`Y_N = Z_N/E[Z_N]`、およびゆらぎを拡大する指数 `a = q/2-1` を用いる。論文の確率論的結果は `β >= 0` で述べ、Lean では解析用の分配関数を `z : ℂ` まで拡張する。
-
-共有模型の `SYK.partitionFunction` は通常のトレースを使う。標準行列表現を構成した後に、この名前空間で `normalizedTrace (exp (-z • H))` による CLT 固有の規格化分配関数を定義し、原稿の `Z_N` に対応させる。この局所的な定義は逆向きに `Model` へ依存させず、共有 API に規格化・非規格化の別名を並べない。
-
-Lean の複素解析を担う層では、`Z_N(z)` の整関数性と微分を、零点に関する仮定なしで扱う。対数微分には `Z_N(z) != 0` を仮定し、具体的に零点がない領域は将来の別の結果として扱う。分配関数の正値性、実数値の `log Z_N`、裾確率、および CLT は `β : ℝ≥0` に限定する。
-
-## 主結果と現在の状態
-
-「自由エネルギー」は以下の対数分配関数の規格化量を指す原稿の呼称として使う。物理的自由エネルギー密度 `-(β N)^(-1) log Z_N` とは係数が異なるため、結果を移す際は名称だけで同一視せず式を照合する。
-
-以下で相対ゆらぎは `Y_N-1`、標準化したゆらぎは `(Z_N-E[Z_N])/sqrt(Var(Z_N))`、対数のゆらぎは `log Z_N-E[log Z_N]` を指す。標準化には分散の正値性が必要である。CLT の矢印 `=>` は分布収束を表し、自由エネルギーの概収束と区別する。
-
-アニール量は `N^(-1) log E[Z_N]` という確定的な量、ここで比較するクエンチ量は `N^(-1) log Z_N` というランダムな量である。`N^(-1) E[log Z_N]` を介して両者を比較するため、期待値と対数の順序を区別する。
-
-### Theorem 1.1：自由エネルギーの大数則
-
-アニール自由エネルギーの極限と、クエンチ自由エネルギーがほとんど確実に同じ極限を持つことを主張する。
-
-目標とする定理文は、十分小さい非負の `beta` に対して
-
-```text
-N^(-1) log Z_N(beta) -> ell_q(beta)    （ほとんど確実に）
-N^(-1) log E[Z_N(beta)] -> ell_q(beta)
-```
-
-さらに、`ell_q` の微分可能性を主張する。原稿中の `ell_p` は `ell_q` の記号上の誤りと考えられるが、定理文を修正する前に確認する。
-
-状態：**未完成**。Proposition 3.2 はアニール量とその導関数の極限を与えるが、クエンチ量とアニール量がほとんど確実に同じ極限を持つことの明示的な証明が本文にない。原稿には0を中心とする実区間を使う旧記述が残るため、非負の逆温度へ統一する必要がある。
-
-### Theorem 1.2：分配関数の中心極限定理
-
-`N^a (Y_N-1)` がガウス分布へ収束することと、標準偏差で割った分配関数のゆらぎに対する CLT を主張する。
-
-相対ゆらぎに関する現在の定理文は
-
-```text
-N^(q/2-1) (Y_N(beta)-1)
-  => Normal(0, (q!/2) * beta^2 * (ell_q'(beta))^2)
-```
-
-である。したがって極限分散は
-
-```text
-rho^2(beta) = (q!/2) * beta^2 * (ell_q'(beta))^2.
-```
-
-状態：**原稿内に証明あり、要監査**。ガウスカオス展開、二次カオスの厳密な同定、高次カオスからなる剰余項の評価、アニール自由エネルギーの導関数の極限、および独立同分布の確率変数に対する古典的な CLT を組み合わせる。標準化した CLT は `beta = 0` で定義されないため、パラメータの範囲を明確にする必要がある。
-
-### Corollary 1.3：分配関数の対数の中心極限定理
-
-`N^a (log Z_N-E[log Z_N])` がガウス分布へ収束することを主張する。
-
-現在の定理文では、極限分散は Theorem 1.2 と同じである。
-
-状態：**原稿内に証明あり、要監査**。Theorem 1.2 に加えて、対数の線形近似、ガウス集中不等式、負の側の裾の制御、および中心化に伴う確定的な誤差の評価を使う。
-
-## 分配関数の中心極限定理に用いる分解
-
-ここでガウスカオスは、ガウス確率変数のエルミート展開を次数ごとに分けた成分であり、量子カオスとは異なる。
-
-証明の中心は、`Y_N-1 = c_N S_N+R_N` という厳密な分解である。具体的には
-
-```text
-S_N = (1 / sqrt(2 M_N)) * sum_I (g_I^2-1),
-c_N(beta) = beta * partial_beta log E[Z_N(beta)] / sqrt(2 M_N),
-R_N = sum_{r >= 3} P_r Y_N.
-```
-
-`S_N` は独立な確率変数 `g_I^2-1` の規格化和、`c_N S_N` は二次ガウスカオス、`R_N` は三次以上のカオス成分の和である。アニール自由エネルギーの導関数の極限と `M_N ~ N^q/q!` から
-
-```text
-N^(q/2-1) c_N(beta)
-  -> sqrt(q!/2) * beta * ell_q'(beta)
-```
-
-を得る。
-
-必要な内部結果は次である。
-
-1. 符号ゲージ変換に関する偶奇則：各頂点の出現回数がすべて偶数でない多重添字に対応するエルミート係数を消す。
-2. ガウス–エルミート部分積分：エルミート係数を微分の期待値に変換する。
-3. 一次・二次カオスの厳密な同定：一次カオスの消滅と二次カオスの係数を有限の `N` で同定する。
-4. Duhamel の微分公式による評価：分配関数の任意階の導関数を評価する。
-5. ラデマッハ変数による符号化：各頂点の出現回数がすべて偶数である多重添字の和を、ラデマッハカオスのモーメントとして表す。
-6. ラデマッハ変数の指数モーメント評価：すべての高次カオス成分を一度に足し合わせて評価する。
-7. 高次カオスの剰余項の評価：`||R_N||_2^2 = O(N^(-3a)) = o(N^(-2a))` を得る。
-8. アニール自由エネルギーの導関数の漸近挙動：二次カオスの確定的な係数の極限を得る。
-9. 独立同分布の確率変数に対する古典的な CLT と Slutsky の定理：Theorem 1.2 を完成する。
-
-## 分配関数からその対数への移行
-
-中心化に現れる差は `E[log Y_N] = E[log Z_N] - log E[Z_N]` である。対数の局所的な線形近似だけでは、その誤差の期待値が小さいことまでは従わないため、負の側の裾の評価を別に使う。
-
-`W_N = log Y_N` とおくと、Corollary 1.3 では次を使う。
-
-```text
-N^a (W_N-E[W_N])
-  = N^a (W_N-(Y_N-1)) + N^a (Y_N-1) - N^a E[W_N].
-```
-
-第1項には `log(1+x)-x = O(x^2)` と Theorem 1.2 から得られる確率的有界性、第2項には Theorem 1.2、第3項にはガウス集中不等式と負の側の裾を積分して得られる評価を使う。
-
-## 自由エネルギーの大数則
-
-Theorem 1.1 の証明を完成するには、アニール自由エネルギーの収束、`E[log Z_N]-log E[Z_N]` の評価、`log Z_N` の集中不等式、および概収束を導くための総和可能な裾確率の評価、またはそれに相当する外部定理が必要である。
-
-既存のガウス集中不等式に関する補題と、Corollary 1.3 で使う中心化の評価を再利用できる可能性がある。ただし、現在の原稿では、それらを組み合わせた Theorem 1.1 の証明は示されていない。
-
-## 外部入力
-
-- `GPSZ2026`：Theorem 5 から高温領域におけるアニール自由エネルギーの極限を用いる。解析性を導く際には、同論文の Proposition 3 の評価も参照する。
-- `AGK2025`：`GPSZ2026` がガウス分布へ拡張する際に参照する、ガウス変数とラデマッハ変数の間の普遍性
-- 独立同分布の確率変数に対する古典的な中心極限定理
-- 標準ガウス測度に対する集中不等式
-
-外部結果を利用するときは、正確な定理文、規格化の変換、逆温度の範囲、および直接引用した結論とそこから推論した結論を区別する。
-
-現在の原稿で用いる `GPSZ2026` との規格化の対応は
-
-```text
-psi_i^GPSZ = 2^(-1/2) psi_i,
-H_N^GPSZ = 2^(-q/2) H_N,
-u = 2^(q/2) beta
-```
-
-である。導関数の収束は外部定理から直接引用するのではなく、アニール自由エネルギーの各点収束、極限関数の正則性、および Lemma 3.1 の凸性を用いた議論から導く。
-
-## 依存関係
-
-次の Mermaid 図は論理的な依存関係の概観であり、本文に記録した正確な定理文や収束の種類に代わるものではない。
-
-Lean モジュール間の依存関係は次の一方向とする。
-
-```mermaid
-flowchart TD
-    gaussian["SYK.Probability.GaussianConcentration"]
-    model["SYK.Model"]
-    superConcentration["SYK.SuperConcentration"]
-    clt["SYK.CLT"]
-
-    gaussian --> superConcentration
-    model --> superConcentration
-    model --> clt
-    superConcentration --> clt
-```
-
-```mermaid
-flowchart TD
-    parity["Lemma 2.1<br/>符号ゲージ変換に関する偶奇則"]
-    ibp["Lemma 2.2<br/>ガウス–エルミート部分積分"]
-    second["Lemma 2.3<br/>一次・二次カオスの厳密な同定"]
-    duhamel["Lemma 2.4<br/>Duhamel の微分公式による評価"]
-    radenc["Lemma 2.5(a)<br/>ラデマッハ変数による符号化"]
-    radmoment["Lemma 2.5(b)<br/>ラデマッハ変数の指数モーメント"]
-    remainder["Proposition 2.6<br/>高次カオスの剰余項の評価"]
-    agk["外部入力：AGK2025<br/>普遍性"]
-    gpsz["外部入力：GPSZ2026<br/>アニール自由エネルギーの極限"]
-    convex["Lemma 3.1<br/>凸関数の導関数の収束"]
-    annealed["Proposition 3.2<br/>アニール量とその導関数の極限"]
-    iid["外部入力：独立同分布の場合の古典的な CLT"]
-    partition["Theorem 1.2<br/>分配関数の CLT"]
-    local["対数の線形近似"]
-    concentration["Lemma 3.3<br/>ガウス集中不等式"]
-    centering["対数の中心化に伴う誤差の評価"]
-    logclt["Corollary 1.3<br/>分配関数の対数の CLT"]
-    quenched["未完成：<br/>クエンチ量とアニール量の概収束による比較"]
-    freeenergy["Theorem 1.1<br/>自由エネルギーの大数則"]
-
-    parity --> second
-    ibp --> second
-    parity --> remainder
-    ibp --> remainder
-    duhamel --> remainder
-    radenc --> remainder
-    radmoment --> remainder
-    agk --> gpsz
-    gpsz --> annealed
-    convex --> annealed
-    second --> partition
-    remainder --> partition
-    annealed --> partition
-    iid --> partition
-    partition --> local
-    local --> logclt
-    partition --> centering
-    concentration --> centering
-    centering --> logclt
-    annealed --> freeenergy
-    concentration --> quenched
-    quenched --> freeenergy
-
-    classDef internal fill:#e8f1fb,stroke:#286090,color:#111;
-    classDef external fill:#f3f3f3,stroke:#666,color:#111;
-    classDef main fill:#e9f7e9,stroke:#287d28,stroke-width:2px,color:#111;
-    classDef incomplete fill:#fff1e6,stroke:#c65d00,stroke-width:2px,color:#111;
-    class parity,ibp,second,duhamel,radenc,radmoment,remainder,convex,annealed,local,concentration,centering internal;
-    class agk,gpsz,iid external;
-    class partition,logclt,freeenergy main;
-    class quenched incomplete;
-```
-
-## Lean モジュールの構成
-
-既存の雛形で採用している、TeX の定理ラベルに基づくファイル分けを維持する。ファイル名とモジュール名を構成する各部分は `UpperCamelCase`、名前空間は `SYK.CLT` とする。形式化の作業枠は編集計画の F01–F08 に分ける。ガウス–エルミート展開、ラデマッハ評価、任意階の行列微分などの独立した入力を整備し、それらを二次カオス・剰余項・最終定理へ接続する。すべてを一つの直線的な順序にはしない。共有すべき行列解析やガウス集中不等式を CLT 内に複製しない。
-
-共有模型と集中不等式の再設計が済むまでは、CLT の雛形へ依存する宣言を追加しない。再設計後には、ガウスカオスの完全直交系・射影・無限和、任意階の行列微分評価、`N` に依存して変わる確率空間上の分布収束、および概収束で必要な共通確率空間を、別々の形式化課題として扱う。mathlib にある古典的 CLT と Slutsky の定理は接続に利用できるが、これらの基盤を省略する根拠にはしない。
-
-W06 で有限模型と集中評価の接続を完成させ、各原稿監査と正確な定理文の確定後に、次の依存関係で形式化する。矢印は主な証明入力を表す。F01・F03・F04 は独立に進める候補であり、同一ファイルの編集や共有補題の統合は別途調整する。
-
-```mermaid
-flowchart LR
-    F01["F01 エルミート展開・部分積分"] --> F02["F02 対称性・二次カオス"]
-    F04["F04 任意階の行列微分"] --> F02
-    F01 --> F05["F05 高次カオスの剰余項"]
-    F02 --> F05
-    F03["F03 ラデマッハ評価"] --> F05
-    F04 --> F05
-    F02 --> F06["F06 係数漸近・分配関数 CLT"]
-    F05 --> F06
-    annealed["監査・確定したアニール入力"] --> F06
-    F06 --> F07["F07 対数 CLT"]
-    concentration["W06 集中評価との接続"] --> F07
-    concentration --> F08["F08 大数則"]
-    annealed --> F08
-```
-
-原稿の Theorem 1.1 の完成は R04、Lean での完成は F08 とする。必要なアニール入力と集中評価が確定すれば、大数則のために分配関数 CLT や対数 CLT 全体を待つ必要はない。ただし、実際に使う共通の入力と確率空間は定理文で明示する。
-
-README には実在するモジュールだけを掲載する。
-
-現在の TeX ラベルと Lean ファイルの対応は次のとおりとする。原稿中の定理番号が変わっても、この表と Lean のコメントでは TeX ラベルによって対応を追跡する。
-
-| Lean ファイル | TeX ラベル |
+| 項目 | 現行の内容 |
 | --- | --- |
-| `Main.lean` | `thm:partition-clt`、`cor:free-energy-clt`、および現在ラベルのない自由エネルギーの大数則 |
-| `Lemmas/CLTComponents.lean` | `lem:exact-second-chaos`, `prop:higher-chaos-closure`, `prop:annealed-free-energy` |
-| `Lemmas/GaussianConcentration.lean` | `eq:centered W_N tail`, `eq:centered W_N exp` |
-| `Lemmas/ConvexDerivatives.lean` | `lem:convex-derivatives` |
-| `Lemmas/Preliminaries.lean` | `lem: parity rule lemma`, `lem:Gaussian-Hermite-IBP`, `lem:Z-derivative-bound`, `lem:Rademacher-encoding` |
+| 模型 | 固定した偶数 `q≥4`、偶数 `N≥q`、独立標準正規座標 `g_I` |
+| 演算子 | 自己共役な Majorana 生成子、反交換関係 `ψ_i ψ_j+ψ_j ψ_i=2δ_ij I`、昇順積と位相 `i^(q/2)` |
+| ハミルトニアン | `H_N=σ_N Σ_I g_I ψ_I`、`σ_N²=(q-1)!/N^(q-1)` |
+| 原稿のトレース | `tr=2^(-N/2) Tr`、標準表現の次元で規格化 |
+| Lean のトレース | 一般の非空有限次元表現で、行列の添字型の要素数 `Fintype.card d` で割る `normalizedTrace` |
+| 分配関数 | `Z_N(z)=tr exp(-z H_N)`、`z : ℂ`、`Z_N(0)=1` |
+| 確率論の逆温度 | 現行原稿・CLT の宣言は `β : ℝ`。共有 Gibbs・集中 API の `β : ℝ≥0` は変更しない |
+| 系の極限 | 原稿は偶数 N を通る極限。Lean の `Setting q` は偶数サイズが無限大へ発散する任意の族 |
+| 確率空間 | 各サイズの共有ガウス係数空間。分布収束はサイズごとの空間を許す。概収束には別途共通確率空間が必要 |
 
-補助モジュールは `Lemmas/` に配置する。空白を含む既存のラベル名は TeX のソースコードと厳密に一致させ、TeX 側を変更するまでは Lean のコメントだけを整形しない。
+標準表現への特殊化で原稿のトレースと一致することと、一般表現で外部極限定理を利用できることは別の確認事項である。W06 は前者を照合する。一般表現族への外部入力の供給は R02・F06 に残し、表現独立性を暗黙に仮定しない。
+
+共有の `SYK.partitionFunction` は通常のトレースを使う。CLT の局所定義は既に存在し、通常トレースの分配関数を次元で割ったものとの一致も証明項を持つ。複素解析の API は共有側を使い、零点のない領域や対数の枝は仮定しない。W06 では利用のない複素解析 API の一式追加を求めない。
+
+## 現在の実装と原稿との差
+
+| 対象 | ソース上の状態と残る照合 |
+| --- | --- |
+| 有限模型の零逆温度・トレース対応・実数性・正値性 | `Main.lean` に証明項あり。9月18日時点の「実数性・正値性が未証明」という記録は履歴 |
+| モーメント | `Setting.partition_moments` の `sorry` が残る。W06 で証明する |
+| 共同 CLT | `partition_and_log_partition_clt` は `hFE : AnnealedInput q` を受け取る条件付きの定理文で、`sorry` が残る。二つの個別 CLT はその射影 |
+| アニール極限・係数漸近・非退化性 | `hFE` の下での証明項あり。入力自体を構築した結果ではない |
+| 凸関数列の導関数収束 | `ConvexDerivatives.lean` に実装あり。関数列の局所一様収束を仮定しており、原稿の各点収束からの補題全体より入力が強い |
+| その他の補助モジュール | `Preliminaries`・`CLTComponents`・`GaussianConcentration` は実質的に雛形 |
+| Blueprint | `../Chapters/AnnealedFE.lean` でガウス入力構造と別原稿の Rademacher 極限を分け、`../Chapters/CLT.lean` で有限模型の証明状態・条件付き極限・現行の対数 CLT の依存を記録した。Verso の生成・参照検査は休止中 |
+
+`Main.lean` は `Annealed_FE/main_result.lean` を直接 import する。同ファイルの `AnnealedFreeEnergyLimit` は高温の共通半径、実解析性、偶性、圧力と導関数の局所一様収束、小温度展開を構造体のフィールドとして受け取る。現行原稿の `prop:annealed-free-energy` は全実軸の偶・凸な `C¹` 関数と明示的評価を主張し、同じ仕様ではない。特に `C¹` から実解析性は出ない。
+
+`Annealed_FE/refs/SYK-HT-arxiv.tex` の主結果は Rademacher 相互作用を使い、物理的 Majorana 生成子の二乗を `I/2` とする別の原稿に属する。同原稿の圧力・自由エネルギー極限を、ガウス模型の全 `Setting q` についての `AnnealedInput` の構築と同一視しない。新しい Annealed_FE 章は両者の接点と未証明状態を示す。
+
+`Annealed_FE` 内には別途 Rademacher 模型・CCG の定義と未完成の定理がある。その存在を Gaussian CLT 用入力の構築と同一視しない。既定ビルド対象から外れていても、CLT の依存先としては構築対象になる。有限模型の成果の公理依存と、import 先に残る未完成箇所は別々に確認する。
+
+## 現行原稿の主張
+
+| TeX ラベル | 主張と監査事項 |
+| --- | --- |
+| `thm: input` | すべての実数の逆温度でのアニール・クエンチ自由エネルギー極限と微分可能性を He2026 から引用。旧計画の「原稿内の大数則証明が欠けている」課題をそのまま適用しない。引用・概収束の量化・`ell_p` の記号は要監査 |
+| `thm:partition-clt` | 小さい `|β|` で相対・標準化 CLT。標準化の定理文は零を含むが、証明と Lean は `β≠0` を要求する。残る `tilde_beta_q` の意味も要確認 |
+| `cor:free-energy-clt` | 同じ範囲と分散で中心化した対数 CLT。新証明は集中不等式を使わない。`beta_p` の記号は要確認 |
+| `prop:annealed-free-energy` | 全実軸の圧力・導関数の局所一様収束、偶性・凸性・`C¹`、小温度展開と非零逆温度の符号。He2026 の引用と内部の導出は分けて監査 |
+
+相対量・スケール・極限分散は
+```text
+Y_N = Z_N / E Z_N,  a = q/2 - 1,
+ρ²(β) = (q!/2) β² (ℓ_q'(β))².
+```
+相対 CLT は `N^a(Y_N-1)`、対数 CLT は `N^a(log Z_N-E log Z_N)` の分布収束である。標準化は `(Z_N-E Z_N)/sqrt(Var Z_N)`。零逆温度の前二者の退化極限と、零分散での標準化を混同しない。Lean の共同定理は非零小温度で「すべての有限サイズの分散正値性」も要求するため、漸近分散の正値性だけではその結論を充足しない。
+
+## カオス分解と係数の漸近
+
+現在の原稿は次の二つの同値な記法を使う。
+```text
+M_N = choose(N,q),  Q_N = M_N⁻¹ Σ_I(g_I²-1),
+A_N(β) = (β/2) ∂_β log E Z_N(β),
+S_N = (2M_N)^(-1/2) Σ_I(g_I²-1),
+c_N(β) = β ∂_β log E Z_N(β) / sqrt(2M_N),
+
+Y_N - 1 = A_N Q_N + R_N = c_N S_N + R_N,
+R_N = Σ_{r≥3} P_r Y_N.
+```
+
+符号ゲージ対称性・Hermite 部分積分で一次・二次カオスを同定し、Duhamel 微分評価と Rademacher 符号化・指数モーメントにより `‖R_N‖₂²=O(N^(-3a))` を得る。係数の同一性には相互作用添字間の対称性の根拠も必要であり、R03 で監査する。アニール導関数の極限と `M_N~N^q/q!` により
+```text
+A_N/N → (β/2) ℓ_q'(β),
+N^a c_N → sqrt(q!/2) β ℓ_q'(β).
+```
+古典的 CLT と Slutsky を適用し、標準化には直交分解による分散漸近と非退化性を別に使う。
+
+## 対数 CLT の新しい経路
+
+`W_N=log Y_N` とすると
+```text
+N^a(log Z_N-E log Z_N)
+  = N^a(W_N-(Y_N-1)) + N^a(Y_N-1) - N^a E W_N.
+```
+最初の項は対数の局所近似と確率的有界性、二番目は相対 CLT を使う。最後の期待値の制御は次の入力に依存する。
+
+| 入力・評価 | 担当 |
+| --- | --- |
+| 相互作用・H のトレース零、Jensen による `Z_N≥1`、モーメントと正しい中心化の恒等式 | W06 |
+| `‖R_N‖₂²=O(N^(-3a))` | F05 |
+| `c_N=O(N^(-a))`、アニール入力から `log E Z_N=O(N)` | F06 |
+| `sup_N E S_N^4<∞`、`P(Y_N<1/2)=O(N^(-3a))`、期待値の誤差 | F07（R05 で監査） |
+
+`h(y)=y-1-log y` に対し `E h(Y_N)=-E log Y_N`。`Y_N≥1/2` では二次モーメントで評価し、`Y_N<1/2` では `h(Y_N)≤-log Y_N≤log E Z_N` を使う。これにより
+```text
+0 ≤ -E log Y_N = O(N^(-2a)) + O(N^(1-3a))
+               = O(N^(-2a)) = o(N^(-a))  (a≥1).
+```
+分布収束だけからこれらのモーメント評価は推論しない。W06 は有限模型の入力までを供給し、この漸近論証全体は F07 に残す。
+
+## 外部入力と未確定事項
+
+現行原稿は He2026 の Theorem 1.1、Proposition 3.3、Theorem 2.5 を引用し、Schwinger–Dyson 圧力・その微分公式・正の Lehmann 表現を用いる。原稿内の変換は `H_N^He=2^(-q/2)H_N`、`s=2^(q/2)|β|` であり、符号の処理にはガウス分布に従う相互作用係数の対称性を使う。ここでは引用内容の正しさを未確認のまま記録し、外部定理を検証済みとはしない。
+
+圧力・導関数の収束、零での接続、明示的な二次・四次誤差、`βℓ_q'(β)>0` の原稿内導出を R02・R03 で照合する。古い GPSZ2026 の解析性を前提とした説明を現行の証明へ自動的に流用しない。He2026 の正確な入力に合わせるために `AnnealedInput` や最終定理文を変更する場合は、その変更案と根拠を先に確定する。これは W06 の有限模型証明とは独立に進められる。
+
+R04 は `thm: input` の引用監査、F08 はその Lean 上の扱いの仕様再検討とする。内部での大数則証明を自動的に再開せず、W06・最終 CLT の前提にも追加しない。
+
+## 依存関係と実装の分担
+
+次は作業上の待ち合わせと数学的な入力を合わせた図であり、現行の import グラフや形式化の完了状態を表すものではない。W06 から F01 への破線は実装順序を示す。共有ガウス基盤の調査は W06 と並行でき、汎用のガウス–エルミート部分積分は W06 を数学的に必要としない。
+
+```mermaid
+flowchart TD
+    shared["共有有限模型・ガウス測度の可積分性"] --> W06["W06 有限模型・モーメント・分配関数の下界"]
+    spin["SpinGlass Common の指数増大・部分積分"] --> gaussian["共有ガウス基盤への選択的流用"]
+    gaussian --> F01["F01 エルミート展開・汎用部分積分"]
+    W06 -.-> F01
+    W06 --> F04["F04 任意階の行列微分"]
+    F01 --> zIBP["Z_N への部分積分の適用"]
+    W06 --> zIBP
+    F04 --> zIBP
+    zIBP --> F02["F02 対称性・二次カオス"]
+    F01 --> F02
+    F04 --> F02
+    F01 --> F05["F05 高次カオス剰余"]
+    F02 --> F05
+    F04 --> F05
+    zIBP --> F05
+    F03["F03 ラデマッハ評価"] --> F05
+    external["監査・確定した He2026 の入力"] --> annealed["F06 凸性・アニール係数漸近"]
+    F02 --> clt["F06 相対・標準化 CLT"]
+    F05 --> clt
+    annealed --> clt
+    clt --> logclt["F07 対数 CLT"]
+    F05 --> logclt
+    W06 --> logclt
+    annealed --> logclt
+```
+
+流用元は SpinGlass のコミット `dc1d3820af6e443c09bd1177ec3e409cf0640d5c` とする。候補は [ExpGrowth.lean](https://github.com/or4nge19/SpinGlass/blob/dc1d3820af6e443c09bd1177ec3e409cf0640d5c/Common/Mathlib/Probability/Distributions/Gaussian/ExpGrowth.lean) の `HasExpGrowth`・可積分性の補題と、[GaussianIntegrationByParts.lean](https://github.com/or4nge19/SpinGlass/blob/dc1d3820af6e443c09bd1177ec3e409cf0640d5c/Common/Mathlib/Probability/Distributions/GaussianIntegrationByParts.lean) の `stein_lemma_gaussianReal_of_expGrowth'` である。先方の Lean/mathlib は `4.34.0-rc2`、現行ワークスペースは `4.32.2` であり、全体を Lake の依存に加えるのではなく、必要な証明を選んで既存の `SYK.Probability.GaussianConcentration` に統合する。既存の `gaussianReal_stein` と重複させず、流用する証明・仮定・出典を個別に確認する。移植・コンパイルと公理依存の検査は未実施である。
+
+原稿の `lem:Gaussian-Hermite-IBP` は `f ∈ C^{|α|}` を仮定し、成分ごとに `η ≤ α` を満たす各偏導関数について、ある `C_η > 0` による `|∂^η f(G)| ≤ C_η exp(C_η ‖G‖)` を要求する。既存の `pi_gaussian_stein_coord` は全座標の一階偏導関数に成長評価を要求するため、そのまま高階に反復すると原稿にない偏導関数の評価まで必要になり得る。F01 の共有基盤側で座標切片を用いる部分積分を整備し、F04 が供給する `Z_N` の正則性・成長評価との接続を CLT 側で行う。エルミート展開の完全性と射影は F01 内の別の成果である。
+
+模型から独立したガウス基盤は利用側を import しない。Model が CLT を import する依存も作らない。`SuperConcentration` は既存の独立成果として維持し、新しい対数 CLT の必須入力にはしない。現行 Lean の `Annealed_FE → CLT/Main` の import は記録して保持し、入力の再設計時に配置先と依存を再検討する。
+
+既存のファイルを使い、W06 で新しいモジュール階層は作らない。共有すべきトレース零・行列評価だけを Model の既存ファイルへ置く。既存の凸関数補題と条件付き漸近補題を再実装せず、F06 で不足する入力を補う。
+
+| Lean ファイル | 原稿との対応・用途 |
+| --- | --- |
+| `../Probability/GaussianConcentration/StandardGaussian.lean` などの既存ファイル | F01 の模型に依存しない指数増大・可積分性・部分積分。現時点では流用・移植前 |
+| `Main.lean` | `subsec:SYK-model`、`thm:partition-clt`、`cor:free-energy-clt`、有限模型と条件付きアニール入力 |
+| `Lemmas/Preliminaries.lean` | `lem: parity rule lemma`、`lem:Gaussian-Hermite-IBP` の共有補題の適用、`lem:Z-derivative-bound`、`lem:Rademacher-encoding` |
+| `Lemmas/CLTComponents.lean` | `lem:exact-second-chaos`、`prop:higher-chaos-closure`、`prop:annealed-free-energy` |
+| `Lemmas/ConvexDerivatives.lean` | `lem:convex-derivatives` の導関数部分。ソースコメントの旧原稿名・単数形ラベルは更新対象 |
+| `Lemmas/GaussianConcentration.lean` | 旧証明の `eq:centered W_N tail`・`eq:centered W_N exp` の雛形。W06 で実装も削除も要求しない |
+
+新しい有限模型の結果に TeX ラベルがない場合は、所在の節と証明を記録し、架空のラベルを作らない。Blueprint の更新細目は Chapters の計画に置く。
