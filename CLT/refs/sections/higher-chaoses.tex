@@ -10,7 +10,7 @@
 
 \begin{lemma}
 \label{lem:Z-derivative-bound}
-For any $\beta\in \mathbb R$ and for any multi-index $\alpha$  with  $|\alpha|=r$ satisfies
+For any $\beta\in \mathbb R$ and for any multi-index $\alpha$  with  $|\alpha|=r$, it holds 
 \begin{equation}\label{eq:Z-derivative-bound}
   \left|\partial_g^\alpha Z_N(\beta;G)\right|
   \leq (|\beta|\sigma_N)^r Z_N(\beta;G).
@@ -19,7 +19,7 @@ For any $\beta\in \mathbb R$ and for any multi-index $\alpha$  with  $|\alpha|=r
 
 \begin{proof}
 The case $r=0$ is immediate, so assume $r\geq1$.  Write $H_N:=H_N(G)$ for
-brevity.  We first derive the equality
+brevity.  We claim that 
 \begin{align}
 	&\partial_{g_{I_r}}\cdots\partial_{g_{I_1}}Z_N(\beta;G)
 	\notag\\
@@ -33,7 +33,7 @@ brevity.  We first derive the equality
 	\label{eq:iterated-Duhamel-formula}
 \end{align}
 where
-\[\Delta_r=\left\{(t_j)_{j=1}^r: t_j\ge0,\quad \sum_{j=1}^r t_j\le 1\right\},\qquad t_0=1-\sum_{i=1}^r t_j. \]
+\[\Delta_r=\left\{(t_j)_{j=1}^r: t_j\ge0,\quad \sum_{j=1}^r t_j\le 1\right\},\qquad t_0=1-\sum_{j=1}^r t_j. \]
 For an affine matrix-valued function $A(\theta)$, the one-variable
 Duhamel formula (see \cite[Corollary~3.11]{HiaiPetz2014}) is
 \begin{equation}\label{eq:one-variable-Duhamel-formula}
@@ -101,9 +101,8 @@ $S_{r-1}\times\{1,\ldots,r\}$ onto $S_r$, summing the Leibniz-rule terms in
 \eqref{eq:iterated-Duhamel-formula-induction} proves
 \eqref{eq:iterated-Duhamel-formula}.
 
-It remains to estimate each integrand in
-\eqref{eq:iterated-Duhamel-formula}.  The Schatten norms are
-defined using the normalized trace:
+To bound the integrand in
+\eqref{eq:iterated-Duhamel-formula}, use the normalized  Schatten norms:
 \[
   \norm{A}_p=(\tr|A|^p)^{1/p},
   \qquad
@@ -125,7 +124,7 @@ in \cite[Theorem~6.20]{HiaiPetz2014}, since, in dimension $d$,
 \]
 and the operator norm is unchanged.
 Let $t_0,\ldots,t_r\geq0$ satisfy $\sum_{j=0}^rt_j=1$, with
-$0=1/\infty$.  Iterating \eqref{eq:normalized-Schatten-Holder} gives
+convention $0=1/\infty$.  Iterating \eqref{eq:normalized-Schatten-Holder} gives
 \begin{align*}
   |\tr(A_0\cdots A_r)|
   &\leq\norm{A_0\cdots A_r}_1\\
@@ -251,7 +250,7 @@ $\alpha$ is even and zero otherwise.  Substitution into
 \eqref{eq:Rademacher-multinomial-expansion} proves
 \eqref{eq:even-sum-Rademacher-moment}.
 
-We next prove a deterministic bound for $S_{N,q}$.  For every $N\geq1$
+We next bound $S_{N,q}$.  For every $N\geq1$
 and every integer $m\geq0$, let $e_m^{(N)}$ denote the $m$th elementary
 symmetric polynomial in $N$ variables, that is,
 \begin{equation*}
@@ -260,11 +259,11 @@ symmetric polynomial in $N$ variables, that is,
   \prod_{x\in I}z_x,
   \qquad e_0^{(N)}(z_1,\ldots,z_N)=1.
 \end{equation*}
-For the rest of the proof, we use the abbreviation
+For the rest of the proof, we abbreviate 
 \[
   e_m:=e_m^{(N)}(\varepsilon_1,\ldots,\varepsilon_N).
 \]
-In particular, $e_1=\sum_{x=1}^N\varepsilon_x$, and
+Then, $e_1=\sum_{x=1}^N\varepsilon_x$, and
 \eqref{eq:Rademacher-chaos-definition} gives $S_{N,q}=e_q$.
 Newton's identities state that
 \begin{equation}\label{eq:Newton-identities}
@@ -281,12 +280,12 @@ $\varepsilon_x\in\{\pm1\}$, we have
     N,&j\text{ even}.
   \end{cases}
 \end{equation*}
-An induction on $m$, using \eqref{eq:Newton-identities}, shows that there is a constant $C_m<\infty$ such that
+We prove this by induction on $m$ to  shows that there is a constant $C_m<\infty$ such that
 \begin{equation*}
 	|e_m|
 	\le C_m\left(N^{m/2}+|e_1|^m\right).
 \end{equation*}
-Indeed, suppose that the estimate is known below order $m$ and set
+Indeed, suppose that the estimate holds for  orders less than $m$. Set
 \[
 X_N:=\frac{e_1}{\sqrt N}.
 \]
@@ -331,9 +330,7 @@ Indeed,
   \left(\frac{|X_N|}{\sqrt N}\right)^{q-2}
   \leq |X_N|^2.
 \end{equation*}
-Choose $c_q$ small enough that the last member of
-\eqref{eq:Rademacher-exponent-reduction} is bounded by
-$(1+|X_N|^2)/4$.
+Choose $c_q$ small enough so that $C_q c_q\leq 1/4$. 
 
 Hoeffding's inequality~\cite[Theorem~2]{Hoeffding1963} gives
 \begin{equation}\label{eq:Hoeffding-Rademacher-sum}
@@ -418,8 +415,7 @@ Since $\E Z_N(\beta)>0$, it follows that
     \frac1{\alpha!}.
   \label{eq:Hermite-Rademacher-bound}
 \end{align}
-By the first assertion of Lemma~\ref{lem:Rademacher-encoding}, namely
-\eqref{eq:even-sum-Rademacher-moment}, summing
+By Lemma~\ref{lem:Rademacher-encoding}, summing
 \eqref{eq:Hermite-Rademacher-bound} over all $r\geq3$ yields
 \begin{align}
   \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
@@ -439,7 +435,7 @@ By the first assertion of Lemma~\ref{lem:Rademacher-encoding}, namely
 \end{align}
 Here the second inequality uses
 $|\E_\varepsilon[S_{N,q}^r]|\leq
-\E_\varepsilon[|S_{N,q}|^r]$, and the last one uses
+\E_\varepsilon[|S_{N,q}|^r]$, and the last inequality uses
 $\sum_{r\geq3}u^r/r!\leq u^3e^u/6$ for $u\geq0$.
 Choose
 \begin{equation*}
@@ -449,9 +445,8 @@ Choose
 where $c_q$ is the constant in Lemma~\ref{lem:Rademacher-encoding}.  If
 $|\beta|<\beta_{\rm Rad}$, then
 $t_N\leq c_qN^{-(q-1)}$.  Therefore the second assertion of
-Lemma~\ref{lem:Rademacher-encoding}, namely
-\eqref{eq:Rademacher-exponential-moment}, together with
-\eqref{eq:all-higher-chaoses-at-once} imply
+Lemma~\ref{lem:Rademacher-encoding}, together with
+\eqref{eq:all-higher-chaoses-at-once} implies 
 \begin{align*}
   \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
   &\leq C_{q,\beta}
