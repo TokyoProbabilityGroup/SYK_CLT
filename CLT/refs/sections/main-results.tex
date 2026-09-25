@@ -572,7 +572,10 @@ To apply the Gaussian concentration
     \left\| \sum_{i \notin S} \langle A_i \rangle_G A_i \right\| 
     = \sqrt{\sum_{i \notin S}  \langle A_i \rangle_G^2}.
   \end{equation}
-  On the other hand, H\"{o}lder's inequality for Schatten norms yields 
+  On the other hand, H\"{o}lder's inequality
+  \eqref{eq:normalized-Schatten-Holder} with $(p,p_1,p_2)=(1,\infty,1)$,
+  together with $|\tr C|\leq\norm{C}_1$ and
+  $\norm{e^{-\beta H_N}}_1=Z_N$, yields
   \begin{equation} \label{eq:GC3}
     \left\langle \sum_{i \notin S} \langle A_i \rangle_G A_i \right\rangle_G 
     \leq
