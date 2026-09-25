@@ -1,3 +1,20 @@
+CURRENT STATUS (2026-09-25)
+===========================
+
+This long-form document is an earlier design proposal, not the current
+workspace layout or a verification record. Its old toolchain, paths, module
+suggestions, and preflight instructions must be checked against the shared
+workspace before use. The current public Blueprint chapter is
+`SYK/Chapters/AnnealedFE.lean`, included by `SYK/Blueprint.lean`.
+
+`SYK/Annealed_FE/main_result.lean` now contains the Rademacher paper model
+and its stated limit, as well as a separate input structure for the Gaussian
+CLT. The Rademacher limit depends on unfinished `sorry` proofs; the Gaussian
+input has no constructed instance for the CLT families. The CLT manuscript's
+He2026 input has different hypotheses. Verso rendering and reference checks
+are temporarily paused; the Blueprint chapter has been checked against source
+declarations only.
+
 LEAN FORMALIZATION BLUEPRINT FOR THE ANNEALED SYK FREE-ENERGY FORMULA
 ====================================================================
 

@@ -17,11 +17,11 @@ The internal planning documents are written in Japanese for collaboration betwee
 
 `Main.lean` defines the normalized Gaussian partition function for general finite-dimensional matrix Majorana systems, families of diverging even system sizes, and the relative, standardized, and centered logarithmic fluctuations. `partition_and_log_partition_clt` states both CLTs with one common radius for real `|β| < βq` and limiting variance `(q!/2) β² (ℓ_q'(β))²`; `partition_clt` and `log_partition_clt` extract the individual conclusions. Standardization excludes zero inverse temperature. The annealed limit identifies `ℓ_q`.
 
-These are theorem statements with explicitly authorized `sorry` proof placeholders. They do not constitute completed formal proofs or completion of the planned finite-model and concentration connection.
+The main CLT theorem still has an explicitly authorized `sorry` proof placeholder. The finite-model definition and several supporting statements have checked proofs, while `partition_moments` remains unfinished. The current logarithmic CLT argument does not require the earlier concentration-based proof.
 
 The manuscript develops the partition-function CLT through an exact second-chaos decomposition and a direct Rademacher estimate for all higher chaoses. It also develops the transfer to the centered log-partition function.
 
-The almost-sure free-energy limit stated as Theorem 1.1 still requires an explicit proof of the quenched/annealed comparison. Several statement-level and editorial issues are recorded in `EDITING_PLAN.md` and must be resolved before the manuscript is complete.
+Theorem 1.1 cites an external almost-sure free-energy limit. Its source, normalization, and almost-sure quantifiers still require an audit; the manuscript does not currently provide an internal proof of that limit. Several statement-level and editorial issues are recorded in `EDITING_PLAN.md`.
 
 ## Verification
 

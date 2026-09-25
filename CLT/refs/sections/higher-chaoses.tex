@@ -34,8 +34,8 @@ brevity.  We first derive the equality
 \end{align}
 where
 \[\Delta_r=\left\{(t_j)_{j=1}^r: t_j\ge0,\quad \sum_{j=1}^r t_j\le 1\right\},\qquad t_0=1-\sum_{i=1}^r t_j. \]
-For a differentiable matrix-valued function $A(\theta)$, the one-variable
-Duhamel formula is
+For an affine matrix-valued function $A(\theta)$, the one-variable
+Duhamel formula (see \cite[Corollary~3.11]{HiaiPetz2014}) is
 \begin{equation}\label{eq:one-variable-Duhamel-formula}
   \frac{\mathrm d}{\mathrm d\theta}e^{A(\theta)}
   =\int_0^1
@@ -45,8 +45,8 @@ By the definition of $H_N$ in Subsection~\ref{subsec:SYK-model},
 \[
   \partial_{g_I}H_N=\sigma_N\psi_I.
 \]
-Applying \eqref{eq:one-variable-Duhamel-formula} to
-$A=-t\beta H_N$ gives, for $t\geq0$,
+Since $A=-t\beta H_N$ is affine in each $g_I$, applying
+\eqref{eq:one-variable-Duhamel-formula} gives, for $t\geq0$,
 \begin{align}
   \partial_{g_I}e^{-t\beta H_N}
   &=-t\beta\sigma_N\int_0^1
@@ -102,24 +102,56 @@ $S_{r-1}\times\{1,\ldots,r\}$ onto $S_r$, summing the Leibniz-rule terms in
 \eqref{eq:iterated-Duhamel-formula}.
 
 It remains to estimate each integrand in
-\eqref{eq:iterated-Duhamel-formula}.  From now on  the Schatten norms are
+\eqref{eq:iterated-Duhamel-formula}.  The Schatten norms are
 defined using the normalized trace:
 \[
   \norm{A}_p=(\tr|A|^p)^{1/p},
   \qquad
   \norm{A}_\infty=\norm{A}.
 \]
-For $t_j>0$,
+For these normalized Schatten norms, H\"older's inequality reads
+\begin{equation}\label{eq:normalized-Schatten-Holder}
+  \norm{AB}_p\leq\norm{A}_{p_1}\norm{B}_{p_2},
+  \qquad
+  \frac1p=\frac1{p_1}+\frac1{p_2},
+  \qquad p,p_1,p_2\in[1,\infty].
+\end{equation}
+This follows from the inequality for the ordinary-trace Schatten norms
+in \cite[Theorem~6.20]{HiaiPetz2014}, since, in dimension $d$,
+\[
+  \norm{A}_s=d^{-1/s}(\operatorname{Tr}|A|^s)^{1/s}
+  \quad (1\leq s<\infty),
+  \qquad d^{-1/p}=d^{-1/p_1}d^{-1/p_2},
+\]
+and the operator norm is unchanged.
+Let $t_0,\ldots,t_r\geq0$ satisfy $\sum_{j=0}^rt_j=1$, with
+$0=1/\infty$.  Iterating \eqref{eq:normalized-Schatten-Holder} gives
+\begin{align*}
+  |\tr(A_0\cdots A_r)|
+  &\leq\norm{A_0\cdots A_r}_1\\
+  &\leq\norm{A_0\cdots A_{r-1}}_{1/(t_0+\cdots+t_{r-1})}
+       \norm{A_r}_{1/t_r}\\
+  &\leq\cdots\leq\prod_{j=0}^r\norm{A_j}_{1/t_j}.
+\end{align*}
+In particular, since $\norm{AB}_p\leq\norm{A}_p\norm{B}_\infty$,
+\[
+  |\tr(A_0B_1A_1\cdots B_rA_r)|
+  \leq\prod_{j=0}^r\norm{A_j}_{1/t_j}
+       \prod_{k=1}^r\norm{B_k}_\infty.
+\]
+
+We apply this inequality with $A_j=e^{-t_j\beta H_N}$ and
+$B_k=\psi_{I_{\pi(k)}}$.  Since $H_N$ is self-adjoint, for $t_j>0$,
 \[
   \norm{e^{-t_j\beta H_N}}_{1/t_j}
+  =\left(\tr\left|e^{-t_j\beta H_N}\right|^{1/t_j}\right)^{t_j}
   =
   \bigl(\tr e^{-\beta H_N}\bigr)^{t_j},
 \]
-with the usual $p=\infty$ interpretation when $t_j=0$.  By
-Subsection~\ref{subsec:SYK-model}, $\norm{\psi_I}_\infty=1$.
-Noncommutative H\"older, with Schatten exponents $1/t_j$, therefore gives,
-for every $\pi\in S_r$ and
-$t\in\Delta_r$,
+For $t_j=0$, the corresponding identity is
+$\norm{I}_\infty=1=(\tr e^{-\beta H_N})^0$.
+Also, $\norm{\psi_I}_\infty=1$ (see Subsection~\ref{subsec:SYK-model}).
+Thus, for every $\pi\in S_r$ and $t\in\Delta_r$,
 \begin{align}
   &\left|
   \tr\!\left(
@@ -303,7 +335,7 @@ Choose $c_q$ small enough that the last member of
 \eqref{eq:Rademacher-exponent-reduction} is bounded by
 $(1+|X_N|^2)/4$.
 
-Hoeffding's inequality gives
+Hoeffding's inequality~\cite[Theorem~2]{Hoeffding1963} gives
 \begin{equation}\label{eq:Hoeffding-Rademacher-sum}
   \mathbb P_\varepsilon(|X_N|\geq u)
   \leq2e^{-u^2/2}
@@ -353,14 +385,31 @@ Put
   =\beta^2(q-1)!N^{-(q-1)}.
 \end{equation*}
 By the Hermite expansion \eqref{eq: chaos} and its orthogonality relation,
-the squared norm of the $r$th projection is the sum of the squared Hermite
-coefficients.  Lemma~\ref{lem: parity rule lemma} eliminates every odd
-multi-index, while Lemma~\ref{lem:Gaussian-Hermite-IBP} replaces each
-remaining Hermite coefficient by the corresponding expected derivative.
-Consequently, Lemma~\ref{lem:Z-derivative-bound} and $\mathbb E Z_N(\beta)>0$ give
+\[
+  \norm{P_r Y_N(\beta)}_2^2
+  =\frac1{(\E Z_N(\beta))^2}
+    \sum_{|\alpha|=r}\frac1{\alpha!}
+    \left|\E\!\left[Z_N(\beta)H_\alpha(G)\right]\right|^2.
+\]
+By Lemmas~\ref{lem: parity rule lemma} and~\ref{lem:Gaussian-Hermite-IBP},
+\[
+  \E\!\left[Z_N(\beta)H_\alpha(G)\right]
+  =\begin{cases}
+    0,&\alpha\text{ is odd},\\
+    \E\partial_g^\alpha Z_N(\beta),&\alpha\text{ is even}.
+  \end{cases}
+\]
+Moreover, Lemma~\ref{lem:Z-derivative-bound} gives, for $|\alpha|=r$,
+\[
+  \left|\E\partial_g^\alpha Z_N(\beta)\right|
+  \leq\E\left|\partial_g^\alpha Z_N(\beta)\right|
+  \leq (|\beta|\sigma_N)^r\E Z_N(\beta)
+  =t_N^{r/2}\E Z_N(\beta).
+\]
+Since $\E Z_N(\beta)>0$, it follows that
 \begin{align}
   \norm{P_r Y_N(\beta)}_2^2
-  &=\frac1{\mathbb E Z_N(\beta)^2}
+  &=\frac1{(\E Z_N(\beta))^2}
     \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
     \frac1{\alpha!}
     \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \notag\\
