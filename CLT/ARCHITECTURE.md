@@ -39,7 +39,7 @@
 | 凸関数列の導関数収束 | `Lemmas/ConvexDerivatives.lean` の `convex_convergence_deriv_tendstoUniformlyOn`。関数列の局所一様収束を仮定しており、原稿の各点収束から局所一様収束を導く補題全体ではない |
 | ガウス–エルミート部分積分 | `Lemmas/GaussianIBP.lean` に一次元・多変数の補助結果がある。`Setting.Z` への正則性・成長評価と特殊化、および原稿全体との照合は別途必要 |
 | ラデマッハ評価 | `Lemmas/Rademacher.lean` に有限符号平均と `rademacher_encoding` がある。F03/F05 の CLT 側への接続と関連ビルドは未確認 |
-| 行列解析と対称性 | Duhamel・高階導関数評価・符号ゲージ・Hermite 偶奇則のCLTへの接続は F02・F04 に残る。旧 `Lemmas/Tool.lean` は未使用のため参照監査後に削除した |
+| 行列解析と対称性 | `Lemmas/Tool.lean` は有限次元の特異値・Schatten 評価と Hermitian 行列の指数の高階微分評価を証明済みで、`lake build CLT` も成功した。これらを CLT のカオス解析へ接続する作業は F04 に残る。符号ゲージ・Hermite 偶奇則の CLT への接続は F02 に残る |
 | その他の補助モジュール | `Preliminaries`・`CLTComponents`・`GaussianConcentration` は引き続き実質的に雛形。新しい補助ファイルの存在だけではこれらの計画済み適用は完了しない |
 | Blueprint | `../Chapters/AnnealedFE.lean` でガウス入力構造と別原稿の Rademacher 極限を分け、`../Chapters/CLT.lean` で有限模型の証明状態・条件付き極限・現行の対数 CLT の依存を記録した。Verso の生成・参照検査は休止中 |
 

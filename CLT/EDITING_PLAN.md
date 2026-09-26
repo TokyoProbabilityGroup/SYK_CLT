@@ -175,7 +175,7 @@ W06 の完了は、上記の有限模型の成果・原稿との対応・[Chapte
 
 - [x] `Tool.lean` の扱いを確定した後、`lake build CLT` を再実行し、W06 の統合検証を完了する（後続依頼による参照監査・削除で解消）。
 
-### Tool.lean の参照監査・削除と W06 完了（2026-09-26）
+### Tool.lean の参照監査・削除（履歴）と W06 完了（2026-09-26）
 
 ユーザーから「本文の主張を含む他ファイルからの参照を確認し、問題なければ Tool.lean を削除し、W06 を閉じて作業記録を残す」と指示されたため、次の順で実施した。
 
@@ -184,6 +184,12 @@ W06 の完了は、上記の有限模型の成果・原稿との対応・[Chapte
 3. **記録の更新**：README・構造文書から Tool を現存する部品として扱う説明を外し、全体計画の W06 を完了に更新した。Blueprint の対応する有限模型のソース照合は前節の結果を維持し、章の計画書にもビルド障害の解消を記録した。過去の Tool の紹介・ビルド失敗は時点付きの履歴として残す。
 
 **W06 は完了。** 有限模型・モーメント・相対量と対数の恒等式・零逆温度・標準表現との対応、個別検査・関連ビルド・公理依存・文書とBlueprintのソース照合・差分確認を終えた。共同 CLT の1箇所と Annealed_FE の10箇所の既存 `sorry`、GaussianIBP 等の既存 linter・非推奨警告は残り、最終 CLT や F01–F08 の完成を意味しない。Verso の章検査・生成・参照検査は休止規則に従って未実施。次単位には着手せず、変更は未コミット。
+
+### Tool.lean 完成後の記録修正（2026-09-26）
+
+上の削除は時点付きの履歴である。その後、`CLT/Lemmas/Tool.lean` は現行 mathlib だけを使う補助モジュールとして同じパスに再実装された。有限次元の特異値、von Neumann 型トレース評価、Schatten--Hölder 評価、Hermitian 行列の指数と規格化トレース指数の高階微分評価を証明し、`sorry`・`admit`・`axiom` を含まない。
+
+親ワークスペースからの `lake -f SYK/workspace/lakefile.toml env lean SYK/CLT/Lemmas/Tool.lean` と `lake -f SYK/workspace/lakefile.toml build CLT` は成功した。前者には5件の非推奨 API・未使用 `simp` 引数の warning、後者には既存の GaussianIBP 等の linter warning が残るが、エラーはない。`Tool.lean` は現在も `Main.lean` や Blueprint から import されていないため、W06 の有限模型の成果と公理依存は変わらない。行列微分評価を CLT のカオス解析へ接続する作業は引き続き F04 に残る。
 
 ### 現行証明の再検証（2026-09-24）
 
@@ -273,7 +279,7 @@ F03 の符号化と指数モーメント、F04 の Duhamel 公式と行列評価
 
 `N` に依存して変わる確率空間上の分布収束と、概収束に必要な共通確率空間を定理文ごとに区別する。外部入力を仮定として受け取る定理については、Lean が検証した条件付きの結論と、入力自体の証明状態を別に報告する。
 
-2026-09-26 のファイル整理：`Chapters/CLT.lean` の import も新モジュールへ変更した。親ワークスペースで統合ファイルの `lake -f lakefile.toml env lean SYK/CLT/GaussianIBP.lean` と `lake -f lakefile.toml build SYK.CLT.GaussianIBP` が成功した。主要な四宣言の公理依存は `propext`・`Classical.choice`・`Quot.sound` のみ。`lake -f lakefile.toml build CLT` は対象外の未追跡 `CLT/Lemmas/Tool.lean` が `RequestProject` を import しているため失敗した。上の個別ファイル名と検証結果は統合前の履歴として残す。Verso の章検査は休止中のため実施していない。
+2026-09-26 のファイル整理：`Chapters/CLT.lean` の import も新モジュールへ変更した。親ワークスペースで統合ファイルの `lake -f lakefile.toml env lean SYK/CLT/GaussianIBP.lean` と `lake -f lakefile.toml build SYK.CLT.GaussianIBP` が成功した。主要な四宣言の公理依存は `propext`・`Classical.choice`・`Quot.sound` のみ。当時の `Tool.lean` による CLT ビルド失敗は、完成後の同モジュールを含む `lake -f SYK/workspace/lakefile.toml build CLT` の成功で解消した。上の個別ファイル名と検証結果は統合前の履歴として残す。Verso の章検査は休止中のため実施していない。
 
 2026-09-26 の補助ファイル確認：`Lemmas/GaussianIBP.lean` は一般ガウス–エルミート部分積分、`Lemmas/Rademacher.lean` は有限符号平均と `rademacher_encoding`、`Lemmas/Tool.lean` は行列解析・トレース指数微分・符号ゲージと Hermite 偶奇則を含む。`Lemmas/ConvexDerivatives.lean` は既存の `convex_convergence_deriv_tendstoUniformlyOn` を持ち、局所一様収束などを仮定する。これらは補題候補の所在を明確にするもので、F01/F03/F04/F06 の完了や Main の証明状態変更を意味しない。`Tool.lean` の `RequestProject.*` imports はこのソースツリー内で解決を確認できず、CLT への統合・ビルドは未確認。個別診断では Rademacher と ConvexDerivatives にエラーなし、GaussianIBP には現行 Mathlib の非推奨 import/API 診断、Tool には import 更新要求があった。Lake によるこの4ファイルの個別検査・関連ビルドと公理依存確認は未実施。
 
@@ -319,6 +325,8 @@ F03 の符号化と指数モーメント、F04 の Duhamel 公式と行列評価
 最終の `lake build CLT` は成功し、`lake env lean SYK/Chapters/CLT.lean` は警告なしで成功した。`git diff --check` は成功した。Git の LF/CRLF 変換案内は数学的・Lean 的な警告とは区別する。
 
 `Tool.lean` の微分補助部分では、Banach 代数の指数関数について全 Fréchet 微分の Duhamel 積分表示 `Duhamel.fderiv_exp_apply` を証明した。さらに `DerivAux.contDiff_tE` を実装し、実スカラーへの制限と行列トレースの解析性から検証した。個別 Lean 検査でこの二つの宣言にエラーはない。残る未定義入力は三つの Schatten 積評価と `DerivAux.iteratedFDeriv_tE_bound_hermitian` であり、`Tool.lean` 全体の検査は未成功である。
+
+この後段の Tool に関する診断・部分実装の記録は、完成までの履歴である。最終状態は上の「Tool.lean 完成後の記録修正」に従う。すなわち、現行の `Tool.lean` は全体として Lean 検査済みであり、同モジュールを含む CLT ビルドも成功している。
 
 ## Z01：複素平面上の零点のない領域
 

@@ -75,4 +75,4 @@ W02 では `GaussianConcentration.lean` の import と宣言参照を新しい�
 
 ### W06 の有限模型のソース照合（2026-09-26）
 
-有限模型30定理の公理依存確認と Main の個別ビルド成功後、モーメント・トレース零・`Z≥1` の状態を更新し、相対量と対数の中心化、零逆温度のノードを追加した。標準表現との規格化の対応もリンクした。古い `SYK.CLT.GaussianIBP` import は実在する `SYK.CLT.Lemmas.GaussianIBP` に訂正した。今回追加・変更した宣言参照とノード依存をソース照合した。引き継ぎ時点ではCLT全体のビルドが Tool の `RequestProject` 依存で失敗していたが、同日の後続依頼で参照監査後に未使用の Tool を削除し、`lake build CLT` が3171 jobsで成功した。これにより W06 の統合検証を完了した。Verso の章検査・生成・参照検査は休止中につき未実施。詳しい検証根拠は [CLT の W06](../CLT/EDITING_PLAN.md#w06) に集約する。
+有限模型30定理の公理依存確認と Main の個別ビルド成功後、モーメント・トレース零・`Z≥1` の状態を更新し、相対量と対数の中心化、零逆温度のノードを追加した。標準表現との規格化の対応もリンクした。古い `SYK.CLT.GaussianIBP` import は実在する `SYK.CLT.Lemmas.GaussianIBP` に訂正した。今回追加・変更した宣言参照とノード依存をソース照合した。当時の Tool の `RequestProject` 依存による CLT ビルド失敗は、Tool を現行 mathlib に再実装した後の `lake build CLT` 成功で解消した。Tool は現在も Blueprint の宣言参照に統合されていないため、章の有限模型ノードと W06 の範囲は変えない。Verso の章検査・生成・参照検査は休止中につき未実施。詳しい検証根拠は [CLT の W06](../CLT/EDITING_PLAN.md#w06) に集約する。
