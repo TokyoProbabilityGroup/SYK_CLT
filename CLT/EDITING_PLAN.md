@@ -26,7 +26,7 @@
 - [ ] `paritcular` などの明らかな綴りの誤りを修正する。
 - [ ] 文脈上明らかな `ell_p` と `ell'` の記号上の誤りを精査する。
 - [ ] 長いコメントアウト済み旧証明の扱いを確認する。方針が未承認の間は保持し、削除が必要なら対象を示して確認する。
-- [ ] LaTeX の生成物の追跡状況を確認する。2026-09-08 時点では `sections/introduction.pdf` と `sections/gaussian-chaos.pdf` が追跡されている。扱いの変更は提案して承認を得る。
+- [x] 2026-09-27 時点で `CLT/refs/` 以下の LaTeX 生成 PDF は追跡されていないことを確認した。原稿や追跡対象の変更は別途、対象を示して扱う。
 - [ ] 原稿をコンパイルし、エラー、警告、および未解決の参照を報告する。
 
 完了条件：定理文の数学的内容を変更せず、重複した記述や壊れた数式がない状態で原稿をコンパイルできる。
@@ -153,7 +153,9 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 `refs/sections/gaussian-chaos.tex` の `eq: chaos` に対し、`Lemmas/GaussianChaos.lean` は二つの Hermite・ガウス測度の規格化を照合した。`GaussianHermiteOrthogonality.lean` の直交性・階乗ノルム・有限射影、`GaussianHermiteDensity.lean` の多項式の有限線形包への包含、`GaussianMomentDetermination.lean` と `GaussianPolynomialDensity.lean` の解析的補助結果も Lean 検査済みである。無条件のガウス $L^2$ 多項式稠密性、Hermite 完全性、無限次数和の収束は未証明で、条件付き `HasSum` を完成と扱わない。[今回の F01 検証履歴](../WORK_HISTORY.md#clt-f01-after-w06)を必要時に参照する。
 
-R03 で原稿の有効な主張と測度・Hermite 規格化を照合し、残る稠密性の証明と `eq: chaos` の無条件の結論を実装する。`GaussianChaos.lean` と `Main.lean` の同時 import は成功したが、符号結果と `Setting.Z` の数学的接続は [F02 の統合](#ticket-integration)に残る。補題ごとに TeX ラベルと Lean 定理文、個別検査・CLT ビルド・公理依存を報告する。`Z_N` への特殊化は F04 に渡し、F01-G と共有ファイルを同時編集しない。
+最初の未完了な入力は、`GaussianPolynomialDensity.lean` の `gaussianLp_eq_zero_of_polynomial_moments_zero` から一変数ガウス $L^2$ の多項式稠密性を導き、有限積ガウス上の `mvPolynomialLp` の稠密性へ移す部分である。得られた結果で `GaussianHermiteDensity.lean` の `hermiteOrthonormal_dense_of_mvPolynomialLp_dense` が受け取る稠密性仮定を供給し、`GaussianHermiteOrthogonality.lean` の `hasSum_hermiteCoefficients` と `hasSum_hermiteDegreeProjection` を無条件の結論へ接続する。既存の条件付き定理を完成済みの無条件の結果として扱わない。
+
+R03 で原稿の有効な主張、測度・Hermite 規格化、実 $L^2$ から原稿の係数への対応を照合し、上の入力を実装する。主な編集対象は `GaussianPolynomialDensity.lean`、`GaussianHermiteDensity.lean`、`GaussianHermiteOrthogonality.lean` とし、公開定理文と追加の編集対象は着手前に確定する。F01-G が `GaussianIBP.lean` や共有 API の配置を変える場合は、その変更を統合してから F01-H の import と利用宣言を再確認する。`GaussianChaos.lean` と `Main.lean` の同時 import は成功したが、符号結果と `Setting.Z` の数学的接続は [F02 の統合](#ticket-integration)に残る。補題ごとに TeX ラベルと Lean 定理文、個別検査・CLT ビルド・公理依存を報告する。`Z_N` への特殊化は F04 に渡す。
 
 <a id="ticket-f03-r"></a>
 
@@ -189,7 +191,7 @@ F01-G と F04-M の整理は、その数学的成果を受け渡す段階で行�
 
 ### 担当票で確定する事項
 
-「F 番号を実装する」という短い依頼を受けても、この表は証明可能性・入力 API の確定を意味しない。担当者は原稿の有効な本文、対応する R 監査、現行 Lean の宣言を照合し、まず対象の最初の未完了な補題群について次の欄を埋める。いずれかが確定できない場合は調査結果と未決事項を返し、推測した定理文や新しい `sorry` で実装を開始しない。
+「F 番号を実装する」という短い依頼を受けても、この表は証明可能性・入力 API の確定を意味しない。担当者は原稿の有効な本文、対応する R 監査、現行 Lean の宣言を照合し、まず対象の最初の未完了な補題群について次の欄を埋めて統合担当と共有する。担当票の候補ファイルだけで編集権限が確定したとは扱わず、共有ファイルの編集担当と先行成果の受け渡し順も固定する。いずれかが確定できない場合は調査結果と未決事項を返し、推測した定理文や新しい `sorry` で実装を開始しない。
 
 | 作業票の欄 | 必ず記録する内容 |
 | --- | --- |
