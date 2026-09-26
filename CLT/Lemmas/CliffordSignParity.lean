@@ -1,6 +1,4 @@
 import SYK.Model.Majorana
-import SYK.CLT.Lemmas.ToolScratch
-import SYK.CLT.Lemmas.PositiveTrace
 import Mathlib.Analysis.CStarAlgebra.Matrix
 import Mathlib.Analysis.InnerProductSpace.SingularValues
 import Mathlib.Analysis.InnerProductSpace.Trace
