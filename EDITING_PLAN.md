@@ -81,7 +81,7 @@ R04・R05 の原稿監査は Lean 形式化の完了と別に判定する。W06 
 
 | ID | 形式化する成果 | 主な入力 | 状態 |
 | --- | --- | --- | --- |
-| F01 | ガウス–エルミート展開の完全性・射影・部分積分 | R03 の該当監査、SpinGlass と既存 API の照合。共有部分の細目は [ガウス基盤](Probability/GaussianConcentration/EDITING_PLAN.md#f01) | 前提待ち |
+| F01 | ガウス–エルミート展開の完全性・射影・部分積分 | R03 の該当監査、SpinGlass と既存 API の照合。共有部分の細目は [ガウス基盤](Probability/GaussianConcentration/EDITING_PLAN.md#f01) | 前提待ち。明示依頼の一般 Hermite 部分積分は 2026-09-26 完了、残りは [CLT の詳細](CLT/EDITING_PLAN.md#formalization) |
 | F02 | 符号対称性と一次・二次カオスの同定 | F01、必要な F04 の微分・可積分性評価、R03 | 前提待ち |
 | F03 | ラデマッハ符号化と一様な指数モーメント評価 | R03 の該当監査 | 前提待ち |
 | F04 | 任意階の行列微分公式と評価 | 共有行列解析、R03 の該当監査 | 前提待ち |

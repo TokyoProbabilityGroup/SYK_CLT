@@ -36,8 +36,11 @@
 | モーメント | `Setting.partition_moments` の `sorry` が残る。W06 で証明する |
 | 共同 CLT | `partition_and_log_partition_clt` は `hFE : AnnealedInput q` を受け取る条件付きの定理文で、`sorry` が残る。二つの個別 CLT はその射影 |
 | アニール極限・係数漸近・非退化性 | `hFE` の下での証明項あり。入力自体を構築した結果ではない |
-| 凸関数列の導関数収束 | `ConvexDerivatives.lean` に実装あり。関数列の局所一様収束を仮定しており、原稿の各点収束からの補題全体より入力が強い |
-| その他の補助モジュール | `Preliminaries`・`CLTComponents`・`GaussianConcentration` は実質的に雛形 |
+| 凸関数列の導関数収束 | `Lemmas/ConvexDerivatives.lean` の `convex_convergence_deriv_tendstoUniformlyOn`。関数列の局所一様収束を仮定しており、原稿の各点収束から局所一様収束を導く補題全体ではない |
+| ガウス–エルミート部分積分 | `Lemmas/GaussianIBP.lean` に一次元・多変数の補助結果がある。`Setting.Z` への正則性・成長評価と特殊化、および原稿全体との照合は別途必要 |
+| ラデマッハ評価 | `Lemmas/Rademacher.lean` に有限符号平均と `rademacher_encoding` がある。F03/F05 の CLT 側への接続と関連ビルドは未確認 |
+| 行列解析と対称性 | `Lemmas/Tool.lean` に Duhamel、正規化 Schatten 評価、高階導関数評価、符号ゲージ・Hermite 偶奇則の結果がある。`RequestProject.*` 依存と CLT への接続は未確認 |
+| その他の補助モジュール | `Preliminaries`・`CLTComponents`・`GaussianConcentration` は引き続き実質的に雛形。新しい補助ファイルの存在だけではこれらの計画済み適用は完了しない |
 | Blueprint | `../Chapters/AnnealedFE.lean` でガウス入力構造と別原稿の Rademacher 極限を分け、`../Chapters/CLT.lean` で有限模型の証明状態・条件付き極限・現行の対数 CLT の依存を記録した。Verso の生成・参照検査は休止中 |
 
 `Main.lean` は `Annealed_FE/main_result.lean` を直接 import する。同ファイルの `AnnealedFreeEnergyLimit` は高温の共通半径、実解析性、偶性、圧力と導関数の局所一様収束、小温度展開を構造体のフィールドとして受け取る。現行原稿の `prop:annealed-free-energy` は全実軸の偶・凸な `C¹` 関数と明示的評価を主張し、同じ仕様ではない。特に `C¹` から実解析性は出ない。
@@ -147,7 +150,7 @@ flowchart TD
 
 流用元は SpinGlass のコミット `dc1d3820af6e443c09bd1177ec3e409cf0640d5c` とする。候補は [ExpGrowth.lean](https://github.com/or4nge19/SpinGlass/blob/dc1d3820af6e443c09bd1177ec3e409cf0640d5c/Common/Mathlib/Probability/Distributions/Gaussian/ExpGrowth.lean) の `HasExpGrowth`・可積分性の補題と、[GaussianIntegrationByParts.lean](https://github.com/or4nge19/SpinGlass/blob/dc1d3820af6e443c09bd1177ec3e409cf0640d5c/Common/Mathlib/Probability/Distributions/GaussianIntegrationByParts.lean) の `stein_lemma_gaussianReal_of_expGrowth'` である。先方の Lean/mathlib は `4.34.0-rc2`、現行ワークスペースは `4.32.2` であり、全体を Lake の依存に加えるのではなく、必要な証明を選んで既存の `SYK.Probability.GaussianConcentration` に統合する。既存の `gaussianReal_stein` と重複させず、流用する証明・仮定・出典を個別に確認する。移植・コンパイルと公理依存の検査は未実施である。
 
-原稿の `lem:Gaussian-Hermite-IBP` は `f ∈ C^{|α|}` を仮定し、成分ごとに `η ≤ α` を満たす各偏導関数について、ある `C_η > 0` による `|∂^η f(G)| ≤ C_η exp(C_η ‖G‖)` を要求する。既存の `pi_gaussian_stein_coord` は全座標の一階偏導関数に成長評価を要求するため、そのまま高階に反復すると原稿にない偏導関数の評価まで必要になり得る。F01 の共有基盤側で座標切片を用いる部分積分を整備し、F04 が供給する `Z_N` の正則性・成長評価との接続を CLT 側で行う。エルミート展開の完全性と射影は F01 内の別の成果である。
+原稿の `lem:Gaussian-Hermite-IBP` は `f ∈ C^{|α|}` を仮定し、成分ごとに `η ≤ α` を満たす各偏導関数について、ある `C_η > 0` による `|∂^η f(G)| ≤ C_η exp(C_η ‖G‖)` を要求する。2026-09-26、`GaussianIBP.lean` の `hermiteMulti_ibp_of_expGrowth` で、この一般部分を同じ仮定のまま証明した。共有 `pi_gaussian_stein_coord` は選択座標だけの成長評価を使い、偏導順序の交換と Hermite 因子の成長評価から反復の入力を導く。両辺の可積分性も `hermiteMulti_ibp_integrable` で証明済み。ユーザーの指定により `Z_N` の正則性・成長評価と特殊化は F04 に残す。エルミート展開の完全性と射影は F01 内の別の成果であり、この一般部分の完成からは従わない。検証根拠は [編集計画](EDITING_PLAN.md#formalization) を参照する。
 
 模型から独立したガウス基盤は利用側を import しない。Model が CLT を import する依存も作らない。`SuperConcentration` は既存の独立成果として維持し、新しい対数 CLT の必須入力にはしない。現行 Lean の `Annealed_FE → CLT/Main` の import は記録して保持し、入力の再設計時に配置先と依存を再検討する。
 
@@ -157,9 +160,12 @@ flowchart TD
 | --- | --- |
 | `../Probability/GaussianConcentration/StandardGaussian.lean` などの既存ファイル | F01 の模型に依存しない指数増大・可積分性・部分積分。現時点では流用・移植前 |
 | `Main.lean` | `subsec:SYK-model`、`thm:partition-clt`、`cor:free-energy-clt`、有限模型と条件付きアニール入力 |
-| `Lemmas/Preliminaries.lean` | `lem: parity rule lemma`、`lem:Gaussian-Hermite-IBP` の共有補題の適用、`lem:Z-derivative-bound`、`lem:Rademacher-encoding` |
+| `Lemmas/Preliminaries.lean` | `lem: parity rule lemma`、`lem:Gaussian-Hermite-IBP` の模型への適用、`lem:Z-derivative-bound`、`lem:Rademacher-encoding` の接続用雛形 |
 | `Lemmas/CLTComponents.lean` | `lem:exact-second-chaos`、`prop:higher-chaos-closure`、`prop:annealed-free-energy` |
-| `Lemmas/ConvexDerivatives.lean` | `lem:convex-derivatives` の導関数部分。ソースコメントの旧原稿名・単数形ラベルは更新対象 |
+| `Lemmas/GaussianIBP.lean` | 汎用のガウス–エルミート部分積分。`lem:Gaussian-Hermite-IBP` の `Z_N` への適用は F04 と接続して検査する |
+| `Lemmas/Rademacher.lean` | `lem:Rademacher-encoding` に対応する有限符号平均と指数モーメント評価。F03/F05 への統合は未完了 |
+| `Lemmas/Tool.lean` | 行列 Duhamel・Schatten・トレース指数微分と符号ゲージ・Hermite 偶奇則の補助結果。外部 `RequestProject.*` imports の解決と重複 API の整理が必要 |
+| `Lemmas/ConvexDerivatives.lean` | `lem:convex-derivatives` の導関数収束補題。局所一様収束などを仮定し、原稿の入力を導く不足部分は F06 に残る |
 | `Lemmas/GaussianConcentration.lean` | 旧証明の `eq:centered W_N tail`・`eq:centered W_N exp` の雛形。W06 で実装も削除も要求しない |
 
 新しい有限模型の結果に TeX ラベルがない場合は、所在の節と証明を記録し、架空のラベルを作らない。Blueprint の更新細目は Chapters の計画に置く。

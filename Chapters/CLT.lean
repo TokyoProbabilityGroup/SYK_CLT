@@ -3,6 +3,7 @@ import VersoManual
 import VersoBlueprint
 import SYK.CLT.Main
 import SYK.CLT.Lemmas.ConvexDerivatives
+import SYK.CLT.GaussianIBP
 
 open Verso.Genre
 open Verso.Genre.Manual
@@ -79,13 +80,44 @@ small nonzero real $`\beta`. These are verified conditional Lean results.
 They do not imply positive variance at every finite size.
 :::
 
-:::theorem "clt_second_chaos_and_remainder" (parent := "central_limit_theorem") (uses := "clt_partition_moments, clt_conditional_annealed_limit")
+:::theorem "clt_gaussian_hermite_ibp" (parent := "central_limit_theorem") (lean := "SYK.CLT.GaussianIBP.hermiteMulti_ibp_of_expGrowth, SYK.CLT.GaussianIBP.hermiteMulti_ibp_integrable, SYK.CLT.GaussianIBP.hermiteMulti_eq_prod, SYK.CLT.GaussianIBP.partialList_perm")
+The general identity in `lem:Gaussian-Hermite-IBP` is proved for any finite
+coordinate set and independent standard Gaussian coordinates. Let
+$`\alpha` be a nonnegative integer multi-index and let
+$`f\in C^{|\alpha|}(\mathbb R^\iota;\mathbb R)`. For each
+$`\eta\le\alpha` componentwise, assume there is $`C_\eta>0` such that
+$`|\partial^\eta f(g)|\le C_\eta\exp(C_\eta\|g\|_2)` for every $`g`.
+Then both expectations below are integrable and
+
+$$`
+\mathbb E\left[\left(\prod_{i\in\iota}\operatorname{He}_{\alpha_i}(G_i)\right)
+f(G)\right]=\mathbb E[\partial^\alpha f(G)].
+`$$
+
+The Hermite polynomials have the probabilists' normalization. The proof
+uses the shared selected-coordinate Gaussian Stein identity, exponential
+integrability, and iteration of the creation operator. Polynomial factors
+and their coordinate derivatives satisfy the necessary growth bounds.
+Finite smoothness permits reordering partial derivatives, so every prefix
+of the iteration is covered by an index $`\eta\le\alpha`. No growth
+assumption on any other derivative is required. The identity and both
+integrability statements have Lean proofs without `sorryAx`, also for
+zero order and an empty coordinate set.
+
+The manuscript's final specialization to $`Z_N` remains assigned to F04:
+its smoothness and derivative growth estimates are separate unfinished
+inputs. Completeness of the Hermite expansion and chaos projections are
+also separate results.
+:::
+
+:::theorem "clt_second_chaos_and_remainder" (parent := "central_limit_theorem") (uses := "clt_partition_moments, clt_conditional_annealed_limit, clt_gaussian_hermite_ibp")
 The manuscript's `lem:exact-second-chaos` identifies the leading Gaussian
 chaos of $`Y_N-1`. Its `prop:higher-chaos-closure` bounds the remainder by
 $`\|\mathcal R_N\|_2^2=O(N^{-3a})`, where $`a=q/2-1`.
 The intended proof uses parity symmetry, Gaussian integration by parts,
 Duhamel derivatives, and Rademacher encoding of the higher-chaos sum.
-These arguments have no completed Lean declarations.
+The general integration-by-parts input is proved above; the application
+to the partition function and these chaos conclusions remain unfinished.
 :::
 
 :::theorem "partition_function_clt" (parent := "central_limit_theorem") (uses := "clt_second_chaos_and_remainder, clt_conditional_nondegeneracy") (lean := "SYK.CLT.partition_clt, SYK.CLT.partition_and_log_partition_clt")

@@ -598,7 +598,7 @@ lemma integrable_abs_coord_mul_exp_c_sum_abs_pi {ι : Type*} [Fintype ι] [Decid
 
 /-
 **Tensorized Stein identity on the product Gaussian measure.**  For a `C¹` function `h`
-on `ι → ℝ` whose value and coordinate partial derivatives grow no faster than
+on `ι → ℝ` whose value and selected coordinate derivative have exponential growth
 `C e^{c ∑ⱼ |yⱼ|}`, integration against the product of standard Gaussians satisfies
 `∫ yᵢ h y = ∫ ∂ᵢ h y`.  This is Fubini over the `i`-th coordinate combined with the
 one-dimensional Stein identity `gaussianReal_stein`.
@@ -607,7 +607,8 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
     (h : (ι → ℝ) → ℝ) (i : ι)
     (hh : ContDiff ℝ 1 h) (C c : ℝ) (hc : 0 ≤ c) (hC : 0 ≤ C)
     (hhb : ∀ y, |h y| ≤ C * Real.exp (c * ∑ j, |y j|))
-    (hdb : ∀ y j, |fderiv ℝ h y (Pi.single j 1)| ≤ C * Real.exp (c * ∑ k, |y k|)) :
+    (hdb : ∀ y,
+      |fderiv ℝ h y (Pi.single i 1)| ≤ C * Real.exp (c * ∑ k, |y k|)) :
     ∫ y, y i * h y ∂(Measure.pi fun _ : ι => gaussianReal 0 1)
       = ∫ y, fderiv ℝ h y (Pi.single i 1) ∂(Measure.pi fun _ : ι => gaussianReal 0 1) := by
   have h_integrable : MeasureTheory.Integrable (fun y : ι → ℝ => y i * h y) (Measure.pi fun _ : ι => gaussianReal 0 1) ∧ MeasureTheory.Integrable (fun y : ι → ℝ => (fderiv ℝ h y) (Pi.single i 1)) (Measure.pi fun _ : ι => gaussianReal 0 1) := by
@@ -621,7 +622,7 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
       refine' fun y => C * Real.exp ( c * ∑ j, |y j| );
       · exact MeasureTheory.Integrable.const_mul ( integrable_exp_c_sum_abs_pi c ) _;
       · fun_prop;
-      · exact Filter.Eventually.of_forall fun y => hdb y i;
+      · exact Filter.Eventually.of_forall hdb
   have h_split : ∀ y : {j // j ≠ i} → ℝ, ∫ x : ℝ, x * h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x) ∂(gaussianReal 0 1) = ∫ x : ℝ, (fderiv ℝ h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x)) (Pi.single i 1) ∂(gaussianReal 0 1) := by
     intro y
     set Yb : ι → ℝ := fun j => if h : j = i then 0 else y ⟨j,h⟩
@@ -644,7 +645,8 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
         · simp +decide [ Function.update_apply ];
         · refine' Finset.sum_bij ( fun j _ => ⟨ j, by aesop ⟩ ) _ _ _ _ <;> simp +decide [ Function.update_apply ];
           aesop;
-      exact ⟨ by simpa only [ h_sum ] using hhb ( Function.update Yb i x ), by simpa only [ h_sum ] using hdb ( Function.update Yb i x ) i ⟩;
+      exact ⟨by simpa only [h_sum] using hhb (Function.update Yb i x),
+        by simpa only [h_sum] using hdb (Function.update Yb i x)⟩
     have := @gaussianReal_stein;
     convert this ( fun x => h ( Function.update Yb i x ) ) ( fun x => ( fderiv ℝ h ( Function.update Yb i x ) ) ( Pi.single i 1 ) ) h_G _ ( C * Real.exp ( c * ∑ j, |y j| ) ) c _ _ using 1;
     · fun_prop;

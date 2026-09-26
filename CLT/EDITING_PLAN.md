@@ -217,6 +217,20 @@ W06 の完了は、上記の有限模型の成果・原稿との対応・[Chapte
 
 F01 は共有ガウス基盤への流用・高階と多変数の部分積分・エルミート展開と射影を、個別に検証できる補題群として渡す。共有部分の編集と検証の細目は [ガウス基盤の F01](../Probability/GaussianConcentration/EDITING_PLAN.md#f01)に集約する。CLT 側では `lem:Gaussian-Hermite-IBP` を `Z_N` に適用し、F04 の正則性・成長評価との接続を確認する。この適用の待ち合わせは、汎用部分積分の完成を妨げる前提にしない。
 
+2026-09-26 の局所確認：`GaussianIBP/GIBPMultiIndex.lean` で creation 作用素から `Polynomial.hermite` の有限積への一致と、明示的な `IBPFamily` を仮定した反復部分積分は Lean 検査済み。`GaussianIBPstandard` と `GaussianIBPHilbert` の import と個別ビルドも成功した。両ファイルの部分積分は多項式増大を仮定するため、指数増大は既存の共有 `StandardGaussian.lean` の定理を利用する。`Setting.Z` の任意階の正則性・指数増大は F04 の未証明入力であり、`Z_N` への特殊化と原稿の `lem:Gaussian-Hermite-IBP` 全体は未検証のまま。定理文を強い増大仮定に置き換えて完了扱いにしない。
+
+同日の追加検査：共有 `pi_gaussian_stein_coord` の増大仮定を選択座標 `i` の導関数だけに弱め、`Smooth.lean` の利用箇所を更新して両モジュールをビルドした。`GIBPMultiIndex.lean` では原稿のユークリッドノルムによる指数増大からこの一座標定理への変換を Lean で検査した。これは原稿の `η ≤ α` 以外の増大評価を使わない一次の入力であり、全多重指数への反復・`Z_N` の評価完了を意味しない。原稿との照合では、エルミート規格化と有限積は一致し、旧抽象多重指数定理には `IBPFamily` という未構成の仮定が残る。
+
+続く局所検査では、指数増大の一座標 Stein 公式から creation 作用素の部分積分を導き、その可積分性を有限積ガウス上の指数可積分性で証明した。`ExpIBPChain` を使う多重指数定理は、必要な座標列に沿う積の増大評価だけを要求し、正則性は単一の `ContDiff ℝ |α| f` から導く。旧 `IBPFamily` より原稿に近いが、原稿の各 `η ≤ α` の偏導関数評価から `ExpIBPChain` の積評価を導く補題、異なる偏導順序の一致、および `Z_N` の入力は未証明である。従って原稿と完全に同じ定理文は未完成。
+
+追加の Lean 検査では、整数係数多項式の評価の指数増大から、各 `Polynomial.hermite` 因子、有限積、および `hermiteMulti α` 自身のユークリッドノルムによる指数増大を証明した。偏導関数との積の評価には、反復中の残りのエルミート因子とその座標導関数に対する同種の評価、および原稿の `η ≤ α` と導関数列との対応がなお必要であった。
+
+2026-09-26、明示的な `GIBPMultiIndex.lean` 完成依頼により、上記の一般部分の残件を解消した。作業開始時の HEAD は `f133a26ab1e116b8f8b581252de9a47089c81294`、同ファイルと二つの GaussianIBP 依存ファイルは未追跡、共有ガウス基盤などには既存差分があった。それらを保持して一般定理と必要な補助証明を追加した。`coordDeriv_comm`・`partialList_perm` は有限階の正則性だけで偏導順序の一致を証明する。各接頭辞の出現回数が `α` 以下であることと `partialList_eq_partialMulti` を用い、原稿の成長仮定から `ExpIBPChain` を導いた。残りの Hermite 関数とその座標導関数は、多項式関数の四則のうち定数・座標・差・積と微分への閉性を使って指数評価する。
+
+公開定理 `hermiteMulti_ibp_of_expGrowth` の仮定は `ContDiff ℝ (∑ i, α i) f` と、各 `η ≤ α` に対する正の `C_η` による原稿と同じユークリッドノルムの評価のみ。`IBPFamily`・`ExpIBPChain`・追加の成長仮定・無限階正則性は要求しない。`hermiteMulti_ibp_integrable` は同じ仮定で両辺の可積分性を証明し、`α = 0` と空の有限添字型も除外していない。原稿の `lem:Gaussian-Hermite-IBP`・`eq:Gaussian-Hermite-IBP` と、標準独立ガウス測度・probabilists' Hermite 規格化・偏導関数・量化範囲を照合した。ユーザーの回答に従い、`Z_N` への適用は F04 に残す。
+
+検証：親ワークスペースで `lake -f lakefile.toml env lean SYK/CLT/GaussianIBP/GIBPMultiIndex.lean` と `lake -f lakefile.toml --no-cache build SYK.CLT.GaussianIBP.GIBPMultiIndex` が成功（3144 jobs）。通常の Lake 入口は既存の `lakefile.lean` を優先し、VersoBlueprint の Git ownership 検査で失敗したため、既存 TOML を明示した。設定・依存バージョン・Git 設定は変更していない。対象ファイルには型クラス仮定についての linter warning、依存先には既存のスタイル・非推奨 API の warning が残る。上記二つの公開定理、`coordDeriv_comm`、`partialList_perm`、`partialList_eq_partialMulti`、`hermiteMulti_eq_prod` の `#print axioms` はすべて `propext`・`Classical.choice`・`Quot.sound` のみで `sorryAx` なし。対象ファイルに `sorry`・`admit`・`axiom` はない。全 CLT の完成や F01 全体の完成を意味しない。Blueprint はソース上の対応を更新し、Verso の章検査・生成・参照検査は休止規則に従い実施していない。
+
 F03 の符号化と指数モーメント、F04 の Duhamel 公式と行列評価も独立した補題群として渡す。F02 は偶奇則から一次・二次カオスの厳密な同定へ進める。F05 は評価補題を先に検証し、無限和・漸近を含む `prop:higher-chaos-closure` を後で統合する。F06 は既存の `ConvexDerivatives` と条件付き漸近を再利用して外部仮定と既存補題を接続し、その後に相対・標準化 CLT を統合する。F07 は対数の確率的誤差と中心化誤差を先に扱い、最後に `cor:free-energy-clt` へ統合する。各段階で先行成果や仕様が不足すれば残部を前倒しせず「前提待ち」、人間の判断が必要なら根拠を示して「判断待ち」とする。
 
 既存の `Preliminaries.lean` は F01・F03・F04 などの雛形を、`CLTComponents.lean` は F02・F05・F06 などの雛形を同居させている。補題群が別でも、同じ共有作業ツリー上で同時編集しない。独立した作業領域で同じファイルに変更を作る場合は、補題と入力 API の担当範囲を先に固定し、統合担当が差分を直列に取り込んで再検査する。共有 Model の変更では Model の作業規則と検証も適用する。Lean 実装担当は TeX 本文・外部入力の採用方針・Blueprint の証明状態を先回りして変更しない。
@@ -224,6 +238,10 @@ F03 の符号化と指数モーメント、F04 の Duhamel 公式と行列評価
 並列実行の候補と条件は全体計画で管理する。F08 と F06 でアニール入力を共有する場合も、同じ入力を重複定義せず、正確な所属と依存関係を実装前に記録する。F04 の共有行列解析などを他のディレクトリに置く場合は、その編集細目を配置先の計画書へ記し、同じ ID で参照する。
 
 `N` に依存して変わる確率空間上の分布収束と、概収束に必要な共通確率空間を定理文ごとに区別する。外部入力を仮定として受け取る定理については、Lean が検証した条件付きの結論と、入力自体の証明状態を別に報告する。
+
+2026-09-26 のファイル整理：`GaussianIBP/GaussianIBPstandard.lean`、`GaussianIBP/GaussianIBPHilbert.lean`、`GaussianIBP/GIBPMultiIndex.lean` を宣言と証明の順序を保って `GaussianIBP.lean` に統合した。`Chapters/CLT.lean` の import も新モジュールへ変更した。親ワークスペースで統合ファイルの `lake -f lakefile.toml env lean SYK/CLT/GaussianIBP.lean` と `lake -f lakefile.toml build SYK.CLT.GaussianIBP` が成功した。主要な四宣言の公理依存は `propext`・`Classical.choice`・`Quot.sound` のみ。`lake -f lakefile.toml build CLT` は対象外の未追跡 `CLT/Lemmas/Tool.lean` が `RequestProject` を import しているため失敗した。上の個別ファイル名と検証結果は統合前の履歴として残す。Verso の章検査は休止中のため実施していない。
+
+2026-09-26 の補助ファイル確認：`Lemmas/GaussianIBP.lean` は一般ガウス–エルミート部分積分、`Lemmas/Rademacher.lean` は有限符号平均と `rademacher_encoding`、`Lemmas/Tool.lean` は行列解析・トレース指数微分・符号ゲージと Hermite 偶奇則を含む。`Lemmas/ConvexDerivatives.lean` は既存の `convex_convergence_deriv_tendstoUniformlyOn` を持ち、局所一様収束などを仮定する。これらは補題候補の所在を明確にするもので、F01/F03/F04/F06 の完了や Main の証明状態変更を意味しない。`Tool.lean` の `RequestProject.*` imports はこのソースツリー内で解決を確認できず、CLT への統合・ビルドは未確認。個別診断では Rademacher と ConvexDerivatives にエラーなし、GaussianIBP には現行 Mathlib の非推奨 import/API 診断、Tool には import 更新要求があった。Lake によるこの4ファイルの個別検査・関連ビルドと公理依存確認は未実施。
 
 ### モジュールと対応の確認
 

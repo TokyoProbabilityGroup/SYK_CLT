@@ -25,6 +25,8 @@ F01–F08・Z01 の後続課題では、主要宣言が実装・統合・検証�
 
 ## 検証と記録
 
+2026-09-26：`CLT.lean` に `clt_gaussian_hermite_ibp` を追加し、`lem:Gaussian-Hermite-IBP` の一般部分を検証済みの `hermiteMulti_ibp_of_expGrowth` と両辺の可積分性へ対応付けた。有限階正則性、`η ≤ α` だけの指数増大、ユークリッドノルム、Hermite の規格化、偏導順序の一致、証明の入力を記した。二次カオスの計画ノードにはこの依存を追加し、`Z_N` への特殊化・完全性・射影は未完了と区別した。Lean の個別検査・関連ビルド・公理依存の確認後に更新し、宣言名・主張・依存先をソース照合した。検証コマンドと対象は [CLT の詳細](../CLT/EDITING_PLAN.md#formalization) に記録する。Verso による章検査・生成・参照検査は実施していない。
+
 Verso 休止中は、変更した章の数学的主張・Lean 宣言名・依存名をソース上で照合する。Verso を必要とする `lake env lean`、生成入口の実行、`vbp check` は復帰後に休止中の変更を含めてまとめて行う。章を並行して編集しても、統合検証の担当は一人とする。以下の過去の検証記録にある旧コマンドと出力先は当時のものであり、現在の手順とは区別する。
 
 2026-09-25：現行の親原稿が読み込む CLT の有効な節と `Annealed_FE/refs/SYK-HT-arxiv.tex`、対応する Lean ソースを照合した。`lake env lean --stdin` で新しい両章の `lean :=` が指す宣言をすべて解決した。全章の 50 ノード・121 件の親子・利用・参照関係に ID 重複、参照切れ、依存循環は検出されなかった。`#print axioms` により CLT の有限模型・条件付きアニール補題と凸性補題は通常公理のみ、`Setting.partition_moments` と最終 CLT は `sorryAx` を含むことを確認した。Annealed_FE の Rademacher 模型の `paperHamiltonian` と主たる極限定理は `sorryAx` を含む。Verso が休止中のため、章自体の Lean 検査と HTML・参照検査は行っていない。

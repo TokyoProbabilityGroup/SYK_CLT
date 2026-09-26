@@ -9,6 +9,8 @@ This directory contains the manuscript and Lean formalization work for the centr
 - `refs/CLT_SYK.pdf`: compiled manuscript snapshot.
 - `ARCHITECTURE.md`: internal proof-dependency and status documentation.
 - `EDITING_PLAN.md`: internal manuscript-audit and formalization plan.
+- `Lemmas/GaussianIBP.lean`, `Lemmas/Rademacher.lean`, and `Lemmas/Tool.lean`: reusable Gaussian, Rademacher-chaos, and matrix-analysis results related to the CLT proof.
+- `Lemmas/ConvexDerivatives.lean`: a convex-convergence theorem for derivatives, used as an input to the annealed-limit argument.
 - `AGENTS.md`: topic-specific instructions for Codex.
 
 The internal planning documents are written in Japanese for collaboration between the researcher and Codex. Public mathematical artifacts, including this README, the manuscript, and future Lean source files, are written in English.
@@ -39,7 +41,7 @@ latexmk -pdf introduction.tex
 
 Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-references and citations whose definitions lie in other subfiles remain unresolved in a standalone build; the complete manuscript build resolves them.
 
-The Lean module skeleton is present. After modifying a Lean file, check it from the shared workspace root:
+The supporting lemma files are present, but their presence does not mean the CLT proof is complete or that every helper is integrated into `Main.lean`. `Tool.lean` imports `RequestProject.*` modules whose sources are not present in this repository, and the current `GaussianIBP.lean` diagnostics include deprecated Mathlib names. See `EDITING_PLAN.md` for the exact integration and verification status. After modifying a Lean file, check it from the shared workspace root:
 
 ```bash
 lake env lean SYK/CLT/path/to/File.lean

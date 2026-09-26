@@ -43,6 +43,8 @@ W02 の完了状態は維持する。CLT 原稿の `lem:Gaussian-Hermite-IBP` �
 
 2026-09-08 の文書再構成ではソースの配置と旧計画を照合しただけであり、この基盤の実装や Lean の再検証は行っていない。
 
+2026-09-26：`pi_gaussian_stein_coord` の指数増大仮定を選択座標の偏導関数だけに弱めた。`StandardGaussian.lean` の個別 Lean 検査と、利用側 `Smooth.lean` のビルドに成功した。`CLT/GaussianIBP/GIBPMultiIndex.lean` ではユークリッドノルムの指数増大からこの補題への変換を検査した。`#print axioms` は共有の座標定理と CLT 側の変換定理について `[propext, Classical.choice, Quot.sound]` のみ。`lake build SYK` も成功したが、既存の `CLT/Main.lean` の `sorry` は残る。高階反復と `Z_N` への適用は未完了であり、F01 全体は未完了のまま。
+
 ### 2026-09-11：検証環境の判断待ち
 
 対象は `e38b47ab56bc0d0aa7449452a8377ee67838a644`。着手時の作業ツリーは変更なし。関連する規約、W02 の各詳細計画、旧4ファイルの宣言と参照を調査した。既存の正の `L` の証明を任意の有限型のまま移設し、零の場合を追加する方針である。実装変更・ファイル移設・Lean の証明検査はまだ行っていない。
