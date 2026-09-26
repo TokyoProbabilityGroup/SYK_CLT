@@ -2,7 +2,7 @@
 
 完了済み作業の検証結果と旧計画を保存する。現行の状態・着手条件・担当票は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
 
-関係する節： [CLT の W06・統合監査](#clt-w06)、[ガウス部分積分](#clt-f01-gaussian)、[Tool](#clt-tool)、[主結果の定理文](#clt-main-statements)、[Model の W01–W04](#model-w01)、[旧段階](#model-legacy)、[ワークスペースの移設](#workspace-migration)。
+関係する節： [CLT の W06・統合監査](#clt-w06)、[ガウス部分積分](#clt-f01-gaussian)、[W06 後の F01](#clt-f01-after-w06)、[F01 取り込み検証](#merge-f01-2026-09-27)、[Tool](#clt-tool)、[主結果の定理文](#clt-main-statements)、[Model の W01–W04](#model-w01)、[旧段階](#model-legacy)、[ワークスペースの移設](#workspace-migration)。
 
 <a id="clt-docs"></a>
 
@@ -796,3 +796,45 @@ W01 は2026-09-08、W02 は2026-09-12、W03・W04・W05 は2026-09-18に完了�
 `84bfde3` の統合監査では、`CliffordSignParity` と Main の同時 import が分配関数の宣言名衝突で失敗した。F02 への接続前にこの障害を解消する。再現方法と規格化の差は [統合監査の記録](#clt-w06)、現在の残件は [CLT の計画](CLT/EDITING_PLAN.md#integration-audit-2026-09-26) に置く。
 
 設定・運用文書の追加照合は [作業履歴](WORK_HISTORY.md#docs-audit-2026-09-26) に保存した。
+
+<a id="clt-f01-after-w06"></a>
+
+## W06 後に先行した F01 の部分成果
+
+出典：`main` の `CLT/EDITING_PLAN.md`。統合時点の現行状態と残件は [F01 の担当票](CLT/EDITING_PLAN.md#ticket-f01-h)を参照する。以下は当時の検証記録である。
+
+### F01 の今回の作業票と部分検証（2026-09-26）
+
+原稿の有効な `eq: chaos` は有限添字集合 $\mathcal I_N$ 上の独立な分散1のガウス測度で、$H_\alpha(g)=\prod_I \mathrm{He}_{\alpha_I}(g_I)$、$\alpha!=\prod_I\alpha_I!$ とする。正確な未形式化の主張は $\int H_\alpha H_\eta\,d\gamma=\alpha!\mathbf1_{\alpha=\eta}$、この族の実 $L^2(\gamma)$ における完全性、各次数 $r$ の有限次元空間への直交射影公式、および次数の部分和が $L^2$ で元の関数へ収束することである。W06 の `Setting.Z` は実値で二乗可積分である。原稿の級数の等号はこの $L^2$ の意味として実装する必要がある。`CliffordSignParity.lean` の符号対称性側は複素値の `partitionFunction` を使うため、その F02 への適用と区別する。
+
+既存の `GaussianIBP.lean` は原稿の `lem:Gaussian-Hermite-IBP` の一般部分を証明済みであり、`CliffordSignParity.lean` は同じ probabilists' Hermite 多項式と積ガウス測度を別定義で使用する。今回の `Lemmas/GaussianChaos.lean` は二つの定義の一致を証明し、既存の部分積分・可積分性を符号対称性側の記法へ移した。さらに正次数の Hermite 関数の平均零と、二つの Hermite 関数の積の可積分性を証明した。`GaussianIBP.lean` には多項式の微分と指数増大への閉性を用いた `hermiteMulti_pair_ibp` を追加し、二つの Hermite 関数の積の期待値を多重偏導関数の期待値へ移した。新しい仮定、`sorry`、公理、TeX 本文の変更はない。着手前の作業ツリーには `Lemmas/Tool.lean` の差分があり、これは変更していない。
+
+この段階で残る主要な証明入力は Hermite 関数同士の直交性と正確なノルム、Hermite 多項式の線形包がガウス $L^2$ に稠密であること、およびその上の射影と次数和の収束であった。直交性・ノルム・有限射影は下記の追加作業で証明した。現行 mathlib とローカル SpinGlass に完成済みのガウス Hermite $L^2$ 基底定理は見つからず、既存の部分積分と符号偶奇則だけから完全性は従わない。R03 の該当する原稿監査と、上記 $L^2$ の型・複素係数との接続を確定してから、残る不足を新しい証明で埋める。F01 全体は未完了のままである。
+
+親ワークスペースの Lean 4.32.2 で変更した二つの Lean ファイルの `lake -f lakefile.toml env lean` が成功した。最初の `lake -f lakefile.toml build CLT` は3180 jobsで成功した。`hermiteMulti_pair_ibp` の追加後、通常のビルドは親 `.lake` 内に存在する上流 `.olean` を構築中に一時的に開けず二度失敗したため、既存の依存成果物を用いる `lake -f lakefile.toml --old build CLT` を再実行し、3179 jobsで成功した。新しい `GaussianChaos.lean` に警告はない。既存の GaussianIBP・共有ガウス基盤の linter・非推奨警告と、対象外の Main・Annealed_FE の `sorry` 警告は残る。今回追加した七つの公開宣言の `#print axioms` はすべて `propext`・`Classical.choice`・`Quot.sound` のみ。章の本文・宣言参照はソース照合し、Verso の章 Lean 検査・生成・参照検査は休止規則により行っていない。親の `.lake` へのビルド書き込みには自動審査で許可された権限昇格を使用した。
+
+同日の追加作業：`Lemmas/GaussianHermiteOrthogonality.lean` で一次元の Hermite 対積分を高階部分積分と多項式の導関数から導き、有限積ガウスの積分公式により $\int H_\alpha H_\eta\,d\gamma=\alpha!\mathbf1_{\alpha=\eta}$ を証明した。実 $L^2$ の `hermiteLp`、有限係数和、有限添字集合の張る部分空間を定義し、係数和と直交射影が一致することを証明した。各次数の多重指数集合が有限であることも証明し、`hermiteDegreeProjection` を定義した。空の座標型と次数0も除外していない。原稿の `eq: chaos` と内積・階乗・標準ガウスの規格化を照合した。$L^2$ 完全性と次数に沿う無限和の収束は未証明である。現行 mathlib にガウス Hermite 基底の完成済み定理が見つからないため、有限射影だけから無限和の等号を導いていない。R03 の全体監査、共有 F01 の SpinGlass との詳細照合、F04 の `Z_N` への部分積分適用も未完了であり、F01 全体は未完了。
+
+検証：親ワークスペースの Lean 4.32.2 で `lake -f lakefile.toml env lean SYK/CLT/Lemmas/GaussianHermiteOrthogonality.lean` と `lake -f lakefile.toml --old build SYK.CLT.Lemmas.GaussianHermiteOrthogonality` が成功（3152 jobs）。`#print axioms` で `hermite_pair_integral_real`、`hermiteMulti_orthogonality`、`inner_hermiteLp`、`hermiteFiniteProjection_eq_starProjection`、`mem_multiIndices_degree` はすべて `propext`・`Classical.choice`・`Quot.sound` のみ。新規ファイルに `sorry`・`admit`・`axiom` はない。新規モジュールのビルド成果物を書き込むため、親 `.lake` への権限昇格を自動審査で許可された。Blueprint は本文と宣言名をソース上で照合し、Verso の章 Lean 検査・生成・参照検査は休止規則により行っていない。
+
+継続作業：`hermiteOrthonormal_orthonormal` で階乗ノルムから正規直交族を作り、`multiIndexDegreeEquiv` と各次数の有限和によって、$L^2$ 稠密性を一つの明示的仮定として受ける `hasSum_hermiteCoefficients`・`hasSum_hermiteDegreeProjection` を証明した。従って `eq: chaos` の無限和の収束に必要な残件は、`(Submodule.span ℝ (Set.range hermiteOrthonormal)).topologicalClosure = ⊤` という無仮定の稠密性定理である。条件付きの `HasSum` をこの稠密性の証明として扱わない。親ワークスペースで同ファイルの個別 Lean 検査と `lake -f lakefile.toml --old build SYK.CLT.Lemmas.GaussianHermiteOrthogonality`（3154 jobs）が成功した。新しい三宣言の `#print axioms` は `propext`・`Classical.choice`・`Quot.sound` のみ。Verso の章検査・生成・参照検査は休止規則により未実施。
+
+続く稠密性の準備：`Lemmas/GaussianHermiteDensity.lean` に実係数の Hermite 多項式列を `Polynomial.Sequence` として構成し、その基底定理から任意の一変数実多項式関数が Hermite 関数の有限線形包に属することを証明した。さらに座標ごとの線形性と有限集合上の帰納法を用い、有限個の一変数多項式関数の積が多変数 Hermite 関数の有限線形包に属することを証明した。多変数単項式に関する帰納法で任意の実係数多変数多項式関数にも拡張した。ガウス $L^2$ における多項式の稠密性はまだ証明していない。新ファイルの `lake -f lakefile.toml env lean` と `lake -f lakefile.toml --old build SYK.CLT.Lemmas.GaussianHermiteDensity` が成功（最終 3158 jobs）。積および多変数多項式の線形包定理の `#print axioms` はともに `propext`・`Classical.choice`・`Quot.sound` のみ。新ファイルに `sorry`・`admit`・`axiom` はない。`Chapters/CLT.lean` に代数的な線形包と未証明の解析的稠密性を区別したノードを追加し、宣言名はソース上で照合した。Verso の章検査・生成・参照検査は休止中のため実施していない。F01 の無仮定の $L^2$ 完全性と次数和は引き続き未証明。
+
+次の橋渡し：Hermite 関数の有限線形包を $L^2$ に送ると、対応する `hermiteLp` の有限線形包に入ることを証明した。この結果から多変数多項式関数の $L^2$ 可積分性とその `mvPolynomialLp` クラスの包含を得た。さらに多項式クラスの線形包がガウス $L^2$ に稠密なら、規格化 Hermite 族の線形包も稠密であることを `hermiteOrthonormal_dense_of_mvPolynomialLp_dense` で証明した。これにより残る解析的入力を多項式クラスの $L^2$ 稠密性として明示した。親ワークスペースで新ファイルの個別 Lean 検査と `lake -f lakefile.toml --old build SYK.CLT.Lemmas.GaussianHermiteDensity`（3158 jobs）が成功し、四つの新しい公開定理の公理依存は `propext`・`Classical.choice`・`Quot.sound` のみ。多項式クラスの稠密性自体は未証明で、F01 は未完了。
+
+解析的稠密性への継続作業：`Lemmas/GaussianMomentDetermination.lean` で、全実パラメータの指数可積分性と全次数のモーメント一致を仮定した有限実測度の一意性を証明した。実 MGF の局所 Taylor 級数と解析関数の一致定理から MGF を一致させ、複素 MGF と特性関数の一意性を用いる。`Lemmas/GaussianPolynomialDensity.lean` では標準ガウスに関する実指数関数の $L^2$ 可積分性と、任意の $f\in L^2$ との積の可積分性を証明した。これらは直交補空間から重み付き測度を作るための入力であり、多項式の $L^2$ 稠密性をまだ証明しない。親ワークスペースで両ファイルの個別 Lean 検査と `lake -f lakefile.toml --old build SYK.CLT.Lemmas.GaussianPolynomialDensity`（3160 jobs）が成功した。四宣言の `#print axioms` はすべて `propext`・`Classical.choice`・`Quot.sound` のみ。両ファイルに `sorry`・`admit`・`axiom` はない。次は $L^2$ の直交条件から正負の重み付き有限測度のモーメント一致を導き、測度一意性を多座標へ移す必要がある。
+
+<a id="merge-f01-2026-09-27"></a>
+
+## F01 先行作業の取り込み検証（2026-09-27）
+
+`kamijima` の `8e8a5f05` を起点とする統合用ブランチへ、W06 の完了時点から分岐した `main` の `63811d8` を取り込んだ。文書4ファイルの競合を解消し、F01 の検証経緯を上の節へ移した。Lean・TeX はまず Git の自動マージで取り込み、後述の接続修正と TeX の行末空白の整理を行った。`Main.lean` の差は改行形式と空行のみだったため、統合差分では元の内容を保持した。`Tool.lean` には説明文と局所的な `simp` 引数の変更がある。原稿 `higher-chaoses.tex` ではラデマッハ半径の表記が `\beta_{\rm Rad}` から `\beta_{\rm r}` に変わったため、現行の R02 作業票もその表記へ合わせた。
+
+統合後の `lake build CLT` は3188 jobs、既定の `lake build` は3262 jobsで成功した。後者は設定上、`Annealed_FE` と `Universality` の個別ビルドを意味しない。F01 の代表的な9宣言（`hermiteMulti_pair_ibp`、`hermite_coefficient_ibp`、`hermiteMulti_orthogonality`、`hermiteFiniteProjection_eq_starProjection`、`hasSum_hermiteDegreeProjection`、`hermiteOrthonormal_dense_of_mvPolynomialLp_dense`、`measure_eq_of_moments`、`gaussianExp_memLp_two`、`gaussianLp_integrable_mul_exp`）の `#print axioms` はいずれも `[propext, Classical.choice, Quot.sound]` のみだった。既存の `Main.lean` の共同 CLT と `Annealed_FE` の `sorry`、既存の linter・非推奨警告は残る。
+
+最初の同時 import 検査は、`CliffordSignParity.lean` と共有 Model の `SYK.partitionFunction.eq_1` の衝突で失敗した。この段階では個別ビルド成功だけでは障害を検出できなかった。F01 の無条件の $L^2$ 完全性と無限次数和、R03 の原稿監査、共有配置も未完了である。
+
+その後、`CliffordSignParity.lean` の重複した分配関数定義を除き、符号ゲージ不変性と偶奇則の定理で共有 `SYK.partitionFunction` を直接使うようにした。前後の式は定義上同じ通常トレースの指数であり、定理の仮定・量化順序・数学的結論は変えていない。変更ファイルの `lake env lean`、`lake build CLT`、`Main.lean` と `GaussianChaos.lean` の同時 import は成功した。二定理の `#print axioms` は `[propext, Classical.choice, Quot.sound]` のみで、既存の共同 CLT は `sorryAx` に依存する。符号結果と `Setting.Z` の規格化・スケール・実部・測度の対応は [F02 統合](CLT/EDITING_PLAN.md#ticket-integration) に残る。
+
+最終の既定 `lake build` は3262 jobsで成功した。新しい F01 ノードを含む `Chapters/CLT.lean` の宣言参照をソースと照合し、実在しない `hermiteDegreeProjection_eq_starProjection` の参照を除いた。Verso を除く同章の import と59件の宣言参照は Lean で検査済みである。Verso の章検査・生成・参照検査は休止中のため実行していない。原稿 `CLT_SYK.tex` は一時領域への `latexmk -pdf` で17ページの PDF を生成し、警告・未解決参照なしで成功した。

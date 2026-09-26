@@ -1,4 +1,5 @@
 import SYK.Model.Majorana
+import SYK.Model.FiniteDimensionalGibbs
 import Mathlib.Analysis.CStarAlgebra.Matrix
 import Mathlib.Analysis.InnerProductSpace.SingularValues
 import Mathlib.Analysis.InnerProductSpace.Trace
@@ -125,14 +126,6 @@ end MajoranaSystem
 def signCharacter {N q : ℕ} (s : Fin N → ℝ) (I : InteractionIndex N q) : ℝ :=
   ∏ x ∈ I.1, s x
 
-/-- The SYK partition function `Z_N(β; J) = tr exp(-β H_N(J))`, for Majorana generators
-realised as `n × n` complex matrices. (Any normalisation `σ_N` of the Hamiltonian can be
-absorbed into `β`.) -/
-noncomputable def partitionFunction {n : Type*} [Fintype n] [DecidableEq n]
-    (P : Params) (M : MajoranaSystem P.N (Matrix n n ℂ)) (β : ℝ)
-    (J : InteractionIndex P.N P.q → ℝ) : ℂ :=
-  (NormedSpace.exp (-(β : ℂ) • hamiltonian P M J)).trace
-
 /-- Conjugation of the Hamiltonian by a gauge element. -/
 theorem hamiltonian_gauge {A : Type*} [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
     (P : Params) (hN : Even P.N) (M : MajoranaSystem P.N A) (J : InteractionIndex P.N P.q → ℝ)
@@ -162,12 +155,14 @@ theorem hamiltonian_gauge {A : Type*} [Ring A] [StarRing A] [Algebra ℂ A] [Sta
 theorem partitionFunction_sign_gauge {n : Type*} [Fintype n] [DecidableEq n]
     (P : Params) (hN : Even P.N) (M : MajoranaSystem P.N (Matrix n n ℂ)) (β : ℝ)
     (J : InteractionIndex P.N P.q → ℝ) (s : Fin P.N → ℝ) (hs : ∀ x, s x = 1 ∨ s x = -1) :
-    partitionFunction P M β J =
-      partitionFunction P M β (fun I => signCharacter s I * J I) := by
+    SYK.partitionFunction (β : ℂ) (hamiltonian P M J) =
+      SYK.partitionFunction (β : ℂ)
+        (hamiltonian P M (fun I => signCharacter s I * J I)) := by
   obtain ⟨U, V, hUV, hVU, hH⟩ := hamiltonian_gauge P hN M J s hs
   have hunit : IsUnit U := ⟨⟨U, V, hUV, hVU⟩, rfl⟩
   have hinv : U⁻¹ = V := Matrix.inv_eq_right_inv hUV
-  rw [partitionFunction, partitionFunction, hH]
+  simp only [SYK.partitionFunction, gibbsOperator]
+  rw [hH]
   have : -(β : ℂ) • (U * hamiltonian P M J * V) = U * (-(β : ℂ) • hamiltonian P M J) * U⁻¹ := by
     rw [hinv, Matrix.mul_smul, Matrix.smul_mul]
   rw [this, Matrix.exp_conj _ _ hunit, hinv, Matrix.trace_mul_comm, ← mul_assoc, hVU, one_mul]
@@ -247,7 +242,7 @@ for i.i.d. standard Gaussian couplings `G`. -/
 theorem expectation_partitionFunction_mul_hermite_eq_zero {n : Type*} [Fintype n]
     [DecidableEq n] (P : Params) (hN : Even P.N) (M : MajoranaSystem P.N (Matrix n n ℂ))
     (β : ℝ) (α : InteractionIndex P.N P.q → ℕ) (hα : IsOddMultiIndex α) :
-    ∫ g, partitionFunction P M β g * (hermiteMulti α g : ℂ)
+    ∫ g, SYK.partitionFunction (β : ℂ) (hamiltonian P M g) * (hermiteMulti α g : ℂ)
       ∂gaussianCouplings (InteractionIndex P.N P.q) = 0 := by
   classical
   have hex : ∃ x : Fin P.N, Odd (∑ I with x ∈ I.1, α I) := by
@@ -264,7 +259,8 @@ theorem expectation_partitionFunction_mul_hermite_eq_zero {n : Type*} [Fintype n
   have hsc : ∀ I, signCharacter s I = c I := fun I => by
     simp only [signCharacter, hs_def, hc_def]
     rw [Finset.prod_ite_eq']
-  have hZ : ∀ g, partitionFunction P M β (fun I => c I * g I) = partitionFunction P M β g :=
+  have hZ : ∀ g, SYK.partitionFunction (β : ℂ) (hamiltonian P M (fun I => c I * g I)) =
+      SYK.partitionFunction (β : ℂ) (hamiltonian P M g) :=
     fun g => by
       rw [partitionFunction_sign_gauge P hN M β g s hs]
       simp only [hsc]
@@ -279,7 +275,8 @@ theorem expectation_partitionFunction_mul_hermite_eq_zero {n : Type*} [Fintype n
       rw [Finset.prod_pow_eq_pow_sum, ← Finset.sum_filter, hx.neg_one_pow]
     rw [this, neg_one_mul]
   have key := integral_gaussianCouplings_sign c hc
-    (fun g => partitionFunction P M β g * (hermiteMulti α g : ℂ))
+    (fun g => SYK.partitionFunction (β : ℂ) (hamiltonian P M g) *
+      (hermiteMulti α g : ℂ))
   simp only [hZ, hH, Complex.ofReal_neg, mul_neg, integral_neg] at key
   linear_combination -key / 2
 end SYK

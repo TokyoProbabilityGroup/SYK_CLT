@@ -4,6 +4,10 @@ import VersoBlueprint
 import SYK.CLT.Main
 import SYK.CLT.Lemmas.ConvexDerivatives
 import SYK.CLT.Lemmas.GaussianIBP
+import SYK.CLT.Lemmas.GaussianChaos
+import SYK.CLT.Lemmas.GaussianHermiteOrthogonality
+import SYK.CLT.Lemmas.GaussianHermiteDensity
+import SYK.CLT.Lemmas.GaussianPolynomialDensity
 
 open Verso.Genre
 open Verso.Genre.Manual
@@ -87,7 +91,7 @@ small nonzero real $`\beta`. These are verified conditional Lean results.
 They do not imply positive variance at every finite size.
 :::
 
-:::theorem "clt_gaussian_hermite_ibp" (parent := "central_limit_theorem") (lean := "SYK.CLT.GaussianIBP.hermiteMulti_ibp_of_expGrowth, SYK.CLT.GaussianIBP.hermiteMulti_ibp_integrable, SYK.CLT.GaussianIBP.hermiteMulti_eq_prod, SYK.CLT.GaussianIBP.partialList_perm")
+:::theorem "clt_gaussian_hermite_ibp" (parent := "central_limit_theorem") (lean := "SYK.CLT.GaussianIBP.hermiteMulti_ibp_of_expGrowth, SYK.CLT.GaussianIBP.hermiteMulti_ibp_integrable, SYK.CLT.GaussianIBP.hermiteMulti_pair_ibp, SYK.CLT.GaussianIBP.hermiteMulti_eq_prod, SYK.CLT.GaussianIBP.partialList_perm, SYK.CLT.hermite_coefficient_ibp, SYK.CLT.integral_hermiteMulti_eq_zero")
 The general identity in `lem:Gaussian-Hermite-IBP` is proved for any finite
 coordinate set and independent standard Gaussian coordinates. Let
 $`\alpha` be a nonnegative integer multi-index and let
@@ -111,10 +115,65 @@ assumption on any other derivative is required. The identity and both
 integrability statements have Lean proofs without `sorryAx`, also for
 zero order and an empty coordinate set.
 
+The checked bridge to the sign-parity module identifies its Hermite
+normalization and Gaussian measure with those above. It also proves that
+Hermite functions of positive total degree have mean zero and that
+pairwise Hermite products are integrable. The orthogonality and finite
+projection results in `eq: chaos` are recorded in the next node.
+Integration by parts for a pair of Hermite functions is also checked;
+polynomial closure supplies its growth hypotheses.
+
 The manuscript's final specialization to $`Z_N` remains assigned to F04:
 its smoothness and derivative growth estimates are separate unfinished
-inputs. Completeness of the Hermite expansion and chaos projections are
-also separate results.
+inputs.
+:::
+
+:::theorem "clt_hermite_polynomial_span" (parent := "central_limit_theorem") (lean := "SYK.CLT.realHermiteBasis, SYK.CLT.polynomialProdEval_mem_hermiteMulti_span, SYK.CLT.mvPolynomial_eval_mem_hermiteMulti_span, SYK.CLT.mvPolynomial_eval_memLp_and_hermiteSpan, SYK.CLT.hermiteOrthonormal_dense_of_mvPolynomialLp_dense")
+For a finite coordinate set, every real multivariate polynomial function is
+a finite real linear combination of products of probabilists' Hermite
+polynomials. Lean proves this first for a product of one-variable
+polynomials, then for arbitrary multivariate polynomials by induction on
+monomials. The polynomial functions define Gaussian $`L^2` classes in the
+span of the Hermite classes. Lean also proves that density of polynomial
+$`L^2` classes would imply completeness of the normalized Hermite products.
+The required polynomial density theorem remains open.
+:::
+
+:::theorem "clt_exponential_moment_determination" (parent := "central_limit_theorem") (lean := "SYK.CLT.measure_eq_of_moments, SYK.CLT.gaussianExp_memLp_two, SYK.CLT.gaussianLp_integrable_mul_exp")
+Finite real measures with every real exponential moment are determined by
+their polynomial moments. Lean proves this through the analytic moment
+generating function and characteristic-function uniqueness. Real
+exponentials belong to standard Gaussian $`L^2`, and their products with
+arbitrary Gaussian $`L^2` functions are integrable. The step from these
+facts to polynomial density in Gaussian $`L^2` has not been formalized.
+:::
+
+:::theorem "clt_finite_hermite_projection" (parent := "central_limit_theorem") (uses := "clt_gaussian_hermite_ibp") (lean := "SYK.CLT.hermiteMulti_orthogonality, SYK.CLT.inner_hermiteLp, SYK.CLT.hermiteFiniteProjection_eq_starProjection, SYK.CLT.mem_multiIndices_degree, SYK.CLT.hermiteOrthonormal_orthonormal, SYK.CLT.hasSum_hermiteDegreeProjection")
+For every finite set of standard Gaussian coordinates, the probabilists'
+Hermite products satisfy
+
+$$`
+\mathbb E[H_\alpha(G)H_\eta(G)]
+=\mathbf1_{\{\alpha=\eta\}}\prod_i\alpha_i!.
+`$$
+
+For any finite set $`S` of multi-indices and real $`f\in L^2(\gamma)`, the
+orthogonal projection onto $`\operatorname{span}\{H_\alpha:\alpha\in S\}`
+is the finite coefficient sum
+
+$$`
+\sum_{\alpha\in S}
+\frac{\langle H_\alpha,f\rangle}{\prod_i\alpha_i!}H_\alpha.
+`$$
+
+The set $`\{\alpha:|\alpha|=r\}` is finite, so this applies to each
+homogeneous degree. Normalizing each Hermite product by its $`L^2` norm
+gives a checked orthonormal family. Under the explicit assumption that its
+span is dense in Gaussian $`L^2`, Lean proves that the infinite sum of
+degree projections converges to $`f` in $`L^2`. The density assumption is
+still unproved, so the unconditional infinite expansion in manuscript
+equation `eq: chaos` remains open. The linked Lean declarations have no
+`sorryAx`.
 :::
 
 :::theorem "clt_second_chaos_and_remainder" (parent := "central_limit_theorem") (uses := "clt_partition_moments, clt_conditional_annealed_limit, clt_gaussian_hermite_ibp")

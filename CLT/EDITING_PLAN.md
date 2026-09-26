@@ -42,7 +42,7 @@
 - [ ] 相対ゆらぎの CLT が `beta = 0` で持つ退化した極限と、そこで未定義となる標準化した CLT のパラメータ範囲を分けて記述する。
 - [ ] `thm: input`・各 CLT・内部補題について、全実軸の入力と高温に限ったゆらぎの結論を区別する。
 - [ ] 原稿の `β ℓ_q'(β) > 0`（すべての非零実数）と、Lean の小さい非零逆温度での条件付き結果を照合する。
-- [ ] 高次カオスに必要な `beta_Rad`、Lean の `hFE.βFE` と非退化半径、原稿に残る `tilde_beta_q` の役割を確認する。旧温度上限の一覧を無条件に再採用しない。
+- [ ] 高次カオスに必要な `β_{\rm r}`、Lean の `hFE.βFE` と非退化半径、原稿に残る `tilde_beta_q` の役割を確認する。旧温度上限の一覧を無条件に再採用しない。
 - [ ] He2026 の引用・規格化・表現の範囲を監査し、`AnnealedInput` を維持するための追加根拠か、原稿に合わせた変更案を示す。`C¹` から実解析性は推論しない。入力の変更は W06 に含めない。
 
 完了条件：三つの主結果について、逆温度の範囲と非退化条件が相互に整合する。
@@ -100,7 +100,7 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 ### W06 後の統合課題
 
-`Lemmas/CliffordSignParity.lean` は共有 Model の `SYK.partitionFunction` と宣言名が衝突し、`Main.lean` と同時に import できない。F02-P で解消する。符号対称性の結果を `Setting.Z` に接続するには、通常トレースと規格化トレース、`couplingScale P`、実部、ガウス測度、Hermite 定義の対応も要る。F03 の偶多重指数の符号化恒等式と、F04 の `Tool.lean` から `Setting.Z` への接続も未完了である。詳しい再現方法は [統合監査](../WORK_HISTORY.md#clt-w06) に残す。
+`Lemmas/CliffordSignParity.lean` の宣言名衝突は共有 `SYK.partitionFunction` の直接利用で解消し、F01 の `GaussianChaos.lean` と `Main.lean` の同時 import は成功した。符号対称性の結果を `Setting.Z` に接続するには、通常トレースと規格化トレース、`couplingScale P`、実部、ガウス測度、Hermite 定義の対応がなお必要である。F03 の偶多重指数の符号化恒等式と、F04 の `Tool.lean` から `Setting.Z` への接続も未完了である。元の障害は [統合監査](../WORK_HISTORY.md#clt-w06)、解消の検査は [F01 取り込み検証](../WORK_HISTORY.md#merge-f01-2026-09-27) を参照する。
 
 <a id="formalization"></a>
 
@@ -110,7 +110,7 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 | ID | 成果と照合する原稿 | 主な依存関係・完了条件 |
 | --- | --- | --- |
-| F01 | ガウス–エルミート展開の完全性、次数ごとの直交射影・無限和、`lem:Gaussian-Hermite-IBP` の汎用的な部分 | R03 の該当監査。SpinGlass の指数増大・部分積分の必要箇所を共有ガウス基盤へ流用し、既存の `gaussianReal_stein` と統合する。展開の完全性・射影は別に証明する。`Z_N` への適用に必要な微分・成長評価は F04 と照合する |
+| F01 | ガウス–エルミート展開の完全性、次数ごとの直交射影・無限和、`lem:Gaussian-Hermite-IBP` の汎用的な部分 | R03 の該当監査。一般部分積分、直交性・階乗ノルムと有限射影は証明済み。$L^2$ 完全性と無限次数和は未証明。SpinGlass・既存 API との照合と共有配置は F01-G、`Z_N` への特殊化は F04 に残る |
 | F02 | 符号ゲージ変換・偶奇則と一次・二次カオスの厳密な同定。`lem: parity rule lemma`、`lem:exact-second-chaos` | F01 と必要な F04 の入力。有限の `N` で係数・規格化が原稿と一致する |
 | F03 | ラデマッハ符号化と一様な指数モーメント。`lem:Rademacher-encoding` | R03 の該当監査。`N` と指数パラメータの範囲、`q` のみに依存する定数を明示する |
 | F04 | 任意階の Duhamel 公式、非可換 Hölder 評価、`lem:Z-derivative-bound` | W06 と R03 の該当監査。共有すべき行列解析を CLT に複製せず、F01 の部分積分へ渡す正則性・各偏導関数の指数増大と、微分・積分交換の仮定も検査する |
@@ -125,7 +125,7 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 | 調査・実装 | 接続・統合 |
 | --- | --- |
-| [R02/R04 外部入力](#ticket-r02-r04) · [R03 分野別監査](#ticket-r03) · [F01-G 共有配置](#ticket-f01-g) · [F01-H 展開・射影](#ticket-f01-h) · [F03-R 符号化恒等式](#ticket-f03-r) | [F02-P 名前衝突](#ticket-f02-p) · [F04-M 行列解析](#ticket-f04-m) · [F02–F07 統合](#ticket-integration) |
+| [R02/R04 外部入力](#ticket-r02-r04) · [R03 分野別監査](#ticket-r03) · [F01-G 共有配置](#ticket-f01-g) · [F01-H 展開・射影](#ticket-f01-h) · [F03-R 符号化恒等式](#ticket-f03-r) | [F02-P 衝突解消済み](#ticket-f02-p) · [F04-M 行列解析](#ticket-f04-m) · [F02–F07 統合](#ticket-integration) |
 
 <a id="ticket-r02-r04"></a>
 
@@ -145,13 +145,15 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 読む箇所：`refs/sections/gaussian-chaos.tex` の `lem:Gaussian-Hermite-IBP` と `eq:Gaussian-Hermite-IBP`、[構造文書の依存関係と流用元](ARCHITECTURE.md#依存関係と実装の分担)、[共有基盤の F01](../Probability/GaussianConcentration/EDITING_PLAN.md#f01)。既存宣言は `StandardGaussian.lean` の `gaussianReal_stein`・`pi_gaussian_stein_coord` と `Lemmas/GaussianIBP.lean` の `hermiteMulti_ibp_of_expGrowth`・`hermiteMulti_ibp_integrable` を照合する。完了済み証明の詳細が必要な場合だけ [作業履歴](../WORK_HISTORY.md#clt-f01-gaussian) を読む。
 
-R03 の該当監査と共有 API の編集担当を固定してから実装する。一般 Hermite 部分積分を再証明せず、汎用部分の利用箇所・公開宣言・必要な import を調べて共有層へ配置する。約7,500行の `GaussianIBP.lean` の前半と旧 `IBPFamily` は削減候補だが、局所的な抽出検査は全 API の不要性を示さない。参照調査後に重複を整理し、定理文・公理依存・共有基盤と CLT の関連ビルドを確認して渡す。
+`GaussianIBP.lean` には F01 側で `hermiteMulti_pair_ibp` も追加された。R03 の該当監査と共有 API の編集担当を固定してから、汎用部分とこの新結果の利用箇所・公開宣言・必要な import を調べて共有層へ配置する。一般 Hermite 部分積分を再証明しない。約7,500行の前半と旧 `IBPFamily` は削減候補だが、局所的な抽出検査は全 API の不要性を示さない。参照調査後に重複を整理し、定理文・公理依存・共有基盤と CLT の関連ビルドを確認して渡す。
 
 <a id="ticket-f01-h"></a>
 
 #### F01-H：展開の完全性と射影
 
-R03 の該当監査で、`refs/sections/gaussian-chaos.tex` の展開・直交射影・無限和の主張と測度・Hermite 規格化を確定してから実装する。補題ごとに TeX ラベルと Lean 定理文を対応させ、個別検査・CLT ビルド・公理依存を報告する。`Z_N` への特殊化は F04 に渡し、F01-G と共有ファイルを同時編集しない。
+`refs/sections/gaussian-chaos.tex` の `eq: chaos` に対し、`Lemmas/GaussianChaos.lean` は二つの Hermite・ガウス測度の規格化を照合した。`GaussianHermiteOrthogonality.lean` の直交性・階乗ノルム・有限射影、`GaussianHermiteDensity.lean` の多項式の有限線形包への包含、`GaussianMomentDetermination.lean` と `GaussianPolynomialDensity.lean` の解析的補助結果も Lean 検査済みである。無条件のガウス $L^2$ 多項式稠密性、Hermite 完全性、無限次数和の収束は未証明で、条件付き `HasSum` を完成と扱わない。[今回の F01 検証履歴](../WORK_HISTORY.md#clt-f01-after-w06)を必要時に参照する。
+
+R03 で原稿の有効な主張と測度・Hermite 規格化を照合し、残る稠密性の証明と `eq: chaos` の無条件の結論を実装する。`GaussianChaos.lean` と `Main.lean` の同時 import は成功したが、符号結果と `Setting.Z` の数学的接続は [F02 の統合](#ticket-integration)に残る。補題ごとに TeX ラベルと Lean 定理文、個別検査・CLT ビルド・公理依存を報告する。`Z_N` への特殊化は F04 に渡し、F01-G と共有ファイルを同時編集しない。
 
 <a id="ticket-f03-r"></a>
 
@@ -163,11 +165,11 @@ R03 で有限和・偶多重指数・次数の範囲を照合してから同フ�
 
 <a id="ticket-f02-p"></a>
 
-#### F02-P：分配関数の宣言名衝突
+#### F02-P：分配関数の宣言名衝突（解消済み）
 
-読む箇所：`refs/sections/gaussian-chaos.tex` の `lem: parity rule lemma`、[構造文書の現行実装との差](ARCHITECTURE.md#現在の実装と原稿との差)、`Main.lean`、`Lemmas/CliffordSignParity.lean`、`../Model/FiniteDimensionalGibbs.lean`。前者の補助モジュールと共有 Model はともに `SYK.partitionFunction` を定義する。[統合監査](../WORK_HISTORY.md#clt-w06)に同時 import の再現方法と規格化の差がある。
+読む箇所：`refs/sections/gaussian-chaos.tex` の `lem: parity rule lemma`、[構造文書の現行実装との差](ARCHITECTURE.md#現在の実装と原稿との差)、`Main.lean`、`Lemmas/CliffordSignParity.lean`、`Lemmas/GaussianChaos.lean`、`../Model/FiniteDimensionalGibbs.lean`。元の衝突と規格化の差は [統合監査](../WORK_HISTORY.md#clt-w06)、解消の検査は [F01 取り込み検証](../WORK_HISTORY.md#merge-f01-2026-09-27)に記録した。
 
-F02 の他の数学的入力を待たず着手できる。両宣言の意味と利用箇所を調べて衝突を解消し、二モジュールの同時 import、既存定理文、規格化、公理依存を検査する。通常トレース、スケール、実部、ガウス測度、Hermite 定義の `Setting.Z` への接続は後続の F02 統合に渡す。
+補助モジュール内で重複していた分配関数定義を除き、符号ゲージ不変性と偶奇則で共有 `SYK.partitionFunction` を直接使うようにした。仮定・量化順序・数学的結論は保ち、個別検査、`Main.lean` と `GaussianChaos.lean` の同時 import、主要二定理の公理依存を確認した。通常トレース、スケール、実部、ガウス測度、Hermite 定義の `Setting.Z` への接続は後続の F02 統合に渡す。
 
 <a id="ticket-f04-m"></a>
 

@@ -7460,6 +7460,38 @@ theorem hermiteMulti_ibp_integrable (α : ι → ℕ)
       integrable_hermiteMulti_mul_of_expGrowth α hf.continuous C₀ hC₀.le h₀
   · exact integrable_of_euclidean_expBound _ hd C C hC.le hC.le hb
 
+private theorem polyFunction_partialList (l : List ι) {f : (ι → ℝ) → ℝ}
+    (hf : PolyFunction f) : PolyFunction (partialList l f) := by
+  induction l generalizing f with
+  | nil => exact hf
+  | cons i l ih => exact ih (hf.deriv_closed i)
+
+/-- Integration by parts for the pairing of two multivariate Hermite
+functions. Their polynomial structure supplies all growth hypotheses. -/
+theorem hermiteMulti_pair_ibp (α β : ι → ℕ) :
+    (∫ g, hermiteMulti α g * hermiteMulti β g
+      ∂(Measure.pi fun _ : ι => gaussianReal 0 1)) =
+      ∫ g, partialMulti α (hermiteMulti β) g
+        ∂(Measure.pi fun _ : ι => gaussianReal 0 1) := by
+  have hβ : PolyFunction (hermiteMulti β) :=
+    polyFunction_hermiteList (multiIndexList β)
+  have hdiff : ContDiff ℝ (↑(∑ i : ι, α i)) (hermiteMulti β) :=
+    hβ.smooth.of_le (by simp)
+  have hgrowth : ∀ η : ι → ℕ, η ≤ α → ∃ D : ℝ, 0 < D ∧ ∀ g,
+      |partialMulti η (hermiteMulti β) g| ≤
+        D * Real.exp (D * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖) := by
+    intro η _
+    obtain ⟨C, c, hC, hc, hb⟩ :=
+      (polyFunction_partialList (multiIndexList η) hβ).expBound
+    let D := max C c + 1
+    have hD : 0 < D := by dsimp [D]; positivity
+    refine ⟨D, hD, ?_⟩
+    simpa only [partialMulti] using
+      expBound_enlarge hC (by dsimp [D]; linarith [le_max_left C c])
+        (by dsimp [D]; linarith [le_max_right C c]) hb
+  simpa only [← hermiteMulti_eq_prod] using
+    hermiteMulti_ibp_of_expGrowth α hdiff hgrowth
+
 /-- Analytic input for iterating one-coordinate integration by parts.
 The `Good` predicate must be established for the intended function class and
 measure before the resulting identity can be applied. -/
