@@ -243,6 +243,20 @@ F03 の符号化と指数モーメント、F04 の Duhamel 公式と行列評価
 
 2026-09-26 の補助ファイル確認：`Lemmas/GaussianIBP.lean` は一般ガウス–エルミート部分積分、`Lemmas/Rademacher.lean` は有限符号平均と `rademacher_encoding`、`Lemmas/Tool.lean` は行列解析・トレース指数微分・符号ゲージと Hermite 偶奇則を含む。`Lemmas/ConvexDerivatives.lean` は既存の `convex_convergence_deriv_tendstoUniformlyOn` を持ち、局所一様収束などを仮定する。これらは補題候補の所在を明確にするもので、F01/F03/F04/F06 の完了や Main の証明状態変更を意味しない。`Tool.lean` の `RequestProject.*` imports はこのソースツリー内で解決を確認できず、CLT への統合・ビルドは未確認。個別診断では Rademacher と ConvexDerivatives にエラーなし、GaussianIBP には現行 Mathlib の非推奨 import/API 診断、Tool には import 更新要求があった。Lake によるこの4ファイルの個別検査・関連ビルドと公理依存確認は未実施。
 
+2026-09-26 の `Tool.lean` 依存診断：`RequestProject.SingularValues`・`GaussianIBPAux`・`SchattenAux`・`ExpAux`・`MatrixRealNormed`・`DerivAux` のソースは現ワークスペースと Git 履歴に存在しない。これらの import だけを外した一時コピーの Lean 検査では、ガウス–エルミート部分積分、特異値の有限和表示、トレース・Schatten 積評価、Hermitian 指数行列の特異値・トレース公式、行列の実ノルム空間インスタンス、高階微分評価が未解決となり、Duhamel 部分にも独立した証明エラーが出た。一時コピーは削除済み。元ファイルの主張を保持して依存を置き換えるには、これらの証明を現行 mathlib と共有模型に合わせて実装・個別検査する必要がある。現時点で `Tool.lean` の Lean 検査は成功していない。
+
+同日の後続修正：`Tool.lean` に mathlib の特異値 import と有限和への変換補題を追加し、Duhamel の導関数計算を修正した。行列の実ノルム空間インスタンスは既存の複素または実スカラーの構造から制限して与えた。Hermitian 行列の指数のトレース公式はスペクトル分解から証明し、トレースの絶対値と特異値の和の評価は `T†T` の固有基底から証明した。`diagonal ![1, 0]` の正規化 Schatten ノルムは二つの特異値を直接計算して証明した。これらの箇所は親 Lake 環境でエラーなしとなった。ファイル全体の個別検査はなお失敗し、未解決の主な入力は Schatten の積評価、指数行列の特異値公式、正規化トレース指数の高階微分評価である。未検証の定理を削除・弱化せず、これらの証明を次の検証対象とする。
+
+同日の追加検査：Hermitian 行列指数のユニタリ対角化公式 `ExpAux.exp_smul_spectral` を追加し、単独の検査ファイル `ToolScratch.lean` では Lean 検査に成功した。`Tool.lean` に統合した後の個別検査は、`SchattenAux.holder`、`SchattenAux.mul_opNorm`、`SchattenAux.opNorm_mul`、`ExpAux.sum_sv_exp`、`DerivAux.tE` が未定義で失敗した。対角化公式はそれらの証明の基礎にはなるが、特異値公式や高階微分評価をまだ証明しない。定理文の削除・弱化、`sorry` の追加は行っていない。
+
+続く検査で `ExpAux.trace_exp_re_pos` を追加し、Hermitian 行列指数のトレースの実部が正であることをスペクトル和から証明した。個別 Lean 検査ではこの補題にエラーは出ず、上記五つの未定義入力に関するエラーが残る。PhysLib の `QuantumInfo/ForMathlib/HermitianMat/Schatten.lean` に複素行列の Schatten–Hölder 不等式があることを確認したが、現ワークスペースの依存には含まれず、一般 `RCLike` の現行定理へ直ちに適用できるものとは扱わない。依存設定は変更していない。
+
+さらに `ExpAux.exp_smul_posSemidef` と `ExpAux.exp_smul_posDef` をスペクトル分解と対角行列の正値性から証明した。これらは親 Lake 環境で新たなエラーを生じていない。`ExpAux.sum_sv_exp` には、正値行列の特異値の和をその固有値の和へ移す補題がなお必要である。現行 mathlib の `LinearMap.singularValues` は `T†T` の固有値の平方根で定義されており、この移行は定義の書き換えだけでは済まない。ファイル全体の個別検査には先述の五つの未定義入力が残る。
+
+続く実装で正値作用素の `T†T` の特性多項式と固有値を計算し、`SVDAux.singularValues_fin_of_positive` を証明した。Hermitian 行列指数の特性多項式の根と Euclidean 線形写像の固有値の多重集合を照合し、任意の実関数 `f` に対する `ExpAux.sum_sv_exp` を証明した。これを用いて `normalizedSchattenNorm_exp_hermitian` の既存証明も修正した。単独の `ToolScratch.lean` の Lean 検査は成功し、二つの主要補題の `#print axioms` は `propext`・`Classical.choice`・`Quot.sound` のみだった。`Tool.lean` の個別検査で指数行列の特異値公式に関するエラーは消え、残る未定義入力は三つの Schatten 積評価と `DerivAux.tE` である。ファイル全体の Lean 検査はなお成功していない。
+
+`CLT/Lemmas/AGENTS.md` の追加後、既存の `ToolScratch.lean` を通常の `SYK.CLT.Lemmas.ToolScratch` モジュールとして個別ビルドし、`Tool.lean` から import した。重複していたスペクトル・SVD の宣言を `Tool.lean` から除き、`ExpAux.sum_sv_exp` は sibling モジュールの証明を使う。`DerivAux.tE` は規格化トレース指数として定義し、`Matrix.traceExp` との定義的等価性を個別検査で確認した。`Tool.lean` の現在の未解決入力は三つの Schatten 積評価、`DerivAux.contDiff_tE`、`DerivAux.iteratedFDeriv_tE_bound_hermitian` である。`ToolScratch.lean` の Lake ビルドは親ワークスペースの `.lake` への書き込みが sandbox で拒否されたため、同じビルドコマンドの権限昇格を自動審査で許可された後に成功した。ファイル全体の Lean 検査はまだ失敗する。
+
 ### モジュールと対応の確認
 
 既存の雛形で採用している TeX のラベルに基づくファイル分け、`UpperCamelCase` のモジュール名、`SYK.CLT` 名前空間を維持する。README には実在するモジュールだけを掲載する。
@@ -269,6 +283,8 @@ F03 の符号化と指数モーメント、F04 の Duhamel 公式と行列評価
 検証：`lake env lean SYK/CLT/Main.lean` と `lake build CLT` は成功し、追加した4宣言の `sorry` 警告が残る。上流の `StandardGaussian.lean` に既存の linter 警告・タクティク案内がある。共同 CLT・個別の両 CLT の `#print axioms` は `[propext, sorryAx, Classical.choice, Quot.sound]`、`partitionFunction_zero` と通常トレースとの一致は `[propext, Classical.choice, Quot.sound]` であった。公理検査用の一時ファイルは削除した。章の宣言参照は `SYK.CLT.Main` の import により解決する。今回の差分は作業開始時のコミットからの未コミット変更で、コミットは作成していない。
 
 最終の `lake build CLT` は成功し、`lake env lean SYK/Chapters/CLT.lean` は警告なしで成功した。`git diff --check` は成功した。Git の LF/CRLF 変換案内は数学的・Lean 的な警告とは区別する。
+
+`Tool.lean` の微分補助部分では、Banach 代数の指数関数について全 Fréchet 微分の Duhamel 積分表示 `Duhamel.fderiv_exp_apply` を証明した。さらに `DerivAux.contDiff_tE` を実装し、実スカラーへの制限と行列トレースの解析性から検証した。個別 Lean 検査でこの二つの宣言にエラーはない。残る未定義入力は三つの Schatten 積評価と `DerivAux.iteratedFDeriv_tE_bound_hermitian` であり、`Tool.lean` 全体の検査は未成功である。
 
 ## Z01：複素平面上の零点のない領域
 
