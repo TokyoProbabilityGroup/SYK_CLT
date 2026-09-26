@@ -24,7 +24,7 @@
 | 系の極限 | 原稿は偶数 N を通る極限。Lean の `Setting q` は偶数サイズが無限大へ発散する任意の族 |
 | 確率空間 | 各サイズの共有ガウス係数空間。分布収束はサイズごとの空間を許す。概収束には別途共通確率空間が必要 |
 
-標準表現への特殊化で原稿のトレースと一致することと、一般表現で外部極限定理を利用できることは別の確認事項である。W06 は前者を照合する。一般表現族への外部入力の供給は R02・F06 に残し、表現独立性を暗黙に仮定しない。
+標準表現への特殊化で原稿のトレースと一致することと、一般表現で外部極限定理を利用できることは別の確認事項である。W06 では前者を照合済みである。一般表現族への外部入力の供給は R02・F06 に残し、表現独立性を暗黙に仮定しない。
 
 共有の `SYK.partitionFunction` は通常のトレースを使う。CLT の局所定義は既に存在し、通常トレースの分配関数を次元で割ったものとの一致も証明項を持つ。複素解析の API は共有側を使い、零点のない領域や対数の枝は仮定しない。W06 では利用のない複素解析 API の一式追加を求めない。
 
@@ -33,13 +33,14 @@
 | 対象 | ソース上の状態と残る照合 |
 | --- | --- |
 | 有限模型の零逆温度・トレース対応・実数性・正値性 | `Main.lean` に証明項あり。9月18日時点の「実数性・正値性が未証明」という記録は履歴 |
-| 有限模型・モーメント・対数 | トレース零、`Z≥1`、`Setting.partition_moments`、相対量の期待値1・二乗可積分性、対数の可積分性・中心化恒等式、零逆温度を検証済み。標準表現との規格化の一致も証明済み。公開30定理に `sorryAx` なし。2026-09-26、未使用の Tool を参照監査後に削除し、`lake build CLT` 成功。W06 完了 |
+| 有限模型・モーメント・対数 | トレース零、`Z≥1`、`Setting.partition_moments`、相対量の期待値1・二乗可積分性、対数の可積分性・中心化恒等式、零逆温度を検証済み。標準表現との規格化の一致も証明済み。公開30定理に `sorryAx` なし。2026-09-26、Tool 再実装後の統合監査でも公開30定理と `lake build` の成功を再確認。W06 完了 |
 | 共同 CLT | `partition_and_log_partition_clt` は `hFE : AnnealedInput q` を受け取る条件付きの定理文で、`sorry` が残る。二つの個別 CLT はその射影 |
 | アニール極限・係数漸近・非退化性 | `hFE` の下での証明項あり。入力自体を構築した結果ではない |
 | 凸関数列の導関数収束 | `Lemmas/ConvexDerivatives.lean` の `convex_convergence_deriv_tendstoUniformlyOn`。関数列の局所一様収束を仮定しており、原稿の各点収束から局所一様収束を導く補題全体ではない |
 | ガウス–エルミート部分積分 | `Lemmas/GaussianIBP.lean` に一次元・多変数の補助結果がある。`Setting.Z` への正則性・成長評価と特殊化、および原稿全体との照合は別途必要 |
-| ラデマッハ評価 | `Lemmas/Rademacher.lean` に有限符号平均と `rademacher_encoding` がある。F03/F05 の CLT 側への接続と関連ビルドは未確認 |
+| ラデマッハ評価 | `Lemmas/Rademacher.lean` に有限符号平均と `rademacher_encoding` がある。関連ビルド・主要定理の公理依存を確認済み。符号化の計数恒等式と F03/F05 の CLT 側への接続は未完了 |
 | 行列解析と対称性 | `Lemmas/Tool.lean` は有限次元の特異値・Schatten 評価と Hermitian 行列の指数の高階微分評価を証明済みで、`lake build CLT` も成功した。これらを CLT のカオス解析へ接続する作業は F04 に残る。符号ゲージ・Hermite 偶奇則の CLT への接続は F02 に残る |
+| 符号ゲージ・偶奇則 | `Lemmas/CliffordSignParity.lean` 単独のビルドと主要定理の公理依存は確認済み。ただし `SYK.partitionFunction` が共有宣言と衝突し、Main と同時に import できない。規格化・測度・Hermite の接続も未完了。詳細は [統合監査](EDITING_PLAN.md#integration-audit-2026-09-26) |
 | その他の補助モジュール | `Preliminaries`・`CLTComponents`・`GaussianConcentration` は引き続き実質的に雛形。新しい補助ファイルの存在だけではこれらの計画済み適用は完了しない |
 | Blueprint | `../Chapters/AnnealedFE.lean` でガウス入力構造と別原稿の Rademacher 極限を分け、`../Chapters/CLT.lean` で有限模型の証明状態・条件付き極限・現行の対数 CLT の依存を記録した。Verso の生成・参照検査は休止中 |
 
@@ -154,21 +155,23 @@ flowchart TD
     annealed --> logclt
 ```
 
-流用元は SpinGlass のコミット `dc1d3820af6e443c09bd1177ec3e409cf0640d5c` とする。候補は [ExpGrowth.lean](https://github.com/or4nge19/SpinGlass/blob/dc1d3820af6e443c09bd1177ec3e409cf0640d5c/Common/Mathlib/Probability/Distributions/Gaussian/ExpGrowth.lean) の `HasExpGrowth`・可積分性の補題と、[GaussianIntegrationByParts.lean](https://github.com/or4nge19/SpinGlass/blob/dc1d3820af6e443c09bd1177ec3e409cf0640d5c/Common/Mathlib/Probability/Distributions/GaussianIntegrationByParts.lean) の `stein_lemma_gaussianReal_of_expGrowth'` である。先方の Lean/mathlib は `4.34.0-rc2`、現行ワークスペースは `4.32.2` であり、全体を Lake の依存に加えるのではなく、必要な証明を選んで既存の `SYK.Probability.GaussianConcentration` に統合する。既存の `gaussianReal_stein` と重複させず、流用する証明・仮定・出典を個別に確認する。移植・コンパイルと公理依存の検査は未実施である。
+流用元は SpinGlass のコミット `dc1d3820af6e443c09bd1177ec3e409cf0640d5c` とする。候補は [ExpGrowth.lean](https://github.com/or4nge19/SpinGlass/blob/dc1d3820af6e443c09bd1177ec3e409cf0640d5c/Common/Mathlib/Probability/Distributions/Gaussian/ExpGrowth.lean) の `HasExpGrowth`・可積分性の補題と、[GaussianIntegrationByParts.lean](https://github.com/or4nge19/SpinGlass/blob/dc1d3820af6e443c09bd1177ec3e409cf0640d5c/Common/Mathlib/Probability/Distributions/GaussianIntegrationByParts.lean) の `stein_lemma_gaussianReal_of_expGrowth'` である。先方の Lean/mathlib は `4.34.0-rc2`、現行ワークスペースは `4.32.2` であり、全体を Lake の依存に加えるのではなく、必要な証明を選んで既存の `SYK.Probability.GaussianConcentration` に統合する。既存の `gaussianReal_stein` と重複させず、流用する証明・仮定・出典を個別に確認する。これらの流用候補の採用・出典照合は未完了である。一方、下記の一般部分積分は現行コードで既に検証済みであり、その証明の完成と、流用・重複整理・共有配置の計画を区別する。
 
 原稿の `lem:Gaussian-Hermite-IBP` は `f ∈ C^{|α|}` を仮定し、成分ごとに `η ≤ α` を満たす各偏導関数について、ある `C_η > 0` による `|∂^η f(G)| ≤ C_η exp(C_η ‖G‖)` を要求する。2026-09-26、`GaussianIBP.lean` の `hermiteMulti_ibp_of_expGrowth` で、この一般部分を同じ仮定のまま証明した。共有 `pi_gaussian_stein_coord` は選択座標だけの成長評価を使い、偏導順序の交換と Hermite 因子の成長評価から反復の入力を導く。両辺の可積分性も `hermiteMulti_ibp_integrable` で証明済み。ユーザーの指定により `Z_N` の正則性・成長評価と特殊化は F04 に残す。エルミート展開の完全性と射影は F01 内の別の成果であり、この一般部分の完成からは従わない。検証根拠は [編集計画](EDITING_PLAN.md#formalization) を参照する。
 
 模型から独立したガウス基盤は利用側を import しない。Model が CLT を import する依存も作らない。`SuperConcentration` は既存の独立成果として維持し、新しい対数 CLT の必須入力にはしない。現行 Lean の `Annealed_FE → CLT/Main` の import は記録して保持し、入力の再設計時に配置先と依存を再検討する。
 
-既存のファイルを使い、W06 で新しいモジュール階層は作らない。共有すべきトレース零・行列評価だけを Model の既存ファイルへ置く。既存の凸関数補題と条件付き漸近補題を再実装せず、F06 で不足する入力を補う。
+W06 の追加証明は既存の `Main.lean` に実装され、Model への補題追加は行われなかった。後続で共有するトレース零・行列評価は Model の既存ファイルへ移す。既存の凸関数補題と条件付き漸近補題を再実装せず、F06 で不足する入力を補う。
 
 | Lean ファイル | 原稿との対応・用途 |
 | --- | --- |
-| `../Probability/GaussianConcentration/StandardGaussian.lean` などの既存ファイル | F01 の模型に依存しない指数増大・可積分性・部分積分。現時点では流用・移植前 |
+| `../Probability/GaussianConcentration/StandardGaussian.lean` などの既存ファイル | 既存の指数可積分性・部分積分を提供し、選択座標だけの成長仮定への更新は検証済み。一般 Hermite 部分積分の共有配置と流用候補の照合は [汎用基盤の残件](../Probability/GaussianConcentration/EDITING_PLAN.md#f01) |
 | `Main.lean` | `subsec:SYK-model`、`thm:partition-clt`、`cor:free-energy-clt`、有限模型と条件付きアニール入力 |
 | `Lemmas/Preliminaries.lean` | `lem: parity rule lemma`、`lem:Gaussian-Hermite-IBP` の模型への適用、`lem:Z-derivative-bound`、`lem:Rademacher-encoding` の接続用雛形 |
 | `Lemmas/CLTComponents.lean` | `lem:exact-second-chaos`、`prop:higher-chaos-closure`、`prop:annealed-free-energy` |
 | `Lemmas/GaussianIBP.lean` | 汎用のガウス–エルミート部分積分。`lem:Gaussian-Hermite-IBP` の `Z_N` への適用は F04 と接続して検査する |
+| `Lemmas/CliffordSignParity.lean` | 符号ゲージと Hermite 偶奇則。共有分配関数との名前衝突を解消してから F02 へ接続する |
+| `Lemmas/Tool.lean` | 一般行列の Schatten 評価と高階微分評価。共有模型への接続は F04 |
 | `Lemmas/Rademacher.lean` | `lem:Rademacher-encoding` に対応する有限符号平均と指数モーメント評価。F03/F05 への統合は未完了 |
 | `Lemmas/ConvexDerivatives.lean` | `lem:convex-derivatives` の導関数収束補題。局所一様収束などを仮定し、原稿の入力を導く不足部分は F06 に残る |
 | `Lemmas/GaussianConcentration.lean` | 旧証明の `eq:centered W_N tail`・`eq:centered W_N exp` の雛形。W06 で実装も削除も要求しない |

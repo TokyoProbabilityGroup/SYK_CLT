@@ -191,6 +191,48 @@ W06 の完了は、上記の有限模型の成果・原稿との対応・[Chapte
 
 親ワークスペースからの `lake -f SYK/workspace/lakefile.toml env lean SYK/CLT/Lemmas/Tool.lean` と `lake -f SYK/workspace/lakefile.toml build CLT` は成功した。前者には5件の非推奨 API・未使用 `simp` 引数の warning、後者には既存の GaussianIBP 等の linter warning が残るが、エラーはない。`Tool.lean` は現在も `Main.lean` や Blueprint から import されていないため、W06 の有限模型の成果と公理依存は変わらない。行列微分評価を CLT のカオス解析へ接続する作業は引き続き F04 に残る。
 
+<a id="integration-audit-2026-09-26"></a>
+
+### W06 後の統合監査（2026-09-26、`84bfde3`）
+
+開始時の HEAD は `84bfde3`、未コミット差分はなかった。W06 の有限模型と、同時に取り込まれた補助モジュールを分けて検査した。数学の Lean・TeX、Lake 設定、依存バージョンは変更していない。
+
+**判定：W06 の完了を再確認した。ただし、補助モジュール全体の統合は未完了である。** 次の阻害要因を解消してから F02 の利用側へ接続する。
+
+| 指摘 | 根拠と影響 | 次の対応・完了条件 |
+| --- | --- | --- |
+| 優先度高：分配関数の宣言名が衝突 | `Lemmas/CliffordSignParity.lean:131` が `SYK.partitionFunction` を定義し、`Model/FiniteDimensionalGibbs.lean:119` の共有宣言と衝突する。両者は別々ならビルドできるが、`Main` と符号対称性を同時に import できない | 共有分配関数を利用する形に整理し、各定理の対象を保つ。単なる改名だけで規格化の接続が済んだとは扱わない。同時 import と主要定理の公理依存を再検査する |
+| F02 の入力の接続が未完了 | 符号対称性の分配関数は通常トレース・未スケールの `hamiltonian P M J`・複素数値。W06 の `Z` は次元で割り、`couplingScale P` を掛けたハミルトニアンの実分配関数である。符号対称性の `gaussianCouplings` は関数空間の積測度、W06 は `WithLp.toLp 2` で移した測度を使う。`hermiteMulti` も GaussianIBP と別定義 | 温度・相互作用係数の変換、次元による除算、実部、測度の移送、Hermite の対応を明示する。積の可積分性を確認し、`Setting.Z` に対する偶奇則へ接続する。現行の積分等式だけをカオス係数の完成としない |
+| F03 の符号化恒等式は未実装 | `Rademacher.rademacher_encoding` は指数付き三次モーメント評価を証明する。原稿の `eq:even-sum-Rademacher-moment`（偶多重指数の和と符号モーメントの一致）は含まない | 原稿の二つの結論を区別し、符号化恒等式を別の未完了成果として残す |
+| F04 の共有模型への接続が未完了 | `Tool.lean` は `MatrixAnalysis.Matrix.normalizedTrace`・`traceExp` と一般行列の方向微分を使い、共有 `SYK.normalizedTrace`・`Setting.Z` を利用していない | 規格化トレースの定義を共有する配置を検討し、連鎖律による `β`・`couplingScale P` の因子、実部、偏導関数の指数増大を照合する。既存の高階微分評価自体は再証明しない |
+
+名前衝突は、一時ファイルの次の二行を `lake env lean` で検査して再現した。
+
+```lean
+import SYK.CLT.Main
+import SYK.CLT.Lemmas.CliffordSignParity
+```
+
+```text
+error: import SYK.CLT.Lemmas.CliffordSignParity failed, environment already contains 'SYK.partitionFunction.eq_1' from SYK.Model.FiniteDimensionalGibbs
+```
+
+`lake build` は各モジュールを独立に検査するため、今回の成功だけではこの同時 import の失敗を検出できない。F02 の統合検査にはこの組合せを含める。W06 の Main は符号対称性モジュールを import しておらず、有限模型の証明をこの衝突で未証明へ戻す必要はない。
+
+検証結果：
+
+- ワークスペースのルートで `lake build` 成功（3252 jobs）。`lake env lean SYK/CLT/Main.lean` も成功し、警告は既存の共同 CLT の `sorry` のみ。
+- Main の有限模型・Setting の公開30定理を列挙して `#print axioms` を再実行した。すべて `propext`・`Classical.choice`・`Quot.sound` のみ。定理文も確認し、`AnnealedInput` や最終 CLT を有限模型の前提として使っていない。
+- 証明の役割は、反交換関係とトレースの巡回性によるトレース零、固有値に対する `Real.add_one_le_exp` による `Z≥1`、線形なハミルトニアンのノルム評価と `integrable_exp_mul_norm` による二乗・対数の可積分性、`standardBasis_card` による標準表現の規格化である。全実数の `β`、正の有限次元、位相・係数の分散・指数の符号、零逆温度、中心化を原稿と照合した。一般表現への外部極限定理の適用可能性は未確認のまま。
+- 補助9定理の公理依存も通常公理のみ：GaussianIBP の `hermiteMulti_ibp_of_expGrowth`・`hermiteMulti_ibp_integrable`・`partialList_perm`、Rademacher の `rademacher_encoding`、Tool の `iterDirectionalFDeriv_traceExp_bound`・`normalizedSchattenNorm_mul_le`、符号対称性の `exists_gauge`・`partitionFunction_sign_gauge`・`expectation_partitionFunction_mul_hermite_eq_zero`。符号対称性だけは独立した import 環境で検査した。他の三補助モジュールと Main の同時 import は成功した。
+- 共同 CLT と二つの射影は引き続き `sorryAx` に依存する。`AnnealedInput` の型を表示し、解析性・共通半径・一般表現族全体に対する局所一様収束・小温度展開が仮定として残ることを確認した。Main の主結果の節は `6621fed` から不変である。
+- Blueprint の数学モジュールだけを import した一時ファイルで、全章の宣言参照110件を `#check` して成功した。ソース上の53ノードについて、未知の依存先・重複した主張ノード・循環がなく、証明ノードの対応先があることも確認した。これは Verso の章検査や `vbp check` の代替ではなく、それらと生成処理は休止中につき未実施。
+- 文書4件の差分を確認した。既存の CRLF 改行を保持し、`git -c core.whitespace=cr-at-eol diff --check` で行末の空白等を検査した。
+- ルートと `workspace/` の TOML・manifest・toolchain は一致する。CI は同じ既定対象を使う。GitHub 上の CI は今回実行していない。`Annealed_FE` 全体・`Universality` の個別ビルド、LaTeX のコンパイル、外部文献の再監査は対象外。
+- 既存の未完成証明は Main の1箇所と `Annealed_FE/main_result.lean` の10箇所。ソース検索で他の `sorry`・`admit`・`axiom` の宣言追加は見つからなかった。ガウス基盤・GaussianIBP・Tool・Rademacher 等の非推奨 API、未使用引数、柔軟な `simp`、書式等の警告は残る。ビルドエラーはなく、別途の同時 import 検査では上記エラーが残る。
+
+今回の記録は R02–R05 の原稿・外部入力監査や F01–F08 の完成を意味しない。既知の `β=0` の標準化の不一致、全実軸の `C¹` 入力と `AnnealedInput` の解析性の差は従来の担当課題に残す。文書の Tool 削除済みという現況説明を訂正し、符号対称性モジュールの所在と統合障害を追記した。次の作業単位の実装には着手していない。
+
 ### 現行証明の再検証（2026-09-24）
 
 ユーザーの再検証依頼により、コミット `6621fedfb214cef1b1c3dead0951efdff6bb3e2d` の数学ソースを検査した。着手時の未コミット差分は前回の再計画による6文書のみで、Lean・TeX の差分はない。今回も数学ソース・依存設定を変更していない。Lean は 4.32.2、Lake は 5.0.0-src+f3b06c7。新しい toolchain や依存は取得していない。
@@ -231,7 +273,7 @@ W06 の完了は、上記の有限模型の成果・原稿との対応・[Chapte
 
 ## F01–F08：後続の Lean 形式化
 
-以下は旧段階6を分割した作業枠である。W06 の完成と対応する原稿の監査を待つ。各枠を実行可能にする前に、正確な定理文・外部入力・必要な補題・編集範囲・検証対象をこの節に記録する。仕様を確定する調査と、その後の実装を混同せず、未確定の主張を仮置きで追加しない。
+以下は旧段階6を分割した作業枠である。W06 は完了済みであり、残る着手条件は各成果に対応する原稿監査・入力の確定・補助モジュールの接続である。各枠を実行可能にする前に、正確な定理文・外部入力・必要な補題・編集範囲・検証対象をこの節に記録する。仕様を確定する調査と、その後の実装を混同せず、未確定の主張を仮置きで追加しない。
 
 | ID | 成果と照合する原稿 | 主な依存関係・完了条件 |
 | --- | --- | --- |
@@ -243,6 +285,23 @@ W06 の完了は、上記の有限模型の成果・原稿との対応・[Chapte
 | F06 | 凸性・アニール入力・係数漸近と相対・標準化 CLT | F02・F05、R02・R03。既存の条件付き極限補題と `ConvexDerivatives` を再利用し、各点収束から局所一様収束への不足を補う。Lean が要求する全有限サイズの分散正値性は、漸近的正値性と区別して証明する |
 | F07 | 対数の線形近似、小確率事象と `Z_N≥1` による中心化誤差、`cor:free-energy-clt` | F06・W06・R05、F05 の剰余評価と二次カオスの四次モーメント。新証明の `O(N^(-2a))` を得る。集中評価の移送は前提にしない |
 | F08 | 大数則の Lean 上の扱い（仕様再検討） | R04 の外部引用監査後に、外部入力として記録するか内部証明を別途行うか確定する。現行 CLT・W06 の必須前提ではない |
+
+### 担当別作業票とコード整理
+
+以下は共同研究者へ切り出せる最小の成果単位であり、F01–F08 の状態を変更しない。票名は割当の目印で、追加の Lean 宣言名ではない。調査票と実装票を分け、原稿・既存宣言の型が未確定の実装票は、まず調査結果を提出する。今回の文書統合ではコード整理を実施していない。
+
+| 票名 | 着手条件と担当範囲 | 受け渡す成果・検査 |
+| --- | --- | --- |
+| R02/R04 外部入力 | 直ちに読み取り着手可。`refs/sections/` の有効な本文、He2026 の原文、`Annealed_FE/main_result.lean` の `AnnealedInput` を照合する。原稿・Lean は変更しない | 逆温度の範囲、規格化、極限の種類、正値性、概収束に必要な確率空間、外部入力と内部証明の境界を、出典と TeX ラベル・Lean 宣言名つきで返す。定理文変更案は研究者の判断へ渡す |
+| R03 分野別監査 | 直ちに読み取り着手可。ガウス–エルミート、ラデマッハ、行列微分・符号偶奇を、原稿の有効な本文ごとに分担する | 各補題の量化・規格化・積分可能性・極限操作と、既存 Lean 定理が実際に証明している範囲を対照表にする。反例候補と未確定の仮定を明記する |
+| F01-G 共有配置と整理 | R03 の該当監査と共有 API の編集担当を固定してから実装する。`Probability/GaussianConcentration/` と `Lemmas/GaussianIBP.lean` の汎用部分だけを対象とする | 既存の一般 Hermite 部分積分を再証明せず、利用箇所・公開宣言・必要な import を調べて共有配置と重複整理を行う。約 7,500 行の `GaussianIBP.lean` の前半と旧 `IBPFamily` は削減候補だが、末尾の二公開定理だけを抽出した局所検査は全 API の不要性を証明しない。削除前に参照を調べ、定理文と公理依存を保つ。共有基盤と CLT の個別検査・関連ビルドを行う |
+| F01-H 展開・射影 | R03 の該当監査で完全性、直交射影、無限和の正確な主張と測度・Hermite 規格化を確定してから実装する。`Z_N` への特殊化は F04 へ渡す | 補題ごとに原稿のラベルと Lean 定理文を対応させ、個別検査・CLT ビルド・主要定理の公理依存を報告する。F01-G と共有ファイルを同時編集しない |
+| F03-R 符号化恒等式 | R03 の該当監査で `eq:even-sum-Rademacher-moment` の有限和と偶多重指数の範囲を確定してから `Lemmas/Rademacher.lean` を編集する | 既存の `rademacher_encoding` が証明した指数付き三次モーメント評価を保持し、未実装の符号化恒等式を別に検査する。個別検査・CLT ビルド・公理依存を返す |
+| F04-M 行列解析の接続と整理 | R03 の行列微分監査後、`Lemmas/Tool.lean` の一般行列結果から `Setting.Z` に必要な結果を選ぶ。共有 Model の編集担当を別に固定する | `SingularAux.singularValues_of_positive` と `SVDAux.singularValues_fin_of_positive`、汎用 `MatrixAnalysis.Matrix.normalizedTrace` と共有 `SYK.normalizedTrace`、Main の局所トレース指数結果の型と利用箇所を比較する。数学的に同じ場合だけ重複を整理し、スカラー型の違いを隠さない。`β`・`couplingScale P`、実部、測度、任意階の正則性・指数増大を `Setting.Z` へ接続する。変更ファイルの個別検査、必要な Model と CLT のビルド、公理依存を返す |
+| F02-P 名前衝突の解消 | `Main.lean` と `Lemmas/CliffordSignParity.lean` の同時 import が失敗する現状を起点とし、F02 の他の数学的入力を待たず着手可。同名の `SYK.partitionFunction` の意味と利用箇所を確定する | 衝突解消後に二モジュールの同時 import を Lean で検査し、既存定理文・規格化・公理依存を確認する。通常トレース、スケール、実部、ガウス測度、Hermite 定義の接続は別の F02 統合作業として残し、名前だけの変更で完了扱いにしない |
+| F02–F07 の統合 | 各 F の先行成果と原稿監査が揃ってから、上表の依存順に着手する。`Preliminaries.lean`・`CLTComponents.lean`・`GaussianConcentration.lean` は宣言のない雛形であり、利用の要否を接続時に判断する | 空の雛形を残すか import から外すかは参照調査後に決め、独立した将来用の層を増やさない。原稿との照合、主要定理の公理依存、CLT と最終的な既定ビルドを報告する |
+
+F01-G と F04-M の整理は、その数学的成果を受け渡す段階で行う。既存の宣言が異なる型・規格化・利用先を持つ場合は無理に一つへ畳まず、違いを記録する。R03 の結果から主張の修正が必要になった場合は、既存の定理文を黙って変えない。担当者は各票について開始ソース、編集ファイル、正確な入力宣言、検査結果を [全体計画の引き継ぎ手順](../EDITING_PLAN.md#別環境への引き継ぎ)に沿って統合担当へ渡す。
 
 ### 共同研究者に渡す作業票
 

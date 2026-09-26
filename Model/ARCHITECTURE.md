@@ -43,7 +43,7 @@ partitionFunction z H = Matrix.trace (exp (-z • H))
 | --- | --- | --- |
 | 逆温度 | `Params` から分離済みであり、解析には `z : ℂ`、物理的な結果には `β : ℝ≥0` を明示的に渡す。 | 移行済みの型を維持する。 |
 | 分配関数 | `partitionFunction` は `z : ℂ` を受け、通常のトレースを使う。規格化が必要な利用側は `normalizedTrace` から局所的に定義する。 | 実装済み。 |
-| 逆温度0 | `partitionFunction 0 H = Fintype.card d`。CLT 側の一般の非空有限次元表現に対する規格化分配関数も定義済みで、零逆温度で1となる。 | 標準表現への特殊化による原稿との対応を W06 で照合する。 |
+| 逆温度0 | `partitionFunction 0 H = Fintype.card d`。CLT 側の一般の非空有限次元表現に対する規格化分配関数も定義済みで、零逆温度で1となる。 | 標準表現への特殊化による原稿との対応は W06 の `SYK.CLT.partitionFunction_standard` で照合済み。 |
 | 複素解析 | 整関数性・複素微分・非零点での `logDeriv` の公式は `05d64f4` に実装され、W01 で関連検証と Blueprint・文書の更新を完了した。 | 現在の API を維持する。零点のない領域と正則な対数は Z01 で別に扱う。 |
 | ガウス型相互作用 | 係数空間、標準ガウス測度、`couplingScale P` と `normalizedHamiltonian P M g` は `Model.GaussianDisorder` に置く。 | 標準座標 `g_A` と実係数 `J_A = couplingScale P * g_A` を区別する。 |
 | 標準行列表現 | W04 で `StandardRepresentation` に Jordan–Wigner 表現を構成した。`StandardBasis (N/2)` の次元、生成子の基本関係、同じ偶数次数の相互作用演算子族の規格化トレース直交性を検証済み。 | 抽象的な `MajoranaSystem` に仮定やフィールドを追加しない。 |
