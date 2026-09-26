@@ -1183,10 +1183,10 @@ open scoped BigOperators InnerProductSpace Matrix.Norms.L2Operator
 open MeasureTheory
 
 /-!
-# Reusable analytic lemmas for finite-dimensional matrix Gibbs functions
+# Reusable spectral and analytic lemmas for finite-dimensional matrix Gibbs functions
 
-The first part contains analytic results independent of the SYK model. The second part
-develops sign-gauge symmetry for the SYK partition function and its Hermite coefficients.
+The spectral infrastructure above develops singular values, eigenvalue comparisons, and
+Schatten bounds. The sections below turn these tools into estimates for matrix exponentials.
 
 The main reusable pieces are:
 
@@ -1195,6 +1195,7 @@ The main reusable pieces are:
 * normalized trace and normalized Schatten norms;
 * Schatten Hölder and operator-norm multiplication bounds;
 * the exact Schatten norm of an exponential of a Hermitian matrix;
+* positive-trace and word bounds, followed by change-of-origin Taylor-coefficient estimates;
 * an iterated directional derivative bound for the normalized trace exponential.
 -/
 
@@ -2071,7 +2072,7 @@ theorem changeOrigin_coef_bound [Nonempty n] (D : Matrix n n 𝕜)
       ContinuousLinearMap.compContinuousMultilinearMap_coe, Function.comp_apply]
     simp only [NormedSpace.expSeries, ContinuousMultilinearMap.smul_apply,
       ContinuousMultilinearMap.mkPiAlgebraFin_apply, map_smul, hL,
-      ContinuousLinearMap.smul_apply, normalizedTraceCLM_apply, smul_eq_mul, smul_eq_mul,
+      normalizedTraceCLM_apply, smul_eq_mul, smul_eq_mul,
       norm_mul, norm_mul, norm_inv, RCLike.norm_natCast, mul_assoc]
     rw [mul_left_comm]
     refine mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left ?_ (by positivity)) (norm_nonneg _)

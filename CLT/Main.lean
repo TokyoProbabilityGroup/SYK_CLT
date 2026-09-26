@@ -540,6 +540,7 @@ end Setting
 
 /-! ## Main results -/
 
+
 /-- The annealed proposition for the Gaussian families in this module. -/
 abbrev AnnealedInput (q : ℕ) :=
   AnnealedFE.AnnealedFreeEnergyLimit q (Setting q) Setting.N Setting.meanZ
