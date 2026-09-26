@@ -124,14 +124,14 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 有限模型では現在の `P : Params`、`M : MajoranaSystem P.N (Matrix d d ℂ)`、`[Fintype d] [DecidableEq d] [Nonempty d]` とすべての `β : ℝ` を用いる。確率測度は `standardGaussianMeasure P.N P.q`。原稿の漸近結果は引き続き固定偶数 `q≥4` と `Setting q` を使う。有限模型の定理に `AnnealedInput` や最終 CLT を仮定しない。
 
-- [ ] 既存の有限模型の定義・証明を再検査する。標準表現へ特殊化したとき、`standardBasis_card` により `normalizedTrace = 2^(-N/2) Tr` となる対応を確認する。一般表現と標準表現の分配関数が一致するという表現独立性までは証明対象にしない。
-- [ ] 偶数の正の次数の各相互作用のトレースが零であることから `normalizedTrace (normalizedHamiltonian P M g) = 0` を導く。既存の `interactionOperator_mul_generator_of_mem`、`majorana_sq`、トレースの巡回性を使う局所的な証明を優先し、F02 の符号ゲージ変換全体を前提にしない。
-- [ ] 自己共役性とトレース零から、規格化された固有値平均への Jensen により `1 ≤ realPartitionFunction P M β g` を証明する。一般行列の補題を追加する場合は Model の既存ファイルに置き、SYK の適用と分離する。
-- [ ] 有限次元で `Z(β,g) ≤ exp(C * ‖g‖)`（固定した模型・`β` に依存する有限定数）などの支配評価と可測性を示し、ガウス測度の既存の `integrable_exp_mul_norm` を使う。必要な結論は `MemLp (S.Z β n) 2 μ`、`Integrable (log ∘ S.Z β n) μ`、`0 < S.meanZ β n`。現在の `partition_moments` の定理文を保って `sorry` を除く。全次数の微分評価やサイズに一様な最良定数は要求しない。
-- [ ] `Y_N=Z_N/E Z_N` の正値性・可積分性・`E Y_N=1` と `MemLp Y_N 2 μ` を導く。`log Y_N=log Z_N-log E Z_N` とその可積分性を示し、中心化した `log Y_N` と `log Z_N` の一致を証明する。
-- [ ] 新証明への有限模型の受け渡しとして `0≤log Z_N`、`-log Y_N≤log E Z_N`、`0≤log E Z_N` を供給する。`log E Z_N=O(N)` と中心化誤差の漸近評価は外部入力・カオス評価を要するため F06・F07 に残す。
-- [ ] `β=0` で `meanZ=1`、`Y_N=1`、実対数と相対・対数ゆらぎが零になることを確認する。標準化 CLT を `β=0` に拡張しない。
-- [ ] README・構造文書・Blueprint の現在の定理文、入力、証明状態、現行原稿の参照との一致を確認する。
+- [x] 既存の有限模型の定義・証明を再検査する。標準表現へ特殊化したとき、`standardBasis_card` により `normalizedTrace = 2^(-N/2) Tr` となる対応を確認する。一般表現と標準表現の分配関数が一致するという表現独立性までは証明対象にしない。
+- [x] 偶数の正の次数の各相互作用のトレースが零であることから `normalizedTrace (normalizedHamiltonian P M g) = 0` を導く。既存の `interactionOperator_mul_generator_of_mem`、`majorana_sq`、トレースの巡回性を使う局所的な証明を優先し、F02 の符号ゲージ変換全体を前提にしない。
+- [x] 自己共役性とトレース零から、規格化された固有値平均への Jensen により `1 ≤ realPartitionFunction P M β g` を証明する。一般行列の補題を追加する場合は Model の既存ファイルに置き、SYK の適用と分離する。
+- [x] 有限次元で `Z(β,g) ≤ exp(C * ‖g‖)`（固定した模型・`β` に依存する有限定数）などの支配評価と可測性を示し、ガウス測度の既存の `integrable_exp_mul_norm` を使う。必要な結論は `MemLp (S.Z β n) 2 μ`、`Integrable (log ∘ S.Z β n) μ`、`0 < S.meanZ β n`。現在の `partition_moments` の定理文を保って `sorry` を除く。全次数の微分評価やサイズに一様な最良定数は要求しない。
+- [x] `Y_N=Z_N/E Z_N` の正値性・可積分性・`E Y_N=1` と `MemLp Y_N 2 μ` を導く。`log Y_N=log Z_N-log E Z_N` とその可積分性を示し、中心化した `log Y_N` と `log Z_N` の一致を証明する。
+- [x] 新証明への有限模型の受け渡しとして `0≤log Z_N`、`-log Y_N≤log E Z_N`、`0≤log E Z_N` を供給する。`log E Z_N=O(N)` と中心化誤差の漸近評価は外部入力・カオス評価を要するため F06・F07 に残す。
+- [x] `β=0` で `meanZ=1`、`Y_N=1`、実対数と相対・対数ゆらぎが零になることを確認する。標準化 CLT を `β=0` に拡張しない。
+- [x] README・構造文書・Blueprint の現在の定理文、入力、証明状態、現行原稿の参照との一致を確認する。
 
 ### 範囲と実行順序
 
@@ -150,6 +150,40 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 `CLT/Main.lean` は `Annealed_FE/main_result.lean` を直接 import するため、同ライブラリの既定対象からの除外だけでは依存先としての構築を除けない。既存の `Annealed_FE` の10箇所と共同 CLT の `sorry` は対象外として報告し、ビルド成功を最終結果の証明完了と呼ばない。対象外のエラーが検査を妨げる場合は根拠を記録し、無断で対象外へ修正を広げない。
 
 W06 の完了は、上記の有限模型の成果・原稿との対応・[Chapters の計画](../Chapters/EDITING_PLAN.md)の更新・差分確認までとする。Verso の生成・参照検査は休止中につき行わない。今回の再計画ではこれらの証明・ビルドを実施しておらず、W06 完了ではない。
+
+### 引き継ぎ・有限模型の検証（2026-09-26）
+
+開始時点は `nakajima` の `b885edd`、作業ツリーはクリーンだった。`0cb8c28` にはトレース零、固有値による `Z≥1`、指数増大と `partition_moments`、零逆温度の証明が既に含まれていた。上の9月24日の棚卸しは履歴であり、現在の未証明箇所の一覧ではない。
+
+今回、既存証明を維持して次を追加・検証した。
+
+- `normalizedHamiltonian_normalizedTrace_eq_zero` と `partitionFunction_standard`。後者は `standardBasis_card` により通常トレースの係数を `(2^(N/2))⁻¹` とする。原稿の `subsec:SYK-model` と位相、ガウス分散、ギブス因子の符号、標準表現の次元が一致する。一般表現の外部極限定理や表現独立性は主張しない。
+- `Setting.Y_memLp`・`Y_integrable`・`Y_pos`・`integral_Y` により相対量の正値性、二乗可積分性、可積分性、期待値1を得た。
+- `meanZ_ge_one`・`log_meanZ_nonneg`・`log_Y_eq`・`log_Y_integrable`・`integral_log_Y`・`centered_log_Y_eq`・`neg_log_Y_le_log_meanZ` により、有効な `cor:free-energy-clt` の有限模型の対数恒等式と下界を得た。`meanLogZ` と `log meanZ` を同一視していない。`log E Z=O(N)` と中心化誤差の漸近評価は引き続き F06・F07。
+- 既存の `varianceZ_zero`・`meanZ_zero`・`Y_zero`・`meanLogZ_zero`・`relativeFluctuation_zero`・`logFluctuation_zero` を再検証した。実対数が零になることは `realPartitionFunction_zero`・`Y_zero` と `Real.log_one` から従う。
+
+検証結果：
+
+- 初回 `lake env lean SYK/CLT/Main.lean` は古い `main_result.olean` の `incompatible header` で失敗。`lake build SYK.CLT.Main` による依存先の再構築で解消し、依存設定・バージョンは変更していない。
+- 最終 `lake env lean SYK/CLT/Main.lean` と `lake build SYK.CLT.Main` は成功（3134 jobs）。`lake build SYK.Model.StandardRepresentation` も成功した。Main の警告は対象外の共同 CLT の既存 `sorry` のみ。
+- Main の有限模型・Setting 部分にある公開30定理すべての `#print axioms` は `propext`・`Classical.choice`・`Quot.sound` のみ。`partition_moments`、トレース零、`Z≥1`、今回追加した相対量と対数の結果は `AnnealedInput`、最終 CLT、未検証の前提に依存しない。
+- 最終 `lake build CLT` は `CLT/Lemmas/Tool.lean:1:0: unknown module prefix 'RequestProject'` で失敗した。Main はこのビルドでも成功し、失敗対象は Tool のみ。`Tool.lean` は着手前から追跡されている別課題の補助ファイルで、W06 の import 経路にない。対象を除外して成功扱いにする設定変更や、未承認の外部依存追加は行わない。GaussianIBP 等の既存 linter・非推奨警告は残る。
+- 既存の共同 CLT の1箇所と `Annealed_FE` の10箇所の `sorry` は対象外。有限模型30定理の公理依存とは区別する。
+- README・構造文書・Blueprint の有限模型の記述を検証済み宣言に対応させ、章の古い GaussianIBP import パスも実在する `Lemmas/GaussianIBP` に合わせた。章内の宣言参照と依存名をソース照合した。Verso は休止中であり、章の Lean 検査・生成・`vbp check` は未実施。
+
+この引き継ぎ時点では有限模型の実装と個別検証が完了し、W06 全体は関連ライブラリの検査条件が未達だった。後続の削除・完了記録は次節を参照する。
+
+- [x] `Tool.lean` の扱いを確定した後、`lake build CLT` を再実行し、W06 の統合検証を完了する（後続依頼による参照監査・削除で解消）。
+
+### Tool.lean の参照監査・削除と W06 完了（2026-09-26）
+
+ユーザーから「本文の主張を含む他ファイルからの参照を確認し、問題なければ Tool.lean を削除し、W06 を閉じて作業記録を残す」と指示されたため、次の順で実施した。
+
+1. **参照監査**：ワークスペース内の Lean・TeX・Markdown・Lake 設定を検索した。他の Lean に `SYK.CLT.Lemmas.Tool` の import はなく、本文・Blueprint にこのモジュールや固有宣言への参照もなかった。Tool 内の宣言名候補60件（コメントアウトされた宣言を含む）を短い名前でも検索した。同名ヒットの `hermiteMulti` は `SYK.CLT.GaussianIBP` の独立定義、`normalizedTrace` は Model または AnnealedFE の独立定義、`partitionFunction` は Model・CLT・AnnealedFE の独立定義とその利用だった。`kernel` と `reflection` は自然言語の記述であり、Tool の宣言利用ではない。README・構造文書・計画書の紹介と履歴だけが Tool を参照していた。本文に関連する題材が Tool に含まれていたことと、本文の主張がその Lean 宣言を参照・利用していることを区別した。
+2. **削除と検証**：`CLT/Lemmas/Tool.lean`（834行）を削除した。削除前の内容は `0cb8c287f85e338e6b25043c228009876ca2ec35:CLT/Lemmas/Tool.lean` で参照できる。Lake の glob・依存・toolchain は変更していない。削除後の `lake build CLT` は **3171 jobsで成功**、`lake env lean SYK/CLT/Main.lean` も成功した。有限模型の公開30定理の公理依存を再確認し、すべて `propext`・`Classical.choice`・`Quot.sound` のみで `sorryAx` はなかった。
+3. **記録の更新**：README・構造文書から Tool を現存する部品として扱う説明を外し、全体計画の W06 を完了に更新した。Blueprint の対応する有限模型のソース照合は前節の結果を維持し、章の計画書にもビルド障害の解消を記録した。過去の Tool の紹介・ビルド失敗は時点付きの履歴として残す。
+
+**W06 は完了。** 有限模型・モーメント・相対量と対数の恒等式・零逆温度・標準表現との対応、個別検査・関連ビルド・公理依存・文書とBlueprintのソース照合・差分確認を終えた。共同 CLT の1箇所と Annealed_FE の10箇所の既存 `sorry`、GaussianIBP 等の既存 linter・非推奨警告は残り、最終 CLT や F01–F08 の完成を意味しない。Verso の章検査・生成・参照検査は休止規則に従って未実施。次単位には着手せず、変更は未コミット。
 
 ### 現行証明の再検証（2026-09-24）
 

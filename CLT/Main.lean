@@ -1,4 +1,5 @@
 import SYK.Annealed_FE.main_result
+import SYK.Model.StandardRepresentation
 import SYK.Model.GaussianDisorder
 import SYK.Model.FiniteDimensionalGibbs
 import Mathlib.Analysis.Asymptotics.Lemmas
@@ -134,6 +135,13 @@ theorem normalizedHamiltonian_trace_eq_zero (P : Params)
 
 variable [Nonempty d]
 
+/-- The Hamiltonian also has zero dimension-normalized trace. -/
+theorem normalizedHamiltonian_normalizedTrace_eq_zero (P : Params)
+    (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (g : CouplingSpace P.N P.q) :
+    normalizedTrace (normalizedHamiltonian P M g) = 0 := by
+  simp only [normalizedTrace, normalizedHamiltonian_trace_eq_zero, zero_div]
+
 private noncomputable def normalizedHamiltonianLinear (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) :
     CouplingSpace P.N P.q →L[ℝ] Matrix d d ℂ :=
@@ -251,6 +259,17 @@ private theorem exists_realPartitionFunction_exp_bound (P : Params)
           simp [A, norm_smul]
     _ ≤ |β| * (C * ‖g‖) * ‖(1 : Matrix d d ℂ)‖ := by gcongr
     _ = K * ‖g‖ := by ring
+
+/-- Specializing the existing definition gives the trace normalization in
+`subsec:SYK-model`; this does not assert representation independence. -/
+theorem partitionFunction_standard (P : Params) (hN : Even P.N) (z : ℂ)
+    (g : CouplingSpace P.N P.q) :
+    partitionFunction P (standardMajoranaSystem P.N hN) z g =
+      ((2 : ℂ) ^ (P.N / 2))⁻¹ *
+        SYK.partitionFunction z
+          (normalizedHamiltonian P (standardMajoranaSystem P.N hN) g) := by
+  rw [partitionFunction_eq_trace_div_card, standardBasis_card]
+  simp only [Nat.cast_pow, Nat.cast_ofNat, div_eq_mul_inv, mul_comm]
 
 end FiniteModel
 
@@ -451,6 +470,71 @@ theorem partition_moments (β : ℝ) (n : ℕ) :
           integral_mono (integrable_const _) hZint (S.Z_ge_one β n)
     linarith
   exact ⟨hlp, hlog, hmean⟩
+
+/-- Normalization preserves the second moment. -/
+theorem Y_memLp (β : ℝ) (n : ℕ) :
+    MemLp (S.Y β n) 2 (standardGaussianMeasure (S.N n) q) := by
+  change MemLp (fun g ↦ S.Z β n g / S.meanZ β n) 2 _
+  simpa only [div_eq_mul_inv, mul_comm] using
+    ((S.partition_moments β n).1.const_mul (S.meanZ β n)⁻¹)
+
+theorem Y_integrable (β : ℝ) (n : ℕ) :
+    Integrable (S.Y β n) (standardGaussianMeasure (S.N n) q) :=
+  (S.Y_memLp β n).integrable (by norm_num)
+
+theorem Y_pos (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
+    0 < S.Y β n g :=
+  div_pos (lt_of_lt_of_le zero_lt_one (S.Z_ge_one β n g))
+    (S.partition_moments β n).2.2
+
+/-- The normalization in `subsec:SYK-model` has expectation one. -/
+theorem integral_Y (β : ℝ) (n : ℕ) :
+    (∫ g, S.Y β n g ∂standardGaussianMeasure (S.N n) q) = 1 := by
+  change (∫ g, S.Z β n g / S.meanZ β n ∂standardGaussianMeasure (S.N n) q) = 1
+  rw [integral_div]
+  exact div_self (ne_of_gt (S.partition_moments β n).2.2)
+
+theorem meanZ_ge_one (β : ℝ) (n : ℕ) : 1 ≤ S.meanZ β n := by
+  have hZint := (S.partition_moments β n).1.integrable (by norm_num : (1 : ENNReal) ≤ 2)
+  calc
+    (1 : ℝ) = ∫ _g : CouplingSpace (S.N n) q, (1 : ℝ)
+        ∂standardGaussianMeasure (S.N n) q := by simp
+    _ ≤ S.meanZ β n := integral_mono (integrable_const _) hZint (S.Z_ge_one β n)
+
+theorem log_meanZ_nonneg (β : ℝ) (n : ℕ) : 0 ≤ Real.log (S.meanZ β n) :=
+  Real.log_nonneg (S.meanZ_ge_one β n)
+
+theorem log_Y_eq (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
+    Real.log (S.Y β n g) = Real.log (S.Z β n g) - Real.log (S.meanZ β n) :=
+  Real.log_div (ne_of_gt (lt_of_lt_of_le zero_lt_one (S.Z_ge_one β n g)))
+    (ne_of_gt (S.partition_moments β n).2.2)
+
+theorem log_Y_integrable (β : ℝ) (n : ℕ) :
+    Integrable (fun g ↦ Real.log (S.Y β n g))
+      (standardGaussianMeasure (S.N n) q) := by
+  simp_rw [S.log_Y_eq β n]
+  exact (S.partition_moments β n).2.1.sub (integrable_const _)
+
+theorem integral_log_Y (β : ℝ) (n : ℕ) :
+    (∫ g, Real.log (S.Y β n g) ∂standardGaussianMeasure (S.N n) q) =
+      S.meanLogZ β n - Real.log (S.meanZ β n) := by
+  simp_rw [S.log_Y_eq β n]
+  rw [integral_sub (S.partition_moments β n).2.1 (integrable_const _)]
+  simp [meanLogZ]
+
+/-- The two logarithmic centerings agree in `cor:free-energy-clt`. -/
+theorem centered_log_Y_eq (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
+    Real.log (S.Y β n g) -
+        (∫ x, Real.log (S.Y β n x) ∂standardGaussianMeasure (S.N n) q) =
+      Real.log (S.Z β n g) - S.meanLogZ β n := by
+  rw [S.log_Y_eq, S.integral_log_Y]
+  ring
+
+/-- Pointwise input for the small-event estimate in `cor:free-energy-clt`. -/
+theorem neg_log_Y_le_log_meanZ (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
+    -Real.log (S.Y β n g) ≤ Real.log (S.meanZ β n) := by
+  rw [S.log_Y_eq]
+  linarith [S.log_Z_nonneg β n g]
 
 end Setting
 

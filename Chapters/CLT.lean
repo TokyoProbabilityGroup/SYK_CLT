@@ -3,7 +3,7 @@ import VersoManual
 import VersoBlueprint
 import SYK.CLT.Main
 import SYK.CLT.Lemmas.ConvexDerivatives
-import SYK.CLT.GaussianIBP
+import SYK.CLT.Lemmas.GaussianIBP
 
 open Verso.Genre
 open Verso.Genre.Manual
@@ -40,18 +40,25 @@ $`d_N=2^{N/2}` representation; the general-family external limit has not
 been supplied.
 :::
 
-:::theorem "clt_finite_partition_properties" (parent := "central_limit_theorem") (uses := "clt_partition_function") (lean := "SYK.CLT.partitionFunction_zero, SYK.CLT.partitionFunction_eq_trace_div_card, SYK.CLT.partitionFunction_im_eq_zero, SYK.CLT.realPartitionFunction_pos")
+:::theorem "clt_finite_partition_properties" (parent := "central_limit_theorem") (uses := "clt_partition_function") (lean := "SYK.CLT.partitionFunction_zero, SYK.CLT.partitionFunction_eq_trace_div_card, SYK.CLT.partitionFunction_im_eq_zero, SYK.CLT.realPartitionFunction_pos, SYK.CLT.partitionFunction_standard")
 The normalized partition function satisfies $`Z_N(0;g)=1`, agrees with the
 shared ordinary-trace partition function after division by $`d_N`, and is
 real and strictly positive at every real inverse temperature. These
 finite-dimensional statements have Lean proofs without `sorryAx`.
+Specialization to the standard representation gives the coefficient
+$`(2^{N/2})^{-1}` by `standardBasis_card`; no representation-independence
+claim is needed.
 :::
 
-:::theorem "clt_partition_moments" (parent := "central_limit_theorem") (uses := "clt_finite_partition_properties") (lean := "SYK.CLT.Setting.partition_moments")
-The intended finite-model input asserts $`Z_N\in L^2`, integrability of
-$`\log Z_N`, and $`\mathbb E Z_N>0` for each real $`\beta` and size.
-Its Lean proof is still `sorry`; positivity of the pointwise partition
-function alone does not establish these moment claims.
+:::theorem "clt_partition_moments" (parent := "central_limit_theorem") (uses := "clt_trace_lower_bound") (lean := "SYK.CLT.Setting.partition_moments")
+For each real $`\beta` and size, $`Z_N\in L^2`, $`\log Z_N` is
+integrable, and $`\mathbb E Z_N>0`. These Lean proofs have no `sorryAx`
+and need no annealed input. The Hamiltonian is a continuous linear map
+of the finite-dimensional Gaussian coordinates, so
+$`Z_N(\beta;g)\le\exp(C\|g\|)` for a finite nonnegative constant
+depending on the model and temperature. Gaussian exponential
+integrability controls the square, while $`1\le Z_N` bounds the
+logarithm between zero and $`C\|g\|`.
 :::
 
 :::theorem "clt_conditional_annealed_limit" (parent := "central_limit_theorem") (uses := "gaussian_annealed_input") (lean := "SYK.CLT.annealedFreeEnergy_tendsto, SYK.CLT.annealedDerivative_tendsto, SYK.CLT.secondChaosCoefficient_tendsto")
@@ -140,15 +147,41 @@ formula; its parameter range still needs correction before treating the
 manuscript and Lean statements as identical.
 :::
 
-:::theorem "clt_trace_lower_bound" (parent := "central_limit_theorem") (uses := "clt_finite_partition_properties")
+:::theorem "clt_trace_lower_bound" (parent := "central_limit_theorem") (uses := "clt_finite_partition_properties") (lean := "SYK.CLT.interactionOperator_trace_eq_zero, SYK.CLT.normalizedHamiltonian_normalizedTrace_eq_zero, SYK.CLT.realPartitionFunction_ge_one")
 In the active proof of `cor:free-energy-clt`, conjugation by a Majorana
 generator makes every even-degree interaction traceless. Hence
 $`\operatorname{tr}H_N=0`, and Jensen's inequality gives
-$`Z_N(\beta;g)\ge1` for real $`\beta`. This is a manuscript argument;
-the corresponding Lean lemmas have not been implemented.
+$`Z_N(\beta;g)\ge1` for real $`\beta`. These statements are proved
+in Lean without `sorryAx` for any nonempty finite matrix Majorana
+representation. The spectral proof sums $`1+x\le e^x` over eigenvalues
+whose sum is zero.
 :::
 
-:::theorem "clt_log_centering_error" (parent := "central_limit_theorem") (uses := "clt_trace_lower_bound, clt_second_chaos_and_remainder")
+:::theorem "clt_relative_and_log_moments" (parent := "central_limit_theorem") (uses := "clt_partition_moments, clt_trace_lower_bound") (lean := "SYK.CLT.Setting.Y_pos, SYK.CLT.Setting.Y_memLp, SYK.CLT.Setting.Y_integrable, SYK.CLT.Setting.integral_Y, SYK.CLT.Setting.log_Y_eq, SYK.CLT.Setting.log_Y_integrable, SYK.CLT.Setting.integral_log_Y, SYK.CLT.Setting.centered_log_Y_eq, SYK.CLT.Setting.log_Z_nonneg, SYK.CLT.Setting.log_meanZ_nonneg, SYK.CLT.Setting.neg_log_Y_le_log_meanZ")
+For every real inverse temperature, $`Y_N=Z_N/\mathbb E Z_N` is positive,
+belongs to $`L^2`, and has expectation one. Its logarithm is integrable,
+and
+
+$$`
+\log Y_N=\log Z_N-\log\mathbb E Z_N,
+\qquad
+\log Y_N-\mathbb E\log Y_N=\log Z_N-\mathbb E\log Z_N.
+`$$
+
+Moreover, $`\log Z_N\ge0`, $`\log\mathbb E Z_N\ge0`, and
+$`-\log Y_N\le\log\mathbb E Z_N`. These finite-model inputs to
+`cor:free-energy-clt` are proved without `sorryAx`. They do not supply
+the asymptotic estimate $`\log\mathbb E Z_N=O(N)`.
+:::
+
+:::theorem "clt_zero_inverse_temperature" (parent := "central_limit_theorem") (uses := "clt_partition_function") (lean := "SYK.CLT.Setting.meanZ_zero, SYK.CLT.Setting.Y_zero, SYK.CLT.Setting.meanLogZ_zero, SYK.CLT.Setting.relativeFluctuation_zero, SYK.CLT.Setting.logFluctuation_zero, SYK.CLT.Setting.varianceZ_zero")
+At zero inverse temperature, $`Z_N=\mathbb E Z_N=Y_N=1`. Both real
+logarithms and the relative and centered logarithmic fluctuations vanish.
+The disorder variance is zero. These identities have Lean proofs without
+`sorryAx`; they do not extend the standardized CLT to $`\beta=0`.
+:::
+
+:::theorem "clt_log_centering_error" (parent := "central_limit_theorem") (uses := "clt_relative_and_log_moments, clt_second_chaos_and_remainder")
 Write $`W_N=\log Y_N` and $`a=q/2-1`. The active manuscript proof combines
 $`\mathbb E(Y_N-1)^2=O(N^{-2a})` with
 $`\mathbb P(Y_N<1/2)=O(N^{-3a})`. On the small event,

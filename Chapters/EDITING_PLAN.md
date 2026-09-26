@@ -17,7 +17,7 @@ CLT・Annealed_FE の共同実装中は、既存の未形式化ノードを計�
 - [x] W04：`Model.lean` に標準表現・次元・基本関係・トレース直交性の主要宣言を反映する。抽象的な系の性質と具体的な表現の性質を区別する。
 - [x] W05：`SuperConcentration.lean` の参照と依存関係を新配置に合わせ、標準規格化の MGF・片側・両側の裾評価を公開宣言へ対応付ける。
 - [x] 2026-09-25 の現行ソース照合：`AnnealedFE.lean` を追加し、Rademacher 原稿の極限と CLT のガウス入力構造を分けた。`CLT.lean` に実装済みの有限模型・条件付き漸近、未完了のモーメント・最終 CLT、改訂原稿の対数 CLT 経路を反映した。`thm: input` の概収束は原典からの追加論証が必要と記録した。Verso の機械的検査は休止中。
-- [ ] W06 の実装完了時：`CLT.lean` のモーメント・トレース零・`Z≥1`・対数の恒等式を、実際に完成した宣言へ対応付け、証明状態を更新する。現行の `AnnealedInput` と原稿の外部結果の差を維持し、旧集中評価を必須依存に戻さない。
+- [x] W06 の有限模型の個別検証後（2026-09-26）：`CLT.lean` のモーメント・トレース零・`Z≥1`・対数の恒等式を、実際に完成した宣言へ対応付け、証明状態を更新する。現行の `AnnealedInput` と原稿の外部結果の差を維持し、旧集中評価を必須依存に戻さない。
 
 今回の章更新では `Blueprint.lean` に `AnnealedFE.lean` を組み込み、既存の長文設計案 `Annealed_FE/annealed_blueprint.txt` の冒頭に現行配置と未完成状態を明記した。`CLT/ARCHITECTURE.md` も新しい章構成に合わせた。原稿、CLT・Annealed_FE の数学 Lean ソース、および共有 Lake 設定は変更していない。
 
@@ -72,3 +72,7 @@ W02 では `GaussianConcentration.lean` の import と宣言参照を新しい�
 対象は着手時コミット `9c8f0354a8429e7f943a34abd5415b1e8845c5dc` からの未コミット差分。SuperConcentration 章の配置説明を `DensityMatrix`・`MajoranaBound`・`Main` に合わせ、MGF と上下の裾の2項目を追加し、零逆温度の点ごとの中心化を公開宣言に対応付けた。MGF パラメータ `β²/q`、片側の指数 `-q t²/(2β²)`、両側の係数2、通常トレース・標準ガウス座標・非空の有限行列表現・逆温度の範囲は Lean の定理文と照合した。最良定数や分散の等式は主張していない。
 
 `lake env lean SYK/Chapters/SuperConcentration.lean` は warning なしで成功した。宣言名と依存名を保存された章・数学ソースで照合し、未定義名は検出されなかった。上流の `lake build Model SuperConcentration CLT` と主要15定理の公理依存確認も成功した。Verso の休止に従い、HTML の生成・参照検査は実行しておらず、その成功は主張しない。
+
+### W06 の有限模型のソース照合（2026-09-26）
+
+有限模型30定理の公理依存確認と Main の個別ビルド成功後、モーメント・トレース零・`Z≥1` の状態を更新し、相対量と対数の中心化、零逆温度のノードを追加した。標準表現との規格化の対応もリンクした。古い `SYK.CLT.GaussianIBP` import は実在する `SYK.CLT.Lemmas.GaussianIBP` に訂正した。今回追加・変更した宣言参照とノード依存をソース照合した。引き継ぎ時点ではCLT全体のビルドが Tool の `RequestProject` 依存で失敗していたが、同日の後続依頼で参照監査後に未使用の Tool を削除し、`lake build CLT` が3171 jobsで成功した。これにより W06 の統合検証を完了した。Verso の章検査・生成・参照検査は休止中につき未実施。詳しい検証根拠は [CLT の W06](../CLT/EDITING_PLAN.md#w06) に集約する。
