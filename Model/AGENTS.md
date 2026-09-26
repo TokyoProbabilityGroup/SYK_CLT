@@ -6,14 +6,15 @@
 
 ## 作業前に読む文書
 
-模型の定義または公開 API を変更する前に、次を確認する。
+模型の定義または公開 API を変更する前に、指定 ID と編集対象に関係する次の箇所を確認する。完了済み作業の履歴は必要になった場合だけ [作業履歴](../WORK_HISTORY.md) の該当節を読む。
 
-1. `ARCHITECTURE.md`
-2. `EDITING_PLAN.md`
-3. `../lectureNotes/note.tex` の有限次元 SYK 模型に関する箇所
-4. `../CLT/refs/sections/introduction.tex` の `subsec:SYK-model`
-5. `model.txt`（過去の設計案としてのみ参照する）
-6. 変更する識別子を利用するすべての Lean ファイル
+1. `../EDITING_PLAN.md` の指定 ID の一覧行
+2. `ARCHITECTURE.md` の関係する規約・依存関係
+3. `EDITING_PLAN.md` の該当する作業節
+4. `../lectureNotes/note.tex` の変更対象に関する有限次元 SYK 模型の箇所
+5. CLT の規格化に関係する場合は `../CLT/refs/sections/introduction.tex` の `subsec:SYK-model`
+6. 過去の設計案との比較が必要な場合だけ `model.txt`
+7. 変更する識別子を利用するすべての Lean ファイル
 
 ## 役割と正式な参照元
 

@@ -4,9 +4,9 @@
 
 2026-09-24、コミット `6621fedfb214cef1b1c3dead0951efdff6bb3e2d` の原稿と手作業を含む Lean 実装に基づき、W06 の再計画に必要な依存関係を更新した。今回の照合はソースの確認であり、外部文献の監査・Lean の再検証・原稿のコンパイルではない。
 
-同日の後続依頼で、関連ビルド・CLT と Annealed_FE の個別検査・26宣言の公理依存を再検証した。有限模型6定理、条件付き漸近5定理、凸関数3補題、共有基盤6宣言は通常公理のみであり、残る6宣言には `sorryAx` がある。正確な対象・仮定・警告は [編集計画の W06 検証記録](EDITING_PLAN.md#w06) に記す。外部入力そのものと最終 CLT は未証明のままである。
+同日の後続依頼で、関連ビルド・CLT と Annealed_FE の個別検査・26宣言の公理依存を再検証した。有限模型6定理、条件付き漸近5定理、凸関数3補題、共有基盤6宣言は通常公理のみであり、残る6宣言には `sorryAx` がある。正確な対象・仮定・警告は [W06 の検証記録](../WORK_HISTORY.md#clt-w06) に記す。外部入力そのものと最終 CLT は未証明のままである。
 
-正確な原稿の主張は `refs/CLT_SYK.tex` と、そこから読み込む `introduction.tex`・`gaussian-chaos.tex`・`higher-chaoses.tex`・`main-results.tex` を参照する。実装の型と証明項は Lean ソース、横断的な状態は [全体計画](../EDITING_PLAN.md)、残作業・検証根拠は [編集計画](EDITING_PLAN.md) に置く。原稿内の証明、外部結果、Lean の検証済み証明を区別する。
+正確な原稿の主張は `refs/CLT_SYK.tex` と、そこから読み込む `introduction.tex`・`gaussian-chaos.tex`・`higher-chaoses.tex`・`main-results.tex` を参照する。実装の型と証明項は Lean ソース、横断的な状態は [全体計画](../EDITING_PLAN.md)、残作業は [編集計画](EDITING_PLAN.md)、完了済み作業の詳しい検証根拠は [作業履歴](../WORK_HISTORY.md) に置く。原稿内の証明、外部結果、Lean の検証済み証明を区別する。
 
 `main-results.tex` の対数 CLT には有効な新証明と `\iffalse` 内の旧証明がある。現在の依存関係は新証明を基準とし、旧集中評価を必須入力に数えない。旧本文の削除はこの再計画に含めない。
 
@@ -40,7 +40,7 @@
 | ガウス–エルミート部分積分 | `Lemmas/GaussianIBP.lean` に一次元・多変数の補助結果がある。`Setting.Z` への正則性・成長評価と特殊化、および原稿全体との照合は別途必要 |
 | ラデマッハ評価 | `Lemmas/Rademacher.lean` に有限符号平均と `rademacher_encoding` がある。関連ビルド・主要定理の公理依存を確認済み。符号化の計数恒等式と F03/F05 の CLT 側への接続は未完了 |
 | 行列解析と対称性 | `Lemmas/Tool.lean` は有限次元の特異値・Schatten 評価と Hermitian 行列の指数の高階微分評価を証明済みで、`lake build CLT` も成功した。これらを CLT のカオス解析へ接続する作業は F04 に残る。符号ゲージ・Hermite 偶奇則の CLT への接続は F02 に残る |
-| 符号ゲージ・偶奇則 | `Lemmas/CliffordSignParity.lean` 単独のビルドと主要定理の公理依存は確認済み。ただし `SYK.partitionFunction` が共有宣言と衝突し、Main と同時に import できない。規格化・測度・Hermite の接続も未完了。詳細は [統合監査](EDITING_PLAN.md#integration-audit-2026-09-26) |
+| 符号ゲージ・偶奇則 | `Lemmas/CliffordSignParity.lean` 単独のビルドと公理依存は確認済み。共有宣言との衝突と模型への接続は [F02 の担当票](EDITING_PLAN.md#ticket-f02-p) を参照 |
 | その他の補助モジュール | `Preliminaries`・`CLTComponents`・`GaussianConcentration` は引き続き実質的に雛形。新しい補助ファイルの存在だけではこれらの計画済み適用は完了しない |
 | Blueprint | `../Chapters/AnnealedFE.lean` でガウス入力構造と別原稿の Rademacher 極限を分け、`../Chapters/CLT.lean` で有限模型の証明状態・条件付き極限・現行の対数 CLT の依存を記録した。Verso の生成・参照検査は休止中 |
 
@@ -157,7 +157,7 @@ flowchart TD
 
 流用元は SpinGlass のコミット `dc1d3820af6e443c09bd1177ec3e409cf0640d5c` とする。候補は [ExpGrowth.lean](https://github.com/or4nge19/SpinGlass/blob/dc1d3820af6e443c09bd1177ec3e409cf0640d5c/Common/Mathlib/Probability/Distributions/Gaussian/ExpGrowth.lean) の `HasExpGrowth`・可積分性の補題と、[GaussianIntegrationByParts.lean](https://github.com/or4nge19/SpinGlass/blob/dc1d3820af6e443c09bd1177ec3e409cf0640d5c/Common/Mathlib/Probability/Distributions/GaussianIntegrationByParts.lean) の `stein_lemma_gaussianReal_of_expGrowth'` である。先方の Lean/mathlib は `4.34.0-rc2`、現行ワークスペースは `4.32.2` であり、全体を Lake の依存に加えるのではなく、必要な証明を選んで既存の `SYK.Probability.GaussianConcentration` に統合する。既存の `gaussianReal_stein` と重複させず、流用する証明・仮定・出典を個別に確認する。これらの流用候補の採用・出典照合は未完了である。一方、下記の一般部分積分は現行コードで既に検証済みであり、その証明の完成と、流用・重複整理・共有配置の計画を区別する。
 
-原稿の `lem:Gaussian-Hermite-IBP` は `f ∈ C^{|α|}` を仮定し、成分ごとに `η ≤ α` を満たす各偏導関数について、ある `C_η > 0` による `|∂^η f(G)| ≤ C_η exp(C_η ‖G‖)` を要求する。2026-09-26、`GaussianIBP.lean` の `hermiteMulti_ibp_of_expGrowth` で、この一般部分を同じ仮定のまま証明した。共有 `pi_gaussian_stein_coord` は選択座標だけの成長評価を使い、偏導順序の交換と Hermite 因子の成長評価から反復の入力を導く。両辺の可積分性も `hermiteMulti_ibp_integrable` で証明済み。ユーザーの指定により `Z_N` の正則性・成長評価と特殊化は F04 に残す。エルミート展開の完全性と射影は F01 内の別の成果であり、この一般部分の完成からは従わない。検証根拠は [編集計画](EDITING_PLAN.md#formalization) を参照する。
+原稿の `lem:Gaussian-Hermite-IBP` は `f ∈ C^{|α|}` を仮定し、成分ごとに `η ≤ α` を満たす各偏導関数について、ある `C_η > 0` による `|∂^η f(G)| ≤ C_η exp(C_η ‖G‖)` を要求する。2026-09-26、`GaussianIBP.lean` の `hermiteMulti_ibp_of_expGrowth` で、この一般部分を同じ仮定のまま証明した。共有 `pi_gaussian_stein_coord` は選択座標だけの成長評価を使い、偏導順序の交換と Hermite 因子の成長評価から反復の入力を導く。両辺の可積分性も `hermiteMulti_ibp_integrable` で証明済み。ユーザーの指定により `Z_N` の正則性・成長評価と特殊化は F04 に残す。エルミート展開の完全性と射影は F01 内の別の成果であり、この一般部分の完成からは従わない。検証根拠は [作業履歴](../WORK_HISTORY.md#clt-f01-gaussian) を参照する。
 
 模型から独立したガウス基盤は利用側を import しない。Model が CLT を import する依存も作らない。`SuperConcentration` は既存の独立成果として維持し、新しい対数 CLT の必須入力にはしない。現行 Lean の `Annealed_FE → CLT/Main` の import は記録して保持し、入力の再設計時に配置先と依存を再検討する。
 
