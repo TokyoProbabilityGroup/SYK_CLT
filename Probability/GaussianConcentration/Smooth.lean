@@ -70,8 +70,9 @@ lemma gaussian_ibp_coord {ι : Type*} [Fintype ι] (g : EuclideanSpace ℝ ι �
     rw [← gradient_toLp_coord_eq_fderiv g hgd y j]
     exact (hcoord _ j).trans ((hgradb _).trans
       (mul_le_mul_of_nonneg_left (Real.exp_le_exp.mpr (hexpmono y)) hC))
-  have eq3 := pi_gaussian_stein_coord (fun z => g (WithLp.toLp 2 z)) i hcd C |c|
-    (abs_nonneg c) hC hhb' hdb'
+  have eq3 := pi_gaussian_stein_coord
+    (fun z => g (WithLp.toLp 2 z)) i hcd C |c| (abs_nonneg c) hC hhb'
+    (fun y => hdb' y i)
   have hμ : standardGaussianMeasureOnEuclidean ι
       = (Measure.pi fun _ : ι => gaussianReal 0 1).map (WithLp.toLp 2) := rfl
   rw [hμ, integral_map hmeas.aemeasurable (by rw [← hμ]; exact hI1.aestronglyMeasurable),

@@ -124,14 +124,14 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 有限模型では現在の `P : Params`、`M : MajoranaSystem P.N (Matrix d d ℂ)`、`[Fintype d] [DecidableEq d] [Nonempty d]` とすべての `β : ℝ` を用いる。確率測度は `standardGaussianMeasure P.N P.q`。原稿の漸近結果は引き続き固定偶数 `q≥4` と `Setting q` を使う。有限模型の定理に `AnnealedInput` や最終 CLT を仮定しない。
 
-- [ ] 既存の有限模型の定義・証明を再検査する。標準表現へ特殊化したとき、`standardBasis_card` により `normalizedTrace = 2^(-N/2) Tr` となる対応を確認する。一般表現と標準表現の分配関数が一致するという表現独立性までは証明対象にしない。
-- [ ] 偶数の正の次数の各相互作用のトレースが零であることから `normalizedTrace (normalizedHamiltonian P M g) = 0` を導く。既存の `interactionOperator_mul_generator_of_mem`、`majorana_sq`、トレースの巡回性を使う局所的な証明を優先し、F02 の符号ゲージ変換全体を前提にしない。
-- [ ] 自己共役性とトレース零から、規格化された固有値平均への Jensen により `1 ≤ realPartitionFunction P M β g` を証明する。一般行列の補題を追加する場合は Model の既存ファイルに置き、SYK の適用と分離する。
-- [ ] 有限次元で `Z(β,g) ≤ exp(C * ‖g‖)`（固定した模型・`β` に依存する有限定数）などの支配評価と可測性を示し、ガウス測度の既存の `integrable_exp_mul_norm` を使う。必要な結論は `MemLp (S.Z β n) 2 μ`、`Integrable (log ∘ S.Z β n) μ`、`0 < S.meanZ β n`。現在の `partition_moments` の定理文を保って `sorry` を除く。全次数の微分評価やサイズに一様な最良定数は要求しない。
-- [ ] `Y_N=Z_N/E Z_N` の正値性・可積分性・`E Y_N=1` と `MemLp Y_N 2 μ` を導く。`log Y_N=log Z_N-log E Z_N` とその可積分性を示し、中心化した `log Y_N` と `log Z_N` の一致を証明する。
-- [ ] 新証明への有限模型の受け渡しとして `0≤log Z_N`、`-log Y_N≤log E Z_N`、`0≤log E Z_N` を供給する。`log E Z_N=O(N)` と中心化誤差の漸近評価は外部入力・カオス評価を要するため F06・F07 に残す。
-- [ ] `β=0` で `meanZ=1`、`Y_N=1`、実対数と相対・対数ゆらぎが零になることを確認する。標準化 CLT を `β=0` に拡張しない。
-- [ ] README・構造文書・Blueprint の現在の定理文、入力、証明状態、現行原稿の参照との一致を確認する。
+- [x] 既存の有限模型の定義・証明を再検査する。標準表現へ特殊化したとき、`standardBasis_card` により `normalizedTrace = 2^(-N/2) Tr` となる対応を確認する。一般表現と標準表現の分配関数が一致するという表現独立性までは証明対象にしない。
+- [x] 偶数の正の次数の各相互作用のトレースが零であることから `normalizedTrace (normalizedHamiltonian P M g) = 0` を導く。既存の `interactionOperator_mul_generator_of_mem`、`majorana_sq`、トレースの巡回性を使う局所的な証明を優先し、F02 の符号ゲージ変換全体を前提にしない。
+- [x] 自己共役性とトレース零から、規格化された固有値平均への Jensen により `1 ≤ realPartitionFunction P M β g` を証明する。一般行列の補題を追加する場合は Model の既存ファイルに置き、SYK の適用と分離する。
+- [x] 有限次元で `Z(β,g) ≤ exp(C * ‖g‖)`（固定した模型・`β` に依存する有限定数）などの支配評価と可測性を示し、ガウス測度の既存の `integrable_exp_mul_norm` を使う。必要な結論は `MemLp (S.Z β n) 2 μ`、`Integrable (log ∘ S.Z β n) μ`、`0 < S.meanZ β n`。現在の `partition_moments` の定理文を保って `sorry` を除く。全次数の微分評価やサイズに一様な最良定数は要求しない。
+- [x] `Y_N=Z_N/E Z_N` の正値性・可積分性・`E Y_N=1` と `MemLp Y_N 2 μ` を導く。`log Y_N=log Z_N-log E Z_N` とその可積分性を示し、中心化した `log Y_N` と `log Z_N` の一致を証明する。
+- [x] 新証明への有限模型の受け渡しとして `0≤log Z_N`、`-log Y_N≤log E Z_N`、`0≤log E Z_N` を供給する。`log E Z_N=O(N)` と中心化誤差の漸近評価は外部入力・カオス評価を要するため F06・F07 に残す。
+- [x] `β=0` で `meanZ=1`、`Y_N=1`、実対数と相対・対数ゆらぎが零になることを確認する。標準化 CLT を `β=0` に拡張しない。
+- [x] README・構造文書・Blueprint の現在の定理文、入力、証明状態、現行原稿の参照との一致を確認する。
 
 ### 範囲と実行順序
 
@@ -150,6 +150,46 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 `CLT/Main.lean` は `Annealed_FE/main_result.lean` を直接 import するため、同ライブラリの既定対象からの除外だけでは依存先としての構築を除けない。既存の `Annealed_FE` の10箇所と共同 CLT の `sorry` は対象外として報告し、ビルド成功を最終結果の証明完了と呼ばない。対象外のエラーが検査を妨げる場合は根拠を記録し、無断で対象外へ修正を広げない。
 
 W06 の完了は、上記の有限模型の成果・原稿との対応・[Chapters の計画](../Chapters/EDITING_PLAN.md)の更新・差分確認までとする。Verso の生成・参照検査は休止中につき行わない。今回の再計画ではこれらの証明・ビルドを実施しておらず、W06 完了ではない。
+
+### 引き継ぎ・有限模型の検証（2026-09-26）
+
+開始時点は `nakajima` の `b885edd`、作業ツリーはクリーンだった。`0cb8c28` にはトレース零、固有値による `Z≥1`、指数増大と `partition_moments`、零逆温度の証明が既に含まれていた。上の9月24日の棚卸しは履歴であり、現在の未証明箇所の一覧ではない。
+
+今回、既存証明を維持して次を追加・検証した。
+
+- `normalizedHamiltonian_normalizedTrace_eq_zero` と `partitionFunction_standard`。後者は `standardBasis_card` により通常トレースの係数を `(2^(N/2))⁻¹` とする。原稿の `subsec:SYK-model` と位相、ガウス分散、ギブス因子の符号、標準表現の次元が一致する。一般表現の外部極限定理や表現独立性は主張しない。
+- `Setting.Y_memLp`・`Y_integrable`・`Y_pos`・`integral_Y` により相対量の正値性、二乗可積分性、可積分性、期待値1を得た。
+- `meanZ_ge_one`・`log_meanZ_nonneg`・`log_Y_eq`・`log_Y_integrable`・`integral_log_Y`・`centered_log_Y_eq`・`neg_log_Y_le_log_meanZ` により、有効な `cor:free-energy-clt` の有限模型の対数恒等式と下界を得た。`meanLogZ` と `log meanZ` を同一視していない。`log E Z=O(N)` と中心化誤差の漸近評価は引き続き F06・F07。
+- 既存の `varianceZ_zero`・`meanZ_zero`・`Y_zero`・`meanLogZ_zero`・`relativeFluctuation_zero`・`logFluctuation_zero` を再検証した。実対数が零になることは `realPartitionFunction_zero`・`Y_zero` と `Real.log_one` から従う。
+
+検証結果：
+
+- 初回 `lake env lean SYK/CLT/Main.lean` は古い `main_result.olean` の `incompatible header` で失敗。`lake build SYK.CLT.Main` による依存先の再構築で解消し、依存設定・バージョンは変更していない。
+- 最終 `lake env lean SYK/CLT/Main.lean` と `lake build SYK.CLT.Main` は成功（3134 jobs）。`lake build SYK.Model.StandardRepresentation` も成功した。Main の警告は対象外の共同 CLT の既存 `sorry` のみ。
+- Main の有限模型・Setting 部分にある公開30定理すべての `#print axioms` は `propext`・`Classical.choice`・`Quot.sound` のみ。`partition_moments`、トレース零、`Z≥1`、今回追加した相対量と対数の結果は `AnnealedInput`、最終 CLT、未検証の前提に依存しない。
+- 最終 `lake build CLT` は `CLT/Lemmas/Tool.lean:1:0: unknown module prefix 'RequestProject'` で失敗した。Main はこのビルドでも成功し、失敗対象は Tool のみ。`Tool.lean` は着手前から追跡されている別課題の補助ファイルで、W06 の import 経路にない。対象を除外して成功扱いにする設定変更や、未承認の外部依存追加は行わない。GaussianIBP 等の既存 linter・非推奨警告は残る。
+- 既存の共同 CLT の1箇所と `Annealed_FE` の10箇所の `sorry` は対象外。有限模型30定理の公理依存とは区別する。
+- README・構造文書・Blueprint の有限模型の記述を検証済み宣言に対応させ、章の古い GaussianIBP import パスも実在する `Lemmas/GaussianIBP` に合わせた。章内の宣言参照と依存名をソース照合した。Verso は休止中であり、章の Lean 検査・生成・`vbp check` は未実施。
+
+この引き継ぎ時点では有限模型の実装と個別検証が完了し、W06 全体は関連ライブラリの検査条件が未達だった。後続の削除・完了記録は次節を参照する。
+
+- [x] `Tool.lean` の扱いを確定した後、`lake build CLT` を再実行し、W06 の統合検証を完了する（後続依頼による参照監査・削除で解消）。
+
+### Tool.lean の参照監査・削除（履歴）と W06 完了（2026-09-26）
+
+ユーザーから「本文の主張を含む他ファイルからの参照を確認し、問題なければ Tool.lean を削除し、W06 を閉じて作業記録を残す」と指示されたため、次の順で実施した。
+
+1. **参照監査**：ワークスペース内の Lean・TeX・Markdown・Lake 設定を検索した。他の Lean に `SYK.CLT.Lemmas.Tool` の import はなく、本文・Blueprint にこのモジュールや固有宣言への参照もなかった。Tool 内の宣言名候補60件（コメントアウトされた宣言を含む）を短い名前でも検索した。同名ヒットの `hermiteMulti` は `SYK.CLT.GaussianIBP` の独立定義、`normalizedTrace` は Model または AnnealedFE の独立定義、`partitionFunction` は Model・CLT・AnnealedFE の独立定義とその利用だった。`kernel` と `reflection` は自然言語の記述であり、Tool の宣言利用ではない。README・構造文書・計画書の紹介と履歴だけが Tool を参照していた。本文に関連する題材が Tool に含まれていたことと、本文の主張がその Lean 宣言を参照・利用していることを区別した。
+2. **削除と検証**：`CLT/Lemmas/Tool.lean`（834行）を削除した。削除前の内容は `0cb8c287f85e338e6b25043c228009876ca2ec35:CLT/Lemmas/Tool.lean` で参照できる。Lake の glob・依存・toolchain は変更していない。削除後の `lake build CLT` は **3171 jobsで成功**、`lake env lean SYK/CLT/Main.lean` も成功した。有限模型の公開30定理の公理依存を再確認し、すべて `propext`・`Classical.choice`・`Quot.sound` のみで `sorryAx` はなかった。
+3. **記録の更新**：README・構造文書から Tool を現存する部品として扱う説明を外し、全体計画の W06 を完了に更新した。Blueprint の対応する有限模型のソース照合は前節の結果を維持し、章の計画書にもビルド障害の解消を記録した。過去の Tool の紹介・ビルド失敗は時点付きの履歴として残す。
+
+**W06 は完了。** 有限模型・モーメント・相対量と対数の恒等式・零逆温度・標準表現との対応、個別検査・関連ビルド・公理依存・文書とBlueprintのソース照合・差分確認を終えた。共同 CLT の1箇所と Annealed_FE の10箇所の既存 `sorry`、GaussianIBP 等の既存 linter・非推奨警告は残り、最終 CLT や F01–F08 の完成を意味しない。Verso の章検査・生成・参照検査は休止規則に従って未実施。次単位には着手せず、変更は未コミット。
+
+### Tool.lean 完成後の記録修正（2026-09-26）
+
+上の削除は時点付きの履歴である。その後、`CLT/Lemmas/Tool.lean` は現行 mathlib だけを使う補助モジュールとして同じパスに再実装された。有限次元の特異値、von Neumann 型トレース評価、Schatten--Hölder 評価、Hermitian 行列の指数と規格化トレース指数の高階微分評価を証明し、`sorry`・`admit`・`axiom` を含まない。
+
+親ワークスペースからの `lake -f SYK/workspace/lakefile.toml env lean SYK/CLT/Lemmas/Tool.lean` と `lake -f SYK/workspace/lakefile.toml build CLT` は成功した。前者には5件の非推奨 API・未使用 `simp` 引数の warning、後者には既存の GaussianIBP 等の linter warning が残るが、エラーはない。`Tool.lean` は現在も `Main.lean` や Blueprint から import されていないため、W06 の有限模型の成果と公理依存は変わらない。行列微分評価を CLT のカオス解析へ接続する作業は引き続き F04 に残る。
 
 ### 現行証明の再検証（2026-09-24）
 
@@ -217,6 +257,20 @@ W06 の完了は、上記の有限模型の成果・原稿との対応・[Chapte
 
 F01 は共有ガウス基盤への流用・高階と多変数の部分積分・エルミート展開と射影を、個別に検証できる補題群として渡す。共有部分の編集と検証の細目は [ガウス基盤の F01](../Probability/GaussianConcentration/EDITING_PLAN.md#f01)に集約する。CLT 側では `lem:Gaussian-Hermite-IBP` を `Z_N` に適用し、F04 の正則性・成長評価との接続を確認する。この適用の待ち合わせは、汎用部分積分の完成を妨げる前提にしない。
 
+2026-09-26 の局所確認：`GaussianIBP/GIBPMultiIndex.lean` で creation 作用素から `Polynomial.hermite` の有限積への一致と、明示的な `IBPFamily` を仮定した反復部分積分は Lean 検査済み。`GaussianIBPstandard` と `GaussianIBPHilbert` の import と個別ビルドも成功した。両ファイルの部分積分は多項式増大を仮定するため、指数増大は既存の共有 `StandardGaussian.lean` の定理を利用する。`Setting.Z` の任意階の正則性・指数増大は F04 の未証明入力であり、`Z_N` への特殊化と原稿の `lem:Gaussian-Hermite-IBP` 全体は未検証のまま。定理文を強い増大仮定に置き換えて完了扱いにしない。
+
+同日の追加検査：共有 `pi_gaussian_stein_coord` の増大仮定を選択座標 `i` の導関数だけに弱め、`Smooth.lean` の利用箇所を更新して両モジュールをビルドした。`GIBPMultiIndex.lean` では原稿のユークリッドノルムによる指数増大からこの一座標定理への変換を Lean で検査した。これは原稿の `η ≤ α` 以外の増大評価を使わない一次の入力であり、全多重指数への反復・`Z_N` の評価完了を意味しない。原稿との照合では、エルミート規格化と有限積は一致し、旧抽象多重指数定理には `IBPFamily` という未構成の仮定が残る。
+
+続く局所検査では、指数増大の一座標 Stein 公式から creation 作用素の部分積分を導き、その可積分性を有限積ガウス上の指数可積分性で証明した。`ExpIBPChain` を使う多重指数定理は、必要な座標列に沿う積の増大評価だけを要求し、正則性は単一の `ContDiff ℝ |α| f` から導く。旧 `IBPFamily` より原稿に近いが、原稿の各 `η ≤ α` の偏導関数評価から `ExpIBPChain` の積評価を導く補題、異なる偏導順序の一致、および `Z_N` の入力は未証明である。従って原稿と完全に同じ定理文は未完成。
+
+追加の Lean 検査では、整数係数多項式の評価の指数増大から、各 `Polynomial.hermite` 因子、有限積、および `hermiteMulti α` 自身のユークリッドノルムによる指数増大を証明した。偏導関数との積の評価には、反復中の残りのエルミート因子とその座標導関数に対する同種の評価、および原稿の `η ≤ α` と導関数列との対応がなお必要であった。
+
+2026-09-26、明示的な `GIBPMultiIndex.lean` 完成依頼により、上記の一般部分の残件を解消した。作業開始時の HEAD は `f133a26ab1e116b8f8b581252de9a47089c81294`、同ファイルと二つの GaussianIBP 依存ファイルは未追跡、共有ガウス基盤などには既存差分があった。それらを保持して一般定理と必要な補助証明を追加した。`coordDeriv_comm`・`partialList_perm` は有限階の正則性だけで偏導順序の一致を証明する。各接頭辞の出現回数が `α` 以下であることと `partialList_eq_partialMulti` を用い、原稿の成長仮定から `ExpIBPChain` を導いた。残りの Hermite 関数とその座標導関数は、多項式関数の四則のうち定数・座標・差・積と微分への閉性を使って指数評価する。
+
+公開定理 `hermiteMulti_ibp_of_expGrowth` の仮定は `ContDiff ℝ (∑ i, α i) f` と、各 `η ≤ α` に対する正の `C_η` による原稿と同じユークリッドノルムの評価のみ。`IBPFamily`・`ExpIBPChain`・追加の成長仮定・無限階正則性は要求しない。`hermiteMulti_ibp_integrable` は同じ仮定で両辺の可積分性を証明し、`α = 0` と空の有限添字型も除外していない。原稿の `lem:Gaussian-Hermite-IBP`・`eq:Gaussian-Hermite-IBP` と、標準独立ガウス測度・probabilists' Hermite 規格化・偏導関数・量化範囲を照合した。ユーザーの回答に従い、`Z_N` への適用は F04 に残す。
+
+検証：親ワークスペースで `lake -f lakefile.toml env lean SYK/CLT/GaussianIBP/GIBPMultiIndex.lean` と `lake -f lakefile.toml --no-cache build SYK.CLT.GaussianIBP.GIBPMultiIndex` が成功（3144 jobs）。通常の Lake 入口は既存の `lakefile.lean` を優先し、VersoBlueprint の Git ownership 検査で失敗したため、既存 TOML を明示した。設定・依存バージョン・Git 設定は変更していない。対象ファイルには型クラス仮定についての linter warning、依存先には既存のスタイル・非推奨 API の warning が残る。上記二つの公開定理、`coordDeriv_comm`、`partialList_perm`、`partialList_eq_partialMulti`、`hermiteMulti_eq_prod` の `#print axioms` はすべて `propext`・`Classical.choice`・`Quot.sound` のみで `sorryAx` なし。対象ファイルに `sorry`・`admit`・`axiom` はない。全 CLT の完成や F01 全体の完成を意味しない。Blueprint はソース上の対応を更新し、Verso の章検査・生成・参照検査は休止規則に従い実施していない。
+
 F03 の符号化と指数モーメント、F04 の Duhamel 公式と行列評価も独立した補題群として渡す。F02 は偶奇則から一次・二次カオスの厳密な同定へ進める。F05 は評価補題を先に検証し、無限和・漸近を含む `prop:higher-chaos-closure` を後で統合する。F06 は既存の `ConvexDerivatives` と条件付き漸近を再利用して外部仮定と既存補題を接続し、その後に相対・標準化 CLT を統合する。F07 は対数の確率的誤差と中心化誤差を先に扱い、最後に `cor:free-energy-clt` へ統合する。各段階で先行成果や仕様が不足すれば残部を前倒しせず「前提待ち」、人間の判断が必要なら根拠を示して「判断待ち」とする。
 
 既存の `Preliminaries.lean` は F01・F03・F04 などの雛形を、`CLTComponents.lean` は F02・F05・F06 などの雛形を同居させている。補題群が別でも、同じ共有作業ツリー上で同時編集しない。独立した作業領域で同じファイルに変更を作る場合は、補題と入力 API の担当範囲を先に固定し、統合担当が差分を直列に取り込んで再検査する。共有 Model の変更では Model の作業規則と検証も適用する。Lean 実装担当は TeX 本文・外部入力の採用方針・Blueprint の証明状態を先回りして変更しない。
@@ -224,6 +278,24 @@ F03 の符号化と指数モーメント、F04 の Duhamel 公式と行列評価
 並列実行の候補と条件は全体計画で管理する。F08 と F06 でアニール入力を共有する場合も、同じ入力を重複定義せず、正確な所属と依存関係を実装前に記録する。F04 の共有行列解析などを他のディレクトリに置く場合は、その編集細目を配置先の計画書へ記し、同じ ID で参照する。
 
 `N` に依存して変わる確率空間上の分布収束と、概収束に必要な共通確率空間を定理文ごとに区別する。外部入力を仮定として受け取る定理については、Lean が検証した条件付きの結論と、入力自体の証明状態を別に報告する。
+
+2026-09-26 のファイル整理：`Chapters/CLT.lean` の import も新モジュールへ変更した。親ワークスペースで統合ファイルの `lake -f lakefile.toml env lean SYK/CLT/GaussianIBP.lean` と `lake -f lakefile.toml build SYK.CLT.GaussianIBP` が成功した。主要な四宣言の公理依存は `propext`・`Classical.choice`・`Quot.sound` のみ。当時の `Tool.lean` による CLT ビルド失敗は、完成後の同モジュールを含む `lake -f SYK/workspace/lakefile.toml build CLT` の成功で解消した。上の個別ファイル名と検証結果は統合前の履歴として残す。Verso の章検査は休止中のため実施していない。
+
+2026-09-26 の補助ファイル確認：`Lemmas/GaussianIBP.lean` は一般ガウス–エルミート部分積分、`Lemmas/Rademacher.lean` は有限符号平均と `rademacher_encoding`、`Lemmas/Tool.lean` は行列解析・トレース指数微分・符号ゲージと Hermite 偶奇則を含む。`Lemmas/ConvexDerivatives.lean` は既存の `convex_convergence_deriv_tendstoUniformlyOn` を持ち、局所一様収束などを仮定する。これらは補題候補の所在を明確にするもので、F01/F03/F04/F06 の完了や Main の証明状態変更を意味しない。`Tool.lean` の `RequestProject.*` imports はこのソースツリー内で解決を確認できず、CLT への統合・ビルドは未確認。個別診断では Rademacher と ConvexDerivatives にエラーなし、GaussianIBP には現行 Mathlib の非推奨 import/API 診断、Tool には import 更新要求があった。Lake によるこの4ファイルの個別検査・関連ビルドと公理依存確認は未実施。
+
+2026-09-26 の `Tool.lean` 依存診断：`RequestProject.SingularValues`・`GaussianIBPAux`・`SchattenAux`・`ExpAux`・`MatrixRealNormed`・`DerivAux` のソースは現ワークスペースと Git 履歴に存在しない。これらの import だけを外した一時コピーの Lean 検査では、ガウス–エルミート部分積分、特異値の有限和表示、トレース・Schatten 積評価、Hermitian 指数行列の特異値・トレース公式、行列の実ノルム空間インスタンス、高階微分評価が未解決となり、Duhamel 部分にも独立した証明エラーが出た。一時コピーは削除済み。元ファイルの主張を保持して依存を置き換えるには、これらの証明を現行 mathlib と共有模型に合わせて実装・個別検査する必要がある。現時点で `Tool.lean` の Lean 検査は成功していない。
+
+同日の後続修正：`Tool.lean` に mathlib の特異値 import と有限和への変換補題を追加し、Duhamel の導関数計算を修正した。行列の実ノルム空間インスタンスは既存の複素または実スカラーの構造から制限して与えた。Hermitian 行列の指数のトレース公式はスペクトル分解から証明し、トレースの絶対値と特異値の和の評価は `T†T` の固有基底から証明した。`diagonal ![1, 0]` の正規化 Schatten ノルムは二つの特異値を直接計算して証明した。これらの箇所は親 Lake 環境でエラーなしとなった。ファイル全体の個別検査はなお失敗し、未解決の主な入力は Schatten の積評価、指数行列の特異値公式、正規化トレース指数の高階微分評価である。未検証の定理を削除・弱化せず、これらの証明を次の検証対象とする。
+
+同日の追加検査：Hermitian 行列指数のユニタリ対角化公式 `ExpAux.exp_smul_spectral` を追加し、単独の検査ファイル `ToolScratch.lean` では Lean 検査に成功した。`Tool.lean` に統合した後の個別検査は、`SchattenAux.holder`、`SchattenAux.mul_opNorm`、`SchattenAux.opNorm_mul`、`ExpAux.sum_sv_exp`、`DerivAux.tE` が未定義で失敗した。対角化公式はそれらの証明の基礎にはなるが、特異値公式や高階微分評価をまだ証明しない。定理文の削除・弱化、`sorry` の追加は行っていない。
+
+続く検査で `ExpAux.trace_exp_re_pos` を追加し、Hermitian 行列指数のトレースの実部が正であることをスペクトル和から証明した。個別 Lean 検査ではこの補題にエラーは出ず、上記五つの未定義入力に関するエラーが残る。PhysLib の `QuantumInfo/ForMathlib/HermitianMat/Schatten.lean` に複素行列の Schatten–Hölder 不等式があることを確認したが、現ワークスペースの依存には含まれず、一般 `RCLike` の現行定理へ直ちに適用できるものとは扱わない。依存設定は変更していない。
+
+さらに `ExpAux.exp_smul_posSemidef` と `ExpAux.exp_smul_posDef` をスペクトル分解と対角行列の正値性から証明した。これらは親 Lake 環境で新たなエラーを生じていない。`ExpAux.sum_sv_exp` には、正値行列の特異値の和をその固有値の和へ移す補題がなお必要である。現行 mathlib の `LinearMap.singularValues` は `T†T` の固有値の平方根で定義されており、この移行は定義の書き換えだけでは済まない。ファイル全体の個別検査には先述の五つの未定義入力が残る。
+
+続く実装で正値作用素の `T†T` の特性多項式と固有値を計算し、`SVDAux.singularValues_fin_of_positive` を証明した。Hermitian 行列指数の特性多項式の根と Euclidean 線形写像の固有値の多重集合を照合し、任意の実関数 `f` に対する `ExpAux.sum_sv_exp` を証明した。これを用いて `normalizedSchattenNorm_exp_hermitian` の既存証明も修正した。単独の `ToolScratch.lean` の Lean 検査は成功し、二つの主要補題の `#print axioms` は `propext`・`Classical.choice`・`Quot.sound` のみだった。`Tool.lean` の個別検査で指数行列の特異値公式に関するエラーは消え、残る未定義入力は三つの Schatten 積評価と `DerivAux.tE` である。ファイル全体の Lean 検査はなお成功していない。
+
+`CLT/Lemmas/AGENTS.md` の追加後、既存の `ToolScratch.lean` を通常の `SYK.CLT.Lemmas.ToolScratch` モジュールとして個別ビルドし、`Tool.lean` から import した。重複していたスペクトル・SVD の宣言を `Tool.lean` から除き、`ExpAux.sum_sv_exp` は sibling モジュールの証明を使う。`DerivAux.tE` は規格化トレース指数として定義し、`Matrix.traceExp` との定義的等価性を個別検査で確認した。`Tool.lean` の現在の未解決入力は三つの Schatten 積評価、`DerivAux.contDiff_tE`、`DerivAux.iteratedFDeriv_tE_bound_hermitian` である。`ToolScratch.lean` の Lake ビルドは親ワークスペースの `.lake` への書き込みが sandbox で拒否されたため、同じビルドコマンドの権限昇格を自動審査で許可された後に成功した。ファイル全体の Lean 検査はまだ失敗する。
 
 ### モジュールと対応の確認
 
@@ -251,6 +323,10 @@ F03 の符号化と指数モーメント、F04 の Duhamel 公式と行列評価
 検証：`lake env lean SYK/CLT/Main.lean` と `lake build CLT` は成功し、追加した4宣言の `sorry` 警告が残る。上流の `StandardGaussian.lean` に既存の linter 警告・タクティク案内がある。共同 CLT・個別の両 CLT の `#print axioms` は `[propext, sorryAx, Classical.choice, Quot.sound]`、`partitionFunction_zero` と通常トレースとの一致は `[propext, Classical.choice, Quot.sound]` であった。公理検査用の一時ファイルは削除した。章の宣言参照は `SYK.CLT.Main` の import により解決する。今回の差分は作業開始時のコミットからの未コミット変更で、コミットは作成していない。
 
 最終の `lake build CLT` は成功し、`lake env lean SYK/Chapters/CLT.lean` は警告なしで成功した。`git diff --check` は成功した。Git の LF/CRLF 変換案内は数学的・Lean 的な警告とは区別する。
+
+`Tool.lean` の微分補助部分では、Banach 代数の指数関数について全 Fréchet 微分の Duhamel 積分表示 `Duhamel.fderiv_exp_apply` を証明した。さらに `DerivAux.contDiff_tE` を実装し、実スカラーへの制限と行列トレースの解析性から検証した。個別 Lean 検査でこの二つの宣言にエラーはない。残る未定義入力は三つの Schatten 積評価と `DerivAux.iteratedFDeriv_tE_bound_hermitian` であり、`Tool.lean` 全体の検査は未成功である。
+
+この後段の Tool に関する診断・部分実装の記録は、完成までの履歴である。最終状態は上の「Tool.lean 完成後の記録修正」に従う。すなわち、現行の `Tool.lean` は全体として Lean 検査済みであり、同モジュールを含む CLT ビルドも成功している。
 
 ## Z01：複素平面上の零点のない領域
 

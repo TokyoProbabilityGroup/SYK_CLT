@@ -30,6 +30,7 @@ build/
 *.synctex.gz(busy)
 /CLT/refs/CLT_SYK.pdf
 /CLT/refs/sections/*.pdf
+.vscode
 
 # OS junk
 .DS_Store
