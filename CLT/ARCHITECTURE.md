@@ -43,6 +43,13 @@
 | その他の補助モジュール | `Preliminaries`・`CLTComponents`・`GaussianConcentration` は引き続き実質的に雛形。新しい補助ファイルの存在だけではこれらの計画済み適用は完了しない |
 | Blueprint | `../Chapters/AnnealedFE.lean` でガウス入力構造と別原稿の Rademacher 極限を分け、`../Chapters/CLT.lean` で有限模型の証明状態・条件付き極限・現行の対数 CLT の依存を記録した。Verso の生成・参照検査は休止中 |
 
+### 補助 Lean ファイルの役割
+
+- `Lemmas/GaussianIBP.lean` は、指数傾斜によるシフト恒等式、差商の一様評価、支配収束を用いて、実ガウス分布の Stein 型部分積分を構成する。多変数側では独立標準ガウスと probabilists' Hermite 多項式に対し、`C^{|α|}` の正則性と `η ≤ α` の各偏導関数に対する指数増大から、多重指数部分積分 `hermiteMulti_ibp_of_expGrowth` と両辺の可積分性を与える。これは `lem:Gaussian-Hermite-IBP` の一般部分に対応するが、`Setting.Z` の各偏導関数の評価を供給したり、この公式を `Z_N` に適用したりするものではない。
+- `Lemmas/Rademacher.lean` は、Boolean ベクトル上の一様平均 `radE`、符号和、および次数 `q` の基本対称式である Rademacher カオスを定義する。Newton 恒等式でカオスを符号和から評価し、独立符号和の指数モーメント評価と組み合わせて、偶数 `q ≥ 4` と `0 ≤ t ≤ c_q N^{-(q-1)}` の下で `𝔼_ε[|S_{N,q}|^3 exp(t|S_{N,q}|)] ≤ C_q N^{3q/2}` を証明する。これは `lem:Rademacher-encoding` の評価部品であり、Gaussian chaos の剰余評価 `prop:higher-chaos-closure` への適用は未完了。
+- `Lemmas/Tool.lean` は模型に依存しない行列解析と SYK の符号対称性を同居させる。前半では Banach 代数の指数関数に対する Duhamel 微分公式、次元規格化 Schatten ノルムの積評価・指数行列での等式、正規化トレース指数の高階方向微分評価を与える。また、規格化 Schatten ノルムが指数 `p` に関して非減少であることと、逆向き単調性の反例を証明する。後半では Majorana 積による符号ゲージ変換から分配関数の符号不変性を示し、奇 multi-index の Hermite 係数のガウス期待値が消えることを導く。前半の補助解析と後半の模型固有結果は別の用途を持つ。現状 `RequestProject.*` の外部 import がこのソースツリー内で解決されず、CLT への統合も検査されていない。
+- `Lemmas/ConvexDerivatives.lean` は、割線の差の評価と平均値の定理を準備し、凸関数列の導関数を左右の割線で挟む証明を形式化する。主定理 `convex_convergence_deriv_tendstoUniformlyOn` は、開集合 `I` 上の各関数の凸性・微分可能性、関数列の局所一様収束、極限関数の微分可能性と導関数の連続性を仮定し、任意のコンパクト集合 `K ⊆ I` 上で導関数の一様収束を結論する。原稿で必要な各点収束から局所一様収束への導出や、アニール入力との接続までは含まない。
+
 `Main.lean` は `Annealed_FE/main_result.lean` を直接 import する。同ファイルの `AnnealedFreeEnergyLimit` は高温の共通半径、実解析性、偶性、圧力と導関数の局所一様収束、小温度展開を構造体のフィールドとして受け取る。現行原稿の `prop:annealed-free-energy` は全実軸の偶・凸な `C¹` 関数と明示的評価を主張し、同じ仕様ではない。特に `C¹` から実解析性は出ない。
 
 `Annealed_FE/refs/SYK-HT-arxiv.tex` の主結果は Rademacher 相互作用を使い、物理的 Majorana 生成子の二乗を `I/2` とする別の原稿に属する。同原稿の圧力・自由エネルギー極限を、ガウス模型の全 `Setting q` についての `AnnealedInput` の構築と同一視しない。新しい Annealed_FE 章は両者の接点と未証明状態を示す。

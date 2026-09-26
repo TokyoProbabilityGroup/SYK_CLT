@@ -239,7 +239,7 @@ F03 の符号化と指数モーメント、F04 の Duhamel 公式と行列評価
 
 `N` に依存して変わる確率空間上の分布収束と、概収束に必要な共通確率空間を定理文ごとに区別する。外部入力を仮定として受け取る定理については、Lean が検証した条件付きの結論と、入力自体の証明状態を別に報告する。
 
-2026-09-26 のファイル整理：`GaussianIBP/GaussianIBPstandard.lean`、`GaussianIBP/GaussianIBPHilbert.lean`、`GaussianIBP/GIBPMultiIndex.lean` を宣言と証明の順序を保って `GaussianIBP.lean` に統合した。`Chapters/CLT.lean` の import も新モジュールへ変更した。親ワークスペースで統合ファイルの `lake -f lakefile.toml env lean SYK/CLT/GaussianIBP.lean` と `lake -f lakefile.toml build SYK.CLT.GaussianIBP` が成功した。主要な四宣言の公理依存は `propext`・`Classical.choice`・`Quot.sound` のみ。`lake -f lakefile.toml build CLT` は対象外の未追跡 `CLT/Lemmas/Tool.lean` が `RequestProject` を import しているため失敗した。上の個別ファイル名と検証結果は統合前の履歴として残す。Verso の章検査は休止中のため実施していない。
+2026-09-26 のファイル整理：`Chapters/CLT.lean` の import も新モジュールへ変更した。親ワークスペースで統合ファイルの `lake -f lakefile.toml env lean SYK/CLT/GaussianIBP.lean` と `lake -f lakefile.toml build SYK.CLT.GaussianIBP` が成功した。主要な四宣言の公理依存は `propext`・`Classical.choice`・`Quot.sound` のみ。`lake -f lakefile.toml build CLT` は対象外の未追跡 `CLT/Lemmas/Tool.lean` が `RequestProject` を import しているため失敗した。上の個別ファイル名と検証結果は統合前の履歴として残す。Verso の章検査は休止中のため実施していない。
 
 2026-09-26 の補助ファイル確認：`Lemmas/GaussianIBP.lean` は一般ガウス–エルミート部分積分、`Lemmas/Rademacher.lean` は有限符号平均と `rademacher_encoding`、`Lemmas/Tool.lean` は行列解析・トレース指数微分・符号ゲージと Hermite 偶奇則を含む。`Lemmas/ConvexDerivatives.lean` は既存の `convex_convergence_deriv_tendstoUniformlyOn` を持ち、局所一様収束などを仮定する。これらは補題候補の所在を明確にするもので、F01/F03/F04/F06 の完了や Main の証明状態変更を意味しない。`Tool.lean` の `RequestProject.*` imports はこのソースツリー内で解決を確認できず、CLT への統合・ビルドは未確認。個別診断では Rademacher と ConvexDerivatives にエラーなし、GaussianIBP には現行 Mathlib の非推奨 import/API 診断、Tool には import 更新要求があった。Lake によるこの4ファイルの個別検査・関連ビルドと公理依存確認は未実施。
 
