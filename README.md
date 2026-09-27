@@ -59,6 +59,7 @@ lake build
 
 `defaultTargets` in `lakefile.toml` selects the libraries built by `lake build`.
 The mathematical topics have individual targets such as `Model`, `SuperConcentration`, and `CLT`; the `SYK` target currently checks shared foundations under `SYK/Probability/` and their dependencies. Blueprint and chapter modules are temporarily excluded.
+`Annealed_FE` and `Universality` remain registered but are temporarily excluded from the default targets. However, `CLT.Main` imports `Annealed_FE.main_result`, so that module is still built as a dependency. A successful build does not establish completion of the CLT or annealed proofs; existing proof placeholders remain.
 There is no aggregate Lean import file: Lake manages the build targets directly.
 All project-specific Lean sources remain inside the repository; only the shared Lake configuration, dependency manifest, and toolchain file are copied to the workspace root.
 To build one library separately, run a command such as `lake build Model`.

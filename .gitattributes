@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.pdf binary
+*.tex diff=tex
+*.bib diff=bibtex

@@ -148,7 +148,7 @@ arbitrary Gaussian $`L^2` functions are integrable. The step from these
 facts to polynomial density in Gaussian $`L^2` has not been formalized.
 :::
 
-:::theorem "clt_finite_hermite_projection" (parent := "central_limit_theorem") (uses := "clt_gaussian_hermite_ibp") (lean := "SYK.CLT.hermiteMulti_orthogonality, SYK.CLT.inner_hermiteLp, SYK.CLT.hermiteFiniteProjection_eq_starProjection, SYK.CLT.hermiteDegreeProjection_eq_starProjection, SYK.CLT.mem_multiIndices_degree, SYK.CLT.hermiteOrthonormal_orthonormal, SYK.CLT.hasSum_hermiteDegreeProjection")
+:::theorem "clt_finite_hermite_projection" (parent := "central_limit_theorem") (uses := "clt_gaussian_hermite_ibp") (lean := "SYK.CLT.hermiteMulti_orthogonality, SYK.CLT.inner_hermiteLp, SYK.CLT.hermiteFiniteProjection_eq_starProjection, SYK.CLT.mem_multiIndices_degree, SYK.CLT.hermiteOrthonormal_orthonormal, SYK.CLT.hasSum_hermiteDegreeProjection")
 For every finite set of standard Gaussian coordinates, the probabilists'
 Hermite products satisfy
 
