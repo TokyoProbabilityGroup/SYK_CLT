@@ -20,10 +20,10 @@ orthogonal basis of $L^2(\gamma_{\mathcal I_N})$, where
 $\gamma_{\mathcal I_N}$ denotes standard Gaussian measure on
 $\mathbb R^{\mathcal I_N}$, we have
 \begin{align}\label{eq: chaos}
-Z_N(\beta:G) = \sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\mathbb E[Z_N(\beta:G')H_\alpha(G')]}{\alpha!} H_\alpha(G),  
+Z_N(\beta;G) = \sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\mathbb E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!} H_\alpha(G),
 \end{align}
-where the second sum runs over all multi-index $\alpha$ such that $\sum_{I} \alpha_I = k$, and the expectation is taken over $G'$ independent copy of $G.$  Let $P_r$ denote the orthogonal projection in
-$L^2(\gamma_{\mathcal I_N})$ onto the $r$-th homogeneous Gaussian chaos:
+where the second sum runs over all multi-indices $\alpha$ such that $\sum_{I} \alpha_I = k$, and the expectation is taken over an independent copy $G'$ of $G$.  Let $P_r$ denote the orthogonal projection in
+$L^2(\gamma_{\mathcal I_N})$ onto the $r$-th homogeneous Gaussian chaos.
 Then, we can write
 \[
   P_r Z_N(\beta;G)
@@ -246,7 +246,20 @@ monomial $g_Ig_J$ with $I\neq J$, since the corresponding multi-index is also od
 \]
 
 
-It remains to compute the coefficient $$b_N(\beta):= \frac{1}{2}\mathbb E[Z_N(\beta;G) (g_I^2-1)].$$ Applying Gaussian integration by parts  yields
+The expectation
+\(
+\mathbb E[Z_N(\beta;G)(g_I^2-1)]
+\)
+is independent of $I$.  Indeed, a permutation of the sites sends any
+$q$-set to any other one; the induced signs on the Majorana monomials are
+absorbed by the coordinatewise sign symmetry of the independent centered
+Gaussian couplings, while the normalized trace is invariant under the
+corresponding Clifford automorphism.  It therefore remains to compute the
+common coefficient
+\[
+b_N(\beta):= \frac{1}{2}\mathbb E[Z_N(\beta;G) (g_I^2-1)].
+\]
+Applying Gaussian integration by parts yields
 \[
   \E\bigl[Z_N(\beta)(g_I^2-1)\bigr]
   =\E\,g_I \partial_{g_I} Z_N(\beta).
