@@ -7,8 +7,8 @@ import Mathlib.Analysis.InnerProductSpace.l2Space
 # Orthogonality of Gaussian Hermite products
 
 The one-coordinate pairing follows from the integration-by-parts theorem in
-`GaussianIBP.lean`: differentiation past the degree gives zero, while the
-derivative at the degree gives the factorial. Factorization of the finite
+`Probability/GaussianConcentration/Smooth.lean`: differentiating past the degree gives zero,
+while differentiation at the degree gives the factorial. Factorization of the finite
 product Gaussian integral yields the orthogonality and exact norm in
 `eq: chaos` of the CLT manuscript.
 -/
@@ -32,28 +32,28 @@ private theorem iterate_derivative_hermite_self (n : ℕ) :
 
 private theorem partialList_replicate_aeval {ι : Type*} [DecidableEq ι]
     (i : ι) (n : ℕ) (p : Polynomial ℤ) (g : ι → ℝ) :
-    GaussianIBP.partialList (List.replicate n i)
+    GaussianConcentration.partialList (List.replicate n i)
         (fun h => Polynomial.aeval (h i) p) g =
       Polynomial.aeval (g i) (Polynomial.derivative^[n] p) := by
   induction n generalizing p with
-  | zero => simp [GaussianIBP.partialList]
+  | zero => simp [GaussianConcentration.partialList]
   | succ n ih =>
-      have hfun : GaussianIBP.coordDeriv i (fun h : ι → ℝ => Polynomial.aeval (h i) p) =
+      have hfun : GaussianConcentration.coordDeriv i (fun h : ι → ℝ => Polynomial.aeval (h i) p) =
           fun h => Polynomial.aeval (h i) (Polynomial.derivative p) := by
         funext h
-        exact GaussianIBP.coordDeriv_aeval i p h
-      simp only [List.replicate_succ, GaussianIBP.partialList, hfun,
+        exact GaussianConcentration.coordDeriv_aeval i p h
+      simp only [List.replicate_succ, GaussianConcentration.partialList, hfun,
         Function.iterate_succ_apply]
       exact ih (Polynomial.derivative p)
 
 private theorem multiIndexList_unit (n : ℕ) :
-    GaussianIBP.multiIndexList (fun _ : Unit => n) = List.replicate n () := by
-  simp [GaussianIBP.multiIndexList]
+    GaussianConcentration.multiIndexList (fun _ : Unit => n) = List.replicate n () := by
+  simp [GaussianConcentration.multiIndexList]
 
 private theorem hermiteMulti_unit (n : ℕ) (g : Unit → ℝ) :
-    GaussianIBP.hermiteMulti (fun _ : Unit => n) g =
+    GaussianConcentration.hermiteMulti (fun _ : Unit => n) g =
       Polynomial.aeval (g ()) (Polynomial.hermite n) := by
-  simp [GaussianIBP.hermiteMulti_eq_prod]
+  simp [GaussianConcentration.hermiteMulti_eq_prod]
 
 private theorem hermite_pair_ibp_unit (n m : ℕ) :
     (∫ g : Unit → ℝ,
@@ -63,14 +63,14 @@ private theorem hermite_pair_ibp_unit (n m : ℕ) :
       ∫ g : Unit → ℝ,
         Polynomial.aeval (g ()) (Polynomial.derivative^[n] (Polynomial.hermite m))
         ∂(Measure.pi fun _ : Unit => ProbabilityTheory.gaussianReal 0 1) := by
-  have h := GaussianIBP.hermiteMulti_pair_ibp (ι := Unit)
+  have h := GaussianConcentration.hermiteMulti_pair_ibp (ι := Unit)
     (fun _ => n) (fun _ => m)
-  have hfun : GaussianIBP.hermiteMulti (fun _ : Unit => m) =
+  have hfun : GaussianConcentration.hermiteMulti (fun _ : Unit => m) =
       fun g => Polynomial.aeval (g ()) (Polynomial.hermite m) := by
     funext g
     exact hermiteMulti_unit m g
   rw [hfun] at h
-  simpa only [hermiteMulti_unit, GaussianIBP.partialMulti, multiIndexList_unit,
+  simpa only [hermiteMulti_unit, GaussianConcentration.partialMulti, multiIndexList_unit,
     partialList_replicate_aeval] using h
 
 private theorem hermite_pair_integral_unit (n m : ℕ) :
@@ -163,12 +163,13 @@ theorem hermiteMulti_orthogonality {ι : Type*} [Fintype ι]
 theorem hermiteMulti_memLp_two {ι : Type*} [Fintype ι] (α : ι → ℕ) :
     MemLp (SYK.hermiteMulti α) 2 (SYK.gaussianCouplings ι) := by
   classical
-  have hfun : GaussianIBP.hermiteMulti α = SYK.hermiteMulti α := by
+  have hfun : GaussianConcentration.hermiteMulti α = SYK.hermiteMulti α := by
     funext g
     exact hermiteMulti_eq_signParity α g
   have hcontinuous : Continuous (SYK.hermiteMulti α) := by
     rw [← hfun]
-    exact (GaussianIBP.contDiff_hermiteList (GaussianIBP.multiIndexList α)).continuous
+    exact (GaussianConcentration.contDiff_hermiteList
+      (GaussianConcentration.multiIndexList α)).continuous
   apply (memLp_two_iff_integrable_sq hcontinuous.aestronglyMeasurable).2
   simpa only [pow_two] using integrable_hermiteMulti_mul α α
 

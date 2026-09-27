@@ -51,7 +51,7 @@ F01 の部分積分では [構造文書](ARCHITECTURE.md#依存関係と実装�
 
 ## Lean の依存関係
 
-共有の `SYK.Probability.GaussianConcentration`・`SYK.Model` と、利用する場合の `SYK.SuperConcentration` から `SYK.CLT` への依存を保つ。現行 `Main.lean` は `SYK.Annealed_FE.main_result` の入力構造も使う。CLT 側で共有部分を再定義せず、共有部分が CLT を `import` する循環も作らない。入力構造の変更は R02・F06 の仕様確定後に行い、W06 では依存先の再設計を行わない。モジュール名とファイル名は `UpperCamelCase` とする。
+共有の `SYK.Probability.GaussianConcentration`・`SYK.Model` と、利用する場合の `SYK.SuperConcentration` から `SYK.CLT` への依存を保つ。現行 `Main.lean` は `SYK.Annealed_FE.main_result` を import せず、`prop:annealed-free-energy` に合わせた `AnnealedInput q S` をファイル内に宣言する。旧ファイルの重複宣言は除去済みである。共有部分が CLT を `import` する循環は作らない。W06 では依存先の再設計を行わない。モジュール名とファイル名は `UpperCamelCase` とする。
 
 この依存方向は「共有部分の結果を CLT が利用する」という意味であり、共有部分が CLT をインポートするという意味ではない。大文字のモジュールパスは移行後の名称を含むため、実際のパスは移行状況と照合する。
 

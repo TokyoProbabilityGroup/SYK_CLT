@@ -2,6 +2,7 @@ import Verso
 import VersoManual
 import VersoBlueprint
 import SYK.Annealed_FE.main_result
+import SYK.CLT.Main
 
 open Verso.Genre
 open Verso.Genre.Manual
@@ -10,25 +11,23 @@ open Informal
 #doc (Manual) "Annealed free energy" =>
 
 :::group "annealed_free_energy"
-Two annealed free-energy developments share a Lean file but have different
-models and proof status. The Rademacher model belongs to
+Two annealed free-energy developments have different models and proof
+status. The Rademacher model belongs to
 `Annealed_FE/refs/SYK-HT-arxiv.tex`; the Gaussian limit used by the CLT is
 an input structure, not a consequence proved from the Rademacher result.
 :::
 
-:::definition "gaussian_annealed_input" (parent := "annealed_free_energy") (lean := "SYK.AnnealedFE.AnnealedFreeEnergyLimit")
-For a specified family of Gaussian models, this structure requires a common
-positive high-temperature radius, a real-analytic even limiting pressure on
-that interval, locally uniform convergence of the annealed pressures and their
-derivatives for every model family, and quartic/cubic errors in the
-small-temperature pressure/derivative expansions. In `SYK.CLT.Main` it is
-specialized as `AnnealedInput q` to the families `Setting q`.
+:::definition "gaussian_annealed_input" (parent := "annealed_free_energy") (lean := "SYK.CLT.AnnealedInput")
+For one Gaussian model family `S : Setting q`, this structure records
+`prop:annealed-free-energy` (Proposition 4.2): an even convex $`C^1` limit
+on the whole real line, locally uniform convergence of the normalized
+pressure and derivative, the explicit quadratic and cubic error bounds,
+and the positive derivative and nonzero-temperature sign. The stated
+small-temperature expansions follow from those bounds.
 
-The structure supplies hypotheses. There is no construction here of an
-instance for the Gaussian SYK families. The CLT manuscript's
-`prop:annealed-free-energy` instead states an even convex $`C^1` limit on the
-whole real line. That statement alone does not supply real analyticity or
-the structure's quantification over general Majorana families.
+The structure supplies hypotheses for a specified family. Constructing
+an instance from the manuscript's result for a concrete `Setting q`
+remains a separate task.
 :::
 
 :::definition "rademacher_annealed_model" (parent := "annealed_free_energy") (uses := "majorana_system") (lean := "SYK.AnnealedFE.admissibleSize, SYK.AnnealedFE.paperHamiltonian, SYK.AnnealedFE.partitionFunction, SYK.AnnealedFE.annealedPressure")

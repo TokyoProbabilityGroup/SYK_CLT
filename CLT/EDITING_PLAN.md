@@ -11,9 +11,10 @@
 - 現在の `thm: input` は He2026 を引用した、すべての実数の逆温度に関する外部結果である。以前の「原稿内で大数則を証明する」計画をそのまま実行せず、R04 で引用と仮定を照合する。
 - 標準化した CLT の定理文は `beta = 0` を除いていないが、本文の証明と Lean は除外している。R02 で照合する。実数の `|β|` 条件を旧方針だけで非負領域へ変更しない。
 - 現行の対数 CLT は `Z_N ≥ 1` とカオス分解による証明である。集中評価を使う旧証明は `main-results.tex` の `\iffalse` 内にある。
-- `AnnealedInput` の解析性・高温半径・一般表現族に対する量化と、現行原稿の全実軸上の `C¹` の外部入力との対応は未確認である。
+- CLT のアニール入力は He2026 を直接仮定するのでなく、`refs/sections/main-results.tex` の `prop:annealed-free-energy`（Proposition 4.2）とする。同命題の証明が使う He2026 の結果の監査と、R04 の `thm: input` の監査は別に扱う。
+- `Main.lean` の `AnnealedInput q S` は Proposition 4.2 の偶・凸な `C¹` 関数、全実軸での局所一様収束、明示的評価、非零逆温度での符号を一つの `Setting q` について記録する。旧構造の実解析性・共通高温半径・全 `Setting q` への一括量化は除いた。原稿の模型族を具体的な `Setting q` に対応付け、入力の値を構築する作業は未完了である。
 
-これらは解決済みの記録ではない。定理文を変更する解決には人間の研究者の承認が必要である。
+解決済みの入力構造の変更と、残る原稿監査・模型族への適用を区別する。今後さらに定理文を変更する場合は人間の研究者の承認を得る。
 
 運用文書の整備履歴は [作業履歴](../WORK_HISTORY.md#clt-docs) に保存した。
 
@@ -42,8 +43,9 @@
 - [ ] 相対ゆらぎの CLT が `beta = 0` で持つ退化した極限と、そこで未定義となる標準化した CLT のパラメータ範囲を分けて記述する。
 - [ ] `thm: input`・各 CLT・内部補題について、全実軸の入力と高温に限ったゆらぎの結論を区別する。
 - [ ] 原稿の `β ℓ_q'(β) > 0`（すべての非零実数）と、Lean の小さい非零逆温度での条件付き結果を照合する。
-- [ ] 高次カオスに必要な `β_{\rm r}`、Lean の `hFE.βFE` と非退化半径、原稿に残る `tilde_beta_q` の役割を確認する。旧温度上限の一覧を無条件に再採用しない。
-- [ ] He2026 の引用・規格化・表現の範囲を監査し、`AnnealedInput` を維持するための追加根拠か、原稿に合わせた変更案を示す。`C¹` から実解析性は推論しない。入力の変更は W06 に含めない。
+- [ ] 高次カオスに必要な `β_{\rm r}`、Lean の CLT 結論が選ぶ高温半径と非退化半径、原稿に残る `tilde_beta_q` の役割を確認する。旧温度上限の一覧を無条件に再採用しない。
+- [x] `prop:annealed-free-energy` に合わせ、`Main.lean` の `AnnealedInput q S` を全実軸の局所一様収束、凸性・`C¹`、導関数・圧力の明示的評価、非零での符号に改めた。実解析性・共通半径・全 `Setting q` の一括量化を除いた。命題の証明中の He2026 の引用監査は R03、`thm: input` の引用監査は R04 に残る。
+- [x] 旧 `AnnealedFreeEnergyLimit` を `Annealed_FE/main_result.lean` から除き、Blueprint の宣言参照を `SYK.CLT.AnnealedInput` に変更した。
 
 完了条件：三つの主結果について、逆温度の範囲と非退化条件が相互に整合する。
 
@@ -59,7 +61,7 @@
 - [ ] Duhamel の反復微分公式と非可換 Hölder 不等式による評価を検証する。
 - [ ] ラデマッハ変数による符号化の恒等式と、指数モーメント評価の一様性を検証する。
 - [ ] `O(N^(-3(q/2-1))) = o(N^(2-q))` を確認する。
-- [ ] He2026 の引用箇所・規格化の変換と、現行原稿の `C¹`・導関数評価・局所一様収束の導出を確認する。旧入力の解析性との差は R02 と共有する。
+- [ ] `prop:annealed-free-energy` の証明中の He2026 の引用箇所・規格化の変換と、原稿内での `C¹`・導関数評価・局所一様収束の導出を確認する。F06 が受け取る入力は Proposition 4.2 とし、Lean の現行構造との差は R02 と共有する。
 - [ ] 分散の漸近挙動と、標準化した CLT を導く論理を確認する。
 
 完了条件：現在の原稿内の結果と、明示した外部入力だけから Theorem 1.2 が証明される。
@@ -110,12 +112,12 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 | ID | 成果と照合する原稿 | 主な依存関係・完了条件 |
 | --- | --- | --- |
-| F01 | ガウス–エルミート展開の完全性、次数ごとの直交射影・無限和、`lem:Gaussian-Hermite-IBP` の汎用的な部分 | R03 の該当監査。一般部分積分、直交性・階乗ノルムと有限射影は証明済み。$L^2$ 完全性と無限次数和は未証明。SpinGlass・既存 API との照合と共有配置は F01-G、`Z_N` への特殊化は F04 に残る |
+| F01 | ガウス–エルミート展開の完全性、次数ごとの直交射影・無限和、`lem:Gaussian-Hermite-IBP` の汎用的な部分 | 完了。R03 の該当監査、SpinGlass・既存 API との照合と共有配置、直交性・階乗ノルム、有限射影、$L^2$ 完全性と無限次数和を検証済み。`eq: chaos` はガウス $L^2$ の等式として解釈する。`Z_N` への特殊化は F04 に残る |
 | F02 | 符号ゲージ変換・偶奇則と一次・二次カオスの厳密な同定。`lem: parity rule lemma`、`lem:exact-second-chaos` | F01 と必要な F04 の入力。有限の `N` で係数・規格化が原稿と一致する |
 | F03 | ラデマッハ符号化と一様な指数モーメント。`lem:Rademacher-encoding` | R03 の該当監査。`N` と指数パラメータの範囲、`q` のみに依存する定数を明示する |
 | F04 | 任意階の Duhamel 公式、非可換 Hölder 評価、`lem:Z-derivative-bound` | W06 と R03 の該当監査。共有すべき行列解析を CLT に複製せず、F01 の部分積分へ渡す正則性・各偏導関数の指数増大と、微分・積分交換の仮定も検査する |
 | F05 | `prop:higher-chaos-closure` の剰余項評価 | F01–F04。無限和の操作と `O(N^(-3(q/2-1))) = o(N^(2-q))` を検査する |
-| F06 | 凸性・アニール入力・係数漸近と相対・標準化 CLT | F02・F05、R02・R03。既存の条件付き極限補題と `ConvexDerivatives` を再利用し、各点収束から局所一様収束への不足を補う。Lean が要求する全有限サイズの分散正値性は、漸近的正値性と区別して証明する |
+| F06 | 凸性・Proposition 4.2 のアニール入力・係数漸近と相対・標準化 CLT | F02・F05、R02・R03。`Main.lean` の `AnnealedInput q S` は `prop:annealed-free-energy` の結論を一つの模型族に対して記録する。原稿から具体的な `Setting q` への適用を確立し、既存の条件付き極限補題と `ConvexDerivatives` を再利用する。命題の証明中の各点収束から局所一様収束への導出は R03 で監査する。Lean が要求する全有限サイズの分散正値性は、漸近的正値性と区別して証明する |
 | F07 | 対数の線形近似、小確率事象と `Z_N≥1` による中心化誤差、`cor:free-energy-clt` | F06・W06・R05、F05 の剰余評価と二次カオスの四次モーメント。新証明の `O(N^(-2a))` を得る。集中評価の移送は前提にしない |
 | F08 | 大数則の Lean 上の扱い（仕様再検討） | R04 の外部引用監査後に、外部入力として記録するか内部証明を別途行うか確定する。現行 CLT・W06 の必須前提ではない |
 
@@ -131,7 +133,7 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 #### R02/R04：外部入力の監査
 
-直ちに読み取り着手できる。原稿の有効な本文、He2026 の原文、`../Annealed_FE/main_result.lean` の `AnnealedInput`、[構造文書の「外部入力と未確定事項」](ARCHITECTURE.md#外部入力と未確定事項)を照合する。逆温度の範囲、規格化、極限の種類、正値性、概収束に必要な確率空間、外部入力と内部証明の境界を、出典・TeX ラベル・Lean 宣言名つきで返す。定理文変更案は研究者の判断へ渡す。
+直ちに読み取り着手できる。R02 は `refs/sections/main-results.tex` の `prop:annealed-free-energy`（Proposition 4.2）と `Main.lean` 内の `SYK.CLT.AnnealedInput` を照合し、原稿の模型族から具体的な `Setting q` への適用を監査する。R03 は同命題の証明が引用する He2026 を監査する。R04 は別の `thm: input` の引用を監査する。逆温度の範囲、規格化、極限の種類、正値性、表現の範囲、概収束に必要な確率空間、原稿内の命題と外部論文の境界を、出典・TeX ラベル・Lean 宣言名つきで返す。定理文・前提の変更案は研究者の判断へ渡す。
 
 <a id="ticket-r03"></a>
 
@@ -145,17 +147,17 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 読む箇所：`refs/sections/gaussian-chaos.tex` の `lem:Gaussian-Hermite-IBP` と `eq:Gaussian-Hermite-IBP`、[構造文書の依存関係と流用元](ARCHITECTURE.md#依存関係と実装の分担)、[共有基盤の F01](../Probability/GaussianConcentration/EDITING_PLAN.md#f01)。既存宣言は `StandardGaussian.lean` の `gaussianReal_stein`・`pi_gaussian_stein_coord` と `Lemmas/GaussianIBP.lean` の `hermiteMulti_ibp_of_expGrowth`・`hermiteMulti_ibp_integrable` を照合する。完了済み証明の詳細が必要な場合だけ [作業履歴](../WORK_HISTORY.md#clt-f01-gaussian) を読む。
 
-`GaussianIBP.lean` には F01 側で `hermiteMulti_pair_ibp` も追加された。R03 の該当監査と共有 API の編集担当を固定してから、汎用部分とこの新結果の利用箇所・公開宣言・必要な import を調べて共有層へ配置する。一般 Hermite 部分積分を再証明しない。約7,500行の前半と旧 `IBPFamily` は削減候補だが、局所的な抽出検査は全 API の不要性を示さない。参照調査後に重複を整理し、定理文・公理依存・共有基盤と CLT の関連ビルドを確認して渡す。
+`GaussianIBP.lean` の高階の一般部分と `hermiteMulti_pair_ibp` は `../Probability/GaussianConcentration/Smooth.lean` に移した。共有 `pi_gaussian_stein_coord` を使い、原稿の `η ≤ α` の仮定を保つ。CLT 利用側の import と Blueprint の宣言参照も更新し、変更した Lean ファイルの個別検査、主要宣言の公理依存検査、`lake -f lakefile.toml --old build CLT` は成功した。SpinGlass の候補は分散一般の一次元公式と指数増大の補助 API だが、今回の標準分散1の証明には既存の `gaussianReal_stein` で足りるため、上流コードは流用していない。約6,500行の前半は独立した既存 API として残し、局所的な参照調査だけを根拠に削除しない。
 
 <a id="ticket-f01-h"></a>
 
 #### F01-H：展開の完全性と射影
 
-`refs/sections/gaussian-chaos.tex` の `eq: chaos` に対し、`Lemmas/GaussianChaos.lean` は二つの Hermite・ガウス測度の規格化を照合した。`GaussianHermiteOrthogonality.lean` の直交性・階乗ノルム・有限射影、`GaussianHermiteDensity.lean` の多項式の有限線形包への包含、`GaussianMomentDetermination.lean` と `GaussianPolynomialDensity.lean` の解析的補助結果も Lean 検査済みである。無条件のガウス $L^2$ 多項式稠密性、Hermite 完全性、無限次数和の収束は未証明で、条件付き `HasSum` を完成と扱わない。[今回の F01 検証履歴](../WORK_HISTORY.md#clt-f01-after-w06)を必要時に参照する。
+`refs/sections/gaussian-chaos.tex` の `eq: chaos` に対し、`Lemmas/GaussianChaos.lean` は二つの Hermite・ガウス測度の規格化を照合した。`GaussianHermiteOrthogonality.lean` の直交性・階乗ノルム・有限射影、`GaussianHermiteDensity.lean` の多項式の有限線形包への包含、`GaussianMomentDetermination.lean` のモーメント一意性も Lean 検査済みである。`GaussianPolynomialDensity.lean` では有限積ガウス $L^2$ の多項式稠密性、Hermite 完全性、無限次数和の収束を無条件に証明した。検証の詳細は [F01 の新しい記録](../WORK_HISTORY.md#clt-f01-completion-2026-09-27) に記す。
 
-最初の未完了な入力は、`GaussianPolynomialDensity.lean` の `gaussianLp_eq_zero_of_polynomial_moments_zero` から一変数ガウス $L^2$ の多項式稠密性を導き、有限積ガウス上の `mvPolynomialLp` の稠密性へ移す部分である。得られた結果で `GaussianHermiteDensity.lean` の `hermiteOrthonormal_dense_of_mvPolynomialLp_dense` が受け取る稠密性仮定を供給し、`GaussianHermiteOrthogonality.lean` の `hasSum_hermiteCoefficients` と `hasSum_hermiteDegreeProjection` を無条件の結論へ接続する。既存の条件付き定理を完成済みの無条件の結果として扱わない。
+一変数ガウス $L^2$ の単項式稠密性 `gaussianMonomialLp_dense` を証明し、有限積では各連続線形写像への射影のモーメント一意性と特性関数の一意性から `mvPolynomialLp_dense` を証明した。これで `hermiteOrthonormal_dense_of_mvPolynomialLp_dense` の仮定を供給し、`hasSum_hermiteCoefficients_unconditional` と `hasSum_hermiteDegreeProjection_unconditional` を証明した。両結論はガウス $L^2$ での収束である。原稿の `eq: chaos` は、直前の完全直交基底の記述に従い、研究者の確認を得てガウス $L^2$ の等式と解釈する。点ごとの収束は F01 の主張に含めない。
 
-R03 で原稿の有効な主張、測度・Hermite 規格化、実 $L^2$ から原稿の係数への対応を照合し、上の入力を実装する。主な編集対象は `GaussianPolynomialDensity.lean`、`GaussianHermiteDensity.lean`、`GaussianHermiteOrthogonality.lean` とし、公開定理文と追加の編集対象は着手前に確定する。F01-G が `GaussianIBP.lean` や共有 API の配置を変える場合は、その変更を統合してから F01-H の import と利用宣言を再確認する。`GaussianChaos.lean` と `Main.lean` の同時 import は成功したが、符号結果と `Setting.Z` の数学的接続は [F02 の統合](#ticket-integration)に残る。補題ごとに TeX ラベルと Lean 定理文、個別検査・CLT ビルド・公理依存を報告する。`Z_N` への特殊化は F04 に渡す。
+R03 の対象範囲として原稿の Hermite とガウス測度の規格化、実 $L^2$ の係数と原稿の階乗係数を照合した。共有 API の配置を統合して CLT の import を再確認した。`GaussianChaos.lean` と `Main.lean` の同時 import、CLT ビルド、主要宣言の公理依存は検査済みである。符号結果と `Setting.Z` の数学的接続は [F02 の統合](#ticket-integration)、`Z_N` への部分積分の特殊化は F04 に渡す。Verso の機械的検査は休止中であり、Blueprint の宣言参照はソース上で照合する。
 
 <a id="ticket-f03-r"></a>
 
@@ -185,7 +187,11 @@ R03 で有限和・偶多重指数・次数の範囲を照合してから同フ�
 
 #### F02–F07：先行成果の統合
 
-各 F の原稿監査と先行成果が揃ってから、上の依存順に着手する。`Preliminaries.lean`・`CLTComponents.lean`・`GaussianConcentration.lean` は宣言のない雛形なので、接続時に参照を調べて要否を決める。F05 は評価補題から剰余へ、F06 は既存の `ConvexDerivatives` と条件付き漸近から主結果へ、F07 は対数の誤差評価から最終定理へ進める。原稿との照合、主要定理の公理依存、CLT と既定ビルドを報告する。
+各 F の原稿監査と先行成果が揃ってから、上の依存順に着手する。`Preliminaries.lean` と `CLTComponents.lean` には F02 の有限サイズ結果を実装中で、`GaussianConcentration.lean` は宣言のない雛形である。F05 は評価補題から剰余へ、F06 は既存の `ConvexDerivatives` と条件付き漸近から主結果へ、F07 は対数の誤差評価から最終定理へ進める。原稿との照合、主要定理の公理依存、CLT と既定ビルドを報告する。
+
+F02 着手監査（2026-09-27）：`lem: parity rule lemma` の符号ゲージ不変性と奇多重指数の積分零は `CliffordSignParity.lean` にある。共有分配関数は通常トレース・未スケールの Hamiltonian・複素値だが、`Preliminaries.lean` の `Setting.Z_sign_gauge` は `couplingScale`、規格化トレース、実部を介して有限模型の `Setting.Z` に点ごとの符号対称性を移した。同ファイルの `Setting.integral_Z_mul_hermite_eq_zero` は `standardGaussianMeasure` 上の奇 Hermite 係数零、`Setting.Y_firstChaos_eq_zero` は F01 の射影による一次カオスの消滅、`Setting.inner_offDiagonal_secondChaos_eq_zero` は異なる二添字の Hermite 係数零を証明済み。`CLTComponents.lean` の `Setting.Y_secondChaos_eq_integral_sum` はすべての二次多重指数を分類し、対角項の `H_2(g_I)=g_I^2-1` と階乗係数 `1/2` を用いた有限サイズの厳密な和を証明済み。個別 Lean 検査と CLT ビルドは成功し、主要定理の公理依存は `propext`、`Classical.choice`、`Quot.sound` のみ。残るのは各対角係数が添字 `I` に依存しないことと、その共通値を `\beta\partial_\beta\log\mathbb E Z_N/M_N` と同定すること。前者は符号ゲージだけからは出ない。原稿の `2M_N b_N=\sum_I \mathbb E[g_I\partial_{g_I}Z_N]` には、この同一性の別証明が必要である。相互作用添字の置換に対するトレースとガウス測度の不変性、または各係数を直接同定する補題を R03 の偶奇・二次カオス監査で確定する。さらに F04 から `Setting.Z` の必要階数の正則性、各偏導関数の指数増大、Hermite 部分積分への特殊化、`\partial_\beta\mathbb E Z_N` と期待値の微分交換を受け取る。これらは現行 Lean に宣言がないため、F02 の原稿どおりの共通係数の結論は前提待ちとする。
+
+同日の追加作業：`CliffordSignParity.lean` に `MajoranaSystem.exists_generator_swap` を証明した。異なる生成子 `i,j` について `U=ψ_i+ψ_j`、`V=U/2` は互いに逆で、`Uψ_i=ψ_jU`、`Uψ_j=ψ_iU`、その他の `ψ_k` には `Uψ_k=-ψ_kU` が成り立つ。`interactionOperator_swap` まで接続し、各相互作用演算子が生成子の転置により、転置された相互作用演算子に符号付きで共役されることを証明した。これを Hamiltonian・規格化トレース・ガウス測度の不変性へ接続する作業は残る。`CLTComponents.lean` の `Setting.Y_secondChaos_eq_common_of_symmetry_and_sum` は、対角係数の添字独立性とその総和の導関数恒等式を明示的な仮定として、原稿の `1/(2M_N)` の規格化を Lean で検証した。二つの仮定は未証明であり、この補題だけでは `lem:exact-second-chaos` は完了しない。両ファイルの個別 Lean 検査と CLT ビルドは成功し、新たな主要宣言の公理依存は `propext`、`Classical.choice`、`Quot.sound` のみ。
 
 F01-G と F04-M の整理は、その数学的成果を受け渡す段階で行う。定義の型・規格化・利用先が異なる場合は違いを記録する。R03 の結果から主張の修正が必要になっても、既存の定理文を黙って変えない。各担当者は開始ソース、編集ファイル、正確な入力宣言、検査結果を統合担当へ渡す。
 
