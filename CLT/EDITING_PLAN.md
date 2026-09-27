@@ -123,6 +123,8 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 ### 担当別作業票とコード整理
 
+配置整理の方針（2026-09-27）：主要補題への入口は [構造文書の索引](ARCHITECTURE.md#補助-lean-ファイルの役割)に整理した。ディレクトリ再配置と参照専用の短い Lean API ファイルの新設は保留する。索引と部分読み取りでも繰り返し探索の負担が残る場合に、実際の利用箇所を根拠に再検討する。同じ定理を再掲するだけの宣言は追加しない。
+
 以下は共同研究者へ切り出せる成果単位であり、F01–F08 全体の状態は [全体計画](../EDITING_PLAN.md) だけで管理する。原稿監査が未了の票は、正確な定理文と入力を照合してから実装する。割当には各票への直接リンクと、[別環境への引き継ぎ手順](../EDITING_PLAN.md#別環境への引き継ぎ)を添える。
 
 | 調査・実装 | 接続・統合 |
@@ -145,7 +147,7 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 #### F01-G：ガウス部分積分の共有配置と整理
 
-読む箇所：`refs/sections/gaussian-chaos.tex` の `lem:Gaussian-Hermite-IBP` と `eq:Gaussian-Hermite-IBP`、[構造文書の依存関係と流用元](ARCHITECTURE.md#依存関係と実装の分担)、[共有基盤の F01](../Probability/GaussianConcentration/EDITING_PLAN.md#f01)。既存宣言は `StandardGaussian.lean` の `gaussianReal_stein`・`pi_gaussian_stein_coord` と `Lemmas/GaussianIBP.lean` の `hermiteMulti_ibp_of_expGrowth`・`hermiteMulti_ibp_integrable` を照合する。完了済み証明の詳細が必要な場合だけ [作業履歴](../WORK_HISTORY.md#clt-f01-gaussian) を読む。
+読む箇所：`refs/sections/gaussian-chaos.tex` の `lem:Gaussian-Hermite-IBP` と `eq:Gaussian-Hermite-IBP`、[構造文書の依存関係と流用候補](ARCHITECTURE.md#依存関係と実装の分担)、[共有基盤の F01](../Probability/GaussianConcentration/EDITING_PLAN.md#f01)。現行宣言は共有基盤の `StandardGaussian.lean` にある `gaussianReal_stein`・`pi_gaussian_stein_coord` と、`Smooth.lean` に移設済みの `hermiteMulti_ibp_of_expGrowth`・`hermiteMulti_ibp_integrable` を参照する。完了済み証明の詳細が必要な場合だけ [作業履歴](../WORK_HISTORY.md#clt-f01-gaussian) を読む。
 
 `GaussianIBP.lean` の高階の一般部分と `hermiteMulti_pair_ibp` は `../Probability/GaussianConcentration/Smooth.lean` に移した。共有 `pi_gaussian_stein_coord` を使い、原稿の `η ≤ α` の仮定を保つ。CLT 利用側の import と Blueprint の宣言参照も更新し、変更した Lean ファイルの個別検査、主要宣言の公理依存検査、`lake -f lakefile.toml --old build CLT` は成功した。SpinGlass の候補は分散一般の一次元公式と指数増大の補助 API だが、今回の標準分散1の証明には既存の `gaussianReal_stein` で足りるため、上流コードは流用していない。約6,500行の前半は独立した既存 API として残し、局所的な参照調査だけを根拠に削除しない。
 
@@ -186,6 +188,8 @@ R03 で有限和・偶多重指数・次数の範囲を照合してから同フ�
 <a id="ticket-integration"></a>
 
 #### F02–F07：先行成果の統合
+
+主定理への接続時には、`Main.lean` から補助モジュールを import する前に共通定義・基本結果を分離する。現状では補助側が `Main.lean` に依存しているためであり、現在の import に循環があるわけではない。候補は `CLT/Basic.lean` 一つとし、`AnnealedInput` とその帰結の移設範囲は利用箇所から決める。宣言名・定理文・証明を維持し、import と参照文書を更新する。個別検査、CLT と既定ビルド、主要定理の型と公理依存の照合を統合作業に含める。この整理の実施は接続時まで保留する。
 
 各 F の原稿監査と先行成果が揃ってから、上の依存順に着手する。`Preliminaries.lean` と `CLTComponents.lean` には F02 の有限サイズ結果を実装中で、`GaussianConcentration.lean` は宣言のない雛形である。F05 は評価補題から剰余へ、F06 は既存の `ConvexDerivatives` と条件付き漸近から主結果へ、F07 は対数の誤差評価から最終定理へ進める。原稿との照合、主要定理の公理依存、CLT と既定ビルドを報告する。
 
