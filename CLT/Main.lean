@@ -1,4 +1,3 @@
-import SYK.Annealed_FE.main_result
 import SYK.Model.StandardRepresentation
 import SYK.Model.GaussianDisorder
 import SYK.Model.FiniteDimensionalGibbs
@@ -6,6 +5,7 @@ import Mathlib.Analysis.Asymptotics.Lemmas
 import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
 import Mathlib.Probability.Moments.Variance
 import Mathlib.Analysis.Matrix.Spectrum
+import Mathlib.Topology.UniformSpace.LocallyUniformConvergence
 
 /-!
 # Central limit theorem for the SYK model
@@ -20,8 +20,8 @@ for these declarations. The standardized CLT excludes `β = 0`; the relative
 and logarithmic CLTs include its degenerate Gaussian limit.
 
 Proofs marked `sorry` are placeholders, not formal proofs of the manuscript.
-The only explicit analytic input is `AnnealedInput`, the annealed proposition
-recorded in `Annealed_FE/main_result.lean`. The CLT proof remains incomplete
+The explicit annealed input is `AnnealedInput`, modeled on
+`prop:annealed-free-energy` in the CLT manuscript. The CLT proof remains incomplete
 while the Gaussian chaos and logarithmic-transfer arguments are unproved.
 The almost-sure free-energy law of large numbers is outside this module's
 present scope.
@@ -540,69 +540,71 @@ end Setting
 
 /-! ## Main results -/
 
-/-- The annealed proposition for the Gaussian families in this module. -/
-abbrev AnnealedInput (q : ℕ) :=
-  AnnealedFE.AnnealedFreeEnergyLimit q (Setting q) Setting.N Setting.meanZ
+/-- `prop:annealed-free-energy` for one Gaussian SYK model family.
+The small-temperature expansions follow from the stated global error bounds. -/
+structure AnnealedInput (q : ℕ) (S : Setting q) where
+  ℓ : ℝ → ℝ
+  even : ∀ β : ℝ, ℓ (-β) = ℓ β
+  convex : ConvexOn ℝ Set.univ ℓ
+  contDiff_one : ContDiff ℝ 1 ℓ
+  pressure_limit : TendstoLocallyUniformlyOn
+    (fun n β ↦ S.annealedFreeEnergy β n) ℓ atTop Set.univ
+  derivative_limit : TendstoLocallyUniformlyOn
+    (fun n β ↦ deriv (fun b ↦ Real.log (S.meanZ b n)) β / (S.N n : ℝ))
+    (deriv ℓ) atTop Set.univ
+  derivative_pos : ∀ β : ℝ, 0 < β → 0 < deriv ℓ β
+  derivative_le : ∀ β : ℝ, 0 < β → deriv ℓ β ≤ β / (q : ℝ)
+  derivative_error_nonneg : ∀ β : ℝ, 0 < β →
+    0 ≤ β / (q : ℝ) - deriv ℓ β
+  derivative_error_le : ∀ β : ℝ, 0 < β →
+    β / (q : ℝ) - deriv ℓ β ≤ β ^ 3 / 3
+  pressure_error_nonneg : ∀ β : ℝ,
+    0 ≤ β ^ 2 / (2 * (q : ℝ)) - ℓ β
+  pressure_error_le : ∀ β : ℝ,
+    β ^ 2 / (2 * (q : ℝ)) - ℓ β ≤ β ^ 4 / 12
+  sign : ∀ β : ℝ, β ≠ 0 → 0 < β * deriv ℓ β
 
 /-- Annealed pressure convergence follows from the permitted input. -/
-theorem annealedFreeEnergy_tendsto {q : ℕ} (hFE : AnnealedInput q)
-    (S : Setting q) {β : ℝ} (hβ : |β| < hFE.βFE) :
+theorem annealedFreeEnergy_tendsto {q : ℕ} {S : Setting q}
+    (hFE : AnnealedInput q S) (β : ℝ) :
     Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) :=
-  (hFE.pressure_limit S).tendsto_at (abs_lt.mp hβ)
+  hFE.pressure_limit.tendsto_at (Set.mem_univ β)
 
 /-- Convergence of the normalized beta derivative from the proposition. -/
-theorem annealedDerivative_tendsto {q : ℕ} (hFE : AnnealedInput q)
-    (S : Setting q) {β : ℝ} (hβ : |β| < hFE.βFE) :
+theorem annealedDerivative_tendsto {q : ℕ} {S : Setting q}
+    (hFE : AnnealedInput q S) (β : ℝ) :
     Tendsto (fun n ↦ deriv (fun b ↦ Real.log (S.meanZ b n)) β / (S.N n : ℝ))
       atTop (𝓝 (deriv hFE.ℓ β)) :=
-  (hFE.derivative_limit S).tendsto_at (abs_lt.mp hβ)
+  hFE.derivative_limit.tendsto_at (Set.mem_univ β)
 
 /-- The normalized coefficient `A_N/N` tends to `β ℓ_q'(β)/2`. -/
-theorem secondChaosCoefficient_tendsto {q : ℕ} (hFE : AnnealedInput q)
-    (S : Setting q) {β : ℝ} (hβ : |β| < hFE.βFE) :
+theorem secondChaosCoefficient_tendsto {q : ℕ} {S : Setting q}
+    (hFE : AnnealedInput q S) (β : ℝ) :
     Tendsto (fun n ↦ (β / 2 * deriv (fun b ↦ Real.log (S.meanZ b n)) β) /
       (S.N n : ℝ)) atTop (𝓝 (β / 2 * deriv hFE.ℓ β)) := by
   simpa only [mul_div_assoc] using
-    (annealedDerivative_tendsto hFE S hβ).const_mul (β / 2)
+    (annealedDerivative_tendsto hFE β).const_mul (β / 2)
 
 /-- The common limiting variance `ρ²(β) = (q!/2) β² (ℓ_q'(β))²`.
 It is allowed to vanish, in particular at `β = 0`. -/
 noncomputable def limitVariance (q : ℕ) (ℓ : ℝ → ℝ) (β : ℝ) : ℝ≥0 :=
   ⟨(q.factorial : ℝ) / 2 * β ^ 2 * (deriv ℓ β) ^ 2, by positivity⟩
 
-/-- The derivative expansion implies the corrected sign conclusion
-`β ℓ_q'(β)>0` at sufficiently small nonzero `β`. -/
-theorem exists_small_temperature_sign {q : ℕ} (hq : 0 < q)
-    (hFE : AnnealedInput q) :
-    ∃ r : ℝ, 0 < r ∧ r ≤ hFE.βFE ∧
+/-- Proposition 4.2 gives the sign at every nonzero temperature. -/
+theorem exists_small_temperature_sign {q : ℕ} {S : Setting q}
+    (hFE : AnnealedInput q S) :
+    ∃ r : ℝ, 0 < r ∧
       ∀ β : ℝ, |β| < r → β ≠ 0 → 0 < β * deriv hFE.ℓ β := by
-  have hqinv : 0 < (q : ℝ)⁻¹ := inv_pos.mpr (Nat.cast_pos.mpr hq)
-  have ho := hFE.derivative_expansion.trans_isLittleO
-    (Asymptotics.isLittleO_pow_id (𝕜 := ℝ) (by decide : 1 < 3))
-  have hb := ho.bound (half_pos hqinv)
-  obtain ⟨δ, hδ, hbound⟩ := Metric.eventually_nhds_iff.mp hb
-  refine ⟨min δ hFE.βFE, lt_min hδ hFE.βFE_pos, min_le_right _ _, ?_⟩
-  intro β hβ hβ0
-  have hdist : dist β 0 < δ := by
-    simpa [Real.dist_eq] using lt_of_lt_of_le hβ (min_le_left δ hFE.βFE)
-  have h := hbound hdist
-  simp only [Real.norm_eq_abs, div_eq_mul_inv] at h
-  rcases lt_or_gt_of_ne hβ0 with hneg | hpos
-  · rw [abs_of_neg hneg] at h
-    have hu := (abs_le.mp h).2
-    exact mul_pos_of_neg_of_neg hneg (by nlinarith [mul_neg_of_neg_of_pos hneg hqinv])
-  · rw [abs_of_pos hpos] at h
-    have hl := (abs_le.mp h).1
-    exact mul_pos hpos (by nlinarith [mul_pos hpos hqinv])
+  exact ⟨1, by norm_num, fun β _ hβ0 ↦ hFE.sign β hβ0⟩
 
 /-- The limiting variance is positive at the small nonzero temperatures
-selected by the annealed derivative expansion. -/
-theorem exists_small_temperature_variance_pos {q : ℕ} (hq : 0 < q)
-    (hFE : AnnealedInput q) :
-    ∃ r : ℝ, 0 < r ∧ r ≤ hFE.βFE ∧
+selected by Proposition 4.2. -/
+theorem exists_small_temperature_variance_pos {q : ℕ} {S : Setting q}
+    (hFE : AnnealedInput q S) :
+    ∃ r : ℝ, 0 < r ∧
       ∀ β : ℝ, |β| < r → β ≠ 0 → 0 < limitVariance q hFE.ℓ β := by
-  obtain ⟨r, hr, hle, hsign⟩ := exists_small_temperature_sign hq hFE
-  refine ⟨r, hr, hle, ?_⟩
+  obtain ⟨r, hr, hsign⟩ := exists_small_temperature_sign hFE
+  refine ⟨r, hr, ?_⟩
   intro β hβ hβ0
   have hd : deriv hFE.ℓ β ≠ 0 := by
     intro hd
@@ -612,8 +614,7 @@ theorem exists_small_temperature_variance_pos {q : ℕ} (hq : 0 < q)
     (mul_pos (div_pos (Nat.cast_pos.mpr q.factorial_pos) (by norm_num))
       (sq_pos_of_ne_zero hβ0)) (sq_pos_of_ne_zero hd)
 
-/-- `thm:partition-clt` and `cor:free-energy-clt`, with one common temperature
-radius and annealed limit for every general matrix Majorana family.
+/-- `thm:partition-clt` and `cor:free-energy-clt` for one matrix Majorana family.
 
 The limit is the identity random variable on `ℝ` with law
 `gaussianReal 0 (limitVariance q ℓ β)`. Thus the conclusion expresses weak
@@ -624,9 +625,9 @@ Positivity is a conclusion wherever standardization is used.
 The proof placeholders cover the annealed input, Gaussian chaos estimates,
 classical CLT, and transfer to the centered logarithm. -/
 theorem partition_and_log_partition_clt (q : ℕ) (_hq : Even q) (_h4 : 4 ≤ q)
-    (hFE : AnnealedInput q) :
-    ∃ βq : ℝ, 0 < βq ∧ βq ≤ hFE.βFE ∧
-      ∀ (S : Setting q) (β : ℝ), |β| < βq →
+    (S : Setting q) (hFE : AnnealedInput q S) :
+    ∃ βq : ℝ, 0 < βq ∧
+      ∀ β : ℝ, |β| < βq →
         Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) ∧
         TendstoInDistribution (S.relativeFluctuation β) atTop (fun x : ℝ ↦ x)
           (fun n ↦ standardGaussianMeasure (S.N n) q)
@@ -643,9 +644,9 @@ theorem partition_and_log_partition_clt (q : ℕ) (_hq : Even q) (_h4 : 4 ≤ q)
 /-- The partition-function part of `thm:partition-clt`. The joint theorem
 above additionally supplies the standardized CLT at nonzero temperature. -/
 theorem partition_clt (q : ℕ) (hq : Even q) (h4 : 4 ≤ q)
-    (hFE : AnnealedInput q) :
-    ∃ βq : ℝ, 0 < βq ∧ βq ≤ hFE.βFE ∧
-      ∀ (S : Setting q) (β : ℝ), |β| < βq →
+    (S : Setting q) (hFE : AnnealedInput q S) :
+    ∃ βq : ℝ, 0 < βq ∧
+      ∀ β : ℝ, |β| < βq →
         Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) ∧
         TendstoInDistribution (S.relativeFluctuation β) atTop (fun x : ℝ ↦ x)
           (fun n ↦ standardGaussianMeasure (S.N n) q)
@@ -654,24 +655,24 @@ theorem partition_clt (q : ℕ) (hq : Even q) (h4 : 4 ≤ q)
           0 < limitVariance q hFE.ℓ β ∧ (∀ n, 0 < S.varianceZ β n) ∧
           TendstoInDistribution (S.standardizedFluctuation β) atTop (fun x : ℝ ↦ x)
             (fun n ↦ standardGaussianMeasure (S.N n) q) (gaussianReal 0 1)) := by
-  obtain ⟨βq, hβq, hle, h⟩ := partition_and_log_partition_clt q hq h4 hFE
-  refine ⟨βq, hβq, hle, ?_⟩
-  intro S β hβ
-  exact ⟨(h S β hβ).1, (h S β hβ).2.1, (h S β hβ).2.2.2⟩
+  obtain ⟨βq, hβq, h⟩ := partition_and_log_partition_clt q hq h4 S hFE
+  refine ⟨βq, hβq, ?_⟩
+  intro β hβ
+  exact ⟨(h β hβ).1, (h β hβ).2.1, (h β hβ).2.2.2⟩
 
 /-- The centered log-partition CLT of `cor:free-energy-clt`.
 The joint theorem supplies the same radius and variance for both CLTs. -/
 theorem log_partition_clt (q : ℕ) (hq : Even q) (h4 : 4 ≤ q)
-    (hFE : AnnealedInput q) :
-    ∃ βq : ℝ, 0 < βq ∧ βq ≤ hFE.βFE ∧
-      ∀ (S : Setting q) (β : ℝ), |β| < βq →
+    (S : Setting q) (hFE : AnnealedInput q S) :
+    ∃ βq : ℝ, 0 < βq ∧
+      ∀ β : ℝ, |β| < βq →
         Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) ∧
         TendstoInDistribution (S.logFluctuation β) atTop (fun x : ℝ ↦ x)
           (fun n ↦ standardGaussianMeasure (S.N n) q)
           (gaussianReal 0 (limitVariance q hFE.ℓ β)) := by
-  obtain ⟨βq, hβq, hle, h⟩ := partition_and_log_partition_clt q hq h4 hFE
-  refine ⟨βq, hβq, hle, ?_⟩
-  intro S β hβ
-  exact ⟨(h S β hβ).1, (h S β hβ).2.2.1⟩
+  obtain ⟨βq, hβq, h⟩ := partition_and_log_partition_clt q hq h4 S hFE
+  refine ⟨βq, hβq, ?_⟩
+  intro β hβ
+  exact ⟨(h β hβ).1, (h β hβ).2.2.1⟩
 
 end SYK.CLT

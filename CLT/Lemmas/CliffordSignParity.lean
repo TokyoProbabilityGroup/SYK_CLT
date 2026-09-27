@@ -99,6 +99,258 @@ theorem exists_gauge (hN : Even N) (S : Finset (Fin N)) :
       · subst hj; simp [hx]
       · simp [hj]
 
+/-- An invertible Clifford element exchanges two generators under conjugation.
+It negates all other generators. For even interaction order, this realizes a
+transposition of interaction labels up to signs. -/
+theorem exists_generator_swap (i j : Fin N) (hij : i ≠ j) :
+    ∃ U V : A, U * V = 1 ∧ V * U = 1 ∧
+      U * M.ψ i = M.ψ j * U ∧
+      U * M.ψ j = M.ψ i * U ∧
+      ∀ k, k ≠ i → k ≠ j → U * M.ψ k = -(M.ψ k * U) := by
+  let U : A := M.ψ i + M.ψ j
+  let V : A := (1 / 2 : ℂ) • U
+  have hanti : M.ψ i * M.ψ j + M.ψ j * M.ψ i = 0 := by
+    simpa [hij] using M.majorana_rel i j
+  have hU2 : U * U = (2 : A) := by
+    dsimp [U]
+    calc
+      (M.ψ i + M.ψ j) * (M.ψ i + M.ψ j) =
+          (M.ψ i * M.ψ i + M.ψ j * M.ψ j) +
+            (M.ψ i * M.ψ j + M.ψ j * M.ψ i) := by noncomm_ring
+      _ = 2 := by
+        rw [M.majorana_sq, M.majorana_sq, hanti]
+        norm_num
+  have hhalf : (1 / 2 : ℂ) • (2 : A) = 1 := by
+    have htwo : (2 : A) = (2 : ℂ) • (1 : A) := by
+      simp only [two_smul]
+      norm_num
+    rw [htwo, smul_smul]
+    norm_num
+  have hUV : U * V = 1 := by
+    change U * ((1 / 2 : ℂ) • U) = 1
+    rw [Algebra.mul_smul_comm, hU2]
+    exact hhalf
+  have hVU : V * U = 1 := by
+    change ((1 / 2 : ℂ) • U) * U = 1
+    rw [Algebra.smul_mul_assoc, hU2]
+    exact hhalf
+  refine ⟨U, V, hUV, hVU, ?_, ?_, ?_⟩
+  · dsimp [U]
+    simp only [add_mul, mul_add, M.majorana_sq]
+    abel
+  · dsimp [U]
+    simp only [add_mul, mul_add, M.majorana_sq]
+    abel
+  · intro k hki hkj
+    dsimp [U]
+    rw [add_mul, mul_add, M.anticommute (Ne.symm hki),
+      M.anticommute (Ne.symm hkj)]
+    abel
+
+/-- Reordering a word of Majorana generators changes it by a sign. -/
+theorem listProduct_eq_sign_smul_of_perm
+    (l₁ l₂ : List (Fin N)) (h : l₁.Perm l₂) :
+    ∃ c : ℂ, (c = 1 ∨ c = -1) ∧
+      (l₁.map M.ψ).prod = c • (l₂.map M.ψ).prod := by
+  induction h with
+  | nil => exact ⟨1, Or.inl rfl, by simp⟩
+  | @cons i l₁ l₂ _ ih =>
+      obtain ⟨c, hc, heq⟩ := ih
+      refine ⟨c, hc, ?_⟩
+      simp only [List.map_cons, List.prod_cons]
+      rw [heq, Algebra.mul_smul_comm]
+  | @swap i j l =>
+      by_cases hij : i = j
+      · subst j
+        exact ⟨1, Or.inl rfl, by simp⟩
+      · refine ⟨-1, Or.inr rfl, ?_⟩
+        simp only [List.map_cons, List.prod_cons]
+        calc
+          M.ψ j * (M.ψ i * (l.map M.ψ).prod) =
+              (M.ψ j * M.ψ i) * (l.map M.ψ).prod := by rw [mul_assoc]
+          _ = (-(M.ψ i * M.ψ j)) * (l.map M.ψ).prod := by
+              rw [M.anticommute (Ne.symm hij)]
+          _ = (-1 : ℂ) • (M.ψ i * (M.ψ j * (l.map M.ψ).prod)) := by
+              simp [mul_assoc]
+  | @trans l₁ l₂ l₃ _ _ ih₁ ih₂ =>
+      obtain ⟨c₁, hc₁, heq₁⟩ := ih₁
+      obtain ⟨c₂, hc₂, heq₂⟩ := ih₂
+      refine ⟨c₁ * c₂, ?_, ?_⟩
+      · rcases hc₁ with h₁ | h₁ <;> rcases hc₂ with h₂ | h₂ <;>
+          simp [h₁, h₂]
+      · rw [heq₁, heq₂, smul_smul]
+
+/-- The swap conjugation as a signed permutation of generator labels. -/
+theorem exists_generator_swap_action (i j : Fin N) (hij : i ≠ j) :
+    ∃ U V : A, U * V = 1 ∧ V * U = 1 ∧
+      ∀ k : Fin N,
+        U * M.ψ k =
+          (if k = i ∨ k = j then (1 : ℂ) else -1) •
+            (M.ψ (Equiv.swap i j k) * U) := by
+  obtain ⟨U, V, hUV, hVU, hi, hj, hother⟩ := M.exists_generator_swap i j hij
+  refine ⟨U, V, hUV, hVU, ?_⟩
+  intro k
+  by_cases hki : k = i
+  · subst k
+    simpa [hij] using hi
+  by_cases hkj : k = j
+  · subst k
+    simpa [hij] using hj
+  simpa [hki, hkj, Equiv.swap_apply_of_ne_of_ne hki hkj] using
+    hother k hki hkj
+
+/-- Move the swap element through a Majorana word. -/
+theorem mul_listProduct_swap {U : A} (i j : Fin N)
+    (hU : ∀ k : Fin N,
+      U * M.ψ k =
+        (if k = i ∨ k = j then (1 : ℂ) else -1) •
+          (M.ψ (Equiv.swap i j k) * U)) (l : List (Fin N)) :
+    U * (l.map M.ψ).prod =
+      ((l.map fun k => if k = i ∨ k = j then (1 : ℂ) else -1).prod) •
+        ((l.map (fun k => M.ψ (Equiv.swap i j k))).prod * U) := by
+  induction l with
+  | nil => simp
+  | cons k l ih =>
+      simp only [List.map_cons, List.prod_cons]
+      rw [← mul_assoc, hU k, Algebra.smul_mul_assoc, mul_assoc, ih,
+        Algebra.mul_smul_comm, smul_smul, mul_assoc]
+
+/-- Relabel an interaction by exchanging two Majorana labels. -/
+def swapInteractionIndex {q : ℕ} (i j : Fin N) (s : InteractionIndex N q) :
+    InteractionIndex N q :=
+  ⟨s.1.image (Equiv.swap i j), by
+    rw [Finset.card_image_of_injective _ (Equiv.swap i j).injective, s.2]⟩
+
+theorem swapInteractionIndex_swap {q : ℕ} (i j : Fin N)
+    (s : InteractionIndex N q) :
+    swapInteractionIndex i j (swapInteractionIndex i j s) = s := by
+  apply Subtype.ext
+  simp [swapInteractionIndex, Finset.image_image, Function.comp_def]
+
+def swapInteractionEquiv {q : ℕ} (i j : Fin N) :
+    InteractionIndex N q ≃ InteractionIndex N q where
+  toFun := swapInteractionIndex i j
+  invFun := swapInteractionIndex i j
+  left_inv := swapInteractionIndex_swap i j
+  right_inv := swapInteractionIndex_swap i j
+
+theorem orderedIndices_swap_perm {q : ℕ} (i j : Fin N)
+    (s : InteractionIndex N q) :
+    ((orderedIndices s).map (Equiv.swap i j)).Perm
+      (orderedIndices (swapInteractionIndex i j s)) := by
+  apply List.perm_of_nodup_nodup_toFinset_eq
+  · exact (Finset.sort_nodup _ _).map (Equiv.swap i j).injective
+  · exact Finset.sort_nodup _ _
+  · ext k
+    simp [orderedIndices, swapInteractionIndex]
+
+/-- Swapping two generator labels carries each interaction word to the
+relabelled interaction word, up to a real sign. -/
+theorem psiProduct_swap {q : ℕ} {U : A} (i j : Fin N)
+    (hU : ∀ k : Fin N,
+      U * M.ψ k =
+        (if k = i ∨ k = j then (1 : ℂ) else -1) •
+          (M.ψ (Equiv.swap i j k) * U)) (s : InteractionIndex N q) :
+    ∃ c : ℂ, (c = 1 ∨ c = -1) ∧
+      U * M.psiProduct s =
+        c • (M.psiProduct (swapInteractionIndex i j s) * U) := by
+  let ε : Fin N → ℂ := fun k => if k = i ∨ k = j then 1 else -1
+  have hε (l : List (Fin N)) : (l.map ε).prod = 1 ∨ (l.map ε).prod = -1 := by
+    induction l with
+    | nil => simp
+    | cons k l ih =>
+        rcases ih with ih | ih <;> by_cases hk : k = i ∨ k = j <;>
+          simp [ε, hk, ih]
+  have hword := M.mul_listProduct_swap i j hU (orderedIndices s)
+  obtain ⟨c, hc, hreorder⟩ := M.listProduct_eq_sign_smul_of_perm
+    ((orderedIndices s).map (Equiv.swap i j))
+    (orderedIndices (swapInteractionIndex i j s))
+    (orderedIndices_swap_perm i j s)
+  have hreorder' :
+      ((orderedIndices s).map (fun k => M.ψ (Equiv.swap i j k))).prod =
+        c • ((orderedIndices (swapInteractionIndex i j s)).map M.ψ).prod := by
+    simpa only [List.map_map, Function.comp_def] using hreorder
+  refine ⟨(orderedIndices s |>.map ε).prod * c, ?_, ?_⟩
+  · rcases hε (orderedIndices s) with h | h <;> rcases hc with hc | hc <;>
+      simp [h, hc]
+  · change U * (orderedIndices s |>.map M.ψ).prod = _
+    rw [hword]
+    change _ = _ • ((orderedIndices (swapInteractionIndex i j s) |>.map M.ψ).prod * U)
+    rw [hreorder', Algebra.smul_mul_assoc, smul_smul]
+
+theorem interactionOperator_swap {q : ℕ} {U : A} (i j : Fin N)
+    (hU : ∀ k : Fin N,
+      U * M.ψ k =
+        (if k = i ∨ k = j then (1 : ℂ) else -1) •
+          (M.ψ (Equiv.swap i j k) * U)) (s : InteractionIndex N q) :
+    ∃ c : ℂ, (c = 1 ∨ c = -1) ∧
+      U * M.interactionOperator s =
+        c • (M.interactionOperator (swapInteractionIndex i j s) * U) := by
+  obtain ⟨c, hc, hpsi⟩ := M.psiProduct_swap i j hU s
+  refine ⟨c, hc, ?_⟩
+  simp only [interactionOperator, Algebra.mul_smul_comm, hpsi,
+    Algebra.smul_mul_assoc]
+  rw [smul_comm]
+
+/-- A single choice of real signs for every interaction under a generator swap. -/
+theorem exists_interaction_swap_sign {q : ℕ} {U : A} (i j : Fin N)
+    (hU : ∀ k : Fin N,
+      U * M.ψ k =
+        (if k = i ∨ k = j then (1 : ℂ) else -1) •
+          (M.ψ (Equiv.swap i j k) * U)) :
+    ∃ c : InteractionIndex N q → ℝ,
+      (∀ s, c s = 1 ∨ c s = -1) ∧
+      ∀ s, U * M.interactionOperator s =
+        (c s : ℂ) • (M.interactionOperator (swapInteractionIndex i j s) * U) := by
+  classical
+  have h (s : InteractionIndex N q) : ∃ r : ℝ,
+      (r = 1 ∨ r = -1) ∧
+      U * M.interactionOperator s =
+        (r : ℂ) • (M.interactionOperator (swapInteractionIndex i j s) * U) := by
+    obtain ⟨c, hc, heq⟩ := M.interactionOperator_swap i j hU s
+    rcases hc with hc | hc
+    · exact ⟨1, Or.inl rfl, by simpa [hc] using heq⟩
+    · exact ⟨-1, Or.inr rfl, by simpa [hc] using heq⟩
+  choose c hc heq using h
+  exact ⟨c, hc, heq⟩
+
+/-- A signed relabelling of couplings conjugates the finite interaction sum. -/
+theorem interactionSum_swap {q : ℕ} (i j : Fin N)
+    (U V : A) (hUV : U * V = 1)
+    (c J : InteractionIndex N q → ℝ)
+    (hO : ∀ s, U * M.interactionOperator s =
+      (c s : ℂ) • (M.interactionOperator (swapInteractionIndex i j s) * U)) :
+    U * (∑ s : InteractionIndex N q,
+        (J s : ℂ) • M.interactionOperator s) * V =
+      ∑ s : InteractionIndex N q,
+        ((c (swapInteractionIndex i j s) * J (swapInteractionIndex i j s) : ℝ) : ℂ) •
+          M.interactionOperator s := by
+  classical
+  have hterm (s : InteractionIndex N q) :
+      U * ((J s : ℂ) • M.interactionOperator s) * V =
+        ((J s * c s : ℝ) : ℂ) •
+          M.interactionOperator (swapInteractionIndex i j s) := by
+    rw [Algebra.mul_smul_comm, hO s, smul_smul,
+      Algebra.smul_mul_assoc, mul_assoc, hUV, mul_one]
+    congr 1
+    exact (Complex.ofReal_mul _ _).symm
+  calc
+    U * (∑ s : InteractionIndex N q,
+        (J s : ℂ) • M.interactionOperator s) * V =
+        ∑ s : InteractionIndex N q,
+          U * ((J s : ℂ) • M.interactionOperator s) * V := by
+            rw [Finset.mul_sum, Finset.sum_mul]
+    _ = ∑ s : InteractionIndex N q,
+          ((J s * c s : ℝ) : ℂ) •
+            M.interactionOperator (swapInteractionIndex i j s) := by
+            exact Finset.sum_congr rfl (fun s _ => hterm s)
+    _ = ∑ s : InteractionIndex N q,
+          ((c (swapInteractionIndex i j s) * J (swapInteractionIndex i j s) : ℝ) : ℂ) •
+            M.interactionOperator s := by
+            apply Fintype.sum_equiv (swapInteractionEquiv i j)
+            intro s
+            simp [swapInteractionEquiv, swapInteractionIndex_swap, mul_comm]
+
 theorem mul_listProduct {U : A} {ε : Fin N → ℂ}
     (h : ∀ j, U * M.ψ j = ε j • (M.ψ j * U)) (l : List (Fin N)) :
     U * (l.map M.ψ).prod = (l.map ε).prod • ((l.map M.ψ).prod * U) := by
@@ -121,6 +373,25 @@ theorem mul_interactionOperator {q : ℕ} {U : A} {ε : Fin N → ℂ}
   rw [interactionOperator, Algebra.mul_smul_comm, hl, Algebra.smul_mul_assoc, smul_comm]
 
 end MajoranaSystem
+
+/-- Relabelling the two selected Majorana generators induces a signed
+permutation of the Gaussian interaction coordinates. -/
+theorem hamiltonian_swap (P : Params) {A : Type*}
+    [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
+    (M : MajoranaSystem P.N A) (i j : Fin P.N) (hij : i ≠ j) :
+    ∃ c : InteractionIndex P.N P.q → ℝ,
+      (∀ s, c s = 1 ∨ c s = -1) ∧
+      ∃ U V : A, U * V = 1 ∧ V * U = 1 ∧
+        ∀ J : InteractionIndex P.N P.q → ℝ,
+          hamiltonian P M
+            (fun s => c s * J (MajoranaSystem.swapInteractionIndex i j s)) =
+            U * hamiltonian P M J * V := by
+  obtain ⟨U, V, hUV, hVU, hU⟩ := M.exists_generator_swap_action i j hij
+  obtain ⟨c, hc, hO⟩ := M.exists_interaction_swap_sign i j hU
+  refine ⟨fun s => c (MajoranaSystem.swapInteractionIndex i j s),
+    fun s => hc _, U, V, hUV, hVU, ?_⟩
+  intro J
+  exact (M.interactionSum_swap i j U V hUV c J hO).symm
 
 /-- The sign character `χ_s(I) = ∏_{x ∈ I} s_x`. -/
 def signCharacter {N q : ℕ} (s : Fin N → ℝ) (I : InteractionIndex N q) : ℝ :=
@@ -166,6 +437,31 @@ theorem partitionFunction_sign_gauge {n : Type*} [Fintype n] [DecidableEq n]
   have : -(β : ℂ) • (U * hamiltonian P M J * V) = U * (-(β : ℂ) • hamiltonian P M J) * U⁻¹ := by
     rw [hinv, Matrix.mul_smul, Matrix.smul_mul]
   rw [this, Matrix.exp_conj _ _ hunit, hinv, Matrix.trace_mul_comm, ← mul_assoc, hVU, one_mul]
+
+/-- Vertex transposition invariance of the finite partition function, with
+the signs required by the canonical ordering of interaction words. -/
+theorem partitionFunction_swap {d : Type*} [Fintype d] [DecidableEq d]
+    (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (i j : Fin P.N) (hij : i ≠ j) (β : ℝ) :
+    ∃ c : InteractionIndex P.N P.q → ℝ,
+      (∀ s, c s = 1 ∨ c s = -1) ∧
+      ∀ J : InteractionIndex P.N P.q → ℝ,
+        SYK.partitionFunction (β : ℂ)
+          (hamiltonian P M
+            (fun s => c s * J (MajoranaSystem.swapInteractionIndex i j s))) =
+          SYK.partitionFunction (β : ℂ) (hamiltonian P M J) := by
+  obtain ⟨c, hc, U, V, hUV, hVU, hH⟩ := hamiltonian_swap P M i j hij
+  refine ⟨c, hc, ?_⟩
+  intro J
+  have hunit : IsUnit U := ⟨⟨U, V, hUV, hVU⟩, rfl⟩
+  have hinv : U⁻¹ = V := Matrix.inv_eq_right_inv hUV
+  simp only [SYK.partitionFunction, gibbsOperator]
+  rw [hH J]
+  have hconj : -(β : ℂ) • (U * hamiltonian P M J * V) =
+      U * (-(β : ℂ) • hamiltonian P M J) * U⁻¹ := by
+    rw [hinv, Matrix.mul_smul, Matrix.smul_mul]
+  rw [hconj, Matrix.exp_conj _ _ hunit, hinv,
+    Matrix.trace_mul_comm, ← mul_assoc, hVU, one_mul]
 
 /-! ### Multi-indices, Hermite polynomials and the Gaussian expectation -/
 
@@ -216,8 +512,9 @@ theorem hermite_aeval_sign (n : ℕ) (c x : ℝ) (hc : c = 1 ∨ c = -1) :
   · rw [neg_one_mul, hermite_aeval_neg]
 
 /-- Flipping the sign of the coordinates is measure preserving for i.i.d. Gaussians. -/
-theorem integral_gaussianCouplings_sign {ι : Type*} [Fintype ι] (c : ι → ℝ)
-    (hc : ∀ i, c i = 1 ∨ c i = -1) (F : (ι → ℝ) → ℂ) :
+theorem integral_gaussianCouplings_sign {ι E : Type*} [Fintype ι]
+    [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E] (c : ι → ℝ)
+    (hc : ∀ i, c i = 1 ∨ c i = -1) (F : (ι → ℝ) → E) :
     ∫ g, F (fun i => c i * g i) ∂gaussianCouplings ι = ∫ g, F g ∂gaussianCouplings ι := by
   have hsq : ∀ i, c i * c i = 1 := fun i => by rcases hc i with h | h <;> simp [h]
   let e1 : ∀ i, ℝ ≃ᵐ ℝ := fun i =>
@@ -236,6 +533,62 @@ theorem integral_gaussianCouplings_sign {ι : Type*} [Fintype ι] (c : ι → �
     · simp only [h, neg_one_mul]
       exact ⟨measurable_neg, by rw [gaussianReal_map_neg, neg_zero]⟩
   exact hmp.integral_comp' F
+
+/-- Reindexing i.i.d. standard Gaussian coordinates preserves expectation. -/
+theorem integral_gaussianCouplings_perm {ι E : Type*} [Fintype ι]
+    [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+    (e : ι ≃ ι) (F : (ι → ℝ) → E) :
+    ∫ g, F (fun i => g (e i)) ∂gaussianCouplings ι =
+      ∫ g, F g ∂gaussianCouplings ι := by
+  have hmp : MeasurePreserving
+      (MeasurableEquiv.piCongrLeft (fun _ : ι => ℝ) e.symm)
+      (gaussianCouplings ι) (gaussianCouplings ι) := by
+    exact measurePreserving_piCongrLeft (fun _ : ι => gaussianReal 0 1) e.symm
+  have heq (g : ι → ℝ) :
+      (MeasurableEquiv.piCongrLeft (fun _ : ι => ℝ) e.symm) g =
+        (fun i => g (e i)) := by
+    funext i
+    have h := MeasurableEquiv.piCongrLeft_apply_apply
+      (β := fun _ : ι => ℝ) e.symm g (e i)
+    simpa using h
+  have h := hmp.integral_comp' F
+  simp_rw [heq] at h
+  exact h
+
+/-- A signed permutation of i.i.d. Gaussian coordinates preserves expectation. -/
+theorem integral_gaussianCouplings_signed_perm {ι E : Type*} [Fintype ι]
+    [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+    (e : ι ≃ ι) (c : ι → ℝ) (hc : ∀ i, c i = 1 ∨ c i = -1)
+    (F : (ι → ℝ) → E) :
+    ∫ g, F (fun i => c i * g (e i)) ∂gaussianCouplings ι =
+      ∫ g, F g ∂gaussianCouplings ι := by
+  calc
+    _ = ∫ g, F (fun i => c i * g i) ∂gaussianCouplings ι :=
+      integral_gaussianCouplings_perm e (fun g => F (fun i => c i * g i))
+    _ = ∫ g, F g ∂gaussianCouplings ι :=
+      integral_gaussianCouplings_sign c hc F
+
+/-- Flipping the interactions containing one vertex negates an odd Hermite monomial. -/
+theorem hermiteMulti_vertex_flip {N q : ℕ} (α : InteractionIndex N q → ℕ)
+    (x : Fin N) (hx : Odd (∑ I with x ∈ I.1, α I))
+    (g : InteractionIndex N q → ℝ) :
+    hermiteMulti α (fun I => (if x ∈ I.1 then -1 else 1) * g I) =
+      -hermiteMulti α g := by
+  classical
+  let c : InteractionIndex N q → ℝ := fun I => if x ∈ I.1 then -1 else 1
+  have hc : ∀ I, c I = 1 ∨ c I = -1 := fun I => by
+    by_cases h : x ∈ I.1 <;> simp [c, h]
+  simp only [hermiteMulti]
+  change (∏ I, Polynomial.aeval (c I * g I) (Polynomial.hermite (α I))) =
+    -(∏ I, Polynomial.aeval (g I) (Polynomial.hermite (α I)))
+  simp only [fun I => hermite_aeval_sign (α I) (c I) (g I) (hc I)]
+  rw [Finset.prod_mul_distrib]
+  have hsign : ∏ I, c I ^ α I = -1 := by
+    have h1 : ∀ I, c I ^ α I = (-1 : ℝ) ^ (if x ∈ I.1 then α I else 0) := fun I => by
+      by_cases h : x ∈ I.1 <;> simp [c, h]
+    simp only [h1]
+    rw [Finset.prod_pow_eq_pow_sum, ← Finset.sum_filter, hx.neg_one_pow]
+  rw [hsign, neg_one_mul]
 
 /-- **Parity rule.** If `α` is odd (and `N` is even), then `𝔼[Z_N(β; G) H_α(G)] = 0`
 for i.i.d. standard Gaussian couplings `G`. -/
@@ -264,16 +617,8 @@ theorem expectation_partitionFunction_mul_hermite_eq_zero {n : Type*} [Fintype n
     fun g => by
       rw [partitionFunction_sign_gauge P hN M β g s hs]
       simp only [hsc]
-  have hH : ∀ g, hermiteMulti α (fun I => c I * g I) = -hermiteMulti α g := fun g => by
-    simp only [hermiteMulti]
-    simp only [fun I => hermite_aeval_sign (α I) (c I) (g I) (hc I)]
-    rw [Finset.prod_mul_distrib]
-    have : ∏ I, c I ^ α I = -1 := by
-      have h1 : ∀ I, c I ^ α I = (-1 : ℝ) ^ (if x ∈ I.1 then α I else 0) := fun I => by
-        by_cases h : x ∈ I.1 <;> simp [hc_def, h]
-      simp only [h1]
-      rw [Finset.prod_pow_eq_pow_sum, ← Finset.sum_filter, hx.neg_one_pow]
-    rw [this, neg_one_mul]
+  have hH : ∀ g, hermiteMulti α (fun I => c I * g I) = -hermiteMulti α g :=
+    fun g => hermiteMulti_vertex_flip α x hx g
   have key := integral_gaussianCouplings_sign c hc
     (fun g => SYK.partitionFunction (β : ℂ) (hamiltonian P M g) *
       (hermiteMulti α g : ℂ))

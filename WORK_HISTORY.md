@@ -838,3 +838,15 @@ W01 は2026-09-08、W02 は2026-09-12、W03・W04・W05 は2026-09-18に完了�
 その後、`CliffordSignParity.lean` の重複した分配関数定義を除き、符号ゲージ不変性と偶奇則の定理で共有 `SYK.partitionFunction` を直接使うようにした。前後の式は定義上同じ通常トレースの指数であり、定理の仮定・量化順序・数学的結論は変えていない。変更ファイルの `lake env lean`、`lake build CLT`、`Main.lean` と `GaussianChaos.lean` の同時 import は成功した。二定理の `#print axioms` は `[propext, Classical.choice, Quot.sound]` のみで、既存の共同 CLT は `sorryAx` に依存する。符号結果と `Setting.Z` の規格化・スケール・実部・測度の対応は [F02 統合](CLT/EDITING_PLAN.md#ticket-integration) に残る。
 
 最終の既定 `lake build` は3262 jobsで成功した。新しい F01 ノードを含む `Chapters/CLT.lean` の宣言参照をソースと照合し、実在しない `hermiteDegreeProjection_eq_starProjection` の参照を除いた。Verso を除く同章の import と59件の宣言参照は Lean で検査済みである。Verso の章検査・生成・参照検査は休止中のため実行していない。原稿 `CLT_SYK.tex` は一時領域への `latexmk -pdf` で17ページの PDF を生成し、警告・未解決参照なしで成功した。
+
+<a id="clt-f01-completion-2026-09-27"></a>
+
+## F01 の共有配置とガウス $L^2$ 完全性（2026-09-27）
+
+原稿 `lem:Gaussian-Hermite-IBP` の一般部分を `CLT/Lemmas/GaussianIBP.lean` から共有 `Probability/GaussianConcentration/Smooth.lean` に移した。`hermiteMulti_ibp_of_expGrowth`、両辺の可積分性、`hermiteMulti_pair_ibp`、多重指数の偏導関数と Hermite 積の補題を同じ名前空間 `SYK.GaussianConcentration` に置いた。CLT 側の参照と import、および Blueprint の宣言名を更新した。原稿が要求する成分ごとの `η ≤ α`、Euclidean ノルムによる指数増大、独立な分散1のガウス座標は維持した。SpinGlass の `dc1d3820af6e443c09bd1177ec3e409cf0640d5c` にある指数増大 API と分散一般の Stein 定理を既存 `gaussianReal_stein`・`pi_gaussian_stein_coord` と照合し、今回の証明には上流コードを流用しなかった。約6,500行の旧前半は独立した API として残した。
+
+原稿 `eq: chaos` の有限積標準ガウスを対象に、`GaussianPolynomialDensity.lean` で一変数の `gaussianMonomialLp_dense` と有限積の `mvPolynomialLp_dense` を証明した。後者では任意の連続線形写像を多変数多項式で表し、直交条件から正負の重み付き測度の全射影モーメントの一致を得る。指数モーメントによる一変数測度の一意性と特性関数の一意性から重み付き測度そのものを同定し、直交補空間を零にする。`hermiteOrthonormal_dense` が条件付きの稠密性入力を供給し、`hasSum_hermiteCoefficients_unconditional` と `hasSum_hermiteDegreeProjection_unconditional` が任意の実 $L^2$ クラスについて階乗係数の和と次数別の和の収束を与える。測度と probabilists' Hermite の規格化は `GaussianChaos.lean` の照合を使う。これらは $L^2$ の等式であり、`Z_N` への正則性・成長評価の適用は F04 に残す。
+
+Lean 4.32.2 の個別検査と `lake -f lakefile.toml --old build Model SuperConcentration CLT` は成功した。変更後の `Main.lean` と F01 モジュールの同時 import も成功した。共有3宣言と新しい稠密性・無限和5宣言の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみ。追加したソースに `sorry`、`admit`、`axiom` はない。親ワークスペースの古い `lakefile.toml` では `lake build SYK` が Blueprint の休止設定と整合せず `some modules have bad imports` で失敗したため、指定した関連ライブラリを個別に検査した。Verso の生成・参照検査は休止規則に従い未実施である。
+
+研究者は原稿 `eq: chaos` をガウス $L^2$ の等式として読むことを確認した。これにより F01 の収束モードは確定し、F01 を完了とした。現在のソースで `lake -f lakefile.toml --old build CLT`（3188 jobs）と既定ビルド（3858 jobs）が成功した。`hermiteOrthonormal_dense`、`hasSum_hermiteCoefficients_unconditional`、`hasSum_hermiteDegreeProjection_unconditional`、共有 `hermiteMulti_ibp_of_expGrowth` の公理依存はそれぞれ `[propext, Classical.choice, Quot.sound]` のみ。F01 の対象ファイルに `sorry`・`admit`・`axiom` はない。既存の `Main.lean` の共同 CLT には `sorry` が残る。Blueprint は宣言参照をソース上で照合し、Verso の機械的検査は休止中のため実施していない。

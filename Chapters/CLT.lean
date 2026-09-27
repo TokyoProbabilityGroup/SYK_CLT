@@ -66,14 +66,11 @@ logarithm between zero and $`C\|g\|`.
 :::
 
 :::theorem "clt_conditional_annealed_limit" (parent := "central_limit_theorem") (uses := "gaussian_annealed_input") (lean := "SYK.CLT.annealedFreeEnergy_tendsto, SYK.CLT.annealedDerivative_tendsto, SYK.CLT.secondChaosCoefficient_tendsto")
-Given `hFE : AnnealedInput q`, Lean proves convergence of the annealed
-pressure and its derivative, and the second-chaos coefficient limit, for
-$`|\beta|<hFE.\beta_{FE}`. The same assumption supplies a common analytic
-limit and locally uniform convergence for every `Setting q`. These results
-are proved conditional statements; neither the Rademacher theorem above
-nor the CLT manuscript's `prop:annealed-free-energy` constructs `hFE`.
-The latter states an even convex $`C^1` limit on all of $`\mathbb R` and
-derives explicit small-temperature bounds from He2026.
+Given `S : Setting q` and `hFE : AnnealedInput q S`, Lean proves convergence
+of the annealed pressure and its derivative, and the second-chaos
+coefficient limit, for every real $`\beta`. The input records the even,
+convex $`C^1` limit and bounds of manuscript Proposition 4.2 for this
+one family. Constructing `hFE` from the manuscript remains separate.
 :::
 
 :::theorem "clt_convex_derivative_transfer" (parent := "central_limit_theorem") (lean := "SYK.CLT.convex_convergence_deriv_tendstoUniformlyOn")
@@ -85,13 +82,13 @@ convergence. That first step remains separate from the linked Lean result.
 :::
 
 :::theorem "clt_conditional_nondegeneracy" (parent := "central_limit_theorem") (uses := "clt_conditional_annealed_limit") (lean := "SYK.CLT.exists_small_temperature_sign, SYK.CLT.exists_small_temperature_variance_pos")
-The derivative expansion in `hFE` gives
-$`\beta\ell'(\beta)>0` and a positive limiting variance at sufficiently
-small nonzero real $`\beta`. These are verified conditional Lean results.
+The sign field in `hFE` gives
+$`\beta\ell'(\beta)>0` for every nonzero real $`\beta`, and hence positive
+limiting variance. These are verified conditional Lean results.
 They do not imply positive variance at every finite size.
 :::
 
-:::theorem "clt_gaussian_hermite_ibp" (parent := "central_limit_theorem") (lean := "SYK.CLT.GaussianIBP.hermiteMulti_ibp_of_expGrowth, SYK.CLT.GaussianIBP.hermiteMulti_ibp_integrable, SYK.CLT.GaussianIBP.hermiteMulti_pair_ibp, SYK.CLT.GaussianIBP.hermiteMulti_eq_prod, SYK.CLT.GaussianIBP.partialList_perm, SYK.CLT.hermite_coefficient_ibp, SYK.CLT.integral_hermiteMulti_eq_zero")
+:::theorem "clt_gaussian_hermite_ibp" (parent := "central_limit_theorem") (lean := "SYK.GaussianConcentration.hermiteMulti_ibp_of_expGrowth, SYK.GaussianConcentration.hermiteMulti_ibp_integrable, SYK.GaussianConcentration.hermiteMulti_pair_ibp, SYK.GaussianConcentration.hermiteMulti_eq_prod, SYK.GaussianConcentration.partialList_perm, SYK.CLT.hermite_coefficient_ibp, SYK.CLT.integral_hermiteMulti_eq_zero")
 The general identity in `lem:Gaussian-Hermite-IBP` is proved for any finite
 coordinate set and independent standard Gaussian coordinates. Let
 $`\alpha` be a nonnegative integer multi-index and let
@@ -134,9 +131,8 @@ a finite real linear combination of products of probabilists' Hermite
 polynomials. Lean proves this first for a product of one-variable
 polynomials, then for arbitrary multivariate polynomials by induction on
 monomials. The polynomial functions define Gaussian $`L^2` classes in the
-span of the Hermite classes. Lean also proves that density of polynomial
-$`L^2` classes would imply completeness of the normalized Hermite products.
-The required polynomial density theorem remains open.
+span of the Hermite classes. Polynomial density and unconditional
+Hermite completeness are proved in the node below.
 :::
 
 :::theorem "clt_exponential_moment_determination" (parent := "central_limit_theorem") (lean := "SYK.CLT.measure_eq_of_moments, SYK.CLT.gaussianExp_memLp_two, SYK.CLT.gaussianLp_integrable_mul_exp")
@@ -144,8 +140,8 @@ Finite real measures with every real exponential moment are determined by
 their polynomial moments. Lean proves this through the analytic moment
 generating function and characteristic-function uniqueness. Real
 exponentials belong to standard Gaussian $`L^2`, and their products with
-arbitrary Gaussian $`L^2` functions are integrable. The step from these
-facts to polynomial density in Gaussian $`L^2` has not been formalized.
+arbitrary Gaussian $`L^2` functions are integrable. Applying moment
+determination to every linear projection proves polynomial density below.
 :::
 
 :::theorem "clt_finite_hermite_projection" (parent := "central_limit_theorem") (uses := "clt_gaussian_hermite_ibp") (lean := "SYK.CLT.hermiteMulti_orthogonality, SYK.CLT.inner_hermiteLp, SYK.CLT.hermiteFiniteProjection_eq_starProjection, SYK.CLT.mem_multiIndices_degree, SYK.CLT.hermiteOrthonormal_orthonormal, SYK.CLT.hasSum_hermiteDegreeProjection")
@@ -170,10 +166,23 @@ The set $`\{\alpha:|\alpha|=r\}` is finite, so this applies to each
 homogeneous degree. Normalizing each Hermite product by its $`L^2` norm
 gives a checked orthonormal family. Under the explicit assumption that its
 span is dense in Gaussian $`L^2`, Lean proves that the infinite sum of
-degree projections converges to $`f` in $`L^2`. The density assumption is
-still unproved, so the unconditional infinite expansion in manuscript
-equation `eq: chaos` remains open. The linked Lean declarations have no
+degree projections converges to $`f` in $`L^2`. The required density
+is supplied by the next node. The linked Lean declarations have no
 `sorryAx`.
+:::
+
+:::theorem "clt_hermite_complete" (parent := "central_limit_theorem") (uses := "clt_hermite_polynomial_span, clt_exponential_moment_determination, clt_finite_hermite_projection") (lean := "SYK.CLT.gaussianMonomialLp_dense, SYK.CLT.mvPolynomialLp_dense, SYK.CLT.hermiteOrthonormal_dense, SYK.CLT.hasSum_hermiteCoefficients_unconditional, SYK.CLT.hasSum_hermiteDegreeProjection_unconditional")
+For every finite coordinate set $`\iota`, real multivariate polynomial
+classes are dense in $`L^2(\gamma_\iota)`. Orthogonality to polynomials
+implies vanishing moments under every real continuous linear observable.
+The positive and negative weighted Gaussian measures then agree after
+every such projection by moment determination, and hence agree by
+characteristic-function uniqueness. Thus the normalized Hermite products
+form a complete orthonormal family. For every real
+$`f\in L^2(\gamma_\iota)`, the factorial-coefficient expansion and
+its grouping by total degree both converge to $`f` in Gaussian $`L^2`.
+This proves `eq: chaos`, interpreted as an equality in Gaussian $`L^2`,
+with the manuscript's Hermite and Gaussian normalizations.
 :::
 
 :::theorem "clt_second_chaos_and_remainder" (parent := "central_limit_theorem") (uses := "clt_partition_moments, clt_conditional_annealed_limit, clt_gaussian_hermite_ibp")
@@ -182,13 +191,26 @@ chaos of $`Y_N-1`. Its `prop:higher-chaos-closure` bounds the remainder by
 $`\|\mathcal R_N\|_2^2=O(N^{-3a})`, where $`a=q/2-1`.
 The intended proof uses parity symmetry, Gaussian integration by parts,
 Duhamel derivatives, and Rademacher encoding of the higher-chaos sum.
+The sign-gauge symmetry of the scaled, normalized finite-model partition
+function is checked as `SYK.CLT.Setting.Z_sign_gauge`. The odd Hermite
+coefficient vanishes for its Gaussian coupling measure by
+`SYK.CLT.Setting.integral_Z_mul_hermite_eq_zero`. The exact first-chaos
+conclusion for $`Y_N` is `SYK.CLT.Setting.Y_firstChaos_eq_zero`.
+For distinct interactions $`I\ne J`, the corresponding degree-two Hermite
+coefficient of $`Y_N` vanishes by
+`SYK.CLT.Setting.inner_offDiagonal_secondChaos_eq_zero`.
+`SYK.CLT.Setting.Y_secondChaos_eq_integral_sum` gives the finite-size
+second-chaos projection as a sum over interactions: the term at $`I` is
+$`\frac12\mathbb E[Y_N(G)(g_I^2-1)](g_I^2-1)` in Gaussian $`L^2`.
+Equality of these coefficients across $`I`, and their identification with
+the derivative of $`\log\mathbb E Z_N`, remain open.
 The general integration-by-parts input is proved above; the application
-to the partition function and these chaos conclusions remain unfinished.
+to the partition function and the exact second-chaos conclusion remain unfinished.
 :::
 
 :::theorem "partition_function_clt" (parent := "central_limit_theorem") (uses := "clt_second_chaos_and_remainder, clt_conditional_nondegeneracy") (lean := "SYK.CLT.partition_clt, SYK.CLT.partition_and_log_partition_clt")
-Assume `hFE : AnnealedInput q`. The Lean statements choose
-$`0<\beta_q\le hFE.\beta_{FE}` so that, for every `Setting q` and real
+Assume `S : Setting q` and `hFE : AnnealedInput q S`. The Lean statements
+choose $`0<\beta_q` so that, for real
 $`|\beta|<\beta_q`, the annealed pressure converges to $`\ell(\beta)` and
 
 $$`
