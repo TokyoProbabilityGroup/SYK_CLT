@@ -25,54 +25,8 @@ F01–F08・Z01 の後続課題では、主要宣言が実装・統合・検証�
 
 ## 検証と記録
 
-2026-09-26：`CLT.lean` に `clt_gaussian_hermite_ibp` を追加し、`lem:Gaussian-Hermite-IBP` の一般部分を検証済みの `hermiteMulti_ibp_of_expGrowth` と両辺の可積分性へ対応付けた。有限階正則性、`η ≤ α` だけの指数増大、ユークリッドノルム、Hermite の規格化、偏導順序の一致、証明の入力を記した。二次カオスの計画ノードにはこの依存を追加し、`Z_N` への特殊化・完全性・射影は未完了と区別した。Lean の個別検査・関連ビルド・公理依存の確認後に更新し、宣言名・主張・依存先をソース照合した。検証コマンドと対象は [CLT の詳細](../CLT/EDITING_PLAN.md#formalization) に記録する。Verso による章検査・生成・参照検査は実施していない。
+現行の `CLT.lean` は、一般ガウス–エルミート部分積分、直交性、有限射影と、稠密性を仮定した次数和を検証済みの Lean 宣言に対応付けている。無条件のガウス $L^2$ 完全性と `Z_N` への適用は未完成と区別する。宣言参照のソース照合は [F01 取り込み検証](../WORK_HISTORY.md#merge-f01-2026-09-27)、先行する部分積分の検証は [作業履歴](../WORK_HISTORY.md#clt-f01-gaussian) を参照する。Verso による章検査・生成・参照検査は休止中である。
 
-Verso 休止中は、変更した章の数学的主張・Lean 宣言名・依存名をソース上で照合する。Verso を必要とする `lake env lean`、生成入口の実行、`vbp check` は復帰後に休止中の変更を含めてまとめて行う。章を並行して編集しても、統合検証の担当は一人とする。以下の過去の検証記録にある旧コマンドと出力先は当時のものであり、現在の手順とは区別する。
+Verso 休止中は、変更した章の数学的主張・Lean 宣言名・依存名をソース上で照合する。Verso を必要とする `lake env lean`、生成入口の実行、`vbp check` は復帰後に休止中の変更を含めてまとめて行う。章を並行して編集しても、統合検証の担当は一人とする。[作業履歴](../WORK_HISTORY.md#chapters-records)の旧コマンドと出力先は当時のものであり、現在の手順とは区別する。
 
-2026-09-25：現行の親原稿が読み込む CLT の有効な節と `Annealed_FE/refs/SYK-HT-arxiv.tex`、対応する Lean ソースを照合した。`lake env lean --stdin` で新しい両章の `lean :=` が指す宣言をすべて解決した。全章の 50 ノード・121 件の親子・利用・参照関係に ID 重複、参照切れ、依存循環は検出されなかった。`#print axioms` により CLT の有限模型・条件付きアニール補題と凸性補題は通常公理のみ、`Setting.partition_moments` と最終 CLT は `sorryAx` を含むことを確認した。Annealed_FE の Rademacher 模型の `paperHamiltonian` と主たる極限定理は `sorryAx` を含む。Verso が休止中のため、章自体の Lean 検査と HTML・参照検査は行っていない。
-
-2026-09-18：明示的に `sorry` を許可された `CLT/Main.lean` の定理文追加に合わせ、`CLT.lean` に一般の非空有限次元 Majorana 表現・次元による規格化・アニール極限・両 CLT の式と共同半径・非零逆温度での標準化条件を記した。Lean 宣言への対応を付け、未証明状態を明示した。W06・F06・F07 の完了記録ではない。Verso の生成・参照検査は休止中のため行わない。関連検証は [CLT の記録](../CLT/EDITING_PLAN.md#main-statements-2026-09-18) に集約する。
-
-
-対象コミット・差分、照合した宣言、コマンド、結果、警告、未解決の参照をこの節に記録する。`Annealed_FE` と `Universality` は既定ビルドから一時的に除外されているため、その成功を両ライブラリの検証結果として扱わない。Verso 復帰後は Blueprint の生成と参照検査を行う。
-
-2026-09-08 の文書再構成では章の Lean ソースを編集しておらず、Blueprint の生成・参照検査も再実行していない。
-
-W01 では `Model.lean` を個別に検査し、追加した3項目を含めて受理された。既存の `Params` と `MajoranaSystem` のフィールドにドキュメント文字列がないという warning は残る。`lake exe vbp build` は、編集対象外の `Annealed_FE` が旧 `Params.β`・`Params.β_nonneg` を参照する既知の2エラーで失敗した。生成物がないため `lake exe vbp check` も manifest 不在を報告した。いずれも成功とは記録しない。詳細は Model の W01 の検証記録を参照する。
-
-SuperConcentration の移行前基準では、`lake env lean SYK/Chapters/SuperConcentration.lean` が warning なしで成功した。`lake exe vbp build` は `SYK.Chapters.SuperConcentration` と `SYK.Blueprint` の構築には成功したが、その後、編集対象外の `Annealed_FE/main_result.lean` に残る旧 `Params.β`・`Params.β_nonneg` 参照の2エラーで全体として失敗した。`lake exe vbp check` は生成されなかった manifest の不在を報告したため、全体の生成・参照検査は未完了である。
-
-2026-09-08 に `Annealed_FE` と `Universality` を既定ビルドから一時除外した後、`lake exe vbp build` と `lake exe vbp check` は成功した。manifest と HTML cache は各50件で整合した。既存の宣言に対するドキュメント文字列の warning と VersoBlueprint の universe に関する warning は残る。
-
-2026-09-11 の生成入口移設後の検証は、全体計画の「ビルド入口のプロジェクト内への移設」に記録する。章の本文・宣言参照は変更していない。
-
-W02 では `GaussianConcentration.lean` の import と宣言参照を新しい名前空間へ切り替え、正の `L` の定数と零の場合の別定理を記録した。`SYK.Chapters.GaussianConcentration` の olean 構築と `lake build SYK` は成功した。2026-09-12、Windows で Verso 4.32.0 の同梱検索資産の相対接頭辞が残る問題に対し、`BlueprintMain.lean` に Windows 限定の準備とコピーを追加した。所定の直接生成コマンドは成功し、`lake exe vbp check --site SYK/_out/site` は manifest と HTML cache が各52件、エラー0件で成功した。既存の docstring と universe の warning は残る。
-
-### W03 の検証記録（2026-09-18）
-
-対象は着手時コミット `475378724d3c2541711a15b19f3ec6500dbf8b2b` からの未コミット差分。標準スケール・ハミルトニアンの定義ノードを同じ ID のまま Model 章へ移し、スケールの二乗・実線形性・自己共役性の宣言を追加した。各実係数の分散と標準座標 `g_A` を区別し、講義ノートの `eq:Hqnormalized`・`eq:Jcovariance` と CLT 原稿の `subsec:SYK-model` との対応を記した。集中評価の章では一般スケールの引数・仮定を除き、方向微分、有限サイズ評価、リプシッツ定数 `β / sqrt q`、`β = 0` と両側の裾 `2 exp(-q t²/(2β²))` を現在の宣言に合わせた。MGF・片側の裾の模型固有定理は未公開のまま区別した。
-
-- 初回の `lake env lean SYK/Chapters/Model.lean` はこのワークスペースの Verso olean が未構築のため失敗した。その後 `lake build` で既存依存を構築し、再検査した。
-- `lake build` は3561 jobsで成功した。`Annealed_FE` と `Universality` は既定対象から除外されたままであり、この結果は両ライブラリの検証ではない。
-- `lake env lean SYK/Chapters/Model.lean` と `lake env lean SYK/Chapters/SuperConcentration.lean` は成功した。Model 章には既存の `Params`・`MajoranaSystem` のフィールドの docstring warning が残り、SuperConcentration 章に warning はなかった。
-- `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` は成功した。
-- `lake exe vbp check --site SYK/_out/site` は初回の検査用実行ファイルの構築後に成功した。manifest と HTML cache は各63件、エラー0件であった。生成済み HTML に Model 章の標準ハミルトニアン定義・基本性質・Lean 宣言リンクがあることも確認した。新たな未解決参照はない。
-
-### W04 の検証記録（2026-09-18）
-
-対象は着手時コミット `4a27dd8e77e99784683f460d2d5d826adac166e3` からの未コミット差分。Model 章に標準表現・次元・生成子の基本関係・共有相互作用の自己共役性と二乗・規格化トレース直交性の5項目を追加した。Jordan–Wigner の Pauli Y の符号、テンソルの順序、0始まりの添字と講義ノートの1始まりの添字の対応を明記し、講義ノートの `eq:majoranaCAR` と CLT 原稿の `subsec:SYK-model` との対応を記した。同じ偶数次数の直交性は構成済みの標準表現に対する結論として記し、抽象構造への追加仮定や異なる次数を混ぜた族の主張は置いていない。
-
-- `lake env lean SYK/Chapters/Model.lean` は成功した。既存の `Params`・`MajoranaSystem` のフィールドの docstring warning は残る。
-- `lake build` は3562 jobsで成功した。既存のガウス基盤などの linter warning と VersoBlueprint の universe warning は残る。`Annealed_FE` と `Universality` は既定対象から除外されたままで、今回も検証していない。
-- `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` は成功した。
-- `lake exe vbp check --site SYK/_out/site` は manifest と HTML cache が各89件、エラー0件で成功した。生成済みの Model 章 HTML に追加した5項目と標準表現・直交性の Lean 宣言リンクがあることを確認した。未解決参照はない。
-
-### W05 の検証記録（2026-09-18）
-
-対象は着手時コミット `9c8f0354a8429e7f943a34abd5415b1e8845c5dc` からの未コミット差分。SuperConcentration 章の配置説明を `DensityMatrix`・`MajoranaBound`・`Main` に合わせ、MGF と上下の裾の2項目を追加し、零逆温度の点ごとの中心化を公開宣言に対応付けた。MGF パラメータ `β²/q`、片側の指数 `-q t²/(2β²)`、両側の係数2、通常トレース・標準ガウス座標・非空の有限行列表現・逆温度の範囲は Lean の定理文と照合した。最良定数や分散の等式は主張していない。
-
-`lake env lean SYK/Chapters/SuperConcentration.lean` は warning なしで成功した。宣言名と依存名を保存された章・数学ソースで照合し、未定義名は検出されなかった。上流の `lake build Model SuperConcentration CLT` と主要15定理の公理依存確認も成功した。Verso の休止に従い、HTML の生成・参照検査は実行しておらず、その成功は主張しない。
-
-### W06 の有限模型のソース照合（2026-09-26）
-
-有限模型30定理の公理依存確認と Main の個別ビルド成功後、モーメント・トレース零・`Z≥1` の状態を更新し、相対量と対数の中心化、零逆温度のノードを追加した。標準表現との規格化の対応もリンクした。古い `SYK.CLT.GaussianIBP` import は実在する `SYK.CLT.Lemmas.GaussianIBP` に訂正した。今回追加・変更した宣言参照とノード依存をソース照合した。当時の Tool の `RequestProject` 依存による CLT ビルド失敗は、Tool を現行 mathlib に再実装した後の `lake build CLT` 成功で解消した。Tool は現在も Blueprint の宣言参照に統合されていないため、章の有限模型ノードと W06 の範囲は変えない。Verso の章検査・生成・参照検査は休止中につき未実施。詳しい検証根拠は [CLT の W06](../CLT/EDITING_PLAN.md#w06) に集約する。
+過去の章検証・生成結果は [作業履歴](../WORK_HISTORY.md#chapters-records) に保存した。新しい検証では対象コミット・差分、照合した宣言、コマンド、結果、警告、未解決の参照を記録する。
