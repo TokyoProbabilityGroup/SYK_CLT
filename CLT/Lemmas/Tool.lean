@@ -4,6 +4,7 @@ import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.Analysis.Calculus.ContDiff.RestrictScalars
 import Mathlib.Analysis.CStarAlgebra.Matrix
 import Mathlib.Analysis.InnerProductSpace.Positive
+import Mathlib.Analysis.InnerProductSpace.SingularValues
 import Mathlib.Analysis.InnerProductSpace.Spectrum
 import Mathlib.Analysis.InnerProductSpace.Trace
 import Mathlib.Analysis.Matrix.Spectrum
@@ -31,54 +32,14 @@ noncomputable section
 /-!
 # Spectral infrastructure
 
-This project's Mathlib version does not provide singular values of operators on finite-dimensional
-inner product spaces, nor the Schatten-Hölder inequality. The first part of this file develops
-them from the spectral theorem: min-max bounds for eigenvalues, singular values
-(`LinearMap.singularValues`), von Neumann's trace inequality, and the Schatten-Hölder inequality.
+This file uses Mathlib's singular values and develops their estimates from the
+spectral theorem: min-max bounds, von Neumann's trace inequality, and the
+Schatten-Hölder inequality.
 -/
 
 section InfrastructureA
 
 open scoped InnerProductSpace
-
-namespace LinearMap
-
-variable {𝕜 E : Type*} [RCLike 𝕜]
-  [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E]
-
-/-- The singular values of `T`, in decreasing order, extended by zero. -/
-noncomputable def singularValues (T : E →ₗ[𝕜] E) : ℕ →₀ ℝ :=
-  Finsupp.onFinset (Finset.range (Module.finrank 𝕜 E))
-    (fun i => if h : i < Module.finrank 𝕜 E then
-      √(T.isSymmetric_adjoint_comp_self.eigenvalues rfl ⟨i, h⟩) else 0)
-    (by
-      intro i hi
-      rw [Finset.mem_range]
-      by_contra h'
-      exact hi (dif_neg h'))
-
-theorem singularValues_of_lt (T : E →ₗ[𝕜] E) {n : ℕ} (hn : Module.finrank 𝕜 E = n) {i : ℕ}
-    (hi : i < n) :
-    T.singularValues i = √(T.isSymmetric_adjoint_comp_self.eigenvalues hn ⟨i, hi⟩) := by
-  subst hn
-  simp [singularValues, Finsupp.onFinset_apply, hi]
-
-theorem singularValues_fin (T : E →ₗ[𝕜] E) {n : ℕ} (hn : Module.finrank 𝕜 E = n) (i : Fin n) :
-    T.singularValues i = √(T.isSymmetric_adjoint_comp_self.eigenvalues hn i) :=
-  T.singularValues_of_lt hn i.2
-
-theorem singularValues_of_finrank_le (T : E →ₗ[𝕜] E) {i : ℕ} (hi : Module.finrank 𝕜 E ≤ i) :
-    T.singularValues i = 0 := by
-  simp [singularValues, Finsupp.onFinset_apply, Nat.not_lt.mpr hi]
-
-theorem singularValues_nonneg (T : E →ₗ[𝕜] E) (i : ℕ) : 0 ≤ T.singularValues i := by
-  unfold singularValues
-  rw [Finsupp.onFinset_apply]
-  split_ifs
-  · exact Real.sqrt_nonneg _
-  · exact le_rfl
-
-end LinearMap
 
 namespace SingularAux
 

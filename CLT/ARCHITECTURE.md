@@ -38,8 +38,8 @@ W06 の有限模型・モーメント・対数に関する公開30定理は検�
 | ガウス–エルミート部分積分・展開 | 共有 `Probability/GaussianConcentration/Smooth.lean` に一般部分積分、`Lemmas/GaussianChaos.lean` に規格化の照合がある。`GaussianHermiteOrthogonality.lean` は直交性・階乗ノルム・有限射影、`GaussianPolynomialDensity.lean` は有限積ガウス $L^2$ 完全性と無限次数和を証明済み。`Setting.Z` への特殊化は F04 に残る |
 | ラデマッハ評価 | `Lemmas/Rademacher.lean` に有限符号平均と `rademacher_encoding` がある。関連ビルド・主要定理の公理依存を確認済み。符号化の計数恒等式と F03/F05 の CLT 側への接続は未完了 |
 | 行列解析と対称性 | `Lemmas/Tool.lean` は有限次元の特異値・Schatten 評価と Hermitian 行列の指数の高階微分評価を証明済みで、`lake build CLT` も成功した。これらを CLT のカオス解析へ接続する作業は F04 に残る |
-| 符号ゲージ・偶奇則 | `Lemmas/CliffordSignParity.lean` の符号ゲージ・Hermite 偶奇則は `Preliminaries.lean` で `Setting.Z` の規格化・ガウス測度に接続済み。一次カオスの消滅と二次の非対角係数零を検証した。二次の共通係数は F02 に残る |
-| その他の補助モジュール | `CLTComponents.lean` は二次カオスの対角係数を個別の期待値で表す有限サイズの恒等式を検証済み。`GaussianConcentration.lean` は引き続き雛形。実装済み部分と原稿どおりの共通係数を区別する |
+| 符号ゲージ・偶奇則 | `Lemmas/CliffordSignParity.lean` の符号ゲージ・Hermite 偶奇則は `Preliminaries.lean` で `Setting.Z` の規格化・ガウス測度に接続済み。一次カオスの消滅と二次の非対角係数零を検証した。二次の共通係数も F02 で検証済み |
+| その他の補助モジュール | `CLTComponents.lean` は二次カオスの対角係数を個別の期待値で表す有限サイズの恒等式を検証済み。`GaussianConcentration.lean` は引き続き雛形。`Setting.Y_secondChaos_eq` は原稿どおりの共通係数まで検証済み |
 | Blueprint | `../Chapters/AnnealedFE.lean` でガウス入力構造と別原稿の Rademacher 極限を分け、`../Chapters/CLT.lean` で有限模型の証明状態・条件付き極限・現行の対数 CLT の依存を記録した。Verso の生成・参照検査は休止中 |
 
 ### 補助 Lean ファイルの役割
@@ -91,7 +91,7 @@ Y_N - 1 = A_N Q_N + R_N = c_N S_N + R_N,
 R_N = Σ_{r≥3} P_r Y_N.
 ```
 
-符号ゲージ対称性・Hermite 部分積分で一次・二次カオスを同定し、Duhamel 微分評価と Rademacher 符号化・指数モーメントにより `‖R_N‖₂²=O(N^(-3a))` を得る。係数の同一性には相互作用添字間の対称性の根拠も必要であり、R03 で監査する。アニール導関数の極限と `M_N~N^q/q!` により
+符号ゲージ対称性・Hermite 部分積分で一次・二次カオスを同定し、Duhamel 微分評価と Rademacher 符号化・指数モーメントにより `‖R_N‖₂²=O(N^(-3a))` を得る。係数の同一性は F02 で符号付き頂点転置とガウス測度の不変性から証明した。`PartitionDerivatives.lean` の一次部分積分・放射方向微分・期待値との微分交換を用い、全実数の逆温度で共通係数を同定済みである。アニール導関数の極限と `M_N~N^q/q!` により
 ```text
 A_N/N → (β/2) ℓ_q'(β),
 N^a c_N → sqrt(q!/2) β ℓ_q'(β).
@@ -173,8 +173,9 @@ W06 の追加証明は既存の `Main.lean` に実装され、Model への補題
 | --- | --- |
 | `../Probability/GaussianConcentration/StandardGaussian.lean` などの既存ファイル | 既存の指数可積分性・部分積分を提供し、選択座標だけの成長仮定への更新は検証済み。一般 Hermite 部分積分の共有配置と流用候補の照合は [汎用基盤の F01 記録](../Probability/GaussianConcentration/EDITING_PLAN.md#f01) |
 | `Main.lean` | `subsec:SYK-model`、`thm:partition-clt`、`cor:free-energy-clt`、有限模型と条件付きアニール入力 |
-| `Lemmas/Preliminaries.lean` | `lem: parity rule lemma` の `Setting.Z` への接続、一次カオス零、二次の非対角係数零。F04 の正則性・部分積分は未接続 |
-| `Lemmas/CLTComponents.lean` | `lem:exact-second-chaos` の対角和と個別係数まで実装。共通係数の同定、`prop:higher-chaos-closure`、`prop:annealed-free-energy` は未完了 |
+| `Lemmas/Preliminaries.lean` | `lem: parity rule lemma` の `Setting.Z` への接続、一次カオス零、二次の非対角係数零。相互作用添字間の対称性も証明済み |
+| `Lemmas/PartitionDerivatives.lean` | `Setting.Z` の滑らかさ・一次微分評価、二次係数への部分積分と期待値の微分交換。任意階の評価は F04 に残る |
+| `Lemmas/CLTComponents.lean` | `lem:exact-second-chaos` の共通係数まで実装済み。`prop:higher-chaos-closure`、`prop:annealed-free-energy` は未完了 |
 | `../Probability/GaussianConcentration/Smooth.lean` | 汎用のガウス–エルミート部分積分。`lem:Gaussian-Hermite-IBP` の `Z_N` への適用は F04 と接続して検査する |
 | `Lemmas/CliffordSignParity.lean` | 符号ゲージと Hermite 偶奇則。共有分配関数を直接利用し、`Preliminaries.lean` に接続する |
 | `Lemmas/Tool.lean` | 一般行列の Schatten 評価と高階微分評価。共有模型への接続は F04 |

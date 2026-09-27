@@ -8,6 +8,7 @@ import SYK.CLT.Lemmas.GaussianChaos
 import SYK.CLT.Lemmas.GaussianHermiteOrthogonality
 import SYK.CLT.Lemmas.GaussianHermiteDensity
 import SYK.CLT.Lemmas.GaussianPolynomialDensity
+import SYK.CLT.Lemmas.CLTComponents
 
 open Verso.Genre
 open Verso.Genre.Manual
@@ -185,7 +186,31 @@ This proves `eq: chaos`, interpreted as an equality in Gaussian $`L^2`,
 with the manuscript's Hermite and Gaussian normalizations.
 :::
 
-:::theorem "clt_second_chaos_and_remainder" (parent := "central_limit_theorem") (uses := "clt_partition_moments, clt_conditional_annealed_limit, clt_gaussian_hermite_ibp")
+:::theorem "clt_exact_second_chaos" (parent := "central_limit_theorem") (uses := "clt_partition_moments, clt_gaussian_hermite_ibp") (lean := "SYK.CLT.Setting.Y_firstChaos_eq_zero, SYK.CLT.Setting.Y_secondChaos_eq")
+For every real inverse temperature and every finite model in `Setting q`,
+the manuscript's `lem:exact-second-chaos` holds in Gaussian $`L^2`:
+$`P_1Y_N=0` and
+$`P_2Y_N=\frac{\beta\partial_\beta\log\mathbb E Z_N}{2M_N}\sum_I(g_I^2-1)`.
+The normalization is $`M_N=\binom Nq`, with $`H_2(x)=x^2-1`
+and $`\mathbb E H_2(g_I)^2=2`.
+:::
+
+:::proof "clt_exact_second_chaos" (uses := "clt_partition_moments, clt_gaussian_hermite_ibp")
+Sign-gauge symmetry removes odd Hermite coefficients and all off-diagonal
+quadratic terms. Signed vertex transpositions preserve the normalized trace
+and Gaussian measure. Their transitivity on interactions proves equality
+of the diagonal coefficients in
+`SYK.CLT.Setting.integral_Y_mul_sq_sub_one_eq`.
+First-order Gaussian integration by parts gives
+$`\mathbb E[Z_N(g_I^2-1)]=\mathbb E[g_I\partial_{g_I}Z_N]`.
+The scaling identity $`Z_N(\beta;tG)=Z_N(t\beta;G)` identifies their sum.
+Smoothness and locally uniform exponential bounds justify differentiating
+the expectation in `SYK.CLT.Setting.meanZ_hasDerivAt`.
+Dividing by the positive mean gives the stated coefficient, including at
+$`\beta=0`. These finite-model results require no annealed-limit input.
+:::
+
+:::theorem "clt_second_chaos_and_remainder" (parent := "central_limit_theorem") (uses := "clt_exact_second_chaos, clt_gaussian_hermite_ibp")
 The manuscript's `lem:exact-second-chaos` identifies the leading Gaussian
 chaos of $`Y_N-1`. Its `prop:higher-chaos-closure` bounds the remainder by
 $`\|\mathcal R_N\|_2^2=O(N^{-3a})`, where $`a=q/2-1`.
@@ -202,10 +227,10 @@ coefficient of $`Y_N` vanishes by
 `SYK.CLT.Setting.Y_secondChaos_eq_integral_sum` gives the finite-size
 second-chaos projection as a sum over interactions: the term at $`I` is
 $`\frac12\mathbb E[Y_N(G)(g_I^2-1)](g_I^2-1)` in Gaussian $`L^2`.
-Equality of these coefficients across $`I`, and their identification with
-the derivative of $`\log\mathbb E Z_N`, remain open.
-The general integration-by-parts input is proved above; the application
-to the partition function and the exact second-chaos conclusion remain unfinished.
+The common coefficient is identified by the checked exact second-chaos
+theorem above. The higher-chaos remainder bound remains unfinished;
+it requires the higher-order partition derivative estimates and the
+Rademacher encoding and moment bounds.
 :::
 
 :::theorem "partition_function_clt" (parent := "central_limit_theorem") (uses := "clt_second_chaos_and_remainder, clt_conditional_nondegeneracy") (lean := "SYK.CLT.partition_clt, SYK.CLT.partition_and_log_partition_clt")

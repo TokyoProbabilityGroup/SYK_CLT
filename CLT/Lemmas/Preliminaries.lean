@@ -1,6 +1,8 @@
 import SYK.CLT.Main
 import SYK.CLT.Lemmas.CliffordSignParity
 import SYK.CLT.Lemmas.GaussianHermiteOrthogonality
+import Mathlib.Logic.Equiv.Fintype
+import Mathlib.GroupTheory.Perm.Sign
 
 /-!
 # Preliminary tools for the SYK central limit theorem
@@ -13,6 +15,98 @@ open MeasureTheory
 open scoped InnerProductSpace
 
 namespace SYK.CLT
+
+/-- Signed vertex transpositions preserve the normalized finite partition function. -/
+theorem Setting.Z_swap {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
+    (i j : Fin (S.N n)) (hij : i ≠ j) :
+    ∃ c : InteractionIndex (S.N n) q → ℝ,
+      (∀ I, c I = 1 ∨ c I = -1) ∧
+      ∀ g : InteractionIndex (S.N n) q → ℝ,
+        S.Z β n (WithLp.toLp 2 fun I =>
+          c I * g (MajoranaSystem.swapInteractionIndex i j I)) =
+        S.Z β n (WithLp.toLp 2 g) := by
+  obtain ⟨c, hc, hZ⟩ := partitionFunction_swap (S.params n) (S.majorana n) i j hij β
+  refine ⟨c, hc, fun g => ?_⟩
+  have h := hZ (fun I => couplingScale (S.params n) * g I)
+  have hscale : (fun I => c I * (couplingScale (S.params n) *
+      g (MajoranaSystem.swapInteractionIndex i j I))) =
+      (fun I => couplingScale (S.params n) *
+        (c I * g (MajoranaSystem.swapInteractionIndex i j I))) := by
+    funext I
+    ring
+  erw [hscale] at h
+  exact congrArg (fun z : ℂ => (z / (Fintype.card (S.d n) : ℂ)).re) h
+
+/-- Diagonal quadratic coefficients are unchanged by a vertex transposition. -/
+theorem Setting.integral_Y_mul_sq_sub_one_swap {q : ℕ} (S : Setting q)
+    (β : ℝ) (n : ℕ) (i j : Fin (S.N n)) (hij : i ≠ j)
+    (I : InteractionIndex (S.N n) q) :
+    (∫ g : InteractionIndex (S.N n) q → ℝ,
+      S.Y β n (WithLp.toLp 2 g) * (g I ^ 2 - 1)
+        ∂gaussianCouplings (InteractionIndex (S.N n) q)) =
+    ∫ g : InteractionIndex (S.N n) q → ℝ,
+      S.Y β n (WithLp.toLp 2 g) *
+        (g (MajoranaSystem.swapInteractionIndex i j I) ^ 2 - 1)
+          ∂gaussianCouplings (InteractionIndex (S.N n) q) := by
+  obtain ⟨c, hc, hZ⟩ := S.Z_swap β n i j hij
+  have hY (g : InteractionIndex (S.N n) q → ℝ) :
+      S.Y β n (WithLp.toLp 2 fun J => c J * g (MajoranaSystem.swapInteractionIndex i j J)) =
+        S.Y β n (WithLp.toLp 2 g) := by
+    unfold Setting.Y
+    rw [hZ]
+  have hsq (x : ℝ) : (c I * x) ^ 2 = x ^ 2 := by
+    rcases hc I with h | h <;> simp [h]
+  have h := integral_gaussianCouplings_signed_perm
+    (MajoranaSystem.swapInteractionEquiv i j) c hc
+    (fun g => S.Y β n (WithLp.toLp 2 g) * (g I ^ 2 - 1))
+  simpa only [MajoranaSystem.swapInteractionEquiv, Equiv.coe_fn_mk, hY, hsq] using h.symm
+
+/-- Transpositions act transitively on interaction subsets of fixed cardinality. -/
+theorem interaction_function_constant_of_swap {N q : ℕ}
+    (f : InteractionIndex N q → ℝ)
+    (hf : ∀ (i j : Fin N), i ≠ j → ∀ I,
+      f I = f (MajoranaSystem.swapInteractionIndex i j I))
+    (I J : InteractionIndex N q) : f I = f J := by
+  classical
+  let act (e : Equiv.Perm (Fin N)) (K : InteractionIndex N q) : InteractionIndex N q :=
+    ⟨K.1.image e, by rw [Finset.card_image_of_injective _ e.injective, K.2]⟩
+  have hinv (e : Equiv.Perm (Fin N)) : ∀ K, f K = f (act e K) := by
+    induction e using Equiv.Perm.swap_induction_on with
+    | one =>
+      intro K
+      congr 1
+      apply Subtype.ext
+      simp [act]
+    | swap_mul e i j hij he =>
+      intro K
+      rw [he K, hf i j hij (act e K)]
+      congr 1
+      apply Subtype.ext
+      simp [act, MajoranaSystem.swapInteractionIndex, Finset.image_image,
+        Function.comp_def]
+  let e : {x // x ∈ I.1} ≃ {x // x ∈ J.1} :=
+    Fintype.equivOfCardEq (by simp [I.2, J.2])
+  have himage : act e.extendSubtype I = J := by
+    apply Subtype.ext
+    apply Finset.eq_of_subset_of_card_le
+    · intro x hx
+      obtain ⟨y, hy, rfl⟩ := Finset.mem_image.mp hx
+      exact e.extendSubtype_mem y hy
+    · rw [(act e.extendSubtype I).2, J.2]
+  simpa only [himage] using hinv e.extendSubtype I
+
+/-- Interaction-index independence of the diagonal second-chaos coefficient.
+This supplies the symmetry omitted in the proof of `lem:exact-second-chaos`. -/
+theorem Setting.integral_Y_mul_sq_sub_one_eq {q : ℕ} (S : Setting q)
+    (β : ℝ) (n : ℕ) (I J : InteractionIndex (S.N n) q) :
+    (∫ g : InteractionIndex (S.N n) q → ℝ,
+      S.Y β n (WithLp.toLp 2 g) * (g I ^ 2 - 1)
+        ∂gaussianCouplings (InteractionIndex (S.N n) q)) =
+    ∫ g : InteractionIndex (S.N n) q → ℝ,
+      S.Y β n (WithLp.toLp 2 g) * (g J ^ 2 - 1)
+        ∂gaussianCouplings (InteractionIndex (S.N n) q) :=
+  interaction_function_constant_of_swap _
+    (fun i j hij K => S.integral_Y_mul_sq_sub_one_swap β n i j hij K) I J
 
 /-- `lem: parity rule lemma` for the normalized, scaled finite model. -/
 theorem Setting.Z_sign_gauge {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)

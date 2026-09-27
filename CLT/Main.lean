@@ -142,7 +142,7 @@ theorem normalizedHamiltonian_normalizedTrace_eq_zero (P : Params)
     normalizedTrace (normalizedHamiltonian P M g) = 0 := by
   simp only [normalizedTrace, normalizedHamiltonian_trace_eq_zero, zero_div]
 
-private noncomputable def normalizedHamiltonianLinear (P : Params)
+noncomputable def normalizedHamiltonianLinear (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) :
     CouplingSpace P.N P.q →L[ℝ] Matrix d d ℂ :=
   ({ toFun := normalizedHamiltonian P M
@@ -227,7 +227,7 @@ theorem realPartitionFunction_ge_one (P : Params)
   simpa [realPartitionFunction, partitionFunction, normalizedTrace,
     gibbsOperator, A, Complex.div_natCast_re] using hdiv
 
-private theorem exists_realPartitionFunction_exp_bound (P : Params)
+theorem exists_realPartitionFunction_exp_bound (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ g : CouplingSpace P.N P.q,
       realPartitionFunction P M β g ≤ Real.exp (C * ‖g‖) := by
