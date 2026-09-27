@@ -9,74 +9,90 @@
 
 
 \subsection{The SYK model}\label{subsec:SYK-model}
-The Sachdev–Ye–Kitaev (SYK) model is a quantum-mechanical model of \(N\) fermions with random interactions between all pairs of particles. It originates in the work of Sachdev and Ye on random quantum magnets \cite{SachdevYe1993} and in Kitaev’s subsequent formulation in terms of Majorana fermions \cite{Kitaev2015}. Later work by Maldacena, Stanford, and others clarified its large-\(N\) behavior and revealed deep connections to quantum chaos and two-dimensional quantum gravity \cite{MaldacenaStanford2016}. These features make the SYK model a useful setting for studying strongly interacting quantum many-body systems, quantum chaos, and quantum gravity.
+The Sachdev--Ye--Kitaev (SYK) model is a quantum-mechanical model of \(N\) \textcolor{red}{Majorana} fermions with random \textcolor{red}{many-body }interactions \textcolor{blue}{between all pairs of particles}. It originates in the work of Sachdev and Ye on random quantum magnets \cite{SachdevYe1993} and in Kitaev’s subsequent formulation in terms of Majorana fermions \cite{Kitaev2015}. Later work by Maldacena, Stanford, and others clarified its large-\(N\) behavior and revealed deep connections to quantum chaos and two-dimensional quantum gravity \cite{MaldacenaStanford2016}. These features make the SYK model a useful setting for studying strongly interacting quantum many-body systems, quantum chaos, and quantum gravity.
 
-Depending on how the inverse temperature \(\beta=\beta_N\) scales with \(N\), the model exhibits several distinct regimes. For fixed \(\beta\), one obtains the standard finite-temperature large-\(N\) regime; when \(1\ll \beta\ll N\), the system enters the conformal regime, characterized by strong interactions and non-Fermi liquid behavior. At lower temperatures, \(N\ll \beta\), the quantum-Schwarzian regime emerges, in which finite-\(N\) effects and quantum fluctuations of the Schwarzian mode play a central role. Finally, when \(\beta\) is exponentially large in \(N\), the partition function is mainly determined by the eigenvalues near the edge of the spectrum. In this regime, random matrix theory (RMT) describes their fluctuations. The appearance of such diverse crossover phenomena is rare in a strongly interacting model that remains analytically tractable in suitable limits.
+Depending on how the inverse temperature \(\beta=\beta_N\) scales with \(N\), the model exhibits several distinct regimes. For fixed \(\beta\), one obtains the standard finite-temperature large-\(N\) regime; when \(1\ll \beta\ll N\), the system enters the conformal regime, characterized by strong interactions and non-Fermi liquid behavior. At lower temperatures, \(N\ll \beta\), the quantum-Schwarzian regime emerges, in which finite-\(N\) effects and quantum fluctuations of the Schwarzian mode play a central role. Finally, when \(\beta\) is exponentially large in \(N\), the partition function is mainly determined by the eigenvalues near the edge of the spectrum. In this regime, random matrix theory (RMT) describes their fluctuations. The appearance of such diverse crossover phenomena is rare in a strongly interacting model that remains analytically tractable in suitable limits.\footnote{\textcolor{red}{I don't understand this paragraph.}}
 
-Previous mathematical work has extensively studied the limiting free energy of the SYK model for fixed $\beta$ \cite{GPSZ2026,He2026}. Moreover, Anschuetz, Gamarnik, and Kiani \cite{AGK2025} established a universality result showing that the limiting free energy is the same for a broad class of interaction distributions.  This naturally raises the question of how physical quantities depend on the interactions. Motivated by this question, we study fluctuations of the free energy and show that, for sufficiently small \(\beta\), the suitably rescaled free energy converges to a Gaussian distribution.
+Previous mathematical work has \textcolor{blue}{extensively} studied the limiting free energy of the SYK model for fixed $\beta$ \cite{GPSZ2026,He2026}. Moreover, Anschuetz, Gamarnik, and Kiani \cite{AGK2025} established a universality result showing that the limiting free energy is the same for a broad class of interaction distributions.  This naturally raises the question of how physical quantities depend on the interactions. Motivated by this question, we study fluctuations of the free energy and show that, for sufficiently small \(\beta\)\footnote{\textcolor{red}{This should be $|\beta|$ as we consider real $\beta$?}}, the suitably rescaled free energy converges to a Gaussian distribution.
 
-Fix an even integer $q\geq4$, and let $N$ be even.  Write
+Fix an even integer $q\geq4$, and let $N$ be even.  \textcolor{red}{Set $[N] := \{1,2,\ldots,N\}$ and write} \textcolor{blue}{Write}
 \[
   \calI_N:=\{I\subset[N]:|I|=q\},\qquad
   \sigma_N^2:=\frac{(q-1)!}{N^{q-1}},
 \]
-and let $G:= (g_I)_{I\in\calI_N}$ be independent standard Gaussian random
-variables.  Let $\psi_1,\ldots,\psi_N$ be Majorana matrices satisfying
+\textcolor{red}{where $|I|$ denotes the cardinality of the set $I$.}
+\textcolor{blue}{and let} \textcolor{red}{Let} $G:= (g_I)_{I\in\calI_N}$ be \textcolor{red}{a family of} independent standard Gaussian random
+variables. \textcolor{red}{We denote the corresponding probability measure and expectation by $\mathbb P$ and $\E$, respectively.} \textcolor{blue}{Let} \textcolor{red}{Following \cite[Section~2]{GPSZ2026}, we let} $\psi_1,\ldots,\psi_N$ be Majorana matrices \textcolor{red}{of size $2^{N/2} \times 2^{N/2}$, which satisfy the following anticommutation relation:} \textcolor{blue}{satisfying}
 \begin{equation}
   \label{eq: clifford relation}
-  \{\psi_i,\psi_j\}=2\delta_{ij}\I
+  \{\psi_i,\psi_j\} \textcolor{red}{:= \psi_i \psi_j + \psi_j \psi_i} =2\delta_{ij}\I \textcolor{red}{,}
 \end{equation}
+\textcolor{red}{where $\I$ denotes the identity matrix.
+(NB. The Majorana matrices considered here are $\sqrt{2}$ times those used in \cite{GPSZ2026,He2026}; this is merely a difference in normalization.)}
 For
-$I=\{i_1<\cdots<i_q\}$ set
+$I=\{i_1<\cdots<i_q\}$\footnote{\textcolor{red}{More precisely, this means $I = \{i_1, \ldots, i_q\} \in \calI_N$ with $i_1 < \cdots < i_q$. Let's discuss the writing.}}\textcolor{red}{,} set
 \[
-  \psi_I:=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}.
+  \psi_I:=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}\textcolor{blue}{.}\textcolor{red}{,}
 \]
-Then $\psi_I$ is Hermitian, $\psi_I^2=\I$, and $\norm{\psi_I}=1$.  Define
+\textcolor{red}{where $\mathrm i$ denotes the imaginary unit. Since Majorana matrices are Hermitian, it follows from \eqref{eq: clifford relation} that }
+\textcolor{blue}{Then} $\psi_I$ is \textcolor{red}{also} Hermitian\textcolor{red}{.}\textcolor{blue}{,} \textcolor{red}{Moreover,} $\psi_I^2=\I$\textcolor{blue}{,} and\textcolor{red}{, in particular,} $\norm{\psi_I}=1$\textcolor{blue}{.}\textcolor{red}{, where $\|\cdot\|$ denotes the operator norm of a matrix.}  \textcolor{blue}{Define
 \[
   H_N(G):=\sigma_N\sum_{I\in\calI_N}g_I\psi_I,
   \qquad
   Z_N(z;G):=\tr e^{-zH_N(G)}.
+\]}
+\textcolor{red}{The Hamiltonian of the SYK model is defined by 
+\[
+  H_N(G):=\sigma_N\sum_{I\in\calI_N}g_I\psi_I.
 \]
-Here $\tr:=2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
-particular, $Z_N(0;G)=1$.  This normalization does not affect the
-relative fluctuations studied below. We sometime write $Z_N(\beta) := Z_N(\beta;G)$ for brevity. 
-For real $\beta$, set
+The associated partition function is then given by\footnote{\textcolor{red}{The variable $z$ should be complex? If only real $z$ is enough, we should replace it by $\beta$.}}
+\[
+  Z_N(z) := Z_N(z;G):=\tr e^{-zH_N(G)},\qquad z \in \mathbb C.
+\]}
+Here\textcolor{red}{,} $\tr:=2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
+particular, $Z_N(0;G)=1$.  \textcolor{blue}{This normalization does not affect the
+relative fluctuations studied below. We sometime write $Z_N(\beta) := Z_N(\beta;G)$ for brevity.} 
+For real $\beta$, \textcolor{blue}{set} \textcolor{red}{define the normalized partition function by}
 \[
  Y_N(\beta):=  Y_N(\beta;G):=\frac{Z_N(\beta;G)}{\mathbb E Z_N(\beta)}.
 \]
 Thus $\E Y_N(\beta)=1$.
-Throughout, all limits are taken as $N\to\infty$ through even integers.
+\textcolor{blue}{Throughout, all limits are taken as $N\to\infty$ through even integers.}
 
 \subsection{Main results}
-It is studied the limiting behavior of the logarithmic partition function in high-temperature regime:
-\begin{theorem}[\cite{He2026}]\label{thm: input}
+\textcolor{blue}{It is studied the limiting behavior of the logarithmic partition function in high-temperature regime:}
+\textcolor{red}{Here, we state our main results: Theorem~\ref{thm:partition-clt} and Corollary~\ref{cor:free-energy-clt}.
+We first recall the convergence of the quenched and annealed free energies, which was established for sufficiently small $|\beta|$ in \cite{GPSZ2026} and recently extended to all $\beta$ in \cite{He2026}. Throughout this article, all limits as $N \to \infty$ are taken through even integers.}
+\begin{theorem}[{\cite[Theorem~1.1]{He2026}}]\label{thm: input}
 For any $\beta\in \mathbb R$, there exists  $\ell_q(\beta)$ such that
 \begin{align*}
-    \lim_{N\to \infty} N^{-1} \log Z_N=     \lim_{N\to \infty} N^{-1} \log \mathbb E[Z_N] =\ell_p(\beta)\qquad \text{ a.s.}
+    \lim_{N\to \infty} N^{-1} \log Z_N= \lim_{N\to \infty} N^{-1} \log \textcolor{red}{\E Z_N}\textcolor{blue}{\E[Z_N]} =\ell_p(\beta)\textcolor{red}{,}\qquad \text{ a.s.}
 \end{align*}
-Moreover, $\ell_p(\beta)$ is differentiable over $\mathbb R$. 
+Moreover, $\ell_p(\beta)$ is differentiable\footnote{\textcolor{red}{In which part of \cite{He2026} is this differentiablity written?}} over $\mathbb R$. 
 \end{theorem}
-Our main result is the following fluctuation resutls:
+\textcolor{blue}{Our main result is the following fluctuation resutls:}
+\textcolor{red}{Our first main result concerns the fluctuations of the normalized partition function $Y_N(\beta)$.\footnote{\textcolor{red}{At this stage, it might be readable to use $Z_N/\E Z_N$ directly, instead of $Y_N$.}} For $a > 0$, we write $\N(0, a)$ for the centered Gaussian distribution with variance $a$.}
 \begin{theorem}
 \label{thm:partition-clt}
-{
-}
-There exists $\beta_q\in (0,\tilde{\beta}_q]$ such that for any $\beta\in (-\beta_q,\beta_q)$,
+There exists $\beta_q\in (0,\tilde{\beta}_q]$\footnote{\textcolor{red}{What is $\tilde{\beta}_q$? This is unspecified.}} such that for any $\beta\in (-\beta_q,\beta_q)$,
  \begin{equation}\label{eq:scaled-relative-clt}
   N^{q/2-1}\left(Y_N(\beta)-1\right)
   \Longrightarrow
-  \,\N\left(0,\frac{q!}{2}\beta^2(\ell_q'(\beta))^2\right).
+  \,\N\left(0,\frac{q!}{2}\beta^2(\ell_q'(\beta))^2\right)\textcolor{blue}{.}\textcolor{red}{,}
 \end{equation}
+\textcolor{red}{where the arrow $\Longrightarrow$ means convergence in distribution.}
 Moreover,
 \begin{equation}\label{eq:standardized-clt}
   \frac{Z_N(\beta)-\E Z_N(\beta)}
   {\sqrt{\Var Z_N(\beta)}}
-  \Longrightarrow\N(0,1).
+  \Longrightarrow\N(0,1)\textcolor{blue}{.}\textcolor{red}{,}
 \end{equation}
+\textcolor{red}{where $\Var Z_N(\beta)$ denotes the variance of $Z_N(\beta)$.}
 \end{theorem}
 
+\textcolor{red}{Combining the above theorem with the asymptotic relation $\log x \sim x-1$ as $x \to 1$, we obtain the following result on the fluctuations of the free energy.\footnote{\textcolor{red}{Because the CLT for $\log Z_N$ is the appealing result, how about stating the result as a theorem instead of a corollary?}}}
 \begin{corollary}\label{cor:free-energy-clt}
-With the same $\beta_p$ as in Theorem~\ref{thm:partition-clt}, for any $\beta\in (-\beta_q,\beta_q)$,
+With the same \textcolor{blue}{$\beta_p$} \textcolor{red}{$\beta_q$} as in Theorem~\ref{thm:partition-clt}, for any $\beta\in (-\beta_q,\beta_q)$,
 \[
   N^{q/2-1}\left(
     \log Z_N(\beta)-\E\log Z_N(\beta)
@@ -85,40 +101,85 @@ With the same $\beta_p$ as in Theorem~\ref{thm:partition-clt}, for any $\beta\in
   \,\N\left(0,\frac{q!}{2}\,\beta^2(\ell_q'(\beta))^2\right).
 \]
 \end{corollary}
+
 \begin{remark}
-Our proof needs small $|\beta|$ to control
-the combinatorial terms arising in higher chaos. 
-  We do not pursue an extension  to the whole $\beta\in \mathbb R$ here, nor do we
-conjecture whether the same fluctuation results hold at all
-temperatures.
+\textcolor{blue}{Our proof needs small $|\beta|$ to control the combinatorial terms arising in higher chaos.}
+\textcolor{red}{The proof of Theorem~\ref{thm:partition-clt} is based on the Wiener chaos expansion of $Y_N(\beta)$, and the smallness of $|\beta|$ is used to control the higher-order chaos terms; see Proposition~\ref{prop:higher-chaos-closure} below.}
+We do not pursue an extension  to the whole $\beta\in \mathbb R$ here, nor do we conjecture whether the same fluctuation results hold at all temperatures.
 \end{remark}
-\subsection{Previous work}
 
+\textcolor{red}{
+\begin{remark}
+ As a related work, Feng, Tian, and Wei \cite{FTW2018} proved a central limit theorem for linear eigenvalue statistics of the Gaussian SYK Hamiltonian. Their result applies to a fixed test function \(f\), under suitable regularity assumptions on \(f\) and \(f'\). In their normalization, however, the partition function corresponds to
+\[
+f_{N,\beta}(x):=e^{-\beta\tau_N x},
+\qquad \tau_N\asymp\sqrt{N},
+\]
+so both the test function and its derivative depend on \(N\). Therefore, their fixed-test-function theorem does not apply directly to \(Z_N(\beta)\)\footnote{\textcolor{red}{This remark should be revised.}}.
+\end{remark}}
+
+\textcolor{blue}{\subsection{Previous work}}
+
+\textcolor{blue}{
 Rigorous results on the high-temperature annealed and quenched free-energy limits were recently obtained in \cite{GPSZ2026}. More recently, He \cite{He2026} identified the fixed-temperature free-energy limit of the Gaussian SYK model with the Schwinger--Dyson pressure and used this result to determine the spectral edge. These works focus on the leading-order behavior of the free energy, while the purpose of this paper is to study its leading fluctuations in the high-temperature regime.
-
 Feng, Tian, and Wei \cite{FTW2018} proved a central limit theorem for linear eigenvalue statistics of the Gaussian SYK Hamiltonian. Their result applies to a fixed test function \(f\), under suitable regularity assumptions on \(f\) and \(f'\). In their normalization, however, the partition function corresponds to
 \[
 f_{N,\beta}(x):=e^{-\beta\tau_N x},
 \qquad \tau_N\asymp\sqrt{N},
 \]
-so both the test function and its derivative depend on \(N\). Therefore, their fixed-test-function theorem does not apply directly to \(Z_N(\beta)\).
+so both the test function and its derivative depend on \(N\). Therefore, their fixed-test-function theorem does not apply directly to \(Z_N(\beta)\).}
 
 
 \subsection{Outline of the proof}
 
-Recall that $Y_n(\beta):= {Z_N(\beta)}/{\mathbb E Z_N(\beta)}$.  
-By applying the chaos expansion, since Clifford sign-gauge symmetry eliminates the first Gaussian chaos and
+\textcolor{blue}{Recall that $Y_n(\beta):= {Z_N(\beta)}/{\mathbb E Z_N(\beta)}$.}
+\textcolor{red}{We give an outline of the proofs of the main results.}  
+By applying the \textcolor{red}{Wiener} chaos expansion \textcolor{red}{to $Y_N(\beta)$, we write 
+\[
+  Y_N(\beta) = \sum_{k = 0}^\infty P_kY_N(\beta),
+\]
+where $P_k Y_N(\beta)$ denotes the $k$-th chaos component. The normalization gives $P_0 Y_N(\beta) = \E Y_N(\beta) = 1$, while the anticommutation relation~\eqref{eq: clifford relation} implies $P_1 Y_N(\beta) = 0$. Moreover, using Gaussian integration by parts, we deduce that 
+}\textcolor{blue}{, since Clifford sign-gauge symmetry eliminates the first Gaussian chaos and
 identifies the second chaos exactly, we have the following:
 \[
   Y_N(\beta)-1=
   A_N(\beta)Q_N+\mathcal R_N(\beta),
-  \]
-  where
-  \begin{equation}\label{eq:finite-N-FTW-coefficient}
-        A_N(\beta):=\frac{\beta}{2}\partial_\beta\log \mathbb E Z_N(\beta),
-    \qquad
-      Q_N:=\frac1{|\mathcal I_N|}\sum_{I\in\mathcal I_N}(g_I^2-1).
-    \end{equation}
+  \]}
+\textcolor{red}{
+\[ 
+  P_2Y_N(\beta) = A_N(\beta) Q_N,
+\]} 
+where
+\begin{equation}\label{eq:finite-N-FTW-coefficient}
+      A_N(\beta):=\frac{\beta}{2}\partial_\beta\log \mathbb E Z_N(\beta),
+  \qquad
+    Q_N:=\frac1{|\mathcal I_N|}\sum_{I\in\mathcal I_N}(g_I^2-1).
+\end{equation}
+\textcolor{red}{Hence, we obtain
+\begin{equation}\label{eq:intro-chaos-expansion}
+  Y_N(\beta)-1=
+  A_N(\beta)Q_N+\mathcal R_N(\beta),
+\end{equation}
+where $\mathcal R_N(\beta) := \sum_{k \geq 3} P_k Y_N(\beta)$.
+The above identity is established in Lemma~\ref{lem:exact-second-chaos}.
+By Theorem~\ref{thm: input} and the convexity of $\log \E Z_N(\beta)$ in $\beta$,
+as shown in Proposition~\ref{prop:annealed-free-energy},
+it holds that
+\begin{equation}\label{eq:intro-A_N-limit}
+  \frac{A_N(\beta)}N
+  = 
+  \frac{\beta}{2}\cdot \frac{1}{N}\partial_\beta\log \E Z_N(\beta)
+  \xlongrightarrow{N \to \infty} \frac{\beta}{2}\ell_q'(\beta).
+\end{equation}
+Since the usual central limit theorem applies to $Q_N$, Theorem~\ref{thm:partition-clt} follows from \eqref{eq:intro-chaos-expansion} and \eqref{eq:intro-A_N-limit}, combined with  
+\begin{equation}\label{eq:intro-higher-chaoses}
+  \E \bigl[ R_N(\beta)^2 \bigr]= o(N^{-(q-2)}),\qquad \text{as } N \to \infty,
+\end{equation}
+where $o(\cdot)$ denotes the usual Landau notation.
+The above estimate is proven in Proposition~\ref{prop:higher-chaos-closure} 
+by using a combinatorial argument to bound the number of non-degenerate terms in the higher-order chaoses.
+}
+\textcolor{blue}{
 Here $\mathcal R_N$ is the sum of the Gaussian chaoses of $Y_N$ of orders at least
 three.  Thus the leading  term is a normalized sum of $\mathcal I_N$
 independent centered variables.  The main task is to prove
@@ -126,28 +187,30 @@ independent centered variables.  The main task is to prove
   \norm{\mathcal R_N(\beta)}_2^2=o(N^{-(q-2)}),
 \]
 which is done in Section~\ref{sec:Rademacher-remainder}.  The proof uses a combinatorial argument to bound the number of terms in the higher-order chaoses, together with a Duhamel derivative bound to control the size of each term.  
-
 Moreover, the annealed free-energy results proved in \cite{He2026} and convexity imply
 \[
   \frac{A_N(\beta)}N
   \longrightarrow \frac{\beta}{2}\ell_q'(\beta).
 \]
-Since $M_N\sim N^q/q!$, the classical central limit theorem for $Q_N$   gives the first claim. 
+Since $M_N\sim N^q/q!$, the classical central limit theorem for $Q_N$   gives the first claim. }
 
-To obtain the second claim, the logarithmic fluctuation, observe that
+To obtain \textcolor{red}{Corollary~\ref{cor:free-energy-clt},} \textcolor{blue}{the second claim, the logarithmic fluctuation,} observe that
 \begin{align*}
     &N^{q/2-1}\bigl(\log Z_N(\beta)-\E\log Z_N(\beta)\bigr)\\
   &=N^{q/2-1}\bigl(\log Y_N(\beta)-(Y_N(\beta)-1)\bigr)
    +N^{q/2-1}(Y_N(\beta)-1)-N^{q/2-1}\E\log Y_N(\beta).
 \end{align*}
-The Taylor expansion $\log(1+x)-x=O(x^2)$, together with the
-first claim, shows that the first term  on the right-hand side converges to zero in probability. 
-The chaos decomposition gives $\E(Y_N(\beta)-1)^2=O(N^{2-q})$ and
+The Taylor expansion $\log(1+x)-x=O(x^2)$ \textcolor{red}{as $x \to 0$}, together with \textcolor{red}{Theorem~\ref{thm:partition-clt}} \textcolor{blue}{first claim}, shows that the first term  on the right-hand side converges to zero in probability. 
+\textcolor{red}{Moreover, using the estimates obtained in the proof of \eqref{eq:intro-higher-chaoses}, we deduce that} \textcolor{blue}{The chaos decomposition gives} $\E(Y_N(\beta)-1)^2=O(N^{2-q})$ and
 $\mathbb P(Y_N(\beta)<1/2)=O(N^{-3(q/2-1)})$. Together with
 $Z_N(\beta)\geq1$, these estimates give
 \[
   \E\log Y_N(\beta)=O\!\left(N^{2-q}\right)
   =o\!\left(N^{1-q/2}\right).
 \]
-Therefore, we conclude the second claim. 
+Therefore, we conclude \textcolor{red}{Corollary~\ref{cor:free-energy-clt}; see Section~4\footnote{\textcolor{red}{Please add a label to Section~4.}} for details.}\textcolor{blue}{the second claim.} 
+
+\textcolor{red}{
+\subsection{Organization of the paper}
+}
 \end{document}
