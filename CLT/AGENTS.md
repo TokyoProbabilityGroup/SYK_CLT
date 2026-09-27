@@ -53,6 +53,12 @@ R01–R05 は原稿・外部入力の監査、F01–F08 は成果の枠であり
 
 `SYK.CLT` は共有の `SYK.Probability.GaussianConcentration`・`SYK.Model` と、必要な場合の `SYK.SuperConcentration` を利用し、共有部分から CLT への `import` は作らない。現行 `Main.lean` は `SYK.Annealed_FE.main_result` を import せず、`prop:annealed-free-energy` に合わせた `AnnealedInput q S` を宣言する。
 
+`Lemmas/` の探索は [README の案内](README.md#finding-a-lemma) から始める。宣言名と caller を `rg` で探し、対象の定理文と周辺の必要な証明だけを読む。型の確認には `#check` や `#print` を使い、巨大な `GaussianIBP.lean` や `Main.lean` を通常の補題利用のために全文走査しない。
+
+補題 file は一つの数学的役割または proof layer に対応させ、再編では依存が閉じた一つの block ずつ移す。`Tool`・`Utils`・`Misc` のような新しい倉庫 file、宣言一覧だけの Lean file、既存定理の wrapper API は作らない。aggregate module が必要なら import-only とする。純粋な file 再編では公開宣言の名前・namespace・型・仮定・属性・規格化を保ち、古い path の互換用 module を作らず caller を更新する。`Preliminaries.lean` の `Main` import は、必要な定義を上流に抽出し caller を更新する場合にだけ解消する。
+
+新 module と直接 consumer を個別に検査してから `lake build CLT` を実行する。
+
 Lean のコメントとドキュメント文字列では、`Theorem 1.2` や `Lemma 3.3` のような原稿編集で変わる番号ではなく、TeX の `\label{...}` をバッククォートで囲んで参照する。対応するラベルがない結果は勝手に命名せず、TeX にラベルを追加するか、現在ラベルがないことを明記する。
 
 ## 文書の集約方針

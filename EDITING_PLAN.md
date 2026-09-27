@@ -70,7 +70,7 @@ R04・R05 の原稿監査は Lean 形式化の完了と別に判定する。W06 
 | ID | 形式化する成果 | 主な入力 | 状態 |
 | --- | --- | --- | --- |
 | F01 | ガウス–エルミート展開の完全性・射影・部分積分 | R03 の該当監査、SpinGlass と既存 API の照合。共有部分は [ガウス基盤](Probability/GaussianConcentration/EDITING_PLAN.md#f01) | 完了。原稿の `eq: chaos` はガウス $L^2$ の等式として解釈する。一般部分積分の共有配置、直交性、有限射影、有限積ガウス $L^2$ の完全性と無限次数和を検証済み。`Z_N` への特殊化は F04 |
-| F02 | 符号対称性と一次・二次カオスの同定 | F01、必要な F04 の微分・可積分性評価、R03。[宣言名衝突](CLT/EDITING_PLAN.md#ticket-f02-p)は解消済み。符号結果と `Setting.Z` の接続、二次係数の添字独立性、微分と期待値の交換は [F02 着手監査](CLT/EDITING_PLAN.md#ticket-integration) に記録 | 前提待ち |
+| F02 | 符号対称性と一次・二次カオスの同定 | F01、必要な F04 の一次微分・可積分性評価、R03 を統合済み。[統合と検証](CLT/EDITING_PLAN.md#ticket-integration)、[検証記録](WORK_HISTORY.md#clt-f02-completion) | 完了 |
 | F03 | ラデマッハ符号化と一様な指数モーメント評価 | R03 の該当監査。[符号化恒等式](CLT/EDITING_PLAN.md#ticket-f03-r)が残る | 前提待ち |
 | F04 | 任意階の行列微分公式と評価 | 共有行列解析、R03 の該当監査。[行列解析の接続](CLT/EDITING_PLAN.md#ticket-f04-m) | 前提待ち |
 | F05 | 高次カオスの剰余項評価 | F01–F04、R03 | 前提待ち |

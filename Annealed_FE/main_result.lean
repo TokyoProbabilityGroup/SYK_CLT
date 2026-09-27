@@ -31,7 +31,6 @@ open scoped BigOperators ComplexConjugate NNReal
 namespace SYK
 namespace AnnealedFE
 
-    (fun n β ↦ deriv (fun b ↦ Real.log (meanPartition s b n)) β / (size s n : ℝ))
 /-! ## Finite Rademacher SYK model -/
 
 /-- Physical sizes tend to infinity through the even integers starting at `q`. -/

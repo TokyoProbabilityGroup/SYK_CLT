@@ -53,7 +53,7 @@ W06 の追加証明は実際には `CLT/Main.lean` に実装され、Model の�
 
 F04 で行列解析を共有する場合は、[CLT の形式化計画](../CLT/EDITING_PLAN.md#formalization)で対象の定理文と利用先を確定してから既存ファイルへ追加する。F01 のガウス–エルミート部分積分を `Z_N` に適用するため、必要な階数の正則性・偏導関数の指数増大評価も供給する。汎用ガウス部分積分は Model に置かない。各変更ファイルの個別検査と `lake build Model SuperConcentration CLT` を行い、主要定理の仮定と公理依存を確認する。両単位の状態は全体計画で管理する。
 
-後続の F04-M では、`CLT/Lemmas/Tool.lean` の汎用行列結果と既存の Model の規格化トレース・分配関数の型と利用先を比較する。スカラー型や規格化が異なる宣言を機械的に統一しない。共有する結果が確定した場合にだけ Model の適切な既存ファイルへ置く。作業票の詳細は [F04-M](../CLT/EDITING_PLAN.md#ticket-f04-m) に置く。
+後続の F04-M では、`CLT/Lemmas/SingularValues.lean` と `CLT/Lemmas/MatrixTraceExponential.lean` の汎用行列結果と既存の Model の規格化トレース・分配関数の型と利用先を比較する。スカラー型や規格化が異なる宣言を機械的に統一しない。共有する結果が確定した場合にだけ Model の適切な既存ファイルへ置く。作業票の詳細は [F04-M](../CLT/EDITING_PLAN.md#ticket-f04-m) に置く。
 
 <a id="z01"></a>
 

@@ -4,6 +4,14 @@ import Mathlib.Topology.MetricSpace.Thickening
 import Mathlib.Topology.UniformSpace.HeineCantor
 import Mathlib.Topology.UniformSpace.LocallyUniformConvergence
 
+/-!
+# Derivatives of convergent convex functions
+
+Local uniform convergence of differentiable convex functions gives uniform
+convergence of their derivatives on compact sets under the stated regularity
+of the limit. Entry point: `convex_convergence_deriv_tendstoUniformlyOn`.
+-/
+
 open Filter Metric
 open scoped Topology
 

@@ -1,12 +1,13 @@
 import SYK.CLT.Lemmas.Preliminaries
-import SYK.CLT.Lemmas.ConvexDerivatives
+import SYK.CLT.Lemmas.PartitionDerivatives
 
 /-!
-# Components of the SYK central limit theorem
+# Exact second chaos of the SYK partition function
 
 The parity selection rule reduces the degree-two projection in
-`lem:exact-second-chaos` to the diagonal Hermite multi-indices. The exact
-common coefficient and the higher-chaos estimate remain to be proved.
+`lem:exact-second-chaos` to the diagonal Hermite multi-indices. Signed vertex
+permutations and first-order Gaussian integration by parts identify the common
+coefficient at every real inverse temperature. Main entry point: `Setting.Y_secondChaos_eq`.
 -/
 
 open MeasureTheory
@@ -91,8 +92,8 @@ theorem Setting.Y_secondChaos_eq_diagonal {q : ℕ} (S : Setting q)
     · subst α
       simp [hdiag, S.inner_offDiagonal_secondChaos_eq_zero β n I J hIJ]
 
-/-- The second chaos is a sum of diagonal Hermite terms, with its still
-unidentified finite-size coefficients displayed individually. -/
+/-- The second chaos is a sum of diagonal Hermite terms, with its finite-size
+coefficients displayed individually. -/
 theorem Setting.Y_secondChaos_eq_sum_diagonal {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     hermiteDegreeProjection 2 (S.YGaussianLp β n) =
@@ -180,5 +181,15 @@ theorem Setting.Y_secondChaos_eq_common_of_symmetry_and_sum {q : ℕ} (S : Setti
   rw [← Finset.smul_sum]
   congr 1
   field_simp
+
+/-- `lem:exact-second-chaos`, with symmetry and derivative exchange proved for
+the finite model. The equality is in Gaussian `L²`, for every real `β`. -/
+theorem Setting.Y_secondChaos_eq {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
+    hermiteDegreeProjection 2 (S.YGaussianLp β n) =
+      (β * deriv (fun b => Real.log (S.meanZ b n)) β /
+        (2 * (Nat.choose (S.N n) q : ℝ))) •
+        ∑ I : InteractionIndex (S.N n) q, hermiteLp (Pi.single I 2) :=
+  S.Y_secondChaos_eq_common_of_symmetry_and_sum β n
+    (S.integral_Y_mul_sq_sub_one_eq β n) (S.sum_integral_Y_mul_sq_sub_one β n)
 
 end SYK.CLT

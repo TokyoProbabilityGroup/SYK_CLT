@@ -5,10 +5,11 @@ import Mathlib.RingTheory.MvPolynomial.Basic
 /-!
 # Density of Hermite products in Gaussian `L²`
 
-The algebraic starting point is that the probabilists' Hermite polynomials,
-after extension of coefficients to the reals, form a basis of `ℝ[X]`.
-The analytic density of their products in Gaussian `L²` is the remaining
-F01 obligation.
+The real probabilists' Hermite polynomials form a basis of `ℝ[X]`.
+This module puts multivariate polynomials in the finite Hermite span and
+transfers polynomial density to Hermite density. Gaussian polynomial density
+is proved in `GaussianPolynomialDensity`.
+Entry point: `hermiteOrthonormal_dense_of_mvPolynomialLp_dense`.
 -/
 
 namespace SYK.CLT
