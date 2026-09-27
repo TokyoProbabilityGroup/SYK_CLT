@@ -2,6 +2,7 @@ import Verso
 import VersoManual
 import VersoBlueprint
 import SYK.CLT.Main
+import SYK.CLT.Normalization
 import SYK.CLT.Lemmas.ConvexDerivatives
 import SYK.CLT.Lemmas.GaussianIBP
 import SYK.CLT.Lemmas.GaussianChaos
@@ -41,24 +42,31 @@ For real $`\beta`, Lean uses the real part of $`Z_N(\beta;g)` to define
 $`Y_N=Z_N/\mathbb E Z_N` and its fluctuations. `Setting q` allows any
 diverging sequence of even sizes and a separate Gaussian coupling space at
 each size. The manuscript's `subsec:SYK-model` uses the standard
-$`d_N=2^{N/2}` representation; the general-family external limit has not
-been supplied.
+$`d_N=2^{N/2}` representation. The abstract CLT takes this family as its
+only model input and assumes `hFE : AnnealedInput q S` separately.
 :::
 
-:::theorem "clt_finite_partition_properties" (parent := "central_limit_theorem") (uses := "clt_partition_function") (lean := "SYK.CLT.partitionFunction_zero, SYK.CLT.partitionFunction_eq_trace_div_card, SYK.CLT.partitionFunction_im_eq_zero, SYK.CLT.realPartitionFunction_pos, SYK.CLT.partitionFunction_standard")
+:::theorem "clt_finite_partition_properties" (parent := "central_limit_theorem") (uses := "clt_partition_function") (lean := "SYK.CLT.partitionFunction_zero, SYK.CLT.partitionFunction_eq_trace_div_card, SYK.CLT.partitionFunction_im_eq_zero, SYK.CLT.realPartitionFunction_pos")
 The normalized partition function satisfies $`Z_N(0;g)=1`, agrees with the
 shared ordinary-trace partition function after division by $`d_N`, and is
 real and strictly positive at every real inverse temperature. These
-finite-dimensional statements have Lean proofs without `sorryAx`.
-Specialization to the standard representation gives the coefficient
-$`(2^{N/2})^{-1}` by `standardBasis_card`; no representation-independence
-claim is needed.
+finite-dimensional statements in `FiniteModel.lean` have Lean proofs
+without `sorryAx` for any nonempty finite matrix Majorana representation.
 :::
 
-:::theorem "clt_partition_moments" (parent := "central_limit_theorem") (uses := "clt_trace_lower_bound") (lean := "SYK.CLT.Setting.partition_moments")
+:::theorem "clt_standard_normalization" (parent := "central_limit_theorem") (uses := "clt_partition_function, standard_representation") (lean := "SYK.CLT.partitionFunction_standard")
+Specialization to the standard representation gives the coefficient
+$`(2^{N/2})^{-1}` by `standardBasis_card`, as in `subsec:SYK-model`.
+This finite correspondence theorem is in `Normalization.lean`; the abstract
+CLT proof does not import it and does not use representation independence.
+:::
+
+:::theorem "clt_partition_moments" (parent := "central_limit_theorem") (uses := "clt_trace_lower_bound") (lean := "SYK.CLT.realPartitionFunction_moments, SYK.CLT.Setting.partition_moments")
 For each real $`\beta` and size, $`Z_N\in L^2`, $`\log Z_N` is
 integrable, and $`\mathbb E Z_N>0`. These Lean proofs have no `sorryAx`
-and need no annealed input. The Hamiltonian is a continuous linear map
+and need no annealed input. The finite theorem takes only `Params` and
+`MajoranaSystem`; its family consequence applies it to `S.majorana n`.
+The Hamiltonian is a continuous linear map
 of the finite-dimensional Gaussian coordinates, so
 $`Z_N(\beta;g)\le\exp(C\|g\|)` for a finite nonnegative constant
 depending on the model and temperature. Gaussian exponential
@@ -71,7 +79,7 @@ Given `S : Setting q` and `hFE : AnnealedInput q S`, Lean proves convergence
 of the annealed pressure and its derivative, and the second-chaos
 coefficient limit, for every real $`\beta`. The input records the even,
 convex $`C^1` limit and bounds of manuscript Proposition 4.2 for this
-one family. Constructing `hFE` from the manuscript remains separate.
+one family. Constructing `hFE` is outside the conditional CLT proof.
 :::
 
 :::theorem "clt_convex_derivative_transfer" (parent := "central_limit_theorem") (lean := "SYK.CLT.convex_convergence_deriv_tendstoUniformlyOn")

@@ -10,6 +10,8 @@ CLT・Annealed_FE の共同実装中は、既存の未形式化ノードを計�
 
 ## 各章の編集細目
 
+- [x] 2026-09-27 の抽象入力統一：個別検査・CLT ビルド・公理依存確認後、`CLT.lean` に `Normalization` の明示 import と独立した有限規格化ノードを追加した。有限モーメントの一般 `MajoranaSystem` 版を参照し、`AnnealedFE.lean` と併せて `hFE` の構築が条件付き CLT の前提作業ではないことを記した。ソース上の宣言・依存照合のみを行い、Verso の機械的検証は実行していない。[検証記録](../WORK_HISTORY.md#clt-abstract-input-2026-09-27) を参照する。
+
 - [x] W01：`Model.lean` に整関数性・複素微分・条件付き対数微分の主要宣言と依存関係を反映した。非零性の仮定を、零点のない領域の証明と混同していない。
 - [x] SuperConcentration の移行前基準：`SuperConcentration.lean` に、一般スケール `𝒥` を含む現行実装の定義、二乗和評価、方向微分、勾配評価、Lipschitz 評価、逆温度が零の場合分け、両側集中不等式を記録した。主張の依存関係と証明だけで使う依存関係を分け、未実装の模型固有 MGF・片側評価を実装済みとして扱っていない。
 - [x] W02：`GaussianConcentration.lean` の import と宣言参照を独立した汎用基盤へ切り替え、MGF・裾の定数と `L=0` の扱いを上流の定理に合わせる。

@@ -1,5 +1,19 @@
 # SYK の作業履歴
 
+<a id="clt-abstract-input-2026-09-27"></a>
+
+## CLT の抽象入力統一（2026-09-27）
+
+開始リビジョンは `c14fce15e06308ad5c370ca5a98e5579ea483c78`。依頼に従い、有限模型の定義・証明を `CLT/FiniteModel.lean` へ移し、`realPartitionFunction_continuous` と `realPartitionFunction_moments` を一般の `Params`・非空有限行列表現 `MajoranaSystem` で証明した。`Setting.partition_moments` はこの有限定理を適用する。標準表現との有限規格化照合 `partitionFunction_standard` は名前と型を保って `CLT/Normalization.lean` に移した。`Main.lean` の import を再帰的に調べ、`Model.StandardRepresentation` と `CLT.Normalization` が依存に含まれないことを確認した。
+
+三つの最終 CLT の入力を `{q : ℕ} (S : Setting q) (hFE : AnnealedInput q S)` にそろえ、`S` のフィールドと重複する偶数性・`4 ≤ q` の引数を除去した。変更前後のソースを比較し、`Setting`・`AnnealedInput` の全フィールドと三定理の結論が同一であることを確認した。Proposition 4.2 の構築を条件付き CLT の完了条件から外す方針を R02-B・F06 と構造文書へ反映した。規格化・温度範囲・極限分散は変更していない。
+
+検証環境は親ワークスペースの Lean 4.32.2 と既存 `lakefile.toml`。既存の `lakefile.lean` と区別するため `lake -f lakefile.toml` を使い、親の設定は変更しなかった。`env lean` による `FiniteModel.lean`、`Main.lean`、`Normalization.lean`、直接 consumer の `Lemmas/Preliminaries.lean` の個別検査、および `build CLT` が成功した（3196 jobs）。最初のビルドでは共有 `.lake` への書き込み権限が不足し、権限付き実行に切り替えた。CLT 全体の初回検査では共有キャッシュのファイル欠落が発生したが、依存を再構築した再検査は成功した。既存の親ワークスペースの既定対象は別プロジェクトの `RSATMain` であり、今回の関連検証には使用していない。
+
+一時ファイルで24宣言の `#print axioms` を実行した。移設・一般化した有限模型の13定理、`Setting` 側のモーメント・相対量・対数の5定理、条件付きアニール極限の3定理は `[propext, Classical.choice, Quot.sound]` のみ。最終 CLT と二つの射影には既存の `sorryAx` が残り、CLT の証明完了を意味しない。有限模型の新規部分に警告はなく、既存の上流・補助モジュールの linter 警告と主 CLT の `sorry` 警告は残る。
+
+Blueprint は検証後に規格化照合を独立ノードへ分離し、有限モーメントと仮定 `hFE` の参照・依存関係をソース上で照合した。Verso の章検査・HTML/PDF 生成・参照検査は休止中のため未実施。作業中に原稿の `introduction.tex` と `main-results.tex` に別途加わった零逆温度除外の差分は編集していない。今回の Lean は相対・対数ゆらぎについて従来の零温度の退化例も含むため、その点では更新中の原稿より広い定理文を保持する。
+
 <a id="clt-r01-r05-audit-2026-09-27"></a>
 
 ## CLT 原稿監査 R01–R05（2026-09-27）

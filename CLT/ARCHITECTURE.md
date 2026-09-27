@@ -22,7 +22,9 @@ W06 の有限模型・モーメント・対数に関する公開30定理は検�
 | 系の極限 | 原稿は偶数 N を通る極限。Lean の `Setting q` は偶数サイズが無限大へ発散する任意の族 |
 | 確率空間 | 各サイズの共有ガウス係数空間。分布収束はサイズごとの空間を許す。概収束には別途共通確率空間が必要 |
 
-標準表現への特殊化で原稿のトレースと一致することと、一般表現で外部極限定理を利用できることは別の確認事項である。W06 では前者を照合済みである。一般表現族への外部入力の供給は R02・F06 に残し、表現独立性を暗黙に仮定しない。
+標準表現への特殊化で原稿のトレースと一致することと、一般表現で外部極限定理を利用できることは別の確認事項である。前者は `Normalization.lean` の `partitionFunction_standard` で照合する。2026-09-27 の指示により、CLT は一つの抽象模型族 `S : Setting q` と `hFE : AnnealedInput q S` を入力とする条件付き定理として統一する。`hFE` の構築や表現独立性の証明はこの CLT の完了条件ではない。
+
+有限模型の定義・評価・モーメントは `FiniteModel.lean` に置き、一般の `Params` と非空有限行列表現 `MajoranaSystem` のみを仮定する。`Main.lean` はこれを import し、`Setting.partition_moments` では `S.params n` と `S.majorana n` に適用する。標準表現の import は規格化照合の `Normalization.lean` に分離し、抽象 CLT の依存から外す。最終三定理の入力は `{q : ℕ} (S : Setting q) (hFE : AnnealedInput q S)` にそろえ、`Even q` と `4 ≤ q` は `S` だけに保持する。
 
 共有の `SYK.partitionFunction` は通常のトレースを使う。CLT の局所定義は既に存在し、通常トレースの分配関数を次元で割ったものとの一致も証明項を持つ。複素解析の API は共有側を使い、零点のない領域や対数の枝は仮定しない。W06 では利用のない複素解析 API の一式追加を求めない。
 
@@ -56,7 +58,7 @@ W06 の有限模型・モーメント・対数に関する公開30定理は検�
 - `Lemmas/Rademacher.lean` は、Boolean ベクトル上の一様平均 `radE`、符号和、および次数 `q` の基本対称式である Rademacher カオスを定義する。Newton 恒等式でカオスを符号和から評価し、独立符号和の指数モーメント評価と組み合わせて、偶数 `q ≥ 4` と `0 ≤ t ≤ c_q N^{-(q-1)}` の下で `𝔼_ε[|S_{N,q}|^3 exp(t|S_{N,q}|)] ≤ C_q N^{3q/2}` を証明する。これは `lem:Rademacher-encoding` の評価部品であり、Gaussian chaos の剰余評価 `prop:higher-chaos-closure` への適用は未完了。
 - `Lemmas/ConvexDerivatives.lean` は、割線の差の評価と平均値の定理を準備し、凸関数列の導関数を左右の割線で挟む証明を形式化する。主定理 `convex_convergence_deriv_tendstoUniformlyOn` は、開集合 `I` 上の各関数の凸性・微分可能性、関数列の局所一様収束、極限関数の微分可能性と導関数の連続性を仮定し、任意のコンパクト集合 `K ⊆ I` 上で導関数の一様収束を結論する。原稿で必要な各点収束から局所一様収束への導出や、アニール入力との接続までは含まない。
 
-`Main.lean` は `Annealed_FE/main_result.lean` を import せず、`SYK.CLT.AnnealedInput q S` を宣言する。CLT の数学的入力は現行原稿の `prop:annealed-free-energy`（Proposition 4.2）である。この構造体は一つの `S : Setting q` に対して、全実軸の偶・凸な `C¹` 極限、圧力と導関数の局所一様収束、命題の明示的評価と非零逆温度での符号を要求する。小温度展開は評価から従うためフィールドに重ねていない。旧構造の実解析性・共通高温半径・全 `Setting q` への一括量化は除去した。原稿の模型族が特定の `Setting q` に対応することと、その族について入力を構築することはなお未証明である。旧ファイルの重複宣言も除去した。
+`Main.lean` は `Annealed_FE/main_result.lean` を import せず、`SYK.CLT.AnnealedInput q S` を宣言する。CLT の数学的入力は現行原稿の `prop:annealed-free-energy`（Proposition 4.2）である。この構造体は一つの `S : Setting q` に対して、全実軸の偶・凸な `C¹` 極限、圧力と導関数の局所一様収束、命題の明示的評価と非零逆温度での符号を要求する。小温度展開は評価から従うためフィールドに重ねていない。旧構造の実解析性・共通高温半径・全 `Setting q` への一括量化は除去した。原稿の模型族について入力を構築することは未証明であり、条件付き CLT の対象外とする。旧ファイルの重複宣言も除去した。
 
 `Annealed_FE/refs/SYK-HT-arxiv.tex` の主結果は Rademacher 相互作用を使い、物理的 Majorana 生成子の二乗を `I/2` とする別の原稿に属する。同原稿の圧力・自由エネルギー極限を、ガウス模型の全 `Setting q` についての `AnnealedInput` の構築と同一視しない。新しい Annealed_FE 章は両者の接点と未証明状態を示す。
 
@@ -167,12 +169,14 @@ F01 で照合した流用候補は SpinGlass のコミット `dc1d3820af6e443c09
 
 模型から独立したガウス基盤は利用側を import しない。Model が CLT を import する依存も作らない。`SuperConcentration` は既存の独立成果として維持し、新しい対数 CLT の必須入力にはしない。現行 `Main.lean` は `Annealed_FE` を import せず、アニール入力を `AnnealedInput q S` として受け取る。
 
-W06 の追加証明は既存の `Main.lean` に実装され、Model への補題追加は行われなかった。後続で共有するトレース零・行列評価は Model の既存ファイルへ移す。既存の凸関数補題と条件付き漸近補題を再実装せず、F06 で不足する入力を補う。
+W06 の有限模型の定義・証明は、抽象入力統一により `FiniteModel.lean` へ移した。Model への補題追加は行っていない。他の研究課題でも共有する必要が生じた場合は、Model の既存ファイルへの移設を検討する。既存の凸関数補題と条件付き漸近補題を再実装せず、F06 では `hFE` とカオス評価を接続する。
 
 | Lean ファイル | 原稿との対応・用途 |
 | --- | --- |
 | `../Probability/GaussianConcentration/StandardGaussian.lean` などの既存ファイル | 既存の指数可積分性・部分積分を提供し、選択座標だけの成長仮定への更新は検証済み。一般 Hermite 部分積分の共有配置と流用候補の照合は [汎用基盤の F01 記録](../Probability/GaussianConcentration/EDITING_PLAN.md#f01) |
-| `Main.lean` | `subsec:SYK-model`、`thm:partition-clt`、`cor:free-energy-clt`、有限模型と条件付きアニール入力 |
+| `FiniteModel.lean` | 一般の `Params`・`MajoranaSystem` に対する規格化分配関数、下界、ガウスモーメント・対数可積分性 |
+| `Normalization.lean` | `subsec:SYK-model` の標準表現との有限規格化照合。抽象証明からは独立 |
+| `Main.lean` | `Setting`、条件付きアニール入力、`thm:partition-clt`、`cor:free-energy-clt` |
 | `Lemmas/Preliminaries.lean` | `lem: parity rule lemma` の `Setting.Z` への接続、一次カオス零、二次の非対角係数零。相互作用添字間の対称性も証明済み |
 | `Lemmas/PartitionDerivatives.lean` | `Setting.Z` の滑らかさ・一次微分評価、二次係数への部分積分と期待値の微分交換。任意階の評価は F04 に残る |
 | `Lemmas/SecondChaos.lean` | `lem:exact-second-chaos` の共通係数まで実装済み。`prop:higher-chaos-closure`、`prop:annealed-free-energy` は未完了 |

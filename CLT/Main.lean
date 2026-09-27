@@ -1,10 +1,7 @@
-import SYK.Model.StandardRepresentation
-import SYK.Model.GaussianDisorder
-import SYK.Model.FiniteDimensionalGibbs
+import SYK.CLT.FiniteModel
 import Mathlib.Analysis.Asymptotics.Lemmas
 import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
 import Mathlib.Probability.Moments.Variance
-import Mathlib.Analysis.Matrix.Spectrum
 import Mathlib.Topology.UniformSpace.LocallyUniformConvergence
 
 /-!
@@ -36,242 +33,6 @@ namespace SYK.CLT
 local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
   unfold standardGaussianMeasure
   infer_instance
-
-/-! ## Finite models -/
-
-section FiniteModel
-
-variable {d : Type*} [Fintype d] [DecidableEq d]
-
-private theorem trace_exp_eq_sum {A : Matrix d d ℂ} (hA : A.IsHermitian) :
-    Matrix.trace (NormedSpace.exp A) =
-      ∑ i, (Real.exp (hA.eigenvalues i) : ℂ) := by
-  let U := hA.eigenvectorUnitary
-  let D := Matrix.diagonal ((RCLike.ofReal : ℝ → ℂ) ∘ hA.eigenvalues)
-  have hAeq : A = (U : Matrix d d ℂ) * D * star (U : Matrix d d ℂ) := by
-    simpa only [U, D, Unitary.conjStarAlgAut_apply] using hA.spectral_theorem
-  have hUinv : (U : Matrix d d ℂ)⁻¹ = star (U : Matrix d d ℂ) :=
-    Matrix.inv_eq_right_inv (Unitary.coe_mul_star_self U)
-  calc
-    Matrix.trace (NormedSpace.exp A) =
-        Matrix.trace (NormedSpace.exp ((U : Matrix d d ℂ) * D * (U : Matrix d d ℂ)⁻¹)) := by
-          rw [hUinv, ← hAeq]
-    _ = Matrix.trace ((U : Matrix d d ℂ) * NormedSpace.exp D * (U : Matrix d d ℂ)⁻¹) := by
-          rw [Matrix.exp_conj _ _ Unitary.isUnit_coe]
-    _ = Matrix.trace (NormedSpace.exp D) := by
-          rw [hUinv, Matrix.trace_mul_comm, ← mul_assoc,
-            Unitary.coe_star_mul_self, one_mul]
-    _ = _ := by simp [D, Matrix.exp_diagonal, Matrix.trace_diagonal,
-      ← Complex.exp_eq_exp_ℂ]
-
-private theorem trace_exp_re_ge_card {A : Matrix d d ℂ}
-    (hA : A.IsHermitian) (htr : Matrix.trace A = 0) :
-    (Fintype.card d : ℝ) ≤ (Matrix.trace (NormedSpace.exp A)).re := by
-  have hsum : (∑ i, hA.eigenvalues i) = 0 := by
-    have ht := hA.trace_eq_sum_eigenvalues
-    rw [htr] at ht
-    have := congrArg Complex.re ht
-    simpa using this.symm
-  rw [trace_exp_eq_sum hA]
-  simp only [Complex.re_sum, Complex.ofReal_re]
-  calc
-    (Fintype.card d : ℝ) = ∑ _i : d, (1 : ℝ) := by simp
-    _ = ∑ i, (hA.eigenvalues i + 1) := by
-      rw [Finset.sum_add_distrib, hsum]
-      simp
-    _ ≤ ∑ i, Real.exp (hA.eigenvalues i) := by
-      apply Finset.sum_le_sum
-      intro i _
-      exact Real.add_one_le_exp _
-
-private theorem trace_exp_re_le_card_exp_norm {A : Matrix d d ℂ}
-    (hA : A.IsHermitian) :
-    (Matrix.trace (NormedSpace.exp A)).re ≤
-      (Fintype.card d : ℝ) * Real.exp (‖A‖ * ‖(1 : Matrix d d ℂ)‖) := by
-  rw [trace_exp_eq_sum hA]
-  simp only [Complex.re_sum, Complex.ofReal_re]
-  calc
-    (∑ i, Real.exp (hA.eigenvalues i)) ≤
-        ∑ _i : d, Real.exp (‖A‖ * ‖(1 : Matrix d d ℂ)‖) := by
-      apply Finset.sum_le_sum
-      intro i _
-      apply Real.exp_le_exp.mpr
-      have hmem := hA.eigenvalues_mem_spectrum_real i
-      have hnorm := spectrum.norm_le_norm_mul_of_mem hmem
-      exact (le_abs_self _).trans (by simpa only [Real.norm_eq_abs] using hnorm)
-    _ = (Fintype.card d : ℝ) * Real.exp (‖A‖ * ‖(1 : Matrix d d ℂ)‖) := by simp
-
-/-- Every interaction of positive even degree has zero matrix trace in any
-finite-dimensional Majorana representation. -/
-theorem interactionOperator_trace_eq_zero (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (s : InteractionIndex P.N P.q) :
-    Matrix.trace (M.interactionOperator s) = 0 := by
-  classical
-  obtain ⟨i, hi⟩ := Finset.card_pos.mp (by rw [s.2]; exact P.q_pos)
-  have hanti := M.interactionOperator_mul_generator_of_mem P.q_even s i hi
-  have hconj : M.ψ i * M.interactionOperator s * M.ψ i =
-      -M.interactionOperator s := by
-    rw [mul_assoc, hanti, mul_neg, ← mul_assoc, M.majorana_sq, one_mul]
-  have hcycle : Matrix.trace (M.ψ i * M.interactionOperator s * M.ψ i) =
-      Matrix.trace (M.interactionOperator s) := by
-    rw [Matrix.trace_mul_comm, ← mul_assoc, M.majorana_sq, one_mul]
-  have htrace : Matrix.trace (M.interactionOperator s) =
-      -Matrix.trace (M.interactionOperator s) := by
-    calc
-      _ = Matrix.trace (M.ψ i * M.interactionOperator s * M.ψ i) := hcycle.symm
-      _ = Matrix.trace (-M.interactionOperator s) := congrArg Matrix.trace hconj
-      _ = _ := Matrix.trace_neg _
-  exact CharZero.eq_neg_self_iff.mp htrace
-
-/-- The Gaussian Hamiltonian is trace zero for every coupling vector. -/
-theorem normalizedHamiltonian_trace_eq_zero (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (g : CouplingSpace P.N P.q) :
-    Matrix.trace (normalizedHamiltonian P M g) = 0 := by
-  classical
-  simp [normalizedHamiltonian, hamiltonian, Matrix.trace_sum,
-    Matrix.trace_smul, interactionOperator_trace_eq_zero P M]
-
-variable [Nonempty d]
-
-/-- The Hamiltonian also has zero dimension-normalized trace. -/
-theorem normalizedHamiltonian_normalizedTrace_eq_zero (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (g : CouplingSpace P.N P.q) :
-    normalizedTrace (normalizedHamiltonian P M g) = 0 := by
-  simp only [normalizedTrace, normalizedHamiltonian_trace_eq_zero, zero_div]
-
-noncomputable def normalizedHamiltonianLinear (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ)) :
-    CouplingSpace P.N P.q →L[ℝ] Matrix d d ℂ :=
-  ({ toFun := normalizedHamiltonian P M
-     map_add' := normalizedHamiltonian_add P M
-     map_smul' := normalizedHamiltonian_smul P M } :
-      CouplingSpace P.N P.q →ₗ[ℝ] Matrix d d ℂ).toContinuousLinearMap
-
-/-- The manuscript's `Z_N(z;G) = tr exp(-z H_N(G))`, with trace divided
-by the representation dimension. In the standard representation this
-dimension is `2^(N/2)`. No irreducibility assumption is imposed. -/
-noncomputable def partitionFunction (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ)) (z : ℂ)
-    (g : CouplingSpace P.N P.q) : ℂ :=
-  normalizedTrace (gibbsOperator z (normalizedHamiltonian P M g))
-
-/-- Real partition function at real inverse temperature. The imaginary part
-vanishes and this real part is strictly positive, as stated below. -/
-noncomputable def realPartitionFunction (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ)
-    (g : CouplingSpace P.N P.q) : ℝ :=
-  (partitionFunction P M (β : ℂ) g).re
-
-@[simp]
-theorem partitionFunction_zero (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (g : CouplingSpace P.N P.q) : partitionFunction P M 0 g = 1 := by
-  simp [partitionFunction]
-
-@[simp]
-theorem realPartitionFunction_zero (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (g : CouplingSpace P.N P.q) : realPartitionFunction P M 0 g = 1 := by
-  simp [realPartitionFunction]
-
-/-- Agreement with the shared partition function, which uses ordinary trace. -/
-theorem partitionFunction_eq_trace_div_card (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ)) (z : ℂ)
-    (g : CouplingSpace P.N P.q) :
-    partitionFunction P M z g =
-      SYK.partitionFunction z (normalizedHamiltonian P M g) / (Fintype.card d : ℂ) :=
-  rfl
-
-theorem partitionFunction_im_eq_zero (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ)
-    (g : CouplingSpace P.N P.q) :
-    (partitionFunction P M (β : ℂ) g).im = 0 := by
-  have hH : star ((β : ℂ) • normalizedHamiltonian P M g) =
-      (β : ℂ) • normalizedHamiltonian P M g := by
-    simp [normalizedHamiltonian_self_adjoint]
-  have h := SYK.partitionFunction_im_eq_zero (1 : ℝ≥0) hH
-  simpa [partitionFunction, normalizedTrace, SYK.partitionFunction,
-    gibbsOperator, smul_smul, Complex.div_natCast_im] using
-    congrArg (fun x : ℝ ↦ x / (Fintype.card d : ℝ)) h
-
-theorem realPartitionFunction_pos (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ)
-    (g : CouplingSpace P.N P.q) : 0 < realPartitionFunction P M β g := by
-  have hH : star ((β : ℂ) • normalizedHamiltonian P M g) =
-      (β : ℂ) • normalizedHamiltonian P M g := by
-    simp [normalizedHamiltonian_self_adjoint]
-  have h := SYK.partitionFunction_pos (1 : ℝ≥0) hH
-  have hd : (0 : ℝ) < Fintype.card d := Nat.cast_pos.mpr Fintype.card_pos
-  simpa [realPartitionFunction, partitionFunction, normalizedTrace,
-    SYK.partitionFunction, gibbsOperator, smul_smul, Complex.div_natCast_re] using
-    div_pos h hd
-
-/-- Jensen's lower bound for the dimension-normalized SYK partition function. -/
-theorem realPartitionFunction_ge_one (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ)
-    (g : CouplingSpace P.N P.q) :
-    1 ≤ realPartitionFunction P M β g := by
-  let A : Matrix d d ℂ := (β : ℂ) • -normalizedHamiltonian P M g
-  have hA : A.IsHermitian := by
-    change star A = A
-    simp [A, normalizedHamiltonian_self_adjoint]
-  have htr : Matrix.trace A = 0 := by
-    simp [A, normalizedHamiltonian_trace_eq_zero P M g]
-  have h := trace_exp_re_ge_card hA htr
-  have hd : (0 : ℝ) < Fintype.card d := Nat.cast_pos.mpr Fintype.card_pos
-  have hdiv : 1 ≤ (Matrix.trace (NormedSpace.exp A)).re / (Fintype.card d : ℝ) :=
-    (le_div_iff₀ hd).mpr (by simpa using h)
-  simpa [realPartitionFunction, partitionFunction, normalizedTrace,
-    gibbsOperator, A, Complex.div_natCast_re] using hdiv
-
-theorem exists_realPartitionFunction_exp_bound (P : Params)
-    (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) :
-    ∃ C : ℝ, 0 ≤ C ∧ ∀ g : CouplingSpace P.N P.q,
-      realPartitionFunction P M β g ≤ Real.exp (C * ‖g‖) := by
-  obtain ⟨C, hC, hbound⟩ := (normalizedHamiltonianLinear P M).bound
-  let K := |β| * C * ‖(1 : Matrix d d ℂ)‖
-  refine ⟨K, by positivity, ?_⟩
-  intro g
-  let A : Matrix d d ℂ := (β : ℂ) • -normalizedHamiltonian P M g
-  have hA : A.IsHermitian := by
-    change star A = A
-    simp [A, normalizedHamiltonian_self_adjoint]
-  have h := trace_exp_re_le_card_exp_norm hA
-  have hd : (0 : ℝ) < Fintype.card d := Nat.cast_pos.mpr Fintype.card_pos
-  have hZ : realPartitionFunction P M β g ≤
-      Real.exp (‖A‖ * ‖(1 : Matrix d d ℂ)‖) := by
-    have hdiv : (Matrix.trace (NormedSpace.exp A)).re / (Fintype.card d : ℝ) ≤
-        Real.exp (‖A‖ * ‖(1 : Matrix d d ℂ)‖) := by
-      apply (div_le_iff₀ hd).mpr
-      simpa [mul_comm] using h
-    simpa [realPartitionFunction, partitionFunction, normalizedTrace,
-      gibbsOperator, A, Complex.div_natCast_re] using hdiv
-  apply hZ.trans (Real.exp_le_exp.mpr ?_)
-  have hlinear : ‖normalizedHamiltonian P M g‖ ≤ C * ‖g‖ := by
-    convert hbound g using 1
-    rfl
-  calc
-    ‖A‖ * ‖(1 : Matrix d d ℂ)‖ =
-        |β| * ‖normalizedHamiltonian P M g‖ * ‖(1 : Matrix d d ℂ)‖ := by
-          simp [A, norm_smul]
-    _ ≤ |β| * (C * ‖g‖) * ‖(1 : Matrix d d ℂ)‖ := by gcongr
-    _ = K * ‖g‖ := by ring
-
-/-- Specializing the existing definition gives the trace normalization in
-`subsec:SYK-model`; this does not assert representation independence. -/
-theorem partitionFunction_standard (P : Params) (hN : Even P.N) (z : ℂ)
-    (g : CouplingSpace P.N P.q) :
-    partitionFunction P (standardMajoranaSystem P.N hN) z g =
-      ((2 : ℂ) ^ (P.N / 2))⁻¹ *
-        SYK.partitionFunction z
-          (normalizedHamiltonian P (standardMajoranaSystem P.N hN) g) := by
-  rw [partitionFunction_eq_trace_div_card, standardBasis_card]
-  simp only [Nat.cast_pow, Nat.cast_ofNat, div_eq_mul_inv, mul_comm]
-
-end FiniteModel
 
 /-! ## Large-system setting -/
 
@@ -329,13 +90,6 @@ theorem Z_ge_one (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
     1 ≤ S.Z β n g :=
   realPartitionFunction_ge_one (S.params n) (S.majorana n) β g
 
-private theorem Z_continuous (β : ℝ) (n : ℕ) : Continuous (S.Z β n) := by
-  unfold Z realPartitionFunction partitionFunction normalizedTrace gibbsOperator
-  have hH : Continuous (normalizedHamiltonian (S.params n) (S.majorana n)) := by
-    convert (normalizedHamiltonianLinear (S.params n) (S.majorana n)).continuous using 1
-    funext g
-    rfl
-  fun_prop
 
 theorem log_Z_nonneg (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
     0 ≤ Real.log (S.Z β n g) :=
@@ -415,61 +169,12 @@ noncomputable def standardizedFluctuation (β : ℝ) (n : ℕ)
 noncomputable def annealedFreeEnergy (β : ℝ) (n : ℕ) : ℝ :=
   Real.log (S.meanZ β n) / (S.N n : ℝ)
 
-/-- Finite Gaussian models have the moments needed for these centerings. -/
+/-- Apply the finite-model moment theorem to a member of the family. -/
 theorem partition_moments (β : ℝ) (n : ℕ) :
     MemLp (S.Z β n) 2 (standardGaussianMeasure (S.N n) q) ∧
       Integrable (fun g ↦ Real.log (S.Z β n g)) (standardGaussianMeasure (S.N n) q) ∧
-      0 < S.meanZ β n := by
-  let μ := standardGaussianMeasure (S.N n) q
-  obtain ⟨C, hC, hbound⟩ :=
-    exists_realPartitionFunction_exp_bound (S.params n) (S.majorana n) β
-  have hcont : Continuous (S.Z β n) := S.Z_continuous β n
-  have hsq : Integrable (fun g ↦ (S.Z β n g) ^ 2) μ := by
-    have hexp : Integrable (fun g : CouplingSpace (S.N n) q ↦
-        Real.exp ((2 * C) * ‖g‖)) μ :=
-      GaussianConcentration.integrable_exp_mul_norm (2 * C)
-    apply hexp.mono' (hcont.pow 2).aestronglyMeasurable
-    filter_upwards [] with g
-    have hZ0 : 0 ≤ S.Z β n g :=
-      (by norm_num : (0 : ℝ) ≤ 1).trans (S.Z_ge_one β n g)
-    have hb : S.Z β n g ≤ Real.exp (C * ‖g‖) := hbound g
-    have hpow : (S.Z β n g) ^ 2 ≤ Real.exp ((2 * C) * ‖g‖) := by
-      calc
-        _ ≤ (Real.exp (C * ‖g‖)) ^ 2 :=
-          pow_le_pow_left₀ hZ0 hb 2
-        _ = Real.exp ((2 * C) * ‖g‖) := by
-          rw [pow_two, ← Real.exp_add]
-          congr 1
-          ring
-    simpa [Pi.pow_apply, Real.norm_eq_abs, abs_of_nonneg (sq_nonneg (S.Z β n g))] using hpow
-  have hlp : MemLp (S.Z β n) 2 μ :=
-    (memLp_two_iff_integrable_sq hcont.aestronglyMeasurable).2 hsq
-  have hnorm : Integrable (fun g : CouplingSpace (S.N n) q ↦ ‖g‖) μ := by
-    have hexp := GaussianConcentration.integrable_exp_mul_norm (ι := InteractionIndex (S.N n) q) 1
-    apply hexp.mono' (by fun_prop)
-    filter_upwards [] with g
-    simp only [Real.norm_eq_abs, abs_of_nonneg (norm_nonneg _), one_mul]
-    linarith [Real.add_one_le_exp ‖g‖]
-  have hlog : Integrable (fun g ↦ Real.log (S.Z β n g)) μ := by
-    apply (hnorm.const_mul C).mono'
-      ((Real.measurable_log.comp hcont.measurable).aestronglyMeasurable)
-    filter_upwards [] with g
-    have hlog0 := S.log_Z_nonneg β n g
-    have hlogC : Real.log (S.Z β n g) ≤ C * ‖g‖ :=
-      (Real.log_le_iff_le_exp (lt_of_lt_of_le (by norm_num) (S.Z_ge_one β n g))).2
-        (by exact hbound g)
-    simpa [Real.norm_eq_abs, abs_of_nonneg hlog0,
-      abs_of_nonneg (mul_nonneg hC (norm_nonneg _))] using hlogC
-  have hmean : 0 < S.meanZ β n := by
-    have hZint : Integrable (S.Z β n) μ := hlp.integrable (by norm_num)
-    have hone : (1 : ℝ) ≤ S.meanZ β n := by
-      change (1 : ℝ) ≤ ∫ g, S.Z β n g ∂μ
-      calc
-        (1 : ℝ) = ∫ _g, (1 : ℝ) ∂μ := by simp [μ]
-        _ ≤ ∫ g, S.Z β n g ∂μ :=
-          integral_mono (integrable_const _) hZint (S.Z_ge_one β n)
-    linarith
-  exact ⟨hlp, hlog, hmean⟩
+      0 < S.meanZ β n :=
+  realPartitionFunction_moments (S.params n) (S.majorana n) β
 
 /-- Normalization preserves the second moment. -/
 theorem Y_memLp (β : ℝ) (n : ℕ) :
@@ -590,7 +295,7 @@ It is allowed to vanish, in particular at `β = 0`. -/
 noncomputable def limitVariance (q : ℕ) (ℓ : ℝ → ℝ) (β : ℝ) : ℝ≥0 :=
   ⟨(q.factorial : ℝ) / 2 * β ^ 2 * (deriv ℓ β) ^ 2, by positivity⟩
 
-/-- Proposition 4.2 gives the sign at every nonzero temperature. -/
+/-- `prop:annealed-free-energy` gives the sign at every nonzero temperature. -/
 theorem exists_small_temperature_sign {q : ℕ} {S : Setting q}
     (hFE : AnnealedInput q S) :
     ∃ r : ℝ, 0 < r ∧
@@ -598,7 +303,7 @@ theorem exists_small_temperature_sign {q : ℕ} {S : Setting q}
   exact ⟨1, by norm_num, fun β _ hβ0 ↦ hFE.sign β hβ0⟩
 
 /-- The limiting variance is positive at the small nonzero temperatures
-selected by Proposition 4.2. -/
+selected by `prop:annealed-free-energy`. -/
 theorem exists_small_temperature_variance_pos {q : ℕ} {S : Setting q}
     (hFE : AnnealedInput q S) :
     ∃ r : ℝ, 0 < r ∧
@@ -622,9 +327,10 @@ convergence of probability laws, including the Dirac law at zero variance.
 The limiting function is the one supplied by the annealed proposition.
 Positivity is a conclusion wherever standardization is used.
 
-The proof placeholders cover the annealed input, Gaussian chaos estimates,
-classical CLT, and transfer to the centered logarithm. -/
-theorem partition_and_log_partition_clt (q : ℕ) (_hq : Even q) (_h4 : 4 ≤ q)
+The annealed proposition is assumed through `hFE`. The proof placeholder covers
+Gaussian chaos estimates, the classical CLT, and transfer to the centered logarithm.
+The interaction-order assumptions are supplied only by `S`. -/
+theorem partition_and_log_partition_clt {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
     ∃ βq : ℝ, 0 < βq ∧
       ∀ β : ℝ, |β| < βq →
@@ -643,7 +349,7 @@ theorem partition_and_log_partition_clt (q : ℕ) (_hq : Even q) (_h4 : 4 ≤ q)
 
 /-- The partition-function part of `thm:partition-clt`. The joint theorem
 above additionally supplies the standardized CLT at nonzero temperature. -/
-theorem partition_clt (q : ℕ) (hq : Even q) (h4 : 4 ≤ q)
+theorem partition_clt {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
     ∃ βq : ℝ, 0 < βq ∧
       ∀ β : ℝ, |β| < βq →
@@ -655,14 +361,14 @@ theorem partition_clt (q : ℕ) (hq : Even q) (h4 : 4 ≤ q)
           0 < limitVariance q hFE.ℓ β ∧ (∀ n, 0 < S.varianceZ β n) ∧
           TendstoInDistribution (S.standardizedFluctuation β) atTop (fun x : ℝ ↦ x)
             (fun n ↦ standardGaussianMeasure (S.N n) q) (gaussianReal 0 1)) := by
-  obtain ⟨βq, hβq, h⟩ := partition_and_log_partition_clt q hq h4 S hFE
+  obtain ⟨βq, hβq, h⟩ := partition_and_log_partition_clt S hFE
   refine ⟨βq, hβq, ?_⟩
   intro β hβ
   exact ⟨(h β hβ).1, (h β hβ).2.1, (h β hβ).2.2.2⟩
 
 /-- The centered log-partition CLT of `cor:free-energy-clt`.
 The joint theorem supplies the same radius and variance for both CLTs. -/
-theorem log_partition_clt (q : ℕ) (hq : Even q) (h4 : 4 ≤ q)
+theorem log_partition_clt {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
     ∃ βq : ℝ, 0 < βq ∧
       ∀ β : ℝ, |β| < βq →
@@ -670,7 +376,7 @@ theorem log_partition_clt (q : ℕ) (hq : Even q) (h4 : 4 ≤ q)
         TendstoInDistribution (S.logFluctuation β) atTop (fun x : ℝ ↦ x)
           (fun n ↦ standardGaussianMeasure (S.N n) q)
           (gaussianReal 0 (limitVariance q hFE.ℓ β)) := by
-  obtain ⟨βq, hβq, h⟩ := partition_and_log_partition_clt q hq h4 S hFE
+  obtain ⟨βq, hβq, h⟩ := partition_and_log_partition_clt S hFE
   refine ⟨βq, hβq, ?_⟩
   intro β hβ
   exact ⟨(h β hβ).1, (h β hβ).2.2.1⟩

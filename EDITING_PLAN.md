@@ -49,6 +49,8 @@
 
 W01–W06 の検証と旧作業順の記録は [作業履歴](WORK_HISTORY.md#w-completion-notes) に保存した。
 
+2026-09-27 の指定作業「CLT の抽象表現・入力統一」は完了した。有限模型・標準規格化照合・漸近入力の依存を分離し、R02-B の入力方針を確定した。詳細と検証は [CLT の計画](CLT/EDITING_PLAN.md#w06) と [作業履歴](WORK_HISTORY.md#clt-abstract-input-2026-09-27) に記す。最終 CLT の未証明部分は引き続き F03–F07 に残る。
+
 後続の運用保守課題：CI の `paths` に、ビルドへ影響する `workspace/lakefile.toml`・`workspace/lake-manifest.json`・`workspace/lean-toolchain` とワークフロー自身を含めるか確認する。変更時は既存の Verso 休止設定を保持し、設定だけを変更した差分で CI が起動する条件と、既定の `lake build` が実際に走ることを検証する。これは F01–F08 の数学的前提ではない。
 
 ## 原稿監査と後続の形式化
@@ -58,7 +60,7 @@ W01–W06 の検証と旧作業順の記録は [作業履歴](WORK_HISTORY.md#w-
 | ID | 原稿側の成果 | 前提・判断条件 | 状態 | 詳細の管理先 |
 | --- | --- | --- | --- | --- |
 | R01 | 数学的内容を変えない原稿整理とコンパイル | 誤植・重複・コメント済み旧証明の現存状況を再照合し、一時出力で LaTeX を検査 | 完了 | [CLT](CLT/EDITING_PLAN.md#r01) |
-| R02 | 実数の温度領域・非退化条件・原稿 Proposition 4.2 と現行 `AnnealedInput` の照合 | 監査済み。標準化 CLT から `β=0` を除く定理文変更と、一般 `Setting q` への外部入力の境界は研究者判断 | 判断待ち | [CLT](CLT/EDITING_PLAN.md#r02) |
+| R02 | 実数の温度領域・非退化条件・原稿 Proposition 4.2 と現行 `AnnealedInput` の照合 | 監査済み。R02-B は `S : Setting q` と `hFE : AnnealedInput q S` を仮定する方針に確定。標準化 CLT から `β=0` を除く原稿定理文の R02-A は研究者判断 | 判断待ち（R02-A） | [CLT](CLT/EDITING_PLAN.md#r02) |
 | R03 | Theorem 1.2 の証明監査と修正 | He2026 v3、Hermite、Duhamel、Rademacher、分散漸近を照合し、二次係数の添字独立性を原稿に追記 | 完了 | [CLT](CLT/EDITING_PLAN.md#r03) |
 | R04 | 外部結果 `thm: input` の引用・規格化・概収束の照合 | 監査済み。He2026 の直接の結論は期待クエンチ圧力であり、標本ごとの概収束を弱めるか集中評価で補うか研究者判断 | 判断待ち | [CLT](CLT/EDITING_PLAN.md#r04) |
 | R05 | 対数 CLT の新証明の監査と修正 | `Z≥1`、四次モーメント、小確率事象、二つの誤差を照合し本文を補足 | 完了 | [CLT](CLT/EDITING_PLAN.md#r05) |
@@ -74,7 +76,7 @@ R04・R05 の原稿監査は Lean 形式化の完了と別に判定する。W06 
 | F03 | ラデマッハ符号化と一様な指数モーメント評価 | R03 の該当監査。[符号化恒等式](CLT/EDITING_PLAN.md#ticket-f03-r)が残る | 前提待ち |
 | F04 | 任意階の行列微分公式と評価 | 共有行列解析、R03 の該当監査。[行列解析の接続](CLT/EDITING_PLAN.md#ticket-f04-m) | 前提待ち |
 | F05 | 高次カオスの剰余項評価 | F01–F04、R03 | 前提待ち |
-| F06 | 凸性・原稿 Proposition 4.2 からの係数漸近と分配関数 CLT | F02・F05、R02・R03、`CLT/Main.lean` の `AnnealedInput q S` を具体的な模型族へ適用 | 前提待ち |
+| F06 | 凸性・原稿 Proposition 4.2 からの係数漸近と分配関数 CLT | F02・F05、R02・R03。抽象族 `S : Setting q` と仮定 `hFE : AnnealedInput q S`。入力の構築は完了条件に含めない | 前提待ち |
 | F07 | `Z≥1`・小確率事象・中心化誤差を用いる対数 CLT | F06、F05 の剰余評価、W06 の有限模型、R05 | 前提待ち |
 | F08 | 大数則の Lean 上の扱い（外部入力か内部証明かを再検討） | R04 の引用監査と仕様の確定。W06・CLT の必須前提ではない | 前提待ち |
 | Z01 | 零点のない領域と必要な対数の構成 | CLT が必要とする領域・一様性・外部入力の選定 | 前提待ち |

@@ -4,6 +4,9 @@ This directory contains the manuscript and Lean formalization work for the centr
 
 ## Current contents
 
+- `FiniteModel.lean`: abstract finite Majorana partition functions, trace bounds, and Gaussian moment and logarithm estimates, with inputs `Params` and `MajoranaSystem`.
+- `Main.lean`: the unique asymptotic family API `Setting q`, the assumed proposition `AnnealedInput q S`, and the conditional CLT statements.
+- `Normalization.lean`: the finite standard-representation check `partitionFunction_standard`; this module is not imported by the abstract CLT proofs.
 - `refs/CLT_SYK.tex`: manuscript root containing the shared preamble, front matter, and references.
 - `refs/sections/`: independently compilable top-level manuscript sections; together with the root file, these are the source of truth for the paper theorem statements.
 - `refs/CLT_SYK.pdf`: compiled manuscript snapshot.
@@ -34,7 +37,7 @@ The principal import paths are:
 
 ## Current status
 
-`Main.lean` defines the normalized Gaussian partition function for general finite-dimensional matrix Majorana systems, families of diverging even system sizes, and the relative, standardized, and centered logarithmic fluctuations. `partition_and_log_partition_clt` states both CLTs with one common radius for real `|β| < βq` and limiting variance `(q!/2) β² (ℓ_q'(β))²`; `partition_clt` and `log_partition_clt` extract the individual conclusions. Standardization excludes zero inverse temperature. The annealed limit identifies `ℓ_q`.
+`FiniteModel.lean` defines the normalized Gaussian partition function for general finite-dimensional matrix Majorana systems. `Main.lean` defines families of diverging even system sizes and the relative, standardized, and centered logarithmic fluctuations. The three CLT statements take `{q : ℕ} (S : Setting q) (hFE : AnnealedInput q S)`; evenness and `q ≥ 4` are fields of `S`, with no duplicate arguments. `partition_and_log_partition_clt` states both CLTs with one common radius for real `|β| < βq` and limiting variance `(q!/2) β² (ℓ_q'(β))²`; `partition_clt` and `log_partition_clt` extract the individual conclusions. Standardization excludes zero inverse temperature. The annealed proposition is assumed for `S`; constructing it is outside the conditional CLT proof.
 
 The main CLT theorem still has an explicitly authorized `sorry` proof placeholder. The finite-model proofs now establish tracelessness, `Z ≥ 1`, `partition_moments`, positivity and expectation one of `Y`, square integrability, integrability of both logarithms, and equality of their centered versions. Specialization to the standard representation gives the manuscript trace normalization. All 30 public finite-model theorems were checked without `sorryAx` on 2026-09-26, independently of `AnnealedInput`. The individual Main module and the full `CLT` library build successfully. `TraceExpDerivatives.lean` supplies the first derivative estimate used in the exact second-chaos proof; W06 remains complete. The current logarithmic CLT argument does not require the earlier concentration-based proof.
 
