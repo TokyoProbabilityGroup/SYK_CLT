@@ -142,11 +142,11 @@ $B_k=\psi_{I_{\pi(k)}}$.  Since $H_N$ is self-adjoint, for $t_j>0$,
   \norm{e^{-t_j\beta H_N}}_{1/t_j}
   =\left(\tr\left|e^{-t_j\beta H_N}\right|^{1/t_j}\right)^{t_j}
   =
-  \bigl(\tr e^{-\beta H_N}\bigr)^{t_j},
+  \bigl(\tr e^{-\beta H_N}\bigr)^{t_j}.
 \]
 For $t_j=0$, the corresponding identity is
 $\norm{I}_\infty=1=(\tr e^{-\beta H_N})^0$.
-Also, $\norm{\psi_I}_\infty=1$ (see Subsection~\ref{subsec:SYK-model}).
+Also, $\norm{\psi_I}_\infty=1$ due to $\psi_I^*\psi_I =\mathbb I$. 
 Thus, for every $\pi\in S_r$ and $t\in\Delta_r$,
 \begin{align}
   &\left|
@@ -262,7 +262,7 @@ For the rest of the proof, we abbreviate
 \]
 Then, $e_1=\sum_{x=1}^N\varepsilon_x$, and
 \eqref{eq:Rademacher-chaos-definition} gives $S_{N,q}=e_q$.
-Newton's identities state that
+Newton's identities (see, e.g., \cite[Chapter I, \S2]{Macdonald1995}), state that
 \begin{equation}\label{eq:Newton-identities}
   m e_m
   =\sum_{j=1}^m(-1)^{j-1}e_{m-j}p_j,
@@ -277,7 +277,7 @@ $\varepsilon_x\in\{\pm1\}$, we have
     N,&j\text{ even}.
   \end{cases}
 \end{equation*}
-We prove this by induction on $m$ to  shows that there is a constant $C_m<\infty$ such that
+we now prove by induction on \(m\) that there is a constant $C_m<\infty$ such that
 \begin{equation*}
 	|e_m|
 	\le C_m\left(N^{m/2}+|e_1|^m\right).
@@ -404,8 +404,7 @@ Since $\E Z_N(\beta)>0$, it follows that
   &=\frac1{(\E Z_N(\beta))^2}
     \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
     \frac1{\alpha!}
-    \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \notag\\
-  &\leq t_N^r
+    \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \leq t_N^r
     \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
     \frac1{\alpha!}.
   \label{eq:Hermite-Rademacher-bound}
@@ -441,7 +440,7 @@ where $c_q$ is the constant in Lemma~\ref{lem:Rademacher-encoding}.  If
 $|\beta|<\beta_{\rm r}$, then
 $t_N\leq c_qN^{-(q-1)}$.  Therefore the second claim of
 Lemma~\ref{lem:Rademacher-encoding}, together with
-\eqref{eq:all-higher-chaoses-at-once} implies 
+\eqref{eq:all-higher-chaoses-at-once}, implies 
 \begin{align*}
   \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
   &\leq C_{q,\beta}
