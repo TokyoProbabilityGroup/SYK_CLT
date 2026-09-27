@@ -5,9 +5,10 @@ import SYK.CLT.Lemmas.CliffordSignParity
 # Gaussian Hermite coefficients for the SYK couplings
 
 The general integration-by-parts theorem and the sign-parity theorem use
-separately defined Hermite functions. The identities below identify their
-normalizations and measures. The completeness and projection formula in
-`eq: chaos` require further `L²` results.
+separately defined Hermite functions. This module identifies their
+normalizations and measures and transfers the coefficient formula.
+Entry points: `hermiteMulti_eq_signParity`, `gaussianCouplings_eq_pi`,
+`hermite_coefficient_ibp`. Orthogonality and completeness are downstream.
 -/
 
 open MeasureTheory ProbabilityTheory

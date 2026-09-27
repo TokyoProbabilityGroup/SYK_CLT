@@ -1,5 +1,5 @@
 import SYK.CLT.Lemmas.Preliminaries
-import SYK.CLT.Lemmas.Tool
+import SYK.CLT.Lemmas.TraceExpDerivatives
 import Mathlib.Analysis.Calculus.ParametricIntegral
 
 /-!
@@ -7,6 +7,9 @@ import Mathlib.Analysis.Calculus.ParametricIntegral
 
 The first-order analytic inputs for `lem:exact-second-chaos` are proved for
 the existing normalized model, at every real inverse temperature.
+Entry points: `Setting.Z_contDiff_couplings`, `Setting.Z_hasDerivAt_beta`,
+`Setting.coordDeriv_Z_eq`, `Setting.integral_Z_mul_sq_sub_one_ibp`,
+`Setting.sum_integral_Y_mul_sq_sub_one`.
 -/
 
 open MeasureTheory Filter

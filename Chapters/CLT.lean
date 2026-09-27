@@ -8,7 +8,7 @@ import SYK.CLT.Lemmas.GaussianChaos
 import SYK.CLT.Lemmas.GaussianHermiteOrthogonality
 import SYK.CLT.Lemmas.GaussianHermiteDensity
 import SYK.CLT.Lemmas.GaussianPolynomialDensity
-import SYK.CLT.Lemmas.CLTComponents
+import SYK.CLT.Lemmas.SecondChaos
 
 open Verso.Genre
 open Verso.Genre.Manual

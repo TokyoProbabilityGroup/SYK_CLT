@@ -11,6 +11,8 @@ The one-coordinate pairing follows from the integration-by-parts theorem in
 while differentiation at the degree gives the factorial. Factorization of the finite
 product Gaussian integral yields the orthogonality and exact norm in
 `eq: chaos` of the CLT manuscript.
+Entry points: `hermiteMulti_orthogonality`, `inner_hermiteLp`,
+`hermiteFiniteProjection_eq_starProjection`.
 -/
 
 open MeasureTheory

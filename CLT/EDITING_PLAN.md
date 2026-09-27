@@ -102,7 +102,7 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 
 ### W06 後の統合課題
 
-`Lemmas/CliffordSignParity.lean` の宣言名衝突は共有 `SYK.partitionFunction` の直接利用で解消し、F01 の `GaussianChaos.lean` と `Main.lean` の同時 import は成功した。符号対称性と `Setting.Z` の規格化、スケール、実部、ガウス測度、Hermite 定義の接続は F02 で検証済みである。F03 の偶多重指数の符号化恒等式と、F04 の `Tool.lean` から `Setting.Z` への接続も未完了である。元の障害は [統合監査](../WORK_HISTORY.md#clt-w06)、解消の検査は [F01 取り込み検証](../WORK_HISTORY.md#merge-f01-2026-09-27) を参照する。
+`Lemmas/CliffordSignParity.lean` の宣言名衝突は共有 `SYK.partitionFunction` の直接利用で解消し、F01 の `GaussianChaos.lean` と `Main.lean` の同時 import は成功した。符号対称性と `Setting.Z` の規格化、スケール、実部、ガウス測度、Hermite 定義の接続は F02 で検証済みである。F03 の偶多重指数の符号化恒等式と、F04 の `TraceExpDerivatives.lean` から `Setting.Z` への接続も未完了である。元の障害は [統合監査](../WORK_HISTORY.md#clt-w06)、解消の検査は [F01 取り込み検証](../WORK_HISTORY.md#merge-f01-2026-09-27) を参照する。
 
 <a id="formalization"></a>
 
@@ -181,7 +181,7 @@ R03 で有限和・偶多重指数・次数の範囲を照合してから同フ�
 
 #### F04-M：行列解析の接続と整理
 
-`Lemmas/Tool.lean` の一般行列結果は Lean 検査済みであり、F02 で一次微分評価を `PartitionDerivatives.lean` の `Setting.Z` に接続した。任意階の接続は未完了である。R03 の行列微分監査後、[構造文書の依存関係](ARCHITECTURE.md#依存関係と実装の分担)、`Lemmas/Tool.lean`、`Main.lean`、[Model 側の F04](../Model/EDITING_PLAN.md#f04-model)を照合する。Model の編集担当を固定し、`SingularAux.singularValues_of_positive` と `SVDAux.singularValues_fin_of_positive`、汎用と共有の `normalizedTrace`、Main の局所トレース指数結果の型と利用箇所を比較する。数学的に同じ結果だけ整理し、スカラー型や規格化の差を保つ。
+`Lemmas/SingularValues.lean`、`Lemmas/MatrixTraceExponential.lean` と `Lemmas/TraceExpDerivatives.lean` の一般行列結果は Lean 検査済みであり、F02 で一次微分評価を `PartitionDerivatives.lean` の `Setting.Z` に接続した。任意階の接続は未完了である。R03 の行列微分監査後、[構造文書の依存関係](ARCHITECTURE.md#依存関係と実装の分担)、この二つの補題 file、`Main.lean`、[Model 側の F04](../Model/EDITING_PLAN.md#f04-model)を照合する。Model の編集担当を固定し、`SingularAux.singularValues_of_positive` と `SVDAux.singularValues_fin_of_positive`、汎用と共有の `normalizedTrace`、Main の局所トレース指数結果の型と利用箇所を比較する。数学的に同じ結果だけ整理し、スカラー型や規格化の差を保つ。
 
 `β`・`couplingScale P`、実部、測度、任意階の正則性・指数増大を `Setting.Z` に接続する。変更ファイルの個別検査、必要な Model と CLT のビルド、公理依存を報告する。
 
@@ -191,9 +191,9 @@ R03 で有限和・偶多重指数・次数の範囲を照合してから同フ�
 
 主定理への接続時には、`Main.lean` から補助モジュールを import する前に共通定義・基本結果を分離する。現状では補助側が `Main.lean` に依存しているためであり、現在の import に循環があるわけではない。候補は `CLT/Basic.lean` 一つとし、`AnnealedInput` とその帰結の移設範囲は利用箇所から決める。宣言名・定理文・証明を維持し、import と参照文書を更新する。個別検査、CLT と既定ビルド、主要定理の型と公理依存の照合を統合作業に含める。この整理の実施は接続時まで保留する。
 
-各 F の原稿監査と先行成果が揃ってから、上の依存順に着手する。`Preliminaries.lean` と `CLTComponents.lean` には F02 の有限サイズ結果を実装済みで、`GaussianConcentration.lean` は宣言のない雛形である。F05 は評価補題から剰余へ、F06 は既存の `ConvexDerivatives` と条件付き漸近から主結果へ、F07 は対数の誤差評価から最終定理へ進める。原稿との照合、主要定理の公理依存、CLT と既定ビルドを報告する。
+各 F の原稿監査と先行成果が揃ってから、上の依存順に着手する。`Preliminaries.lean` と `SecondChaos.lean` には F02 の有限サイズ結果を実装済みで、`GaussianConcentration.lean` は宣言のない雛形である。F05 は評価補題から剰余へ、F06 は既存の `ConvexDerivatives` と条件付き漸近から主結果へ、F07 は対数の誤差評価から最終定理へ進める。原稿との照合、主要定理の公理依存、CLT と既定ビルドを報告する。
 
-F02 完了（2026-09-27）：`Preliminaries.lean` は規格化模型への符号対称性・偶奇則・一次カオス零と、符号付き頂点転置による対角係数の添字独立性を証明した。`PartitionDerivatives.lean` は `Setting.Z` の滑らかさ、一次微分の指数増大、ガウス部分積分、放射方向微分恒等式、期待値との微分交換を証明した。`CLTComponents.lean` の `Setting.Y_secondChaos_eq` は任意の実数 `β` と有限サイズで、原稿 `lem:exact-second-chaos` の係数 `β * deriv (log meanZ) / (2 * choose N q)` をガウス $L^2$ の等式として与える。対称性・微分交換を追加仮定として受け取らず、`AnnealedInput` も使わない。
+F02 完了（2026-09-27）：`Preliminaries.lean` は規格化模型への符号対称性・偶奇則・一次カオス零と、符号付き頂点転置による対角係数の添字独立性を証明した。`PartitionDerivatives.lean` は `Setting.Z` の滑らかさ、一次微分の指数増大、ガウス部分積分、放射方向微分恒等式、期待値との微分交換を証明した。`SecondChaos.lean` の `Setting.Y_secondChaos_eq` は任意の実数 `β` と有限サイズで、原稿 `lem:exact-second-chaos` の係数 `β * deriv (log meanZ) / (2 * choose N q)` をガウス $L^2$ の等式として与える。対称性・微分交換を追加仮定として受け取らず、`AnnealedInput` も使わない。
 
 R03 の今回の監査では、原稿で省略されていた対角係数の添字独立性を転置の推移性から補った。規格化トレース、`couplingScale`、実部、二つのガウス測度、`H₂(x)=x²-1` と階乗 `2` を照合した。一次の部分積分だけで F02 に十分であり、任意階の導関数評価・部分積分の特殊化は F04 に残る。今回 `Main.lean` から補助モジュールを import する必要はなく、`Basic.lean` への分離はまだ行わない。個別検査、CLT ビルド、主要8宣言の公理依存検査、既定ビルドは成功した。詳細と既存警告・環境の範囲は [検証記録](../WORK_HISTORY.md#clt-f02-completion) を参照する。Blueprint はソース照合のみで、Verso の機械的検査は未実施。
 

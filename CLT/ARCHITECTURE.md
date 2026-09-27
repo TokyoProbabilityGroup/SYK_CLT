@@ -37,9 +37,9 @@ W06 の有限模型・モーメント・対数に関する公開30定理は検�
 | 凸関数列の導関数収束 | `Lemmas/ConvexDerivatives.lean` の `convex_convergence_deriv_tendstoUniformlyOn`。関数列の局所一様収束を仮定しており、原稿の各点収束から局所一様収束を導く補題全体ではない |
 | ガウス–エルミート部分積分・展開 | 共有 `Probability/GaussianConcentration/Smooth.lean` に一般部分積分、`Lemmas/GaussianChaos.lean` に規格化の照合がある。`GaussianHermiteOrthogonality.lean` は直交性・階乗ノルム・有限射影、`GaussianPolynomialDensity.lean` は有限積ガウス $L^2$ 完全性と無限次数和を証明済み。`Setting.Z` への特殊化は F04 に残る |
 | ラデマッハ評価 | `Lemmas/Rademacher.lean` に有限符号平均と `rademacher_encoding` がある。関連ビルド・主要定理の公理依存を確認済み。符号化の計数恒等式と F03/F05 の CLT 側への接続は未完了 |
-| 行列解析と対称性 | `Lemmas/Tool.lean` は有限次元の特異値・Schatten 評価と Hermitian 行列の指数の高階微分評価を証明済みで、`lake build CLT` も成功した。これらを CLT のカオス解析へ接続する作業は F04 に残る |
+| 行列解析と対称性 | `Lemmas/SingularValues.lean` は有限次元の特異値・Schatten 評価、`Lemmas/MatrixTraceExponential.lean` は規格化トレースと指数の評価、`Lemmas/TraceExpDerivatives.lean` は Hermitian 行列の指数の高階微分評価を証明済み。これらを CLT のカオス解析へ接続する作業は F04 に残る |
 | 符号ゲージ・偶奇則 | `Lemmas/CliffordSignParity.lean` の符号ゲージ・Hermite 偶奇則は `Preliminaries.lean` で `Setting.Z` の規格化・ガウス測度に接続済み。一次カオスの消滅と二次の非対角係数零を検証した。二次の共通係数も F02 で検証済み |
-| その他の補助モジュール | `CLTComponents.lean` は二次カオスの対角係数を個別の期待値で表す有限サイズの恒等式を検証済み。`GaussianConcentration.lean` は引き続き雛形。`Setting.Y_secondChaos_eq` は原稿どおりの共通係数まで検証済み |
+| その他の補助モジュール | `SecondChaos.lean` は二次カオスの対角係数を個別の期待値で表す有限サイズの恒等式を検証済み。`GaussianConcentration.lean` は引き続き雛形。`Setting.Y_secondChaos_eq` は原稿どおりの共通係数まで検証済み |
 | Blueprint | `../Chapters/AnnealedFE.lean` でガウス入力構造と別原稿の Rademacher 極限を分け、`../Chapters/CLT.lean` で有限模型の証明状態・条件付き極限・現行の対数 CLT の依存を記録した。Verso の生成・参照検査は休止中 |
 
 ### 補助 Lean ファイルの役割
@@ -52,7 +52,7 @@ W06 の有限模型・モーメント・対数に関する公開30定理は検�
 - [GaussianHermiteDensity.lean](Lemmas/GaussianHermiteDensity.lean)：一変数実多項式の Hermite 基底、任意の実係数多変数多項式関数の Hermite 有限線形包への包含、$L^2$ クラスへの移送を証明する。多項式クラスがガウス $L^2$ に稠密なら規格化 Hermite 族も稠密であることを証明済み。
 - [GaussianMomentDetermination.lean](Lemmas/GaussianMomentDetermination.lean)：指数モーメントを持つ有限実測度のモーメント一意性を扱う。
 - [GaussianPolynomialDensity.lean](Lemmas/GaussianPolynomialDensity.lean)：`SYK.CLT.hermiteOrthonormal_dense`、`hasSum_hermiteCoefficients_unconditional`、`hasSum_hermiteDegreeProjection_unconditional` が完全性と展開の入口である。標準ガウスの指数関数と $L^2$ 関数との積の可積分性、有限積ガウス $L^2$ の多項式稠密性を経て、Hermite 完全性、階乗係数と次数別の無限和を証明済みである。これらの展開定理は完全性を追加仮定として受け取らない。
-- [Tool.lean](Lemmas/Tool.lean)：高階微分評価の入口は、末尾の `MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound` と `iterDirectionalFDeriv_traceExp_bound_of_norm_le_one` である。`traceExp` は規格化トレースを使い、Hermitian な基点における反復方向微分を扱う。前半の特異値・Schatten 評価はその証明基盤であり、`Setting.Z` のスケール・実部・ガウス可積分性との接続は F04 に残る。
+- [SingularValues.lean](Lemmas/SingularValues.lean)：特異値・min-max・Ky Fan・Schatten 評価の証明基盤である。[MatrixTraceExponential.lean](Lemmas/MatrixTraceExponential.lean) は規格化トレース、Schatten 評価と指数の評価を扱う。[TraceExpDerivatives.lean](Lemmas/TraceExpDerivatives.lean) の高階微分評価の入口は `MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound` と `iterDirectionalFDeriv_traceExp_bound_of_norm_le_one` であり、Hermitian な基点における反復方向微分を扱う。`Setting.Z` のスケール・実部・ガウス可積分性との接続は F04 に残る。
 - `Lemmas/Rademacher.lean` は、Boolean ベクトル上の一様平均 `radE`、符号和、および次数 `q` の基本対称式である Rademacher カオスを定義する。Newton 恒等式でカオスを符号和から評価し、独立符号和の指数モーメント評価と組み合わせて、偶数 `q ≥ 4` と `0 ≤ t ≤ c_q N^{-(q-1)}` の下で `𝔼_ε[|S_{N,q}|^3 exp(t|S_{N,q}|)] ≤ C_q N^{3q/2}` を証明する。これは `lem:Rademacher-encoding` の評価部品であり、Gaussian chaos の剰余評価 `prop:higher-chaos-closure` への適用は未完了。
 - `Lemmas/ConvexDerivatives.lean` は、割線の差の評価と平均値の定理を準備し、凸関数列の導関数を左右の割線で挟む証明を形式化する。主定理 `convex_convergence_deriv_tendstoUniformlyOn` は、開集合 `I` 上の各関数の凸性・微分可能性、関数列の局所一様収束、極限関数の微分可能性と導関数の連続性を仮定し、任意のコンパクト集合 `K ⊆ I` 上で導関数の一様収束を結論する。原稿で必要な各点収束から局所一様収束への導出や、アニール入力との接続までは含まない。
 
@@ -175,10 +175,10 @@ W06 の追加証明は既存の `Main.lean` に実装され、Model への補題
 | `Main.lean` | `subsec:SYK-model`、`thm:partition-clt`、`cor:free-energy-clt`、有限模型と条件付きアニール入力 |
 | `Lemmas/Preliminaries.lean` | `lem: parity rule lemma` の `Setting.Z` への接続、一次カオス零、二次の非対角係数零。相互作用添字間の対称性も証明済み |
 | `Lemmas/PartitionDerivatives.lean` | `Setting.Z` の滑らかさ・一次微分評価、二次係数への部分積分と期待値の微分交換。任意階の評価は F04 に残る |
-| `Lemmas/CLTComponents.lean` | `lem:exact-second-chaos` の共通係数まで実装済み。`prop:higher-chaos-closure`、`prop:annealed-free-energy` は未完了 |
+| `Lemmas/SecondChaos.lean` | `lem:exact-second-chaos` の共通係数まで実装済み。`prop:higher-chaos-closure`、`prop:annealed-free-energy` は未完了 |
 | `../Probability/GaussianConcentration/Smooth.lean` | 汎用のガウス–エルミート部分積分。`lem:Gaussian-Hermite-IBP` の `Z_N` への適用は F04 と接続して検査する |
 | `Lemmas/CliffordSignParity.lean` | 符号ゲージと Hermite 偶奇則。共有分配関数を直接利用し、`Preliminaries.lean` に接続する |
-| `Lemmas/Tool.lean` | 一般行列の Schatten 評価と高階微分評価。共有模型への接続は F04 |
+| `Lemmas/SingularValues.lean`・`Lemmas/MatrixTraceExponential.lean`・`Lemmas/TraceExpDerivatives.lean` | 一般行列の特異値・Schatten 評価と高階微分評価。共有模型への接続は F04 |
 | `Lemmas/Rademacher.lean` | `lem:Rademacher-encoding` に対応する有限符号平均と指数モーメント評価。F03/F05 への統合は未完了 |
 | `Lemmas/ConvexDerivatives.lean` | `lem:convex-derivatives` の導関数収束補題。局所一様収束などを仮定し、原稿の入力を導く不足部分は F06 に残る |
 | `Lemmas/GaussianConcentration.lean` | 旧証明の `eq:centered W_N tail`・`eq:centered W_N exp` の雛形。W06 で実装も削除も要求しない |

@@ -17,6 +17,14 @@ import Mathlib.Analysis.Calculus.Deriv.Mul
 import Mathlib.MeasureTheory.Integral.DominatedConvergence
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
 
+/-!
+# Clifford sign gauges and Hermite parity
+
+Sign gauges on a `MajoranaSystem` induce parity rules for interaction
+coefficients and Hermite products. Entry points: `MajoranaSystem.exists_gauge`,
+`SYK.hermiteMulti_vertex_flip`.
+-/
+
 open scoped BigOperators
 open MeasureTheory ProbabilityTheory
 

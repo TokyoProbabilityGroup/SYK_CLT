@@ -1,14 +1,13 @@
 import SYK.CLT.Lemmas.Preliminaries
 import SYK.CLT.Lemmas.PartitionDerivatives
-import SYK.CLT.Lemmas.ConvexDerivatives
 
 /-!
-# Components of the SYK central limit theorem
+# Exact second chaos of the SYK partition function
 
 The parity selection rule reduces the degree-two projection in
 `lem:exact-second-chaos` to the diagonal Hermite multi-indices. Signed vertex
 permutations and first-order Gaussian integration by parts identify the common
-coefficient at every real inverse temperature. The higher-chaos estimate remains open.
+coefficient at every real inverse temperature. Main entry point: `Setting.Y_secondChaos_eq`.
 -/
 
 open MeasureTheory

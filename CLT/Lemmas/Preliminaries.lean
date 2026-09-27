@@ -9,6 +9,9 @@ import Mathlib.GroupTheory.Perm.Sign
 
 The gauge symmetry in `lem: parity rule lemma` is specialized here to the
 normalized real partition function of a `Setting`.
+Entry points: `Setting.Z_sign_gauge`, `Setting.Z_firstChaos_eq_zero`,
+`Setting.Y_firstChaos_eq_zero`,
+`Setting.inner_offDiagonal_secondChaos_eq_zero`.
 -/
 
 open MeasureTheory

@@ -1,5 +1,19 @@
 # SYK の作業履歴
 
+<a id="clt-f02-completion"></a>
+
+## F02：一次・二次カオスの同定完了（2026-09-27）
+
+開始時の HEAD は `ffd041a67e5c50b0b50f1bb469267751bbf3133e`。既存の未コミット実装を保持して検証・統合した。`Preliminaries.lean` の符号付き頂点転置と固定濃度集合への推移性により、対角 Hermite 係数が相互作用添字によらないことを証明した。`PartitionDerivatives.lean` は一次微分の指数評価、ガウス部分積分、放射方向微分恒等式、局所的な可積分支配による期待値の微分交換を実装する。`CLTComponents.lean` の `Setting.Y_secondChaos_eq` は `lem:exact-second-chaos` の二次射影を全実数 `β` について証明する。一次射影は `Setting.Y_firstChaos_eq_zero`。原稿の係数 `1/(2M_N)`、`H₂(x)=x²-1`、分散1のガウス測度、実際の表現次元による規格化を照合した。標準表現、外部極限入力、非零逆温度を追加要求しない。
+
+原稿が省略する対角係数の同一性を証明で補い、定理文・模型規約は変更していない。F02 には一次部分積分で足りるため、任意階の評価と特殊化は F04 に残る。`Main.lean` の線形 Hamiltonian と指数評価を公開して再利用し、`Tool.lean` は現行 mathlib の特異値を利用する。`Annealed_FE/main_result.lean` の開始時からの差分は今回の対象外として保持した。
+
+共有ワークスペースのルートから `lake -f lakefile.toml --old env lean` で `SYK/CLT/Main.lean` と `SYK/CLT/Lemmas/` の `Preliminaries.lean`、`Tool.lean`、`PartitionDerivatives.lean`、`CLTComponents.lean` を個別検査し成功した。`lake -f lakefile.toml --old build CLT` は3189 jobsで成功。`lake -f lakefile.toml --old build` は3858 jobsで成功。ただし、この環境の既定対象は `RSATMain` であり、配布用設定の既定対象一式の検証とは同一視しない。CLT は明示的な個別ビルドで確認した。最初のビルドは共有キャッシュの書込権限で失敗し、同じ既存キャッシュへの権限付き再実行で成功した。依存設定は変更していない。
+
+`#print axioms` で `Setting.Z_sign_gauge`、`integral_Z_mul_hermite_eq_zero`、`Y_firstChaos_eq_zero`、`integral_Y_mul_sq_sub_one_eq`、`meanZ_hasDerivAt`、`integral_Z_mul_sq_sub_one_ibp`、`sum_integral_Y_mul_sq_sub_one`、`Y_secondChaos_eq` を確認した。いずれも `propext`、`Classical.choice`、`Quot.sound` のみで、`sorryAx` はない。最終定理の型に残る入力は `Setting q`、実数 `β`、有限サイズ添字 `n` のみ。
+
+既存の最終 CLT の `sorry`、`Tool.lean` の非推奨名警告、共有ガウス基盤等の linter 警告は残る。新規ファイルには Lake の行長警告があるが、証明エラーはない。Blueprint には一次・二次射影の検証済みノードを追加し、未完了の高次剰余と区別した。数学的主張・宣言名・依存名はソース照合済み。Verso 休止に従い、章の Lean 検査・HTML/PDF 生成・参照検査は実行していない。
+
 完了済み作業の検証結果と旧計画を保存する。現行の状態・着手条件・担当票は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
 
 関係する節： [CLT の W06・統合監査](#clt-w06)、[ガウス部分積分](#clt-f01-gaussian)、[W06 後の F01](#clt-f01-after-w06)、[F01 取り込み検証](#merge-f01-2026-09-27)、[Tool](#clt-tool)、[主結果の定理文](#clt-main-statements)、[Model の W01–W04](#model-w01)、[旧段階](#model-legacy)、[ワークスペースの移設](#workspace-migration)。

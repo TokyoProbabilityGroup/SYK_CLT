@@ -4,8 +4,11 @@ import SYK.CLT.Lemmas.GaussianMomentDetermination
 /-!
 # Polynomial density for Gaussian `L²`
 
-Analytic lemmas toward proving the Gaussian polynomial density condition in
-`GaussianHermiteDensity.lean`.
+Polynomial density in finite-product Gaussian `L²` completes the Hermite
+density argument of `GaussianHermiteDensity`. Entry points:
+`mvPolynomialLp_dense`, `hermiteOrthonormal_dense`,
+`hasSum_hermiteCoefficients_unconditional`,
+`hasSum_hermiteDegreeProjection_unconditional`.
 -/
 
 open MeasureTheory ProbabilityTheory

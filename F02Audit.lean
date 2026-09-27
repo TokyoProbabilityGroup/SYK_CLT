@@ -1,4 +1,4 @@
-import SYK.CLT.Lemmas.CLTComponents
+import SYK.CLT.Lemmas.SecondChaos
 
 #check SYK.CLT.Setting.Y_secondChaos_eq
 #print axioms SYK.CLT.Setting.Z_sign_gauge
