@@ -49,13 +49,19 @@ Throughout, all limits are taken as $N\to\infty$ through even integers.
 
 \subsection{Main results}
 We first recall the limiting behavior of the logarithmic partition function:
-\begin{theorem}[\cite{GPSZ2026,He2026}]\label{thm: input}
-For any $\beta\in \mathbb R$, there exists  $\ell_q(\beta)$ such that
+\begin{theorem}\label{thm: input}
+For every fixed $\beta\in\mathbb R$, there exists $\ell_q(\beta)$ such that
 \begin{align*}
-    \lim_{N\to \infty} N^{-1} \log Z_N=     \lim_{N\to \infty} N^{-1} \log \mathbb E[Z_N] =\ell_q(\beta)\qquad \text{ a.s.}
+    \lim_{N\to\infty}\frac1N\mathbb E[\log Z_N(\beta)]
+    =\lim_{N\to\infty}\frac1N\log\mathbb E[Z_N(\beta)]
+    =\ell_q(\beta).
 \end{align*}
 Moreover, $\ell_q$ is differentiable on $\mathbb R$.
 \end{theorem}
+The fixed positive-temperature limits are given by \cite{He2026}.
+Gaussian symmetry extends them to negative $\beta$, while $Z_N(0)=1$ gives
+the zero-temperature case. The regularity of $\ell_q$ used here is established
+in Proposition~\ref{prop:annealed-free-energy}.
 Our main result is the following fluctuation theorem:
 \begin{theorem}
 \label{thm:partition-clt}

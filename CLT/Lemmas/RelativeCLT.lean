@@ -72,7 +72,7 @@ theorem Setting.scaled_higherChaosRemainderLp_ae {q : ℕ} (S : Setting q)
 
 theorem Setting.relativeFluctuation_pi_clt {q : ℕ} (S : Setting q)
     (hFE : AnnealedInput q S) :
-    ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →
+    ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq → β ≠ 0 →
       TendstoInDistribution
         (fun n (g : InteractionIndex (S.N n) q → ℝ) =>
           S.relativeFluctuation β n (WithLp.toLp 2 g))
@@ -83,7 +83,7 @@ theorem Setting.relativeFluctuation_pi_clt {q : ℕ} (S : Setting q)
         (gaussianReal 0 1) := by
   obtain ⟨βq, hβq, hrem⟩ := S.scaled_higherChaosRemainderLp_norm_tendsto_zero
   refine ⟨βq, hβq, ?_⟩
-  intro β hβ
+  intro β hβ hβ0
   let X (n : ℕ) (g : InteractionIndex (S.N n) q → ℝ) : ℝ :=
     (S.fluctuationScale n *
       (β * deriv (fun b => Real.log (S.meanZ b n)) β /
@@ -98,7 +98,7 @@ theorem Setting.relativeFluctuation_pi_clt {q : ℕ} (S : Setting q)
       (fun x : ℝ =>
         (β * deriv hFE.ℓ β * Real.sqrt ((q.factorial : ℝ) / 2)) * x)
       (fun n => SYK.gaussianCouplings (InteractionIndex (S.N n) q))
-      (gaussianReal 0 1) := S.scaledQuadraticGaussianLp_clt hFE β
+      (gaussianReal 0 1) := S.scaledQuadraticGaussianLp_clt hFE β hβ0
   have hR (n : ℕ) : (R n : (InteractionIndex (S.N n) q → ℝ) → ℝ) =ᵐ[
       SYK.gaussianCouplings (InteractionIndex (S.N n) q)]
       fun g => Y n g - X n g := by

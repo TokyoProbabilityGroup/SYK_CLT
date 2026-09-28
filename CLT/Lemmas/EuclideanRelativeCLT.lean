@@ -64,15 +64,15 @@ theorem gaussian_scaled_limit_law
 
 theorem Setting.relativeFluctuation_clt {q : ℕ} (S : Setting q)
     (hFE : AnnealedInput q S) :
-    ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →
+    ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq → β ≠ 0 →
       TendstoInDistribution (S.relativeFluctuation β) atTop
         (fun x : ℝ => x)
         (fun n => standardGaussianMeasure (S.N n) q)
         (gaussianReal 0 (limitVariance q hFE.ℓ β)) := by
   obtain ⟨βq, hβq, hpi⟩ := S.relativeFluctuation_pi_clt hFE
   refine ⟨βq, hβq, ?_⟩
-  intro β hβ
-  have h := (hpi β hβ).tendsto
+  intro β hβ hβ0
+  have h := (hpi β hβ hβ0).tendsto
   refine ⟨?_, ?_, ?_⟩
   · intro n
     exact (S.relativeFluctuation_memLp β n).aestronglyMeasurable.aemeasurable

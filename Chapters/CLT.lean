@@ -24,7 +24,7 @@ sections. The active log-CLT proof is in `main-results.tex`; the argument
 inside `\iffalse` is historical.
 
 Finite-model results, conditional consequences of an external annealed input,
-and unfinished CLT proofs have different status below.
+and the external expected-pressure statement have different status below.
 :::
 
 :::definition "clt_partition_function" (parent := "central_limit_theorem") (uses := "scaled_syk_hamiltonian") (lean := "SYK.CLT.partitionFunction, SYK.CLT.realPartitionFunction, SYK.CLT.Setting")
@@ -341,7 +341,8 @@ and `SYK.CLT.Setting.quadraticGaussianLp_clt` gives the sum's limit
 on the product Gaussian space.
 The changing scalar is handled by
 `SYK.CLT.tendstoInDistribution_mul_coeff`, giving
-`SYK.CLT.Setting.scaledQuadraticGaussianLp_clt` under `AnnealedInput`.
+`SYK.CLT.Setting.scaledQuadraticGaussianLp_clt` under `AnnealedInput`
+for nonzero inverse temperature.
 `SYK.CLT.varying_l2_perturb_clt` transfers the vanishing tail despite
 the varying coupling spaces. `SYK.CLT.Setting.relativeFluctuation_clt`
 states the resulting relative CLT on the model's Euclidean coupling space
@@ -359,7 +360,7 @@ of the remaining logarithmic transfer.
 :::theorem "partition_function_clt" (parent := "central_limit_theorem") (uses := "clt_second_chaos_and_remainder, clt_gaussian_quadratic_sum, clt_conditional_nondegeneracy") (lean := "SYK.CLT.partition_clt, SYK.CLT.partition_and_log_partition_clt")
 Assume `S : Setting q` and `hFE : AnnealedInput q S`. The Lean statements
 choose $`0<\beta_q` so that, for real
-$`|\beta|<\beta_q`, the annealed pressure converges to $`\ell(\beta)` and
+$`0<|\beta|<\beta_q`, the annealed pressure converges to $`\ell(\beta)` and
 
 $$`
 N^{q/2-1}(Y_N(\beta)-1)
@@ -367,14 +368,13 @@ N^{q/2-1}(Y_N(\beta)-1)
 \mathcal N\!\left(0,\frac{q!}{2}\beta^2\ell'(\beta)^2\right).
 `$$
 
-For $`\beta\ne0`, the statements also require positive limiting variance,
+The statements also require positive limiting variance,
 positive variance at every finite size, and a standardized CLT. At
-$`\beta=0`, the relative limit is degenerate and standardization is excluded.
+$`\beta=0`, the relative fluctuation vanishes and standardization is undefined;
+this point is outside the CLT statements.
 The joint declaration and both individual CLTs are Lean-checked without
 `sorryAx`, conditional on `hFE`.
-The manuscript's `thm:partition-clt` includes zero in its standardized
-formula; its parameter range still needs correction before treating the
-manuscript and Lean statements as identical.
+The manuscript and Lean impose the same nonzero-temperature restriction.
 :::
 
 :::theorem "clt_trace_lower_bound" (parent := "central_limit_theorem") (uses := "clt_finite_partition_properties") (lean := "SYK.CLT.interactionOperator_trace_eq_zero, SYK.CLT.normalizedHamiltonian_normalizedTrace_eq_zero, SYK.CLT.realPartitionFunction_ge_one")
@@ -423,7 +423,7 @@ mean error and centered $`L^1` error under `hFE`.
 :::
 
 :::theorem "log_partition_clt" (parent := "central_limit_theorem") (uses := "partition_function_clt, clt_log_centering_error") (lean := "SYK.CLT.log_partition_clt, SYK.CLT.partition_and_log_partition_clt")
-Under the same `hFE`, $`\beta_q`, and real $`|\beta|<\beta_q`, the intended
+Under the same `hFE`, $`\beta_q`, and real $`0<|\beta|<\beta_q`, the intended
 conclusion is
 
 $$`
@@ -438,12 +438,14 @@ logarithmic CLT and the joint theorem without `sorryAx`, conditional on
 `hFE`.
 :::
 
-:::theorem "free_energy_law_of_large_numbers" (parent := "central_limit_theorem")
-The manuscript's `thm: input` attributes an almost-sure fixed-temperature
-limit of $`N^{-1}\log Z_N` and the annealed pressure limit for every real
-$`\beta` to He2026. He2026 Theorem 1.1 directly states limits of
-expected quenched and annealed pressures at fixed positive temperature.
-The almost-sure upgrade, extension to negative temperature, and the
-applicability to Lean's general representation families require separate
-justification. No Lean theorem in this project supplies this input.
+:::theorem "clt_expected_pressure_limit" (parent := "central_limit_theorem")
+The manuscript's `thm: input` states, for each fixed real $`\beta`, the
+deterministic common limit of $`N^{-1}\mathbb E\log Z_N(\beta)` and
+$`N^{-1}\log\mathbb E Z_N(\beta)`. He2026 Theorem 1.1 gives both
+limits at fixed positive temperature for the standard representation;
+Gaussian symmetry and $`Z_N(0)=1` cover nonpositive temperatures.
+The regularity of the limiting function is established in manuscript
+Proposition 4.2. There is no almost-sure claim. Lean's conditional CLT
+uses only the annealed proposition through `AnnealedInput q S`, which
+remains an assumed input; it does not import a quenched-pressure limit.
 :::

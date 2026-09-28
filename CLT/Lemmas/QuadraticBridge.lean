@@ -148,9 +148,10 @@ theorem Setting.quadraticGaussianLp_clt {q : ℕ} (S : Setting q) :
     simpa only [heq] using h
 
 /-- The leading scaled chaos has the conditional Gaussian limit on the
-product coupling space. -/
+product coupling space at nonzero inverse temperature. The coefficient
+calculation itself remains valid at zero temperature. -/
 theorem Setting.scaledQuadraticGaussianLp_clt {q : ℕ} (S : Setting q)
-    (hFE : AnnealedInput q S) (β : ℝ) :
+    (hFE : AnnealedInput q S) (β : ℝ) (_hβ : β ≠ 0) :
     TendstoInDistribution
       (fun n (g : InteractionIndex (S.N n) q → ℝ) =>
         (S.fluctuationScale n *

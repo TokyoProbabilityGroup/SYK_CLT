@@ -75,7 +75,7 @@ theorem Setting.standardizedFluctuation_clt {q : ℕ} (S : Setting q)
   have hm := tendstoInDistribution_mul_coeff
     (fun n => standardGaussianMeasure (S.N n) q)
     (gaussianReal 0 v)
-    (S.relativeFluctuation β) (fun x : ℝ => x) (hrel β hβrel)
+    (S.relativeFluctuation β) (fun x : ℝ => x) (hrel β hβrel hβ0)
     a (Real.sqrt (v : ℝ))⁻¹ ha
   have hLaw (n : ℕ) :
       (standardGaussianMeasure (S.N n) q).map

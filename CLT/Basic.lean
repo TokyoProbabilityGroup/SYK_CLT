@@ -12,10 +12,11 @@ system, the shared Gaussian Hamiltonian, and normalized trace. The main
 statements in `Main.lean` correspond to `thm:partition-clt` and
 `cor:free-energy-clt`.
 
-As requested, inverse temperature is real and the high-temperature condition
-is `|β| < βq`. This supersedes the planned nonnegative-temperature restriction
-for these declarations. The standardized CLT excludes `β = 0`; the relative
-and logarithmic CLTs include its degenerate Gaussian limit.
+Inverse temperature is real, and the main CLT statements use
+`|β| < βq` together with `β ≠ 0`. This supersedes the planned
+nonnegative-temperature restriction. The relative, standardized, and
+logarithmic CLTs all exclude zero inverse temperature; finite-model
+zero-temperature identities remain available separately.
 
 The explicit annealed input is `AnnealedInput`, modeled on
 `prop:annealed-free-energy` in the CLT manuscript. The Gaussian chaos and

@@ -1,5 +1,25 @@
 # SYK の作業履歴
 
+<a id="clt-nonzero-temperature-2026-09-28"></a>
+
+## CLT の Lean 定理文を非零温度へ統一（2026-09-28）
+
+研究者の指示により、原稿 `thm:partition-clt`・`cor:free-energy-clt` と対応する Lean の共同定理 `partition_and_log_partition_clt`、個別定理 `partition_clt`・`log_partition_clt`、中間の `Setting.relativeFluctuation_pi_clt`・`Setting.relativeFluctuation_clt`・`Setting.logFluctuation_clt` に、共通して `|β|<βq → β≠0` を明示した。既存の `Setting.standardizedFluctuation_clt` も同じ範囲である。先頭二次カオスの固定温度 CLT `Setting.scaledQuadraticGaussianLp_clt` にも `β≠0` を明示した。有限模型の零温度恒等式、全実数で成り立つ解析・係数・剰余評価、および外部入力 `AnnealedInput` の全実軸での主張は変更していない。共同定理は非零温度の分散正値性と標準化 CLT を同じ量化の下に置き、原稿の三つの結論と整合する。
+
+変更前から前節の原稿・計画・Blueprint 更新は未コミットで存在し、その差分を保持した。ワークスペースのルートから `lake -f SYK/workspace/lakefile.toml build CLT` は 3253 jobs で成功した。共同・個別・中間の八つの CLT 宣言の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみ。既存の上流・補助モジュールの linter 警告は再表示された。Blueprint の数学的主張と宣言名はソース上で照合し、休止中の Verso 機械的検査は行っていない。変更は未コミット。
+
+<a id="clt-r-f-completion-2026-09-28"></a>
+
+## CLT 原稿 R01–R05 と F01–F08 の確認（2026-09-28）
+
+開始 HEAD は `9857962`（`sasayan_task`）、作業開始時の追跡・未追跡差分はなかった。R02-A の手動修正を確認した。`introduction.tex` の `thm:partition-clt` と `cor:free-energy-clt` はいずれも `β∈(-β_q,β_q)\setminus\{0\}` を仮定する。相対・対数 CLT に関しては Lean の零温度を含む主張より狭いが、標準化量の零温度での未定義性は解消している。F06 の `Setting.varianceZ_pos_of_ne_zero` は非零温度における全有限サイズの正値性を与える。R02-B の `S : Setting q` と `hFE : AnnealedInput q S` を入力とする条件付き方針は維持した。
+
+R04-A は方針(i)を採用し、`thm: input` を `N^{-1}E[log Z_N(β)]` と `N^{-1}log E[Z_N(β)]` の決定論的な共通極限へ修正した。標本ごとの概収束表記を除去した。[He2026 v3, Theorem 1.1](https://arxiv.org/html/2607.18998v3) は固定した正の逆温度で期待クエンチ・アニール圧力の極限を述べる。負温度はガウス係数の対称性、零温度は `Z_N(0)=1`、極限関数の `C¹` 正則性は原稿の Proposition 4.2 に基づく。`thm: input` の見出しから直接引用の表示を外し、引用と原稿内の拡張を定理直後に区別した。R01・R03・R05 は既存の監査記録と現行本文を照合し、R01–R05 の状態を完了にそろえた。
+
+F08 は R04-A の決定で概収束の形式化対象がなくなったことを確認し、新規 Lean 宣言を追加せず仕様確定で完了した。`AnnealedInput q S` は期待クエンチ圧力も概収束も要求せず、条件付きの相対・標準化・対数 CLT の入力を維持する。F01–F07 の既存実装・検証記録と合わせて F01–F08 を完了とした。これらの完了は `AnnealedInput` 自体の構築、He2026 の Lean 証明、概収束の Lean 証明を意味しない。
+
+`latexmk -pdf -silent -interaction=nonstopmode -halt-on-error -outdir=/private/tmp/syk-r08-tex.jkAZxk CLT_SYK.tex` は17ページの PDF を一時ディレクトリに生成して成功し、最終ログに未解決引用・参照や組版警告はない。ワークスペースのルートから `lake -f SYK/workspace/lakefile.toml build CLT` は3253 jobs で成功した。既存 Lean ファイルの linter 警告は再表示された。Blueprint の数学的主張と参照はソース上で照合し、休止中の Verso 生成・参照検査は行っていない。変更は未コミット。
+
 <a id="clt-abstract-input-2026-09-27"></a>
 
 ## CLT の抽象入力統一（2026-09-27）

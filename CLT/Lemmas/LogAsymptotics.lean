@@ -367,14 +367,14 @@ theorem Setting.scaled_centered_logLinearError_l1_tendsto_zero {q : ℕ}
 relative partition function. -/
 theorem Setting.logFluctuation_clt {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
-    ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →
+    ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq → β ≠ 0 →
       TendstoInDistribution (S.logFluctuation β) atTop (fun x : ℝ => x)
         (fun n => standardGaussianMeasure (S.N n) q)
         (gaussianReal 0 (limitVariance q hFE.ℓ β)) := by
   obtain ⟨rrel, hrrel, hrel⟩ := S.relativeFluctuation_clt hFE
   obtain ⟨rerr, hrerr, herr⟩ := S.scaled_centered_logLinearError_l1_tendsto_zero hFE
   refine ⟨min rrel rerr, lt_min hrrel hrerr, ?_⟩
-  intro β hβ
+  intro β hβ hβ0
   have hβrel : |β| < rrel := lt_of_lt_of_le hβ (min_le_left _ _)
   have hβerr : |β| < rerr := lt_of_lt_of_le hβ (min_le_right _ _)
   have heq (n : ℕ) (g : CouplingSpace (S.N n) q) :
@@ -407,6 +407,6 @@ theorem Setting.logFluctuation_clt {q : ℕ}
     (fun n => standardGaussianMeasure (S.N n) q)
     (gaussianReal 0 (limitVariance q hFE.ℓ β))
     (S.relativeFluctuation β) (S.logFluctuation β) (fun x : ℝ => x)
-    (hrel β hβrel) hY hErrInt hErr
+    (hrel β hβrel hβ0) hY hErrInt hErr
 
 end SYK.CLT
