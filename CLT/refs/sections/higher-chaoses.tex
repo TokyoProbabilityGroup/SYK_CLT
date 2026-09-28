@@ -10,7 +10,7 @@
 
 \begin{lemma}
 \label{lem:Z-derivative-bound}
-For any $\beta\in \mathbb R$ and for any multi-index $\alpha$  with  $|\alpha|=r$ satisfies
+For any $\beta\in \mathbb R$ and for any multi-index $\alpha$  with  $|\alpha|=r$, it holds 
 \begin{equation}\label{eq:Z-derivative-bound}
   \left|\partial_g^\alpha Z_N(\beta;G)\right|
   \leq (|\beta|\sigma_N)^r Z_N(\beta;G).
@@ -19,7 +19,7 @@ For any $\beta\in \mathbb R$ and for any multi-index $\alpha$  with  $|\alpha|=r
 
 \begin{proof}
 The case $r=0$ is immediate, so assume $r\geq1$.  Write $H_N:=H_N(G)$ for
-brevity.  We first derive the equality
+brevity.  We claim that 
 \begin{align}
 	&\partial_{g_{I_r}}\cdots\partial_{g_{I_1}}Z_N(\beta;G)
 	\notag\\
@@ -33,20 +33,16 @@ brevity.  We first derive the equality
 	\label{eq:iterated-Duhamel-formula}
 \end{align}
 where
-\[\Delta_r=\left\{(t_j)_{j=1}^r: t_j\ge0,\quad \sum_{j=1}^r t_j\le 1\right\},\qquad t_0=1-\sum_{i=1}^r t_j. \]
-For a differentiable matrix-valued function $A(\theta)$, the one-variable
-Duhamel formula is
+\[\Delta_r=\left\{(t_j)_{j=1}^r: t_j\ge0,\quad \sum_{j=1}^r t_j\le 1\right\},\qquad t_0=1-\sum_{j=1}^r t_j. \]
+For an affine matrix-valued function $A(\theta)$, the one-variable
+Duhamel formula (see \cite[Corollary~3.11]{HiaiPetz2014}) is
 \begin{equation}\label{eq:one-variable-Duhamel-formula}
   \frac{\mathrm d}{\mathrm d\theta}e^{A(\theta)}
   =\int_0^1
     e^{sA(\theta)}A'(\theta)e^{(1-s)A(\theta)}\,\mathrm ds.
 \end{equation}
-By the definition of $H_N$ in Subsection~\ref{subsec:SYK-model},
-\[
-  \partial_{g_I}H_N=\sigma_N\psi_I.
-\]
-Applying \eqref{eq:one-variable-Duhamel-formula} to
-$A=-t\beta H_N$ gives, for $t\geq0$,
+Since $\partial_{g_I}H_N=\sigma_N\psi_I$ and the fact that $A=-t\beta H_N$ is affine in each $g_I$, by
+\eqref{eq:one-variable-Duhamel-formula}, for $t\geq0$,
 \begin{align}
   \partial_{g_I}e^{-t\beta H_N}
   &=-t\beta\sigma_N\int_0^1
@@ -57,7 +53,7 @@ $A=-t\beta H_N$ gives, for $t\geq0$,
     e^{-(t-u)\beta H_N}\,\mathrm du.
   \label{eq:Duhamel-interval-splitting}
 \end{align}
-Here, \eqref{eq:Duhamel-interval-splitting} with $t=1$ yields
+Note that  \eqref{eq:Duhamel-interval-splitting} with $t=1$ yields
 \eqref{eq:iterated-Duhamel-formula} for $r=1$.  Suppose inductively that the
 formula holds at order $r-1$.  Then
 \begin{align}
@@ -72,15 +68,15 @@ formula holds at order $r-1$.  Then
 	\right)\,\mathrm dt_1\cdots\mathrm dt_{r-1}.
 	\label{eq:iterated-Duhamel-formula-induction}
 \end{align}
-For fixed $\pi\in S_{r-1}$ and $j\in\{1,\ldots,r\}$, differentiating the
-factor $e^{-t_{j-1}\beta H_N}$ replaces it, by
-\eqref{eq:Duhamel-interval-splitting}, with
+For fixed $\pi\in S_{r-1}$ and $j\in\{1,\ldots,r\}$, by
+\eqref{eq:Duhamel-interval-splitting}, differentiating the
+factor $e^{-t_{j-1}\beta H_N}$ replaces it  with
 \[
   -\beta\sigma_N\int_0^{t_{j-1}}
   e^{-u\beta H_N}\psi_{I_r}
   e^{-(t_{j-1}-u)\beta H_N}\,\mathrm du.
 \]
-Splitting $t_{j-1}$ into $u$ and $t_{j-1}-u$ and relabeling the resulting
+Splitting the interval $[0, t_{j-1}]$ into $[0, u]$ and $[u, t_{j-1}]$ and relabeling the resulting
 simplex variables, the corresponding term in the Leibniz rule becomes
 \begin{align*}
   -\beta\sigma_N\int_{\Delta_r}
@@ -92,34 +88,66 @@ simplex variables, the corresponding term in the Leibniz rule becomes
 \end{align*}
 where
 \[\sigma_{\pi,j}(k)=\begin{cases}
-	\pi(k) & (k<j)\\
-	r &(k=j)\\
-	\pi(k-1) & (k>j)
-\end{cases}. \]
+	\pi(k) & (k<j),\\
+	r &(k=j),\\
+	\pi(k-1) & (k>j).
+\end{cases} \]
 Since $(\pi,j)\mapsto\sigma_{\pi,j}$ is a bijection from
-$S_{r-1}\times\{1,\ldots,r\}$ onto $S_r$, summing the Leibniz-rule terms in
+$S_{r-1}\times\{1,\ldots,r\}$ onto $S_r$, summing the terms produced by the Leibniz rule in
 \eqref{eq:iterated-Duhamel-formula-induction} proves
 \eqref{eq:iterated-Duhamel-formula}.
 
-It remains to estimate each integrand in
-\eqref{eq:iterated-Duhamel-formula}.  From now on  the Schatten norms are
-defined using the normalized trace:
+To bound the integrand in
+\eqref{eq:iterated-Duhamel-formula}, use the normalized  Schatten norms:
 \[
   \norm{A}_p=(\tr|A|^p)^{1/p},
   \qquad
   \norm{A}_\infty=\norm{A}.
 \]
-For $t_j>0$,
+For these normalized Schatten norms, H\"older's inequality reads
+\begin{equation}\label{eq:normalized-Schatten-Holder}
+  \norm{AB}_p\leq\norm{A}_{p_1}\norm{B}_{p_2},
+  \qquad
+  \frac1p=\frac1{p_1}+\frac1{p_2},
+  \qquad p,p_1,p_2\in[1,\infty].
+\end{equation}
+This follows from the inequality
+in \cite[Theorem~6.20]{HiaiPetz2014}, since, in dimension $d$,
+\[
+  \norm{A}_s=d^{-1/s}(\operatorname{Tr}|A|^s)^{1/s}
+  \quad (1\leq s<\infty),
+  \qquad d^{-1/p}=d^{-1/p_1}d^{-1/p_2},
+\]
+with the convention \(d^{-1/\infty}=1\).
+Let $t_0,\ldots,t_r\geq0$ satisfy $\sum_{j=0}^rt_j=1$.  Iterating \eqref{eq:normalized-Schatten-Holder} gives
+\begin{align*}
+  |\tr(A_0\cdots A_r)|
+  &\leq\norm{A_0\cdots A_r}_1\\
+  &\leq\norm{A_0\cdots A_{r-1}}_{1/(t_0+\cdots+t_{r-1})}
+       \norm{A_r}_{1/t_r}.
+\end{align*}
+Applying this inductively, this is bounded from above by
+$$\prod_{j=0}^r\norm{A_j}_{1/t_j}.$$
+
+In particular, since $\norm{AB}_p\leq\norm{A}_p\norm{B}_\infty$,
+\[
+  |\tr(A_0B_1A_1\cdots B_rA_r)|
+  \leq\prod_{j=0}^r\norm{A_j}_{1/t_j}
+       \prod_{k=1}^r\norm{B_k}_\infty.
+\]
+
+We apply this inequality with $A_j=e^{-t_j\beta H_N}$ and
+$B_k=\psi_{I_{\pi(k)}}$.  Since $H_N$ is self-adjoint, for $t_j>0$,
 \[
   \norm{e^{-t_j\beta H_N}}_{1/t_j}
+  =\left(\tr\left|e^{-t_j\beta H_N}\right|^{1/t_j}\right)^{t_j}
   =
-  \bigl(\tr e^{-\beta H_N}\bigr)^{t_j},
+  \bigl(\tr e^{-\beta H_N}\bigr)^{t_j}.
 \]
-with the usual $p=\infty$ interpretation when $t_j=0$.  By
-Subsection~\ref{subsec:SYK-model}, $\norm{\psi_I}_\infty=1$.
-Noncommutative H\"older, with Schatten exponents $1/t_j$, therefore gives,
-for every $\pi\in S_r$ and
-$t\in\Delta_r$,
+For $t_j=0$, the corresponding identity is
+$\norm{I}_\infty=1=(\tr e^{-\beta H_N})^0$.
+Also, $\norm{\psi_I}_\infty=1$ due to $\psi_I^*\psi_I =\mathbb I$. 
+Thus, for every $\pi\in S_r$ and $t\in\Delta_r$,
 \begin{align}
   &\left|
   \tr\!\left(
@@ -183,14 +211,14 @@ For every integer $r\geq0$,
   =\frac1{r!}\E_\varepsilon\!\left[S_{N,q}^r\right].
 \end{equation}
 Moreover, there are constants $c_q>0$ and $C_q<\infty$, depending only on
-$q$, such that
+$q$, such that for every $N$ and every $0\leq t\leq c_qN^{-(q-1)}$,
 \begin{equation}\label{eq:Rademacher-exponential-moment}
   \E_\varepsilon\!\left[
     |S_{N,q}|^3e^{t|S_{N,q}|}
   \right]
-  \leq C_qN^{3q/2}
+  \leq C_qN^{3q/2}.
 \end{equation}
-for every $N$ and every $0\leq t\leq c_qN^{-(q-1)}$.
+
 \end{lemma}
 
 \begin{proof}
@@ -215,11 +243,11 @@ For a fixed $\alpha$, the product inside the expectation is
 \end{equation*}
 By independence of the Rademacher variables and the definition of an even
 multi-index in \eqref{eq:even-multi-index}, its expectation is one if
-$\alpha$ is even and zero otherwise.  Substitution into
+$\alpha$ is even and zero otherwise.  Substituting this into
 \eqref{eq:Rademacher-multinomial-expansion} proves
 \eqref{eq:even-sum-Rademacher-moment}.
 
-We next prove a deterministic bound for $S_{N,q}$.  For every $N\geq1$
+We next bound $S_{N,q}$.  For every $N\geq1$
 and every integer $m\geq0$, let $e_m^{(N)}$ denote the $m$th elementary
 symmetric polynomial in $N$ variables, that is,
 \begin{equation*}
@@ -228,13 +256,13 @@ symmetric polynomial in $N$ variables, that is,
   \prod_{x\in I}z_x,
   \qquad e_0^{(N)}(z_1,\ldots,z_N)=1.
 \end{equation*}
-For the rest of the proof, we use the abbreviation
+For the rest of the proof, we abbreviate 
 \[
   e_m:=e_m^{(N)}(\varepsilon_1,\ldots,\varepsilon_N).
 \]
-In particular, $e_1=\sum_{x=1}^N\varepsilon_x$, and
+Then, $e_1=\sum_{x=1}^N\varepsilon_x$, and
 \eqref{eq:Rademacher-chaos-definition} gives $S_{N,q}=e_q$.
-Newton's identities state that
+Newton's identities (see, e.g., \cite[Chapter I, \S2]{Macdonald1995}), state that
 \begin{equation}\label{eq:Newton-identities}
   m e_m
   =\sum_{j=1}^m(-1)^{j-1}e_{m-j}p_j,
@@ -249,12 +277,12 @@ $\varepsilon_x\in\{\pm1\}$, we have
     N,&j\text{ even}.
   \end{cases}
 \end{equation*}
-An induction on $m$, using \eqref{eq:Newton-identities}, shows that there is a constant $C_m<\infty$ such that
+we now prove by induction on \(m\) that there is a constant $C_m<\infty$ such that
 \begin{equation*}
 	|e_m|
 	\le C_m\left(N^{m/2}+|e_1|^m\right).
 \end{equation*}
-Indeed, suppose that the estimate is known below order $m$ and set
+Indeed, suppose that the estimate holds for  orders less than $m$. Set
 \[
 X_N:=\frac{e_1}{\sqrt N}.
 \]
@@ -275,21 +303,20 @@ Hence, with $C_0=1$,
 \]
 where we used $1+|X|^m-|X|^{m-j}-|X|^j
 =(1-|X|^j)(1-|X|^{m-j})\ge0.$
-Substitution into \eqref{eq:Newton-identities} proves the induction step.
+Substituting this into \eqref{eq:Newton-identities} proves the induction step.
 Taking $m=q$ and using \eqref{eq:Rademacher-chaos-definition}, we obtain
 \begin{equation}\label{eq:Rademacher-chaos-deterministic-bound}
   |S_{N,q}|
   \leq C_q\left(N^{q/2}+|e_1|^q\right).
 \end{equation}
 
-Since $q\geq4$ by Subsection~\ref{subsec:SYK-model} and
+Since $q\geq4$ and
 $|X_N|\leq\sqrt N$,
 \eqref{eq:Rademacher-chaos-deterministic-bound} implies that,
 for $0\leq t\leq c_qN^{-(q-1)}$,
 \begin{align}
   t|S_{N,q}|
-  &\leq C_qc_qN^{-(q/2-1)}\left(1+|X_N|^q\right) \notag\\
-  &\leq C_qc_q\left(1+|X_N|^2\right).
+  &\leq C_qc_qN^{-(q/2-1)}\left(1+|X_N|^q\right)\leq C_qc_q\left(1+|X_N|^2\right).
   \label{eq:Rademacher-exponent-reduction}
 \end{align}
 Indeed,
@@ -299,17 +326,14 @@ Indeed,
   \left(\frac{|X_N|}{\sqrt N}\right)^{q-2}
   \leq |X_N|^2.
 \end{equation*}
-Choose $c_q$ small enough that the last member of
-\eqref{eq:Rademacher-exponent-reduction} is bounded by
-$(1+|X_N|^2)/4$.
 
-Hoeffding's inequality gives
+Choose $c_q$ small enough so that $C_q c_q\leq 1/4$.  Hoeffding's inequality~\cite[Theorem~2]{Hoeffding1963} gives
 \begin{equation}\label{eq:Hoeffding-Rademacher-sum}
   \mathbb P_\varepsilon(|X_N|\geq u)
   \leq2e^{-u^2/2}
   \qquad (u\geq0).
 \end{equation}
-Consequently, integration of the tail in
+Consequently, integrating the tail bound   in
 \eqref{eq:Hoeffding-Rademacher-sum} yields
 \begin{equation}\label{eq:uniform-Rademacher-integrability}
   \sup_{N\geq1}
@@ -337,8 +361,8 @@ which proves \eqref{eq:Rademacher-exponential-moment}.
 \end{proof}
 
 \begin{proposition} \label{prop:higher-chaos-closure}
-There exists $\beta_{\rm Rad}=\beta_{\rm Rad}(q)>0$ such that, for every
-fixed real $\beta$ with $|\beta|<\beta_{\rm Rad}$,
+There exists $\beta_{\rm r}=\beta_{\rm r}(q)>0$ such that, for every
+fixed real $\beta$ with $|\beta|<\beta_{\rm r}$,
 \begin{equation*}
   \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
   =O\!\left(N^{-3(q/2-1)}\right)
@@ -353,24 +377,39 @@ Put
   =\beta^2(q-1)!N^{-(q-1)}.
 \end{equation*}
 By the Hermite expansion \eqref{eq: chaos} and its orthogonality relation,
-the squared norm of the $r$th projection is the sum of the squared Hermite
-coefficients.  Lemma~\ref{lem: parity rule lemma} eliminates every odd
-multi-index, while Lemma~\ref{lem:Gaussian-Hermite-IBP} replaces each
-remaining Hermite coefficient by the corresponding expected derivative.
-Consequently, Lemma~\ref{lem:Z-derivative-bound} and $\mathbb E Z_N(\beta)>0$ give
+\[
+  \norm{P_r Y_N(\beta)}_2^2
+  =\frac1{(\E Z_N(\beta))^2}
+    \sum_{|\alpha|=r}\frac1{\alpha!}
+    \left|\E\!\left[Z_N(\beta)H_\alpha(G)\right]\right|^2.
+\]
+By Lemmas~\ref{lem: parity rule lemma} and~\ref{lem:Gaussian-Hermite-IBP},
+\[
+  \E\!\left[Z_N(\beta)H_\alpha(G)\right]
+  =\begin{cases}
+    0,&\alpha\text{ is odd},\\
+    \E\partial_g^\alpha Z_N(\beta),&\alpha\text{ is even}.
+  \end{cases}
+\]
+Moreover, Lemma~\ref{lem:Z-derivative-bound} gives, for $|\alpha|=r$,
+\[
+  \left|\E\partial_g^\alpha Z_N(\beta)\right|
+  \leq\E\left|\partial_g^\alpha Z_N(\beta)\right|
+  \leq (|\beta|\sigma_N)^r\E Z_N(\beta)
+  =t_N^{r/2}\E Z_N(\beta).
+\]
+Since $\E Z_N(\beta)>0$, it follows that
 \begin{align}
   \norm{P_r Y_N(\beta)}_2^2
-  &=\frac1{\mathbb E Z_N(\beta)^2}
+  &=\frac1{(\E Z_N(\beta))^2}
     \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
     \frac1{\alpha!}
-    \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \notag\\
-  &\leq t_N^r
+    \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \leq t_N^r
     \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
     \frac1{\alpha!}.
   \label{eq:Hermite-Rademacher-bound}
 \end{align}
-By the first assertion of Lemma~\ref{lem:Rademacher-encoding}, namely
-\eqref{eq:even-sum-Rademacher-moment}, summing
+By Lemma~\ref{lem:Rademacher-encoding}, summing
 \eqref{eq:Hermite-Rademacher-bound} over all $r\geq3$ yields
 \begin{align}
   \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
@@ -385,29 +424,27 @@ By the first assertion of Lemma~\ref{lem:Rademacher-encoding}, namely
   \frac{t_N^3}{6}
   \E_\varepsilon\!\left[
     |S_{N,q}|^3e^{t_N|S_{N,q}|}
-  \right].
+  \right],
   \label{eq:all-higher-chaoses-at-once}
 \end{align}
-Here the second inequality uses
+where the second inequality uses
 $|\E_\varepsilon[S_{N,q}^r]|\leq
-\E_\varepsilon[|S_{N,q}|^r]$, and the last one uses
+\E_\varepsilon[|S_{N,q}|^r]$, and the last inequality uses
 $\sum_{r\geq3}u^r/r!\leq u^3e^u/6$ for $u\geq0$.
 Choose
 \begin{equation*}
-  \beta_{\rm Rad}
+  \beta_{\rm r}
   :=\sqrt{\frac{c_q}{(q-1)!}},
 \end{equation*}
 where $c_q$ is the constant in Lemma~\ref{lem:Rademacher-encoding}.  If
-$|\beta|<\beta_{\rm Rad}$, then
-$t_N\leq c_qN^{-(q-1)}$.  Therefore the second assertion of
-Lemma~\ref{lem:Rademacher-encoding}, namely
-\eqref{eq:Rademacher-exponential-moment}, together with
-\eqref{eq:all-higher-chaoses-at-once} imply
+$|\beta|<\beta_{\rm r}$, then
+$t_N\leq c_qN^{-(q-1)}$.  Therefore the second claim of
+Lemma~\ref{lem:Rademacher-encoding}, together with
+\eqref{eq:all-higher-chaoses-at-once}, implies 
 \begin{align*}
   \sum_{r\geq3}\norm{P_r Y_N(\beta)}_2^2
   &\leq C_{q,\beta}
-  N^{-3(q-1)}N^{3q/2} \\
-  &=C_{q,\beta}N^{-3(q/2-1)}.
+  N^{-3(q-1)}N^{3q/2}=C_{q,\beta}N^{-3(q/2-1)}.
 \end{align*}
 Since $q\geq4$, we have $3(q/2-1)>q-2$, which completes the proof.
 \end{proof}

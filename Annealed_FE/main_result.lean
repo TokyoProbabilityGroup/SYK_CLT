@@ -31,29 +31,6 @@ open scoped BigOperators ComplexConjugate NNReal
 namespace SYK
 namespace AnnealedFE
 
-/-! ## Annealed input for the Gaussian CLT -/
-
-/-- The annealed free-energy proposition, with a common radius and limit for
-the model families under consideration. `meanPartition s β n` is
-`E Z_N(β)` and `size s n` is `N`. -/
-structure AnnealedFreeEnergyLimit (q : ℕ) (ι : Type*)
-    (size : ι → ℕ → ℕ) (meanPartition : ι → ℝ → ℕ → ℝ) where
-  βFE : ℝ
-  βFE_pos : 0 < βFE
-  ℓ : ℝ → ℝ
-  analytic : AnalyticOnNhd ℝ ℓ (Set.Ioo (-βFE) βFE)
-  even : ∀ β ∈ Set.Ioo (-βFE) βFE, ℓ (-β) = ℓ β
-  pressure_limit : ∀ s, TendstoLocallyUniformlyOn
-    (fun n β ↦ Real.log (meanPartition s β n) / (size s n : ℝ))
-    ℓ atTop (Set.Ioo (-βFE) βFE)
-  derivative_limit : ∀ s, TendstoLocallyUniformlyOn
-    (fun n β ↦ deriv (fun b ↦ Real.log (meanPartition s b n)) β / (size s n : ℝ))
-    (deriv ℓ) atTop (Set.Ioo (-βFE) βFE)
-  pressure_expansion :
-    (fun β ↦ ℓ β - β ^ 2 / (2 * (q : ℝ))) =O[𝓝 0] (fun β ↦ β ^ 4)
-  derivative_expansion :
-    (fun β ↦ deriv ℓ β - β / (q : ℝ)) =O[𝓝 0] (fun β ↦ β ^ 3)
-
 /-! ## Finite Rademacher SYK model -/
 
 /-- Physical sizes tend to infinity through the even integers starting at `q`. -/

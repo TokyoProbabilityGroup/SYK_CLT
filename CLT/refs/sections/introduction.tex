@@ -75,6 +75,9 @@ Moreover, $\ell_p(\beta)$ is differentiable\footnote{\textcolor{red}{In which pa
 \begin{theorem}
 \label{thm:partition-clt}
 There exists $\beta_q\in (0,\tilde{\beta}_q]$\footnote{\textcolor{red}{What is $\tilde{\beta}_q$? This is unspecified.}} such that for any $\beta\in (-\beta_q,\beta_q)$,
+{
+}
+There exists $\beta_q\in (0,\infty)$ such that for any $\beta\in (-\beta_q,\beta_q)$,
  \begin{equation}\label{eq:scaled-relative-clt}
   N^{q/2-1}\left(Y_N(\beta)-1\right)
   \Longrightarrow
@@ -124,10 +127,9 @@ so both the test function and its derivative depend on \(N\). Therefore, their f
 Rigorous results on the high-temperature annealed and quenched free-energy limits were recently obtained in \cite{GPSZ2026}. More recently, He \cite{He2026} identified the fixed-temperature free-energy limit of the Gaussian SYK model with the Schwinger--Dyson pressure and used this result to determine the spectral edge. These works focus on the leading-order behavior of the free energy, while the purpose of this paper is to study its leading fluctuations in the high-temperature regime.
 Feng, Tian, and Wei \cite{FTW2018} proved a central limit theorem for linear eigenvalue statistics of the Gaussian SYK Hamiltonian. Their result applies to a fixed test function \(f\), under suitable regularity assumptions on \(f\) and \(f'\). In their normalization, however, the partition function corresponds to
 \[
-f_{N,\beta}(x):=e^{-\beta\tau_N x},
-\qquad \tau_N\asymp\sqrt{N},
+f_{N,\beta}(x):=e^{-\beta\sqrt{N} x},
 \]
-so both the test function and its derivative depend on \(N\). Therefore, their fixed-test-function theorem does not apply directly to \(Z_N(\beta)\).}
+so both the test function and its derivative depend on \(N\). Therefore, their theorem does not apply directly to \(Z_N(\beta)\).
 
 
 \subsection{Outline of the proof}
@@ -187,7 +189,8 @@ independent centered variables.  The main task is to prove
   \norm{\mathcal R_N(\beta)}_2^2=o(N^{-(q-2)}),
 \]
 which is done in Section~\ref{sec:Rademacher-remainder}.  The proof uses a combinatorial argument to bound the number of terms in the higher-order chaoses, together with a Duhamel derivative bound to control the size of each term.  
-Moreover, the annealed free-energy results proved in \cite{He2026} and convexity imply
+
+Moreover, the annealed free energy results proved in \cite{He2026} and convexity imply
 \[
   \frac{A_N(\beta)}N
   \longrightarrow \frac{\beta}{2}\ell_q'(\beta).

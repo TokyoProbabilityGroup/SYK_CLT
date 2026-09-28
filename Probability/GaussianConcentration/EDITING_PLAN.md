@@ -2,7 +2,7 @@
 
 ## 担当範囲
 
-この文書は、このディレクトリの `StandardGaussian.lean`、`Smooth.lean`、`Lipschitz.lean` の構成・証明・検証の細目を管理する。数学的規約と公開 API は [AGENTS.md](AGENTS.md) に従う。
+この文書は、このディレクトリの `StandardGaussian.lean`、`Smooth.lean`、`Lipschitz.lean` の構成・証明・検証の細目を管理する。F01 で共有するガウス解析もここで管理する。数学的規約と公開 API は [AGENTS.md](AGENTS.md) に従う。
 
 全体の実行順序、状態、ファイル別の非同期実行の可否は [全体計画](../../EDITING_PLAN.md) を参照する。W02 はこの基盤だけでなく、Model の測度接続、SuperConcentration の利用側移行、Blueprint の更新を含む。ここでは他ディレクトリの編集を重複管理しない。
 
@@ -21,30 +21,28 @@
 
 担当部分の完了条件：3ファイルが依存順に検査され、定理文と推移的な import に SYK 固有のデータが現れず、正の `L` と `L=0` の結果が揃っている。独立した外部パッケージや `lean_lib` は作らない。移行元の整理は [SuperConcentration の W02](../../SuperConcentration/EDITING_PLAN.md#w02) が担当する。
 
+<a id="f01"></a>
+
+## F01：ガウス部分積分の共有基盤
+
+W02 の完了状態は維持する。2026-09-26、`pi_gaussian_stein_coord` の選択座標化と一般部分積分・両辺の可積分性は検証済みとなった。F01-G で高階の汎用部分を `Smooth.lean` へ移し、個別 Lean 検査、主要宣言の公理依存検査、CLT の関連 Lake ビルドを行った。F01 全体も完了した。以前の検証根拠は [ガウス部分積分の記録](../../WORK_HISTORY.md#clt-f01-gaussian) と [統合監査](../../WORK_HISTORY.md#clt-w06) を参照する。
+
+CLT 原稿の `lem:Gaussian-Hermite-IBP` に必要な模型から独立した部分を共有層の `Smooth.lean` に置く。SpinGlass の対象コミット・候補補題・Lean/mathlib の版差は [CLT の構造文書](../../CLT/ARCHITECTURE.md#依存関係と実装の分担)に集約する。対象補題の依存関係と配置後の互換性を検証し、上流の証明が存在するだけで移植先を証明済みとしない。着手順序は全体計画に従う。
+
+- [x] `StandardGaussian.lean` の `gaussianReal_stein` および `pi_gaussian_stein_coord` と、SpinGlass の一次元定理文・仮定・規格化を比較した。原稿は分散1であり、既存の証明を再利用するため、上流コードは移植しない。
+- [x] SpinGlass の `HasExpGrowth` と可積分性補題を確認した。今回の共有部分は既存の指数増大評価と可積分性で検査でき、上流コードを複製していない。
+- [x] 高階の一次元部分積分と有限個の独立座標への反復を `Smooth.lean` へ移した。原稿の `η ≤ α` の成長仮定と選択座標だけの条件を維持し、Lean の個別検査を行った。
+
+共有基盤の成果は、必要な正則性・成長条件を明示した汎用補題までとする。`Z_N` への特殊化は F04 の評価を受け取って CLT 側で行い、共有基盤の完了条件には含めない。エルミート展開の完全性・直交射影も [CLT の計画](../../CLT/EDITING_PLAN.md#formalization)で管理する。
+
+F01-G では公開宣言と CLT の利用箇所を照合して共有配置へ移した。`IBPFamily` は一般部分と共に移し、それより前の独立した証明は CLT ファイルに残す。参照調査だけを根拠に大きな証明部分を削除しない。検査の結果は [F01-G](../../CLT/EDITING_PLAN.md#ticket-f01-g) に置く。
+
+完了条件：共有する宣言の定理文を原稿・既存 API・流用元と照合し、変更した Lean ファイルの個別検査、必要な最小ビルド、主要宣言の `#print axioms` を行う。公開 API が Model・CLT へ逆向きに依存しないことと、既存の集中評価を壊していないことを確認する。F01 全体の完了判定は [CLT の計画](../../CLT/EDITING_PLAN.md#formalization)に従う。
+
 ## 検証と記録
 
 各ファイルをワークスペースのルートから依存順に `lake env lean` で検査する。後続ファイルが import するモジュールは、次へ進む前に `lake build +<module>:olean` で成果物を生成する。3ファイルを検査した後に `lake build SYK` を実行する。公開 MGF のパラメータが正確に `L^2` であること、裾の定数、零の場合の処理、主要定理の `#print axioms` と残る仮定を確認する。新しい `sorry`、`admit`、`axiom` は許容しない。
 
-対象コミット・差分、コマンド、結果、警告、未解決事項をこの節に記録する。W02 全体には接続後の `lake build Model SuperConcentration` と Blueprint の編集・宣言参照の照合を含む。Verso 休止中は機械的な Blueprint 検証を要求しない。
+対象コミット・差分、コマンド、結果、警告、未解決事項を検査時に記録し、現行の結論と残作業を該当節へ反映する。詳しい完了記録は [作業履歴](../../WORK_HISTORY.md#gaussian-foundation) に置く。W02 全体には接続後の `lake build Model SuperConcentration` と Blueprint の編集・宣言参照の照合を含む。Verso 休止中は機械的な Blueprint 検証を要求しない。
 
-2026-09-08 の文書再構成ではソースの配置と旧計画を照合しただけであり、この基盤の実装や Lean の再検証は行っていない。
-
-### 2026-09-11：検証環境の判断待ち
-
-対象は `e38b47ab56bc0d0aa7449452a8377ee67838a644`。着手時の作業ツリーは変更なし。関連する規約、W02 の各詳細計画、旧4ファイルの宣言と参照を調査した。既存の正の `L` の証明を任意の有限型のまま移設し、零の場合を追加する方針である。実装変更・ファイル移設・Lean の証明検査はまだ行っていない。
-
-実際の親ディレクトリ `C:/Users/Public/Github/Lean` の `lakefile.lean` と `lake-manifest.json` は mathlib 4.32.1、`lean-toolchain` は Lean 4.32.1 を指定する。一方、このリポジトリの `workspace/` はコピー用テンプレートであり、Lean/mathlib 4.32.2 と VersoBlueprint を指定する。実際の親には VersoBlueprint、`Model`・`SuperConcentration` の個別ターゲット、`SYK.lean`・`SYKMain.lean` がない。他の研究ライブラリが登録されているため、テンプレートの上書きは行わない。テンプレートのディレクトリで `lake --version` を実行し、Lean 4.32.2 の実行可能性だけは確認した。これはソースや依存パッケージの検証ではない。
-
-必要な判断は、他課題の設定を保持した共有環境の更新を許可するか、SYK 用の別ワークスペースと依存キャッシュの作成を許可するかである。後者なら共有環境の既存依存を更新せずに、テンプレートどおりの検証が可能になる。いずれも `workspace/AGENTS.md` の依存設定変更・別ワークスペース作成に関する規則により明示的な承認を必要とする。
-
-再開地点：承認された方法で検証環境を整え、`StandardGaussian.lean` の測度・可積分性の抽出から開始する。各層の個別検査を通した後、Model・利用側・Blueprint を移行し、所定のビルド、公理依存、定数と仮定の照合を行う。過去の成功記録を今回の環境での成功として扱わない。
-
-### 2026-09-11から2026-09-12：実装と統合検証
-
-対象は `580792710437fb4b5c02c80aaaada0fee2acca85`。着手時の作業ツリーは変更なし。旧4ファイルを目標の3ファイルへ移し、名前空間を `SYK.GaussianConcentration` に変更した。汎用3ファイルの import と宣言には Model・SuperConcentration・`N`・`q`・`CouplingSpace` が現れない。公開 MGF 定理は `L ≥ 0` の下でパラメータ `Real.toNNReal (L^2)` を与え、正の `L` では上下・両側の裾を `exp (-t^2/(2L^2))` とその2倍で評価する。`L=0` では関数の定数性を証明し、MGF と上下・両側の空事象を別に処理した。
-
-`StandardGaussian.lean`、`Smooth.lean`、`Lipschitz.lean` は依存順の `lake env lean` に成功し、各 `+SYK.Probability.GaussianConcentration.<module>:olean` も成功した。主要な測度、MGF、正の `L` の両側評価、零の場合の両側評価は `#print axioms` で `propext`、`Classical.choice`、`Quot.sound` のみに依存した。移設元由来の未使用 `simp` 引数、deprecated 名、`ring_nf` の提案などの warning は残る。新しい `sorry`、`admit`、`axiom` はない。
-
-最初の `lake build SYK` は、親ワークスペースで `lakefile.lean` が `lakefile.toml` より優先され、既定範囲外の `Annealed_FE` と親環境にない Verso モジュールまで含めたため失敗した。承認後、親の `lakefile.lean` に `Model`、`SuperConcentration`、`CLT` の個別ターゲットと VersoBlueprint 4.32.0 を追加し、mathlib を4.32.2へ揃えた。`lake build Model SuperConcentration` は3194 jobs、`lake build SYK` は3553 jobsで成功した。汎用3層、`SYK.SuperConcentration.Main`、`SYK.Chapters.GaussianConcentration` の明示的な olean ターゲットも成功している。
-
-Verso 4.32.0 は Windows 上で同梱検索資産の相対接頭辞を除けず、Blueprint 生成時に出力先の外を指すパスを作る。このため `BlueprintMain.lean` に Windows 限定の準備とコピーを追加した。所定の直接生成コマンドは成功し、`lake exe vbp check --site SYK/_out/site` は manifest と HTML cache が各52件、エラー0件で成功した。これは当時の Windows 共同研究環境の記録であり、現在の各ワークスペースへの設定適用を意味しない。既存の未使用 `simp` 引数、deprecated 名、`ring_nf` の提案、Model の不足 docstring、VersoBlueprint の universe warning は残る。`aesop`・`grind` を使う既存証明の整理は W02 後の保守課題である。
+過去の移設・検証経緯は [作業履歴](../../WORK_HISTORY.md#gaussian-foundation) に保存した。

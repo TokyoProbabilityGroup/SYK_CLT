@@ -8,9 +8,9 @@
 \subsection{Annealed free energy and coefficient asymptotics}
 
 To identify the deterministic coefficient $A_N(\beta)$ in
-\eqref{eq:finite-N-FTW-coefficient}, we use the annealed free-energy limit
-from \cite{He2026}, which holds at every fixed inverse temperature.
-Convexity then gives locally uniform convergence of the first derivatives.
+\eqref{eq:finite-N-FTW-coefficient}, we use the annealed free energy limit
+from \cite{He2026}, which holds at every fixed non-negative $\beta$. 
+Gaussian symmetry extends the claim to negative \(\beta\). 
 
 The following is a standard convergence theorem for convex functions; see
 \cite[Theorems~10.8 and~25.7]{Rockafellar1970}.
@@ -68,8 +68,13 @@ and hence
 \]
 Therefore, $h_N'\to h'$ uniformly on $[a,b]$. 
 
-By the mean value theorem, we also have that $h_N\to h$ uniformly
-on $[a,b]$.
+For $x\in[a,b]$, the mean value theorem gives
+\[
+ |h_N(x)-h(x)|
+ \leq |h_N(a)-h(a)|
+ +(b-a)\sup_{y\in[a,b]}|h_N'(y)-h'(y)|.
+\]
+Taking the supremum over $x\in[a,b]$, the right-hand side tends to zero.
 \end{proof}
 \begin{proposition} \label{prop:annealed-free-energy}
     There exists an even convex function $\ell_q\in C^1(\mathbb R)$ such that,
@@ -102,21 +107,20 @@ on $[a,b]$.
 \end{proposition}
 
 \begin{proof}
-    We first record the normalization used in \cite{He2026}.  Set
+  We use the normalization from \cite{He2026}.   Note that the paper also uses the normalized trace. Set
     \begin{equation*}
         H_N^{\rm He}:=2^{-q/2}H_N,
         \qquad
         p_{N,q}^{\rm He}(s):=\frac1N\log\E\tr e^{sH_N^{\rm He}}.
     \end{equation*}
-   Note that the paper also uses the normalized trace.  Since $G$ and $-G$ have the
+    Since $G$ and $-G$ have the
     same law and $H_N(-G)=-H_N(G)$, for every $\beta\in\mathbb R$,
     \begin{equation} \label{eq:He-normalization-conversion}
         \frac1N\log\E Z_N(\beta)
         =\frac1N\log\E\tr e^{|\beta|H_N}
         =p_{N,q}^{\rm He}(2^{q/2}|\beta|).
     \end{equation}
-    Writing $p_q:=p_{{\rm SD},q}$ for the Schwinger--Dyson pressure in
-    \cite{He2026}, \cite[Theorem~1.1 and Proposition~3.3]{He2026} give
+    Writing $p_q:=p_{{\rm SD},q}$ for the Schwinger--Dyson pressure, \cite[Theorem~1.1 and Proposition~3.3]{He2026} give
     \begin{equation*}
         p_{N,q}^{\rm He}(s)\longrightarrow p_q(s)
         \quad (s>0),
@@ -137,8 +141,7 @@ on $[a,b]$.
     \eqref{eq:He-normalization-conversion}, together with $Z_N(0)=1$,
     proves pointwise convergence in \eqref{eq:annealed-free-energy-limit}.
 
-    We next use the derivative formula in
-    \cite[Proposition~3.3]{He2026}: for any $s>0$, 
+    By the derivative formula in \cite[Proposition 3.3]{He2026}, for any $s>0$, 
     \begin{equation} \label{eq:He-pressure-derivative}
         p_q'(s)=\frac{s}{q}\int_0^1G_{s,q}(u)^q\,\mathrm du.
     \end{equation}
@@ -220,7 +223,8 @@ on $[a,b]$.
         =\frac{\beta^4}{12}.
     \end{equation*}
 This proves 
-    \eqref{eq:ell-quadratic-error} for $\beta>0$. Since $\ell_q$ is even as we proved,  we have the claim for all $\beta\in\mathbb R$.
+    \eqref{eq:ell-quadratic-error} for $\beta>0$. Since \(\ell_q\) is even, the same bound holds for all
+\(\beta\in\mathbb R\). 
 
     The bound \eqref{eq:ell-quadratic-error} implies
     \begin{equation*}
@@ -228,7 +232,7 @@ This proves
         \frac{\ell_q(\beta)-\ell_q(0)}{\beta}=0.
     \end{equation*}
     Hence $\ell_q'(0)=0$.  On $\mathbb R\setminus\{0\}$, the derivative $\ell_q'$ 
-    is continuous by $p_q\in C^1((0,\infty))$ and the chain rule, and is odd
+    is continuous by $p_q\in C^1((0,\infty))$,  and is odd
     by evenness of $\ell_q$.  By \eqref{eq:ell-derivative-bounds},
     \begin{equation*}
         |\ell_q'(\beta)|\leq\frac{|\beta|}{q},
@@ -238,7 +242,7 @@ This proves
     \eqref{eq:ell-quadratic-error} give \eqref{eq:ell-small-beta}, and
     oddness of $\ell_q'$ gives $\beta\ell_q'(\beta)>0$ for $\beta\neq0$.
 
-    It remains to prove convexity and the two local-uniform convergences.
+It remains to prove convexity. 
     Set
     \begin{equation*}
         F_N(\beta):=\E Z_N(\beta),
@@ -318,7 +322,6 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$ and the strict positivity
 $\beta\ell_q'(\beta)>0$ give \eqref{eq:standardized-clt}.
 \end{proof}
 
-\footnote{SN: The following is a revised proof}
 \begin{proof}[Proof of Corollary~\ref{cor:free-energy-clt}]
 The case $\beta=0$ is trivial, so assume $\beta\neq0$.  Set
 \[
@@ -367,18 +370,18 @@ where
 \[
 c_N=\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{\sqrt{2M_N}}= O(N^{-a}),\quad S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\mathcal I_N}(g_I^2-1)
 ,\quad
-\|\mathcal R_N\|_2^2=O(N^{-3a})
+\|\mathcal R_N\|_2^2=o(N^{-2a})
 \]
-by Proposition~\ref{prop:higher-chaos-closure}. 
-We note that 
-\[
-\sup_N \E S_N^4<\infty.
-\]  Orthogonality therefore
+by Proposition~\ref{prop:higher-chaos-closure}. Orthogonality therefore
 gives
 \[
-\E(Y_N-1)^2=O(N^{-2a}).
+\E(Y_N-1)^2=c_N^2 \mathbb E[S_N^2] + \mathbb E[\mathcal R_N^2]= O(N^{-2a}).
 \]
-On the other hand, we estimate
+On the other hand, we note that 
+\[
+\sup_N \E S_N^4<\infty.
+\]  
+Hence, we estimate
 \begin{align*}
 \mathbb P(Y_N<1/2)
 &\le
@@ -389,14 +392,14 @@ On the other hand, we estimate
 C c_N^4\E S_N^4
 +
 C\|\mathcal R_N\|_2^2\\
-&=O(N^{-3a}).
+&=o(N^{-2a}).
 \end{align*}
 
-Next we will prove that 
+We claim that 
 \[
 Z_N(\beta;G)\ge1.
 \]
-Choose $x\in I$. 
+To this end, fix \(I\in\mathcal I_N\) and choose \(x\in I\). 
 The unitary $U_x$ from Lemma~\ref{lem: parity rule lemma} satisfies
 \[
 U_x\psi_IU_x^*=-\psi_I,
@@ -461,19 +464,14 @@ h(Y_N)\mathbf 1_{\{Y_N<1/2\}}
 \right]
 &\le
 O(N)\,\mathbb P(Y_N<1/2)=
-O(N^{1-3a}).
+o(N^{1-2a})
+=o(N^{-a}).
 \end{align*}
-Since $q\ge4$, we have $a\ge1$, and hence
-\(
-1-3a\le-2a.
-\) 
 Consequently,
 \[
 0\le-\E W_N
 =
-O(N^{-2a})
-=
-O(N^{2-q})
+O(N^{-2a})+o(N^{-a})
 =
 o(N^{-a}).
 \]
@@ -490,316 +488,4 @@ N^{q/2-1}
 \right).
 \]
 \end{proof}
-\iffalse
-{\color{blue} 
-\begin{lemma}\footnote{SN: I think we can remove the blue.}
-  Write 
-  \begin{equation*}
-    W_N \coloneqq \log Y_N(\beta).
-  \end{equation*}
-  Then, for $\beta\neq0$ and any $\lambda, t > 0$,
-  \begin{align}
-    \mathbb P\!\left(W_N - \E W_N < -t \right)
-    &\leq \exp\left(-\frac{qt^2}{2\beta^2}\right),
-    \label{eq:centered W_N tail}\\
-    \E\exp\!\left(\lambda(W_N - \E W_N)\right) 
-    &\leq \exp\!\left(\frac{\lambda^2 \beta^2}{2q}\right).
-    \label{eq:centered W_N exp}
-  \end{align}
-\end{lemma}
-
-\begin{proof}
-To apply the Gaussian concentration
-  inequality, we view $Z_N(\beta;G)$ as a function of
-  $G := (g_I)_{I \in \calI_N}$ and establish the Lipschitz bound for $W_N$.
-  Fix $I \in \calI_N$.
-  By the one-variable Duhamel formula \eqref{eq:one-variable-Duhamel-formula},
-  we deduce that 
-  \begin{align*}
-    \partial_{g_I} Z_N 
-    &= 
-    \tr \partial_{g_I} e^{-\beta H_N(G)}\\
-    &=
-    -\beta     
-    \tr \!\left( \partial_{g_I} H_N(G) \cdot e^{-\beta H_N(G)} \right)\\ 
-    &=
-    -\beta \sigma_N \tr\bigl( e^{-\beta H_N} \psi_I \bigr).
-  \end{align*}
-  Write $\langle \cdot \rangle_G$ 
-  for the expectation with respect to the normalized Gibbs state,
-  i.e.,
-  \begin{equation*}
-    \langle A \rangle_G
-    \coloneqq 
-    \frac{\tr(A e^{-\beta H_N(G)})}{Z_N(\beta;G)}.
-  \end{equation*}
-  Then we obtain 
-  \begin{equation} \label{eq:GC1}
-    \partial_{g_I} W_N = -\beta \sigma_N \langle \psi_I \rangle_G.
-  \end{equation}
-  Fix an arbitrary subset $S \subseteq [N]$ with $|S| = q-1$.
-  Set $A_i \coloneqq \psi_{S \cup \{i\}}$ for each $i \notin S$.
-  Note that, by the relation $\{\psi_i, \psi_j\} = 2\delta_{ij} \I$,
-  it holds that   
-  \begin{equation} \label{eq:A_i relation}
-    A_i^2 = \I,
-    \qquad 
-    A_i A_j + A_j A_i = 0 \quad \text{if}\quad i \neq j.
-  \end{equation}
-  This yields 
-  \begin{equation*}
-    \left(\sum_{i \notin S} \langle A_i \rangle_G A_i\right)^2
-    = 
-    \sum_{i \notin S}  \langle A_i \rangle_G^2 A_i^2
-    +
-    \sum_{\substack{i,j \notin S \\ i < j}}
-    \langle A_i \rangle_G \langle A_j \rangle_G
-    (A_iA_j + A_j A_i) 
-    = 
-    \sum_{i \notin S}  \langle A_i \rangle_G^2 \I.
-  \end{equation*}
-  If we write $\|\cdot\|$ for the operator norm,
-  then, by \eqref{eq:A_i relation},
-  we obtain 
-  \begin{equation*}
-    \left\|\left(\sum_{i \notin S} \langle A_i \rangle_G A_i\right)^2\right\|
-    = 
-    \sum_{i \notin S}  \langle A_i \rangle_G^2.
-  \end{equation*}
-  Since $A_i$ is self-adjoint,
-  it follows that 
-  \begin{equation} \label{eq:GC2}
-    \left\| \sum_{i \notin S} \langle A_i \rangle_G A_i \right\| 
-    = \sqrt{\sum_{i \notin S}  \langle A_i \rangle_G^2}.
-  \end{equation}
-  On the other hand, H\"{o}lder's inequality for Schatten norms yields 
-  \begin{equation} \label{eq:GC3}
-    \left\langle \sum_{i \notin S} \langle A_i \rangle_G A_i \right\rangle_G 
-    \leq
-    \left\| \sum_{i \notin S} \langle A_i \rangle_G A_i \right\|.
-  \end{equation}
-  Since the left-hand side equals $\sum_{i \notin S} \langle A_i \rangle_G^2$,
-  we deduce from \eqref{eq:GC2} and \eqref{eq:GC3} that 
-  \begin{equation} \label{eq:GC4}
-    \sum_{i \notin S} \langle A_i \rangle^2 \leq 1.
-  \end{equation}
-  For each $I \in \calI_N$,
-  there exist exactly $q$ subsets $S \subseteq [N]$ satisfying $I = S \cup \{i\}$.
-  Hence,
-  \begin{equation*}
-    \sum_{\substack{S \subseteq [N]\\ |S| = q-1}} 
-    \sum_{i \notin S} 
-    \langle \psi_{S \cup \{i\}}\rangle_G^2 
-    = 
-    q \sum_{I \in \calI_N} \langle \psi_I\rangle_G^2.
-  \end{equation*} 
-  This, combined with \eqref{eq:GC4}, yields 
-  \begin{equation*}
-    \sum_{I \in \calI_N} \langle \psi_I \rangle_G^2
-    \leq 
-    \frac{1}{q} 
-    \sum_{\substack{S \subseteq [N]\\ |S| = q-1}} 1 
-    = 
-    \frac{1}{q} \binom{N}{q-1}
-    \leq    
-    \frac{N^{q-1}}{q!}.
-  \end{equation*}
-  From this and \eqref{eq:GC1}, we deduce that 
-  \begin{equation*}
-    \left\| \nabla W_N \right\|_2^2 
-    \leq
-    \frac{\beta^2 \sigma_N^2 N^{q-1}}{q!}
-    = 
-    \frac{\beta^2}{q},
-  \end{equation*}
-  where the last equality follows from the definition of $\sigma_N^2$.
-  This implies that $W_N(G)$ is $|\beta|/\sqrt q$-Lipschitz as a function of $G = (g_I)_{I \in \calI_N}$.
-  Hence, the Gaussian concentration inequality gives the desired result.
-\end{proof}
-
-\begin{proof}[Proof of Corollary~\ref{cor:free-energy-clt}]
-The case $\beta=0$ is trivial, so assume $\beta\neq0$.
-Put
-\[
-  a:=\frac q2-1,\qquad
-  W_N:=\log Y_N(\beta).
-\]
-It then holds that 
-\begin{align*}
-  \log Z_N - \E\log Z_N 
-  &=
-  (\log Z_N - \log \E Z_N) + (\log \E Z_N - \E \log Z_N)\\
-  &=
-  W_N - \E W_N\\
-  &= 
-  \bigl(W_N-(Y_N(\beta)-1)\bigr)
-  +(Y_N(\beta)-1)-\E W_N,
-\end{align*}
-which yields 
-\begin{equation*}
-  N^a(\log Z_N - \E \log Z_N)
-  =
-  N^a\bigl(W_N-(Y_N(\beta)-1)\bigr)
-  +N^a(Y_N(\beta)-1)-N^a \E W_N.
-\end{equation*}
-By Theorem~\ref{thm:partition-clt},
-we have 
-\begin{equation} \label{eq:cor1}
-    N^a(Y_N(\beta)-1)
-    \Longrightarrow
-    \sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta)\,\xi.
-\end{equation}
-Let $C_0 \in (0,\infty)$ be such that 
-$|\log (1+x) - x| \leq C_0x^2$ for all $x \in [-1/2, 1/2]$.
-Since $W_N = \log Y_N(\beta)=\log(1+(Y_N(\beta)-1))$,
-it follows that 
-\begin{equation*}
-  \E \bigl[ 1 \wedge (N^a|W_N-(Y_N(\beta)-1)|) \bigr]
-  \leq
-  \E \bigl[ 1 \wedge (C_0 N^a|Y_N(\beta)-1|^2) \bigr]
-  + 
-  \mathbb P(|Y_N(\beta)-1| > 1/2).
-\end{equation*}
-By \eqref{eq:cor1},
-$|Y_N(\beta)-1| \xrightarrow{\mathrm{p}} 0$ and
-$(N^a |Y_N(\beta)-1|)_{N \geq 1}$ is tight.
-Thus, 
-the right-hand side of the above inequality converges to $0$ as $N \to \infty$.
-Hence, $N^a(W_N-(Y_N(\beta)-1)) \xrightarrow{\mathrm{p}} 0$.
-Therefore, it suffices to show that $\E W_N = o(N^{-a})$.
-% To this end,
-% we first establish a Lipschitz bound for $G\mapsto W_N(G)$.  
-% Thus $W_N=\log(1+(Y_N-1))$, and Theorem~\ref{thm:partition-clt} gives
-% We claim that
-% \begin{equation}\label{eq:log-centering-negligible}
-%   \E W_N=o(N^{-(q/2-1)}).
-% \end{equation}
-% Differentiation gives
-% \[
-%   \partial_{g_I}W_N
-%   =-\beta\sigma_N\langle\psi_I\rangle_{\beta,g}.
-% \]
-% For each $(q-1)$-set $S$, the operators
-% $(\psi_{S\cup\{i\}})_{i\notin S}$ are pairwise anticommuting Hermitian
-% involutions.  If $A_1,\ldots,A_m$ are any such operators and
-% $a_j=\langle A_j\rangle$ in a state, set $B=\sum_j a_jA_j$ and
-% $s=\sum_j a_j^2$.  Pairwise anticommutation gives
-% \[
-%   B^2=s\I,
-%   \qquad
-%   s=\langle B\rangle\leq\norm{B}=\sqrt{s},
-% \]
-% and hence $s\leq1$.  Applying this observation for each $S$ and noting that
-% every $I\in\calI_N$ is counted exactly $q$ times yields
-% \[
-%   \sum_{I\in\calI_N}|\langle\psi_I\rangle_{\beta,g}|^2
-%   \leq \frac1q\binom N{q-1}.
-% \]
-% Consequently,
-% \[
-%   \sum_{I\in\calI_N}|\partial_{g_I}W_N|^2
-%   \leq
-%   \frac{\beta^2\sigma_N^2}{q}\binom N{q-1}
-%   \leq\frac{\beta^2}{q}.
-% \]
-% Writing $\mu_N=\E W_N$, the Gaussian concentration inequality therefore
-% implies, for every $\lambda\in\mathbb R$,
-% \begin{equation}\label{eq:WN-subgaussian}
-%   \E e^{\lambda(W_N-\mu_N)}
-%   \leq \exp\left(\frac{\lambda^2\beta^2}{2q}\right).
-% \end{equation}
-
-We first claim that 
-\begin{equation} \label{eq:EWN range}
-  -\frac{\beta^2}{2q}\leq \E W_N\leq0.
-\end{equation}
-Indeed, the upper bound follows from Jensen's inequality,
-while the lower bound follows from \eqref{eq:centered W_N exp} with $\lambda=1$ and the identity $\E e^{W_N}=1$.
- By Theorem~\ref{thm:partition-clt},
-\begin{equation} \label{eq:deltaN asymp}
-  \delta_N^2 := \E (Y_N(\beta)-1)^2= O(N^{-(q-2)}).
-\end{equation}
-Henceforth, we consider sufficiently large $N$ so that $\delta_N \leq e^{-1}$.
-Since $e^{W_N}-1=Y_N(\beta)-1$,
-Markov's inequality implies that for any $t\geq 1$, 
-\begin{equation} \label{eq:W_N tail1}
-  \mathbb P(W_N<-t)
-  \leq \frac{\delta_N^2}{(1-e^{-t})^2}
-  \leq C \delta_N^2.
-\end{equation}
-
-On the other hand, 
-by $-\E W_N \leq K_\beta:= \beta^2/(2q)$ due to \eqref{eq:EWN range} and \eqref{eq:centered W_N tail}, for any $t>K_\beta$,
-\begin{equation} \label{eq:W_N tail2}
-  \mathbb P(W_N<-t)
-  \leq
-  \exp\left(-\frac{q(t-K_\beta)^2}{2\beta^2}\right).
-\end{equation}
-Set
-\[
-  T_N:=\max\left\{
-    1,\,
-    K_\beta+\frac{2|\beta|}{\sqrt q}
-    \sqrt{\log(1/\delta_N)}
-  \right\}.
-\]
-We represent
-\[
-  \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
-  =
-  \mathbb P(W_N<-1)+
-  \int_1^\infty\mathbb P(W_N<-t)\,\mathrm dt.
-\]
-Applying \eqref{eq:W_N tail1} to the first term and the integral over $[1,T_N]$
-and applying \eqref{eq:W_N tail2} to the integral over $(T_N, \infty)$,
-we obtain
-\begin{equation*}
-  \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
-  \leq     
-  C T_N \delta_N^2
-  +
-  \int_{T_N}^\infty \exp\left(-\frac{q(t-K_\beta)^2}{2\beta^2}\right) \mathrm dt.
-\end{equation*}
-By the Gaussian tail bound $\int_a^\infty e^{-t^2} \mathrm dt \leq C e^{-a^2}$ for any $a \geq 0$,
-the second term is bounded by $C \delta_N^2$. 
-Consequently,
-\begin{equation}\label{eq:WN-negative-tail}
-  \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
-  \leq C\delta_N^2\sqrt{\log(1/\delta_N)}.
-\end{equation}
-Now set $h(w):=e^w-1-w$.  
-Note that
-\[
-  h(w)\leq C(e^w-1)^2\quad (w\geq-1),
-  \qquad
-  h(w)\leq |w|\quad (w<-1).
-\]
-This, combined with $e^{W_N} - 1 = Y_N(\beta)-1$ and
-\eqref{eq:WN-negative-tail}, yields
-\begin{equation*}
-  \E h(W_N) 
-  \leq    
-  C\E (Y_N(\beta)-1)^2
-  +\E\bigl[|W_N|\, \mathbf1_{\{W_N<-1\}}\bigr]
-  \leq
-  C\delta_N^2\sqrt{\log(1/\delta_N)}.
-\end{equation*}
-Moreover,
-since $h(W_N) = Y_N(\beta)-1-W_N$ and $\E(Y_N(\beta)-1) = 0$,
-we have $-\E W_N = \E h(W_N)$.
-Therefore, by \eqref{eq:EWN range},
-we deduce that 
-\begin{equation*}
-  0 \leq -\E W_N \leq C\delta_N^2\sqrt{\log(1/\delta_N)}.
-\end{equation*}
-From this and \eqref{eq:deltaN asymp},
-it follows that 
-\[\E W_N
-  =O\!\left(N^{2-q}\sqrt{\log N}\right)
-  =o(N^{-(q/2-1)}),
-\]
-which completes the proof.
-\end{proof}
-}
-\fi
 \end{document}

@@ -6,6 +6,7 @@ import VersoBlueprint.Commands.Summary
 import SYK.Chapters.Model
 import SYK.Chapters.GaussianConcentration
 import SYK.Chapters.SuperConcentration
+import SYK.Chapters.AnnealedFE
 import SYK.Chapters.CLT
 
 set_option linter.mathlibStandardSet false
@@ -16,14 +17,16 @@ open Informal
 
 #doc (Manual) "Formalization Blueprint for the SYK Model" =>
 
-This Blueprint records the mathematical dependencies shared by the finite-dimensional
-SYK model, Gaussian concentration, superconcentration, and the central limit theorem.
+This Blueprint records the finite-dimensional SYK model, Gaussian concentration,
+superconcentration, annealed free energy, and the central limit theorem, with
+their mathematical dependencies.
 It distinguishes declarations already checked by Lean from results that remain to be
 formalized.
 
 {include 0 SYK.Chapters.Model}
 {include 0 SYK.Chapters.GaussianConcentration}
 {include 0 SYK.Chapters.SuperConcentration}
+{include 0 SYK.Chapters.AnnealedFE}
 {include 0 SYK.Chapters.CLT}
 
 {blueprint_graph}

@@ -6,16 +6,16 @@
 
 ## 作業前に読む文書
 
-1. `ARCHITECTURE.md`
-2. `EDITING_PLAN.md`
-3. `../Model/ARCHITECTURE.md`
-4. `../Model/EDITING_PLAN.md`
-5. `README.md`
-6. 二つの証明計画書（過去の資料としてのみ参照する）
+1. `../EDITING_PLAN.md` の指定 ID の一覧行
+2. `EDITING_PLAN.md` の該当する作業節
+3. `ARCHITECTURE.md` と `../Model/ARCHITECTURE.md` の関係する規約・依存関係
+4. 変更対象が Model の共有 API に及ぶ場合は `../Model/EDITING_PLAN.md` の該当節
+5. 公開用の説明を変更する場合は `README.md`
+6. 旧仕様との比較が必要な場合だけ二つの証明計画書
 
-正確な定理文と検証状態は Lean のソースコード、目標設計は `ARCHITECTURE.md` を優先する。作業単位とその前提・状態は `../EDITING_PLAN.md`、細目と検証記録は `EDITING_PLAN.md` を読む。
+正確な定理文と検証状態は Lean のソースコード、目標設計は `ARCHITECTURE.md` を優先する。作業単位とその前提・状態は `../EDITING_PLAN.md`、細目と残作業は `EDITING_PLAN.md` を読む。完了済み作業の詳しい検証記録は必要になった場合だけ [作業履歴](../WORK_HISTORY.md) の該当節を読む。
 
-W02 で移設先の汎用証明を扱う場合は、`../Probability/GaussianConcentration/AGENTS.md` と同じ場所の `EDITING_PLAN.md` も読む。ここでの旧配置整理と利用側移行を、新基盤の証明の完了と混同しない。
+汎用ガウス基盤を変更する場合は、`../Probability/GaussianConcentration/AGENTS.md` と同じ場所の `EDITING_PLAN.md` も読む。
 
 ## 役割の境界
 
@@ -31,8 +31,8 @@ W02 で移設先の汎用証明を扱う場合は、`../Probability/GaussianConc
 
 `β=0` は定数関数として扱い、物理的な密度行列・実対数・裾確率の性質を複素逆温度へ一般化しない。一般スケール `𝒥` は基本 API に含めず、必要なら相互作用係数のスカラー倍から導く。
 
-過去の証明計画書との相違は `EDITING_PLAN.md` の「過去の証明計画書との相違」を確認し、旧記述を根拠に証明や API を後退させない。
+過去の証明計画書との相違は [作業履歴](../WORK_HISTORY.md#super-legacy) の該当節を必要な場合に確認し、旧記述を根拠に証明や API を後退させない。
 
 ## 編集と検証
 
-再設計時には、ファイル名とモジュール名を構成する各部分を `UpperCamelCase` とする。互換性のための別名は作らない。Git コミット `1b5a64cc9860f36876cc30b1a13d66ad4bfe8047` を比較元として現行ファイルを直接改修し、旧実装を併存させる別モジュールや別名前空間は作らない。一度に依存関係の一つの層だけを変更し、各変更ファイルを `lake env lean` で検査する。一つの指示が複数の層を含む場合も、層ごとの検証を通してから次の層へ進む。層の境界をユーザーの再承認や作業終了の境界とはしない。数学的内容を保つ限り、既存の証明スクリプトは重複の除去、mathlib の利用、可読性の改善のために置き換えてよい。最後に `lake build Model SuperConcentration` と主要な定理の `#print axioms` を確認する。証明の未完成箇所を新たに導入することは許容しない。
+一度に依存関係の一つの層だけを変更し、各変更ファイルを `lake env lean` で検査する。一つの指示が複数の層を含む場合も、層ごとの検証を通してから次の層へ進む。層の境界をユーザーの再承認や作業終了の境界とはしない。最後に `lake build Model SuperConcentration` と主要な定理の `#print axioms` を確認する。証明の未完成箇所を新たに導入することは許容しない。

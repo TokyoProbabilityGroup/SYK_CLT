@@ -58,6 +58,31 @@ lake build
 
 Review existing root files before overwriting them. Lake creates `.lake/` locally; do not copy it into this template.
 
+<a id="collaborator-setup"></a>
+
+## Collaborator setup for an assigned task
+
+The task owner should provide the full `SYK` Git commit ID and every uncommitted change needed for the assignment, including untracked files. A clone at the commit alone will not include those changes. From the workspace root, the owner can prepare a patch of tracked changes and list the files that must be transferred separately:
+
+```bash
+git -C SYK rev-parse HEAD
+git -C SYK diff --binary HEAD > syk-worktree.patch
+git -C SYK ls-files --others --exclude-standard
+```
+
+The recipient checks out that commit, applies the supplied patch with `git -C SYK apply ../syk-worktree.patch`, copies any listed untracked files, and confirms the received source before editing:
+
+```bash
+git -C SYK rev-parse HEAD
+git -C SYK status --short
+```
+
+Use the layout above in a dedicated workspace, or compare the four root configuration files with this template when joining an existing shared workspace. Read the root `AGENTS.md`, `SYK/AGENTS.md`, and every `AGENTS.md` on the path to the assigned files. Keep the repository's `.lake/` out of the handoff; Lake creates a local cache at the workspace root. If the existing root configuration has different Lean, mathlib, or other project dependencies, resolve that difference with the workspace owner before building or replacing root files. A matching Git commit does not imply matching Lake dependencies.
+
+Run commands from the workspace root. For a Lean edit, start with `lake env lean SYK/path/to/ModifiedFile.lean`, then build the smallest affected target. Use `lake build` for the final integration check. If an existing `lakefile.lean` takes precedence over the intended TOML configuration, select the reviewed TOML explicitly with `lake -f lakefile.toml ...`; do not silently replace the existing workspace configuration. The active configuration has Verso paused, so do not run the Blueprint renderer or reference checker for an assigned Lean task. A successful build can still contain existing proof placeholders; check the statement and `#print axioms` of each assigned result separately.
+
+The integration owner collects the changed files, exact validation commands and results, remaining assumptions and warnings, and any mismatch with the manuscript. The task-specific scope and handoff prompt are in [`SYK/EDITING_PLAN.md`](../EDITING_PLAN.md#別環境への引き継ぎ).
+
 ## Updating an existing workspace
 
 The root copies are active; the files here are versioned templates. Compare them before applying changes:
@@ -73,7 +98,7 @@ Do not blindly overwrite root files when the workspace contains other projects. 
 
 When migrating from the old layout, review the imports in the root `SYK.lean` and cover the required modules with Lake targets. Compare `SYKMain.lean` with `SYK/BlueprintMain.lean` and preserve local renderer changes. Update the root Lake configuration, then remove the two obsolete root files. Their template copies are no longer distributed. Existing output under the root `_out/site/` is from the old layout and is not used by the new commands.
 
-Run `lake build` for the targets listed in `defaultTargets`. Individual targets such as `lake build Model SuperConcentration CLT` are unchanged. `lake build SYK` checks the shared foundations under `SYK/Probability/`, and their dependencies (Blueprint and chapter modules are temporarily excluded); it does not replace the individual mathematical library targets. CI uses the same `defaultTargets` rather than maintaining a separate list.
+Run `lake build` for the targets listed in `defaultTargets`. Individual targets such as `lake build Model SuperConcentration CLT` are unchanged. `lake build SYK` checks the shared foundations under `SYK/Probability/`, and their dependencies (Blueprint and chapter modules are temporarily excluded); it does not replace the individual mathematical library targets. CI uses the same `defaultTargets` rather than maintaining a separate list. `Annealed_FE` and `Universality` are temporarily excluded as targets. `CLT.Main` does not import `Annealed_FE.main_result`, so a successful default build does not validate either excluded library. Existing proof placeholders remain; a successful build does not certify the completed mathematical results.
 
 After restoring Verso, uncomment and use the `lake lean` renderer command shown above, followed by `lake exe vbp check --site SYK/_out/site`. Lake builds the renderer's imports automatically. This explicitly selects the repository's renderer because the installed `vbp build` only discovers root-level entry points. Generated output stays under `SYK/_out/site/` and is ignored by Git. Append `--pdf` to the renderer command for an optional PDF. See the project README for local serving instructions and the reason for invoking the server separately.
 

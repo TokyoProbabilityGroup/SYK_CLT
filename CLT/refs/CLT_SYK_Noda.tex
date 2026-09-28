@@ -36,11 +36,11 @@ Model}
 Fix an even integer $q\geq4$, and let $Z_N(\beta)$ be the
 partition function of the Gaussian $q$-body Sachdev--Ye--Kitaev model with $N$
 Majorana fermions.  We prove that for all sufficiently small inverse temperatures
-$\beta > 0$, there exists $\rho=\rho(\beta)>0$ such that   
+$\beta > 0$, there exists $\rho=\rho(\beta)>0$ such that
 \[
 N^{q/2 -1}(\log Z_N(\beta)-\E \log Z_N(\beta))
   \Longrightarrow \N(0,\rho^2).
-\]  
+\]
 \end{abstract}
 
 \noindent\emph{Keywords:} Sachdev--Ye--Kitaev model,
@@ -50,33 +50,25 @@ free energy, central limit theorem, Gaussian chaos.
 \noindent\emph{Mathematics Subject Classification (2020):}
 60F05, 60B20, 82B44.
 
+
+
 \subfile{sections/introduction}
 \subfile{sections/gaussian-chaos}
 \subfile{sections/higher-chaoses}
 \subfile{sections/main-results}
-
+\medskip
+\noindent\emph{Statement on the use of AI.}
+The proof of the first main theorem was initially developed with ChatGPT
+5.6 Sol PRO. The authors subsequently checked and revised the proof and
+deduced the second main theorem from the first. The authors used Codex to generate Lean 4 code for verifying their proofs assuming Proposition~\ref{prop:annealed-free-energy}.
 \begin{thebibliography}{99}
 
-\bibitem{SachdevYe1993}
-S.~Sachdev and J.~Ye,
-\newblock Gapless spin-fluid ground state in a random quantum Heisenberg
-magnet,
-\newblock \emph{Phys. Rev. Lett.} 70 (1993), 3339--3342.
-\newblock \href{https://doi.org/10.1103/PhysRevLett.70.3339}
-{doi:10.1103/PhysRevLett.70.3339}.
-
-\bibitem{Kitaev2015}
-A.~Kitaev,
-\newblock A simple model of quantum holography (part 2),
-\newblock \emph{Entanglement in Strongly-Correlated Quantum Matter}, 2015,
-38.
-
-\bibitem{MaldacenaStanford2016}
-J.~Maldacena and D.~Stanford,
-\newblock Remarks on the Sachdev--Ye--Kitaev model,
-\newblock \emph{Phys. Rev. D} 94 (2016), 106002.
-\newblock \href{https://doi.org/10.1103/PhysRevD.94.106002}
-{doi:10.1103/PhysRevD.94.106002}.
+\bibitem{AGK2025}
+E.~R. Anschuetz, D.~Gamarnik, and B.~T. Kiani,
+\newblock Bounds on the ground state energy of quantum $p$-spin Hamiltonians,
+\newblock \emph{Commun. Math. Phys.} 406 (2025), article 232.
+\newblock \href{https://doi.org/10.1007/s00220-025-05412-4}
+{doi:10.1007/s00220-025-05412-4}.
 
 \bibitem{FTW2018}
 R.~Feng, G.~Tian, and D.~Wei,
@@ -84,13 +76,6 @@ R.~Feng, G.~Tian, and D.~Wei,
 \newblock \emph{Random Matrices Theory Appl.} 10 (2021), no.~4, 2150037.
 \newblock \href{https://doi.org/10.1142/S2010326321500374}
 {doi:10.1142/S2010326321500374}.
-
-\bibitem{Zlokapa2026}
-A.~Zlokapa,
-\newblock A rigorous quasipolynomial-time classical algorithm for SYK thermal
-expectations,
-\newblock \href{https://arxiv.org/abs/2604.21089}
-{arXiv:2604.21089v1}, 2026.
 
 \bibitem{GPSZ2026}
 D.~Gamarnik, F.~Pernice, A.~Schmidhuber, and A.~Zlokapa,
@@ -104,12 +89,41 @@ Y.~He,
 \newblock \href{https://arxiv.org/abs/2607.18998}
 {arXiv:2607.18998v3}, 2026.
 
-\bibitem{AGK2025}
-E.~R. Anschuetz, D.~Gamarnik, and B.~T. Kiani,
-\newblock Bounds on the ground state energy of quantum $p$-spin Hamiltonians,
-\newblock \emph{Commun. Math. Phys.} 406 (2025), article 232.
-\newblock \href{https://doi.org/10.1007/s00220-025-05412-4}
-{doi:10.1007/s00220-025-05412-4}.
+\bibitem{Kitaev2015}
+A.~Kitaev,
+\newblock A simple model of quantum holography (part 2),
+\newblock Talk at the KITP program \emph{Entanglement in Strongly-Correlated
+Quantum Matter}, May 27, 2015.
+\newblock \url{https://online.kitp.ucsb.edu/online/entangled15/kitaev2/}.
+
+\bibitem{Macdonald1995}
+I.~ G.~ Macdonald,
+\newblock \emph{Symmetric Functions and Hall Polynomials},
+\newblock 2nd ed.,
+\newblock Oxford Mathematical Monographs,
+\newblock Oxford University Press, Oxford, 1995.
+
+\bibitem{MaldacenaStanford2016}
+J.~Maldacena and D.~Stanford,
+\newblock Remarks on the Sachdev--Ye--Kitaev model,
+\newblock \emph{Phys. Rev. D} 94 (2016), 106002.
+\newblock \href{https://doi.org/10.1103/PhysRevD.94.106002}
+{doi:10.1103/PhysRevD.94.106002}.
+
+
+
+\bibitem{Rockafellar1970}
+R.~T. Rockafellar,
+\newblock \emph{Convex Analysis},
+\newblock Princeton University Press, 1970.
+
+\bibitem{SachdevYe1993}
+S.~Sachdev and J.~Ye,
+\newblock Gapless spin-fluid ground state in a random quantum Heisenberg
+magnet,
+\newblock \emph{Phys. Rev. Lett.} 70 (1993), 3339--3342.
+\newblock \href{https://doi.org/10.1103/PhysRevLett.70.3339}
+{doi:10.1103/PhysRevLett.70.3339}.
 
 \bibitem{S2023}
 D.~W.~Stroock,
@@ -118,6 +132,28 @@ D.~W.~Stroock,
 \newblock \href{https://doi.org/10.1007/978-3-031-23122-3}
 {doi:10.1007/978-3-031-23122-3}.
 
+
+\bibitem{HiaiPetz2014}
+F.~Hiai and D.~Petz,
+\newblock \emph{Introduction to Matrix Analysis and Applications},
+\newblock Universitext, Springer (2014).
+\newblock \href{https://doi.org/10.1007/978-3-319-04150-6}
+{doi:10.1007/978-3-319-04150-6}.
+
+\bibitem{Hoeffding1963}
+W.~Hoeffding,
+\newblock Probability inequalities for sums of bounded random variables,
+\newblock \emph{J. Amer. Statist. Assoc.} 58 (1963), no.~301, 13--30.
+\newblock \href{https://doi.org/10.1080/01621459.1963.10500830}
+{doi:10.1080/01621459.1963.10500830}.
+
+
+\bibitem{Zlokapa2026}
+A.~Zlokapa,
+\newblock A rigorous quasipolynomial-time classical algorithm for SYK thermal
+expectations,
+\newblock \href{https://arxiv.org/abs/2604.21089}
+{arXiv:2604.21089v1}, 2026.
 \end{thebibliography}
 
 \end{document}
