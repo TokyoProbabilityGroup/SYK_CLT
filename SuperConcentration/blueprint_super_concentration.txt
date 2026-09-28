@@ -1,3 +1,18 @@
+Historical proof plan (superseded before W03)
+=============================================
+
+The snapshot below is retained as a past design, not the current API.
+W03 shares `couplingScale P` and `normalizedHamiltonian P M g` in
+`SYK.Model.GaussianDisorder`, with no general energy-scale argument.
+The checked standard-coordinate Lipschitz bound is β / sqrt(q), and the
+existing two-sided tail has bound 2 exp(-q t² / (2 β²)) for β ≠ 0, t > 0.
+The zero-inverse-temperature case β = 0 is treated separately.
+W05 splits the concentration argument into DensityMatrix, MajoranaBound, and
+Main. Its public MGF parameter is β²/q for all β ≥ 0; each one-sided tail is
+exp(-q t² / (2 β²)) for β ≠ 0, t > 0. The Lipschitz estimate is proved internally.
+The Lean sources and public Blueprint chapter are authoritative; the
+existential constants and N^(q/2) target below are abandoned goals.
+
 LEAN BLUEPRINT: super-Gaussian concentration for logPartition
 ==============================================================
 

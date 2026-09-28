@@ -1,5 +1,11 @@
 # 共有模型・集中不等式・CLT の全体実施計画
 
+## Verso の一時休止（2026-09-18）
+
+ユーザーの指示により、Verso の依存設定・Blueprint のビルド対象・CI の生成と参照検査をコメントで保持して休止した。Blueprint の本文と宣言参照の編集・照合は続けるが、Verso を必要とする章・生成入口の Lean 検査、HTML/PDF の生成、参照検査は実行しない。JSON の依存情報は `workspace/lake-manifest.verso.json` に保存し、現行 manifest は mathlib とその依存だけとした。復帰手順は `workspace/README.md` に記す。
+
+検証：TOML・JSON の構文、mathlib とその依存のリビジョン保持、復帰用 manifest と変更前の内容一致、数学の Lean ソースから Verso を参照していないこと、差分を確認した。これは配布設定と当時の検証環境に関する記録である。共同研究者の親ワークスペースは他プロジェクトを含み、異なる設定を持ち得るため、個別の設定・検証結果をこの記録で上書きしない。
+
 ## 対象範囲と文書の役割
 
 この文書は、共有模型と集中不等式の再設計、CLT の有限模型との接続、およびそこから続く原稿監査・形式化について、全体の実施手順と待ち合わせを管理する。`Universality` などの独立した研究課題の作業順序は定めず、`Annealed_FE` は引き続き移行対象外とする。
@@ -33,13 +39,13 @@
 | ID | 作業単位・成果 | 前提 | 状態 | 詳細の管理先 |
 | --- | --- | --- | --- | --- |
 | W01 | 共有行列解析の仕上げ。追加済みの整関数性・複素微分・条件付き対数微分を、関連検証と Blueprint・文書更新まで完了した | 現行実装 | 完了 | [Model](Model/EDITING_PLAN.md#w01) |
-| W02 | 汎用ガウス集中不等式の独立化。測度・平滑化・MGF・裾評価と `L=0` の処理、利用側の参照移行 | 現行の汎用証明 | 未着手 | [汎用基盤](Probability/GaussianConcentration/EDITING_PLAN.md#w02)、[Model の接続](Model/EDITING_PLAN.md#w02)、[利用側](SuperConcentration/EDITING_PLAN.md#w02) |
-| W03 | ガウス型 SYK ハミルトニアンの共有化。標準スケールとハミルトニアンを Model に置き、直接の利用側を移行する | W02 | 前提待ち | [Model](Model/EDITING_PLAN.md#w03)、[利用側](SuperConcentration/EDITING_PLAN.md#w03) |
-| W04 | 標準行列表現の構成。Jordan–Wigner 表現、次元、反交換関係、自己共役性、対象演算子族のトレース直交性 | 既存の共有代数 | 未着手 | [Model](Model/EDITING_PLAN.md#w04)、[必要な補題の移設元](SuperConcentration/EDITING_PLAN.md#w04) |
-| W05 | SYK 集中不等式の移行完了。有限サイズ評価、標準規格化でのリプシッツ評価、MGF、上下・両側の裾評価、旧基本 API の整理 | W01・W03 | 前提待ち | [SuperConcentration](SuperConcentration/EDITING_PLAN.md#w05) |
-| W06 | CLT の有限模型との接続。局所的な規格化分配関数、`Z(0)=1`、共有分配関数との対応、中心化した対数への集中評価の移送 | W04・W05 | 前提待ち | [CLT](CLT/EDITING_PLAN.md#w06) |
+| W02 | 汎用ガウス集中不等式の独立化。測度・平滑化・MGF・裾評価と `L=0` の処理、利用側の参照移行 | 現行の汎用証明 | 完了（残る証明探索の整理は保守課題） | [汎用基盤](Probability/GaussianConcentration/EDITING_PLAN.md#w02)、[Model の接続](Model/EDITING_PLAN.md#w02)、[利用側](SuperConcentration/EDITING_PLAN.md#w02) |
+| W03 | ガウス型 SYK ハミルトニアンの共有化。標準スケールとハミルトニアンを Model に置き、直接の利用側を移行する | W02 | 完了 | [Model](Model/EDITING_PLAN.md#w03)、[利用側](SuperConcentration/EDITING_PLAN.md#w03) |
+| W04 | 標準行列表現の構成。Jordan–Wigner 表現、次元、反交換関係、自己共役性、対象演算子族のトレース直交性 | 既存の共有代数 | 完了 | [Model](Model/EDITING_PLAN.md#w04)、[必要な補題の移設元](SuperConcentration/EDITING_PLAN.md#w04) |
+| W05 | SYK 集中不等式の移行完了。有限サイズ評価、標準規格化でのリプシッツ評価、MGF、上下・両側の裾評価、旧基本 API の整理 | W01・W03 | 完了 | [SuperConcentration](SuperConcentration/EDITING_PLAN.md#w05) |
+| W06 | CLT の有限模型との接続。局所的な規格化分配関数、`Z(0)=1`、共有分配関数との対応、中心化した対数への集中評価の移送 | W04・W05 | 未着手（前提充足） | [CLT](CLT/EDITING_PLAN.md#w06) |
 
-全 W 単位には、対応する [Blueprint の編集](Chapters/EDITING_PLAN.md) と必要な統合検証も含む。
+全 W 単位には、対応する [Blueprint の編集](Chapters/EDITING_PLAN.md) と宣言参照の照合を含む。Verso の機械的検証は休止中は完了条件から除き、復帰後にまとめて行う。
 
 W01 当時の検証結果と Blueprint 全体生成の失敗は、[Model の検証記録](Model/EDITING_PLAN.md#w01) と [Chapters の検証記録](Chapters/EDITING_PLAN.md#検証と記録) に履歴として残す。現在の既定ビルド範囲は、この文書の「完了とコミットの区切り」に記す。
 
@@ -54,7 +60,7 @@ flowchart LR
     W05 --> W06
 ```
 
-W01 は2026-09-08に完了した。次は W02 と W04 を並行して進める候補である。ただし、並行作業を依頼されていない場合は、一覧順で前提が満たされた最初の未完了単位を一つ選ぶ。指定した単位が前提待ちなら、無断で前提の実装まで範囲を広げない。単位の完了時には、依存する単位の前提と状態も更新する。
+W01 は2026-09-08、W02 は2026-09-12、W03・W04・W05 は2026-09-18に完了した。W04 は Jordan–Wigner 表現と同じ偶数次数の相互作用の規格化トレース直交性を証明し、必要な共有代数補題を Model へ移設した。W05 は評価を分割し、標準規格化の MGF・上下・両側の裾と零逆温度の直接処理を供給した。詳細な検証記録は各担当計画に置く。W02 の基盤には既存の `aesop`・`grind` が残るため、その整理は完了記録と区別した保守課題とするが、検証済みの公開結果や W06 の前提を無効にはしない。次の候補は前提が満たされた W06である。完了済み単位についての下記の並列・受け渡し記録は履歴であり、再実行の指示ではない。
 
 ## 原稿監査と後続の形式化
 
@@ -86,13 +92,13 @@ Z01 の詳細は [Model](Model/EDITING_PLAN.md#z01) で管理する。実逆温�
 
 ## 編集範囲と並列・非同期実行
 
-ここで非同期とは、担当範囲と入力を固定し、結果を後から統合できることを指す。数学的に独立でも、同じファイルや未確定の公開 API を同時に変更してよいとは限らない。次の可否は単位間の前提を満たした後のものであり、表に「条件付き」とあるものは条件を満たすまでは同時編集しない。
+ここで非同期とは、担当範囲と入力を固定し、結果を後から統合できることを指す。数学的に独立でも、同じファイルや未確定の公開 API を同時に変更してよいとは限らない。完了済み W01–W05 に関する行は当時の統合記録であり、未完了の W06、R01–R05、F01–F08、Z01 にだけ将来の実行上の指示として適用する。
 
 | ファイル・ファイル群 | 関係する単位 | 非同期・同時編集の可否と待ち合わせ |
 | --- | --- | --- |
 | `Model/FiniteDimensionalGibbs.lean` | W01、W04 のトレース補題、F04 の共有解析 | 同じファイルの変更は直列。W01 完了後、W04 と W02 の別ファイル作業は並行可能 |
 | `Model/Majorana.lean` | W04、W05 で必要になる共有補題 | ガウス基盤のファイルとは並行可能。`Core.lean` からの補題移設は担当を一人に固定する |
-| `Model/StandardRepresentation.lean`（作成予定） | W04 | 共有代数の入力が安定していれば W02 と並行可能 |
+| `Model/StandardRepresentation.lean` | W04 | 共有代数の入力が安定していれば W02 と並行可能 |
 | `Model/GaussianDisorder.lean` | W02 の測度接続、W03 | 直列。W02 の汎用測度の確定後に接続し、W02 の統合完了後に W03 を行う |
 | `Probability/GaussianConcentration/StandardGaussian.lean`（移行先） | W02 | W04 と並行可能。測度・可積分性の API を後続ファイルの着手前に固定する |
 | 同 `Smooth.lean`（移行先） | W02 | `StandardGaussian.lean` の必要な宣言が検証・固定済みなら別作業と並行可能 |
@@ -109,10 +115,9 @@ Z01 の詳細は [Model](Model/EDITING_PLAN.md#z01) で管理する。実逆温�
 
 W02 では「汎用基盤の構成 → Model の測度接続 → 利用側の import 切替・旧配置の整理 → 統合検証」の順に受け渡す。W03 は Model の共有定義を確定してから利用側を更新する。W04 と W05 が同じ代数補題を必要とする場合は、共有層への移設を先に統合してから双方が使用する。これらの受け渡しは一単位内で行い、そのたびに新しい指示を求めない。
 
-- **並列実装**：W01 後の W02 と W04 が第一候補。数学的に独立でも、共有補題・文書・Blueprint の同時編集は調整する。
-- **後続の並列候補**：W06 と各仕様の確定後の F01・F03・F04。F06 の凸性・外部入力の照合は他の証明から独立して調査できるが、単位全体の完了には一覧の前提が必要である。
+- **後続の並列候補**：W06 完了後、各仕様の確定した F01・F03・F04。F06 の凸性・外部入力の照合は他の証明から独立して調査できるが、単位全体の完了には一覧の前提が必要である。
 - **非同期の調査**：R02 の外部入力照合、R03 の偶奇則と二次カオス・行列微分・ラデマッハ評価・外部入力の各監査、mathlib の探索。根拠・未解決点・必要な入力を報告し、定理文を無断で修正しない。
-- **長時間の実装**：W02・W04、仕様確定後の F01–F08。開始前に対象の定理文・編集範囲・完了条件を固定する。
+- **長時間の実装**：仕様確定後の F01–F08。開始前に対象の定理文・編集範囲・完了条件を固定する。W02・W04 に関する過去の実装計画は完了済み単位の履歴である。
 - **非同期の検証**：対象ソースを固定してビルド・公理依存を確認する。開始時のコミットと未コミット差分を記録し、その後にソースが変わった場合は対応する検証をやり直す。共有キャッシュへの複数の重いビルドは避ける。
 - **直列の統合**：W02・W03・W05 の `Main.lean` 移行、共通文書の更新、同一ファイルへの変更の取り込み。別々に検証済みでも統合後に関連ビルドを行う。
 
@@ -120,17 +125,32 @@ W02 では「汎用基盤の構成 → Model の測度接続 → 利用側の im
 
 ## 完了とコミットの区切り
 
-Lean の実装単位は、変更ファイルの個別検査、関連する最小ビルド、主要定理の公理依存・残る仮定の確認、差分確認、必要な文書・Blueprint 更新までを含む。全体の完了は、関係するすべての詳細計画の担当部分と統合検証が揃ってから判定する。正確なコマンドと例外は各作業の `AGENTS.md` と詳細計画に従う。原稿監査は数学的な確認とコンパイル結果を記録し、Lean による検証と区別する。
+Lean の実装単位は、変更ファイルの個別検査、関連する最小ビルド、主要定理の公理依存・残る仮定の確認、差分確認、必要な文書と Blueprint の更新・宣言参照の照合までを含む。Verso の機械的検証は休止中は除き、復帰後に休止中の変更を含めて行う。全体の完了は、関係するすべての詳細計画の担当部分と必要な統合検証が揃ってから判定する。原稿監査は数学的な確認とコンパイル結果を記録し、Lean による検証と区別する。
 
-`Annealed_FE` と `Universality` は Lake の独立したライブラリ登録を維持しつつ、ルートモジュールと CI の既定ビルドから一時的に除外する。`Annealed_FE` は共有 API への移行と個別ビルド、`Universality` は実装と個別ビルドが完了した後、それぞれの import と CI の対象を復帰させる。復帰後は `lake build`、`lake exe vbp build`、`lake exe vbp check` を再実行する。
+`Annealed_FE` と `Universality` は Lake の独立したライブラリ登録を維持しつつ、`lakefile.toml` の `defaultTargets` から一時的に除外する。CI も同じ既定対象を使う。`Annealed_FE` は共有 API への移行と個別ビルド、`Universality` は実装と個別ビルドが完了した後、ルートと `workspace/` の両設定で `defaultTargets` に復帰させる。復帰後は `lake build` を実行する。Verso の復帰は独立した変更であり、そのときに限り Blueprint の生成と参照検査も再開する。
 
-除外中の `lake build` と CI の成功は両ライブラリの検証を意味しない。`Annealed_FE` の既知のエラーと未完成の証明は検証記録に残し、既定範囲に新しいエラーや未完成の証明を許容しない。Blueprint は除外中のライブラリに阻害されないため、対象単位の完了には生成と参照検査の成功を必要とする。公開 README は全ライブラリを既定ビルドへ戻した将来の運用を記しており、この暫定状態に合わせて変更しない。
+除外中の `lake build` と CI の成功は両ライブラリの検証を意味しない。`Annealed_FE` の既知のエラーと未完成の証明は検証記録に残し、既定範囲に新しいエラーや未完成の証明を許容しない。Verso 休止中は Blueprint の生成と参照検査を対象単位の完了条件にしない。公開 README は一般的なビルド手順を記し、この暫定状態や AI 向けの作業規則は載せない。
 
 2026-09-08 に両ライブラリを一時除外し、`lake env lean SYK.lean`、`lake build Model SuperConcentration CLT`、`lake build`、`lake exe vbp build`、`lake exe vbp check` が成功した。Blueprint の manifest と HTML cache は各50件で整合した。Model・SuperConcentration・Chapters と VersoBlueprint には既存の linter warning が残るが、エラー、未解決の証明目標、および既定範囲の `sorry`・`admit`・`axiom` は検出されなかった。
 
 一単位を原則一コミット候補とし、独立して検証できる成果が複数ある場合だけ分割する。例えば W04 は「標準表現と基本関係」「トレース直交性」で分けられるが、ユーザーへの指示単位は W04 のままでよい。W02 でも依存層ごとの検証を行うが、検証のたびに作業を終了しない。
 
+## ビルド入口のプロジェクト内への移設（2026-09-11）
+
+W01–W06 とは独立した構成変更として、コミット `e1ea38d` の配置から次の移行を行った。数学的な定義・定理・証明と依存バージョンは変更していない。
+
+- 生成入口を `BlueprintMain.lean` に移設し、ルートの `SYK.lean`・`SYKMain.lean` と `workspace/` 内の配布用コピーを削除した。一括 import 専用ファイルは置かず、旧内容は Git 履歴に保持する。
+- ルートと `workspace/` の `lakefile.toml` で `defaultTargets` を `["Model", "SuperConcentration", "CLT", "SYK"]` に揃えた。`SYK` の対象は共有基盤の `SYK.Probability.GaussianConcentration.+`、`SYK.Blueprint`、`SYK.Chapters.+` とし、数学の各話題は個別対象で管理する。`lake build` は既定対象全体、`lake build SYK` は共有基盤・Blueprint・章とその依存先を検査する。共有の `.lake/` は引き続き使う。
+- Blueprint は `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` で直接生成する。Lake が import を自動ビルドするため、シェルスクリプトや専用の実行ファイルは追加しない。生成先は Git の対象外とした。README のサーバー起動箇所には、現行の `vbp build --serve` がルート直下しか生成入口を探索しないことと、内蔵サーバーも Python を使うことをコメントで明記した。
+- `README.md`・`workspace/README.md`・`SuperConcentration/README.md` の配置・コピー・ビルド・生成手順、`.github/workflows/lean_action_ci.yml`、`AGENTS.md`、本計画、`Model/EDITING_PLAN.md`・`Chapters/EDITING_PLAN.md` の現行検証手順を更新した。CI のビルド対象一覧は TOML の `defaultTargets` に集約した。過去の検証コマンドは履歴として保持した。
+
+最終構成で `lake build`（3562 jobs）、`lake env lean SYK/BlueprintMain.lean`、上記の `lake lean` による直接生成が成功した。`lake exe vbp check --site SYK/_out/site` は manifest・HTML cache 各50件、エラー0件で成功した。配布用と実際の Lake 設定・manifest・toolchain の一致、および `git diff --check` も確認した。
+
+Model・SuperConcentration・Chapters と VersoBlueprint の既存の警告は残る。`Annealed_FE`・`Universality` の一時除外は維持しており、両ライブラリを検証済みとは扱わない。GitHub 上の CI 実行、任意の PDF 生成、ローカルサーバーの起動は今回の検証には含めていない。
+
 ## 旧計画との対応
+
+2026-09-18：一般 `MajoranaSystem` に対する `CLT/Main.lean` の設定と二種類の CLT の定理文を、`sorry` を許可する明示的な依頼に従って追加する作業を実施した。実数の `|β|` 条件を今回の宣言に採用し、共有模型や原稿は変更しない。これは W06・F06・F07 の完了ではなく、証明付き形式化に先立つ定理文の追加である。詳細・検証は [CLT の記録](CLT/EDITING_PLAN.md#main-statements-2026-09-18) に集約する。
 
 | 旧計画 | 新しい管理先 |
 | --- | --- |

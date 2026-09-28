@@ -1,4 +1,5 @@
 # Lake / build artifacts
+/_out/
 .lake/
 lake-packages/
 build/
@@ -28,6 +29,7 @@ build/
 *.synctex.gz
 *.synctex.gz(busy)
 /CLT/refs/CLT_SYK.pdf
+/CLT/refs/sections/*.pdf
 
 # OS junk
 .DS_Store
@@ -41,3 +43,4 @@ SYK/
 
 # nested local repos
 research_public/
+

@@ -18,9 +18,9 @@
 
 ## 暫定的なビルド範囲
 
-`Annealed_FE` と `Universality` は Lake の独立したライブラリとして登録したまま、実装または共有 API への移行が完了するまで、ルートモジュールと CI の既定ビルドから一時的に除外する。復帰箇所は `workspace/SYK.lean` と `.github/workflows/lean_action_ci.yml` にコメントとして保持する。
+`Annealed_FE` と `Universality` は Lake の独立したライブラリとして登録したまま、実装または共有 API への移行が完了するまで、`lakefile.toml` の `defaultTargets` から一時的に除外する。CI も同じ既定対象を使う。復帰用の設定は TOML のコメントに保持し、変更時はワークスペースのルートと `workspace/` の配布用設定を揃える。
 
-現在の `lake build`、CI、および Blueprint の生成・検査の成功は、これら二つのライブラリを検証したことを意味しない。各ライブラリの実装と個別ビルドが成功した後、ルートの import と CI の対象を復帰させ、既定ビルドと Blueprint を改めて検査する。詳しい状態と復帰条件は [全体計画](EDITING_PLAN.md) に記録する。
+現在の `lake build`、CI、および Blueprint の生成・検査の成功は、これら二つのライブラリを検証したことを意味しない。各ライブラリの実装と個別ビルドが成功した後、`defaultTargets` に復帰させ、既定ビルドと Blueprint を改めて検査する。詳しい状態と復帰条件は [全体計画](EDITING_PLAN.md) に記録する。
 
 ## 外部文献の利用
 
@@ -58,10 +58,12 @@ CLT 固有の極限・逆温度条件・証明構造は `CLT/ARCHITECTURE.md`、
 
 ## Blueprint
 
+Verso は CI の実行時間を抑えるため一時休止中である。`Blueprint.lean` と `Chapters/` の編集、および宣言名・依存関係・数学的主張のソース上の照合は続ける。休止中は Verso を必要とする章・生成入口の Lean 検査、HTML/PDF の生成、`vbp check`、CI のこれらの工程を実行しない。その不実行を Blueprint の内容や参照が検証済みでないことと記録する。数学ライブラリの個別検査・関連ビルド・公理依存確認は従来どおり行う。復帰方法と保存した依存情報は `workspace/README.md` を参照する。
+
 `Blueprint.lean` と `Chapters/` は、形式化の設計図として、主要な定義・定理・補題の正確な数学的主張、仮定、規格化、証明の要点、および主張と証明それぞれの依存関係を公開用に記す。原稿の対応箇所を示し、実装済みの結果は Lean の宣言に対応付ける。
 
 未形式化の主張や証明計画も記載してよいが、未解決事項・外部入力・Lean で検証済みの結果を区別する。原稿・Blueprint・Lean の主張の対応は明示的に照合し、宣言へのリンクや生成・参照検査の成功だけで数学的な一致を確認済みとしない。
 
 モジュール構成の設計理由は `ARCHITECTURE.md`、編集手順・作業単位・検証記録は `EDITING_PLAN.md` に置き、Blueprint に不要な重複を持ち込まない。ただし、数学的な主張と論証の理解に必要な説明は省略しない。
 
-主要な主張の追加、依存関係の変更、または形式化の完了時には、対応する Blueprint の節も更新する。編集後はワークスペースのルートで `lake exe vbp build` と `lake exe vbp check` を実行し、HTML の生成と参照の整合性を確認する。
+主要な主張の追加、依存関係の変更、または形式化の完了時には、対応する Blueprint の節も更新する。Verso 復帰後は、休止中に変更した章も含めてワークスペースのルートで `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` と `lake exe vbp check --site SYK/_out/site` を実行し、HTML の生成と参照の整合性を確認する。生成入口は `BlueprintMain.lean` とし、ルート直下に入口を要求する現行の `lake exe vbp build` は使わない。

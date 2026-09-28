@@ -167,6 +167,118 @@ theorem interactionOperator_star
   rw [interactionOperator, star_smul, M.star_psiProduct_of_even s hq,
     smul_smul, star_phase_mul_sign]
 
+theorem majorana_sq (i : Fin N) : M.ψ i * M.ψ i = 1 := by
+  have h := M.majorana_rel i i
+  rw [if_pos rfl] at h
+  rw [← one_add_one_eq_two] at h
+  apply smul_right_injective A (show (2 : ℂ) ≠ 0 by norm_num)
+  simpa [two_smul] using h
+
+/-- Permuting a Majorana word changes it by a scalar sign. -/
+theorem listProduct_eq_smul_of_perm
+    (l₁ l₂ : List (Fin N)) (h : l₁.Perm l₂) :
+    ∃ c : ℂ, (l₁.map M.ψ).prod = c • (l₂.map M.ψ).prod := by
+  induction h with
+  | nil => exact ⟨1, by simp⟩
+  | @cons i l₁ l₂ _ ih =>
+      rcases ih with ⟨c, hc⟩
+      refine ⟨c, ?_⟩
+      simp only [List.map_cons, List.prod_cons]
+      rw [hc, Algebra.mul_smul_comm]
+  | @swap i j l =>
+      by_cases hij : i = j
+      · subst j
+        exact ⟨1, by simp⟩
+      · refine ⟨-1, ?_⟩
+        simp only [List.map_cons, List.prod_cons]
+        calc
+          M.ψ j * (M.ψ i * (l.map M.ψ).prod) =
+              (M.ψ j * M.ψ i) * (l.map M.ψ).prod := by rw [mul_assoc]
+          _ = (-(M.ψ i * M.ψ j)) * (l.map M.ψ).prod := by
+            rw [M.anticommute (Ne.symm hij)]
+          _ = (-1 : ℂ) • (M.ψ i * (M.ψ j * (l.map M.ψ).prod)) := by
+            simp [mul_assoc]
+  | @trans l₁ l₂ l₃ _ _ ih₁ ih₂ =>
+      rcases ih₁ with ⟨c₁, hc₁⟩
+      rcases ih₂ with ⟨c₂, hc₂⟩
+      refine ⟨c₁ * c₂, ?_⟩
+      rw [hc₁, hc₂, smul_smul]
+
+private theorem star_listProduct_mul_self
+    (l : List (Fin N)) (hl : l.Nodup) :
+    star ((l.map M.ψ).prod) * (l.map M.ψ).prod = 1 := by
+  induction l with
+  | nil => simp
+  | cons i l ih =>
+      rw [List.nodup_cons] at hl
+      simp only [List.map_cons, List.prod_cons, star_mul, M.self_adjoint]
+      rw [← mul_assoc, mul_assoc (star ((l.map M.ψ).prod)),
+        M.majorana_sq, mul_one, ih hl.2]
+
+theorem psiProduct_star_mul_self (s : InteractionIndex N q) :
+    star (M.psiProduct s) * M.psiProduct s = 1 := by
+  apply M.star_listProduct_mul_self
+  simp [orderedIndices]
+
+theorem interactionOperator_sq
+    (hq : Even q) (s : InteractionIndex N q) :
+    M.interactionOperator s * M.interactionOperator s = 1 := by
+  have hstar := M.interactionOperator_star hq s
+  calc
+    M.interactionOperator s * M.interactionOperator s =
+        star (M.interactionOperator s) * M.interactionOperator s := by
+          rw [hstar]
+    _ = (star (phase q) * phase q) •
+        (star (M.psiProduct s) * M.psiProduct s) := by
+          rw [interactionOperator, star_smul, smul_mul_smul_comm]
+    _ = (star (phase q) * phase q) • (1 : A) := by
+          rw [M.psiProduct_star_mul_self]
+  rw [star_phase_mul_self, one_smul]
+
+
+/-- Moving an included generator past an interaction word contributes `q-1`
+minus signs, because its own factor commutes with itself. -/
+theorem psiProduct_mul_generator_of_mem
+    (s : InteractionIndex N q) (i : Fin N) (hi : i ∈ s.1) :
+    M.psiProduct s * M.ψ i =
+      ((-1 : ℂ) ^ (q - 1)) • (M.ψ i * M.psiProduct s) := by
+  let l := orderedIndices s
+  have hmem : i ∈ l := by simpa [l, orderedIndices] using hi
+  have hnodup : l.Nodup := by simp [l, orderedIndices]
+  obtain ⟨c, hc⟩ := M.listProduct_eq_smul_of_perm l (i :: l.erase i)
+    (List.perm_cons_erase hmem)
+  simp only [List.map_cons, List.prod_cons] at hc
+  have heq : M.psiProduct s = c • (M.ψ i * ((l.erase i).map M.ψ).prod) := hc
+  have hanti := M.listProduct_mul_generator i (l.erase i) hnodup.not_mem_erase
+  rw [List.length_erase_of_mem hmem, show l.length = q from length_orderedIndices s] at hanti
+  rw [heq, Algebra.smul_mul_assoc, mul_assoc, hanti,
+    Algebra.mul_smul_comm, Algebra.mul_smul_comm, smul_smul, smul_smul]
+  congr 1
+  exact mul_comm _ _
+
+/-- For even degree, the interaction anticommutes with each included generator. -/
+theorem interactionOperator_mul_generator_of_mem
+    (hq : Even q) (s : InteractionIndex N q) (i : Fin N) (hi : i ∈ s.1) :
+    M.interactionOperator s * M.ψ i = -(M.ψ i * M.interactionOperator s) := by
+  have hqpos : 0 < q := by
+    have := Finset.card_pos.mpr ⟨i, hi⟩
+    simpa [s.2] using this
+  have hodd : Odd (q - 1) := by
+    obtain ⟨m, hm⟩ := hq
+    exact ⟨m - 1, by omega⟩
+  rw [interactionOperator, Algebra.smul_mul_assoc, M.psiProduct_mul_generator_of_mem s i hi,
+    hodd.neg_one_pow, neg_one_smul, smul_neg, Algebra.mul_smul_comm]
+
+/-- For even degree, the interaction commutes with every excluded generator. -/
+theorem interactionOperator_mul_generator_of_not_mem
+    (hq : Even q) (s : InteractionIndex N q) (i : Fin N) (hi : i ∉ s.1) :
+    M.interactionOperator s * M.ψ i = M.ψ i * M.interactionOperator s := by
+  have hnot : i ∉ orderedIndices s := by simpa [orderedIndices] using hi
+  have h := M.listProduct_mul_generator i (orderedIndices s) hnot
+  rw [length_orderedIndices, hq.neg_one_pow, one_smul] at h
+  change M.psiProduct s * M.ψ i = M.ψ i * M.psiProduct s at h
+  rw [interactionOperator, Algebra.smul_mul_assoc, h, Algebra.mul_smul_comm]
+
 end MajoranaSystem
 
 /-- The deterministic SYK Hamiltonian associated to real couplings `J`. -/

@@ -1,11 +1,15 @@
-# Blueprint for `gaussian_lipschitz_concentration`
+# Historical blueprint for `gaussian_lipschitz_concentration`
 
-This blueprint matches the current file
-`SYK/Gaussian_concentration/gaussian_concentration.lean`.
+This document records the pre-W02 file layout and theorem name. The verified
+implementation now lives in `SYK/Probability/GaussianConcentration/` under the
+namespace `SYK.GaussianConcentration`; the generic two-sided theorem is
+`euclidean_lipschitz_gaussian_concentration`. The Lean sources and the public
+Blueprint chapter are authoritative.
 
-The file proves the SYK concentration theorem by reducing it to a reusable
-finite-dimensional Gaussian concentration theorem. The only analytic input left
-as `sorry` is the upper-tail concentration theorem.
+The text below is an unmaintained snapshot of the former
+`SYK/Gaussian_concentration/gaussian_concentration.lean` layout. Statements in
+that snapshot about imports, names, locations, or unfinished proofs describe the
+old implementation and must not be used as the status of the current sources.
 
 ## Imports and namespace
 

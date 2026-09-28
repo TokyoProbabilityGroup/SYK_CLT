@@ -10,13 +10,12 @@ This directory contains the files to copy to the parent directory of the cloned 
 ├── lakefile.toml
 ├── lake-manifest.json
 ├── lean-toolchain
-├── SYK.lean               # default library entry point
-├── SYKMain.lean           # Blueprint renderer entry point
 ├── .lake/                  # generated locally by Lake
 └── SYK/                    # cloned repository
     ├── AGENTS.md
     ├── Annealed_FE/
     ├── Blueprint.lean
+    ├── BlueprintMain.lean  # Blueprint renderer entry point
     ├── Chapters/
     ├── CLT/
     ├── Model/
@@ -33,13 +32,13 @@ A separate Lake project normally maintains its own `.lake` directory and depende
 
 ## Template files
 
-- `lakefile.toml` defines the workspace package, pinned mathlib and Verso Blueprint dependencies, common Lean options, and Lean libraries under `SYK/`. A compatible new project should normally be added as another `lean_lib`, not as a nested Lake project.
+- `lakefile.toml` defines the workspace package, the pinned mathlib dependency and a commented-out Verso Blueprint dependency, common Lean options, and Lean libraries under `SYK/`. A compatible new project should normally be added as another `lean_lib`, not as a nested Lake project.
 - `lake-manifest.json` records exact resolved dependency revisions. It should normally be updated through Lake rather than edited manually.
 - `lean-toolchain` fixes the Lean version shared by all libraries.
-- `SYK.lean` is the root module built by the default `SYK` target.
-- `SYKMain.lean` is the conventional entry point used by `lake exe vbp build` to render `SYK.Blueprint`.
 - `AGENTS.md` provides project-independent Codex instructions. At the workspace root, it is supplemented by files such as `SYK/AGENTS.md` and `SYK/CLT/AGENTS.md`.
 - `README.md` documents this template and remains in `SYK/workspace/`.
+
+`defaultTargets` selects the individual mathematical libraries and the `SYK` target for shared foundations. No aggregate Lean import file is needed. The renderer `SYK/BlueprintMain.lean` stays in the repository; no project-specific Lean file needs to be copied to the workspace root.
 
 ## Initial setup
 
@@ -51,12 +50,10 @@ cp SYK/workspace/lakefile.toml .
 cp SYK/workspace/lake-manifest.json .
 cp SYK/workspace/lean-toolchain .
 cp SYK/workspace/AGENTS.md .
-cp SYK/workspace/SYK.lean .
-cp SYK/workspace/SYKMain.lean .
 lake exe cache get
 lake build
-lake exe vbp build
-lake exe vbp check
+# lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site
+# lake exe vbp check --site SYK/_out/site
 ```
 
 Review existing root files before overwriting them. Lake creates `.lake/` locally; do not copy it into this template.
@@ -70,13 +67,15 @@ diff -u lakefile.toml SYK/workspace/lakefile.toml
 diff -u lake-manifest.json SYK/workspace/lake-manifest.json
 diff -u lean-toolchain SYK/workspace/lean-toolchain
 diff -u AGENTS.md SYK/workspace/AGENTS.md
-diff -u SYK.lean SYK/workspace/SYK.lean
-diff -u SYKMain.lean SYK/workspace/SYKMain.lean
 ```
 
 Do not blindly overwrite root files when the workspace contains other projects. Merge relevant changes while preserving their libraries and instructions. A template change does not automatically update an existing workspace, and a local root change should be copied back only when it is appropriate for future users.
 
-The normal Blueprint check is `lake exe vbp build` followed by `lake exe vbp check`. The generated HTML is written under `_out/site/` and is a local build artifact. A PDF is optional and is produced only when `lake exe vbp build --pdf` is requested.
+When migrating from the old layout, review the imports in the root `SYK.lean` and cover the required modules with Lake targets. Compare `SYKMain.lean` with `SYK/BlueprintMain.lean` and preserve local renderer changes. Update the root Lake configuration, then remove the two obsolete root files. Their template copies are no longer distributed. Existing output under the root `_out/site/` is from the old layout and is not used by the new commands.
+
+Run `lake build` for the targets listed in `defaultTargets`. Individual targets such as `lake build Model SuperConcentration CLT` are unchanged. `lake build SYK` checks the shared foundations under `SYK/Probability/`, and their dependencies (Blueprint and chapter modules are temporarily excluded); it does not replace the individual mathematical library targets. CI uses the same `defaultTargets` rather than maintaining a separate list.
+
+After restoring Verso, uncomment and use the `lake lean` renderer command shown above, followed by `lake exe vbp check --site SYK/_out/site`. Lake builds the renderer's imports automatically. This explicitly selects the repository's renderer because the installed `vbp build` only discovers root-level entry points. Generated output stays under `SYK/_out/site/` and is ignored by Git. Append `--pdf` to the renderer command for an optional PDF. See the project README for local serving instructions and the reason for invoking the server separately.
 
 ## Adding another project
 
@@ -85,3 +84,11 @@ A project compatible with the current Lean and mathlib versions should normally 
 ## Files excluded from this template
 
 Do not place `.lake/`, copied mathlib sources, compiled artifacts, editor or machine state, absolute local paths, secrets, LaTeX products, or project-specific proof plans here. Project-specific architecture and progress documents belong in the corresponding project directory, such as `SYK/CLT/`.
+
+## Restoring Verso
+
+Verso is temporarily disabled in the dependency configuration, the `SYK` build globs, and the Blueprint CI steps. The Blueprint sources remain intact. `lake-manifest.verso.json` preserves the full dependency manifest from before the pause; JSON does not support comments. The active manifest contains only mathlib and its dependencies, with their revisions unchanged.
+
+To restore, uncomment the Verso dependency in `lakefile.toml`, restore the commented `SYK` globs (replacing the active globs), and use `lake-manifest.verso.json` to reconcile the manifest without discarding dependency revisions added during the pause. Apply both files to the workspace root, review dependency revisions if other dependencies have changed, and run `lake update` if needed. Uncomment the two Blueprint CI steps and the renderer/check commands in the documentation. Update the pause instructions in `SYK/AGENTS.md` and `SYK/EDITING_PLAN.md`, then run `lake build` and the Blueprint commands for all chapters changed during the pause.
+
+Existing workspaces must apply the same configuration changes separately. This repository's CI uses the versioned template; a parent workspace with other projects is not changed automatically.

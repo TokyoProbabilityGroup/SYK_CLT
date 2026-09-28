@@ -1,5 +1,5 @@
 \documentclass[../CLT_SYK.tex]{subfiles}
-\setcounter{section}{2}
+\setcounter{section}{3}
 
 \begin{document}
 
@@ -9,157 +9,276 @@
 
 To identify the deterministic coefficient $A_N(\beta)$ in
 \eqref{eq:finite-N-FTW-coefficient}, we use the annealed free-energy limit
-from \cite{GPSZ2026}.  The required convergence of derivatives follows from
-convexity and is not an additional input.
+from \cite{He2026}, which holds at every fixed inverse temperature.
+Convexity then gives locally uniform convergence of the first derivatives.
+
+The following is a standard convergence theorem for convex functions; see
+\cite[Theorems~10.8 and~25.7]{Rockafellar1970}.
 
 \begin{lemma} \label{lem:convex-derivatives}
-Let $I\subset\mathbb R$ be open.  Suppose that $h_N:I\to\mathbb R$ are finite,
-differentiable, convex functions and $h_N(x)\to h(x)$ pointwise, where
-$h\in C^1(I)$.  Then $h_N\to h$ and $h_N'\to h'$ locally uniformly on $I$.
+Let $I\subset\mathbb R$ be open. Suppose that $h_N:I\to\mathbb R$ are
+finite, differentiable, convex functions and that $h_N\to h$ pointwise,
+where $h\in C^1(I)$. Then locally uniformly on $I$, 
+\[
+    h_N\to h
+    \qquad\text{and}\quad
+    h_N'\to h'.
+\]
+
 \end{lemma}
 
 \begin{proof}
-Fix a compact interval $[a,b]\subset I$ and choose $u<a<b<v$ in $I$.
-Monotonicity of secant slopes bounds every secant slope of $h_N$ on $[a,b]$
-between quantities formed from $h_N(u),h_N(a),h_N(b),h_N(v)$.  These
-endpoint values converge, so the functions $h_N$ are equi-Lipschitz on
-$[a,b]$.  Pointwise convergence on a finite mesh, followed by mesh
-refinement, gives uniform convergence there.
-
-For $x\in I$ and sufficiently small $s>0$, convexity gives
+Fix $[a,b]\subset I$. For $x\in I$ and sufficiently small $s>0$,
+convexity gives
 \[
-  \frac{h_N(x)-h_N(x-s)}s
-  \leq h_N'(x)\leq
-  \frac{h_N(x+s)-h_N(x)}s.
+ \frac{h_N(x)-h_N(x-s)}{s}
+ \le h_N'(x)
+ \le \frac{h_N(x+s)-h_N(x)}{s}.
 \]
-First let $N\to\infty$ and then $s\downarrow0$ to obtain
-$h_N'(x)\to h'(x)$.  Finally, $h_N'$ are nondecreasing.  On a fine partition
-of $[a,b]$, monotonicity traps $h_N'(x)$ between its values at adjacent mesh
-points, while uniform continuity traps $h'(x)$ between the corresponding
-values of $h'$.  Pointwise convergence at the finitely many mesh points then
-gives uniform convergence of the derivatives.
+Taking $\liminf$ and $\limsup$ as $N\to\infty$, using pointwise
+convergence, and then letting $s\downarrow0$, gives
+\[
+ h'(x)\le\liminf_N h_N'(x)
+ \le\limsup_N h_N'(x)\le h'(x).
+\]
+Thus $h_N'(x)\to h'(x)$ pointwise.
+
+Each $h_N'$ is nondecreasing. Given \(\varepsilon>0\), by uniform
+continuity of \(h'\) on \([a,b]\), choose a partition
+\(
+a=x_0<x_1<\cdots<x_m=b
+\)
+such that, for every \(i=0,\ldots,m-1\),
+\[
+ \sup_{x,y\in[x_i,x_{i+1}]}
+ \lvert h'(x)-h'(y)\rvert<\varepsilon.
+\]
+Pointwise convergence at the finitely many $x_i$ gives, for all
+sufficiently large $N$ and every $i=0,\ldots,m$,
+\[
+ |h_N'(x_i)-h'(x_i)|<\varepsilon.
+\]
+For $x\in[x_i,x_{i+1}]$, monotonicity of $h_N'$ gives
+\[
+ h_N'(x_i)\le h_N'(x)\le h_N'(x_{i+1}),
+\]
+and hence
+\[
+ |h_N'(x)-h'(x)|<2\varepsilon.
+\]
+Therefore, $h_N'\to h'$ uniformly on $[a,b]$. 
+
+By the mean value theorem, we also have that $h_N\to h$ uniformly
+on $[a,b]$.
 \end{proof}
-
-\begin{proposition}
-\label{prop:annealed-free-energy}
-There are $\beta_{\rm FE}=\beta_{\rm FE}(q)>0$ and an even real-analytic
-function $\ell_q$ on $(-\beta_{\rm FE},\beta_{\rm FE})$ such that, locally
-uniformly on this interval,
-\begin{align}
-  \frac1N\log \mathbb E Z_N(\beta)&\longrightarrow\ell_q(\beta),
-  \label{eq:annealed-free-energy-limit}\\
-  \frac1N\partial_\beta\log \mathbb E Z_N(\beta)&\longrightarrow\ell_q'(\beta).
-  \label{eq:annealed-derivative-limit}
-\end{align}
-Moreover,
-\begin{equation}\label{eq:ell-small-beta}
-  \ell_q(\beta)=\frac{\beta^2}{2q}+O(\beta^4),
-  \qquad
-  \ell_q'(\beta)=\frac\beta q+O(\beta^3).
-\end{equation}
-In paritcular, $\ell'(\beta)>0$, for every sufficiently
-small real $\beta\neq0$.
-
+\begin{proposition} \label{prop:annealed-free-energy}
+    There exists an even convex function $\ell_q\in C^1(\mathbb R)$ such that,
+    locally uniformly for $\beta\in\mathbb R$,
+    \begin{align}
+        \frac1N\log \mathbb E Z_N(\beta)
+        &\longrightarrow \ell_q(\beta),
+        \label{eq:annealed-free-energy-limit}\\
+        \frac1N\partial_\beta\log \mathbb E Z_N(\beta)
+        &\longrightarrow \ell_q'(\beta).
+        \label{eq:annealed-derivative-limit}
+    \end{align}
+    Moreover, for every $\beta>0$,
+    \begin{equation} \label{eq:ell-derivative-bounds}
+        0<\ell_q'(\beta)\leq\frac\beta q,
+        \qquad
+        0\leq\frac\beta q-\ell_q'(\beta)\leq\frac{\beta^3}{3},
+    \end{equation}
+    and, for every $\beta\in\mathbb R$,
+    \begin{equation} \label{eq:ell-quadratic-error}
+        0\leq\frac{\beta^2}{2q}-\ell_q(\beta)\leq\frac{\beta^4}{12}.
+    \end{equation}
+    In particular, as $\beta\to0$,
+    \begin{equation} \label{eq:ell-small-beta}
+        \ell_q(\beta)=\frac{\beta^2}{2q}+O(\beta^4),
+        \qquad
+        \ell_q'(\beta)=\frac\beta q+O(|\beta|^3).
+    \end{equation}
+    Furthermore, $\beta\ell_q'(\beta)>0$ for every $\beta\neq0$.
 \end{proposition}
 
-
 \begin{proof}
-The pointwise convergence in \eqref{eq:annealed-free-energy-limit} is Theorem
-5 of \cite{GPSZ2026}, together with the Gaussian extension stated there.  That
-extension invokes the Gaussian--Rademacher universality result
-\cite{AGK2025}. 
+    We first record the normalization used in \cite{He2026}.  Set
+    \begin{equation*}
+        H_N^{\rm He}:=2^{-q/2}H_N,
+        \qquad
+        p_{N,q}^{\rm He}(s):=\frac1N\log\E\tr e^{sH_N^{\rm He}}.
+    \end{equation*}
+   Note that the paper also uses the normalized trace.  Since $G$ and $-G$ have the
+    same law and $H_N(-G)=-H_N(G)$, for every $\beta\in\mathbb R$,
+    \begin{equation} \label{eq:He-normalization-conversion}
+        \frac1N\log\E Z_N(\beta)
+        =\frac1N\log\E\tr e^{|\beta|H_N}
+        =p_{N,q}^{\rm He}(2^{q/2}|\beta|).
+    \end{equation}
+    Writing $p_q:=p_{{\rm SD},q}$ for the Schwinger--Dyson pressure in
+    \cite{He2026}, \cite[Theorem~1.1 and Proposition~3.3]{He2026} give
+    \begin{equation*}
+        p_{N,q}^{\rm He}(s)\longrightarrow p_q(s)
+        \quad (s>0),
+        \qquad
+        p_q\in C^1((0,\infty)),
+        \qquad
+        \lim_{s\downarrow0}p_q(s)=0.
+    \end{equation*}
+    Define
+    \begin{equation*}
+        \ell_q(\beta):=
+        \begin{cases}
+            p_q(2^{q/2}|\beta|),&\beta\neq0,\\
+            0,&\beta=0.
+        \end{cases}
+    \end{equation*}
+    Then $\ell_q$ is even and continuous on $\mathbb R$, and
+    \eqref{eq:He-normalization-conversion}, together with $Z_N(0)=1$,
+    proves pointwise convergence in \eqref{eq:annealed-free-energy-limit}.
 
-We first record the normalization conversion.  The
-Majoranas of \cite{GPSZ2026} satisfy
-\[
-  \psi_i^{\rm GPSZ}=2^{-1/2}\psi_i,
-  \qquad
-  H_N^{\rm GPSZ}=2^{-q/2}H_N.
-\]
-Set $u=2^{q/2}\beta$.  Gaussian symmetry gives
-\[
-  \E\tr e^{-\beta H_N}
-  =
-  \E\tr e^{+\beta H_N},
-\]
-and $uH_N^{\rm GPSZ}=\beta H_N$.  Thus the sign and normalization conventions
-of \cite{GPSZ2026} give
-\begin{equation}\label{eq:GPSZ-conversion}
-  \frac1N\log \mathbb E Z_N(\beta)=\frac{u}{N}f_{N,q}^{\rm GPSZ}(u),
-\end{equation}
-where $f_{N,q}^{\rm GPSZ}(u)=u^{-1}\log\E Z_N^{\rm GPSZ}(u)$.
+    We next use the derivative formula in
+    \cite[Proposition~3.3]{He2026}: for any $s>0$, 
+    \begin{equation} \label{eq:He-pressure-derivative}
+        p_q'(s)=\frac{s}{q}\int_0^1G_{s,q}(u)^q\,\mathrm du.
+    \end{equation}
+    By the positive Lehmann representation and
+    \cite[Theorem~2.5]{He2026}, there is a probability measure $\nu_s$
+    on $[0,\infty)$ such that
+    \begin{equation*}
+        G_{s,q}(u)
+        =\int_0^\infty
+        \frac{\cosh(x(1/2-u))}{2\cosh(x/2)}\,\nu_s(\mathrm dx),
+        \qquad
+        \int_0^\infty x^2\,\nu_s(\mathrm dx)=2^{2-q}s^2.
+    \end{equation*}
+    For $\beta>0$, put
+    \begin{equation*}
+        K_\beta(u):=2G_{2^{q/2}\beta,q}(u).
+    \end{equation*}
+    The chain rule and
+    \eqref{eq:He-pressure-derivative} yield
+    \begin{equation} \label{eq:ell-kernel-derivative}
+        \ell_q'(\beta)
+        =2^{q/2}p_q'(2^{q/2}\beta)
+        =\frac{2^q\beta}{q}\int_0^1G_{2^{q/2}\beta,q}(u)^q\,\mathrm du
+        =\frac\beta q\int_0^1K_\beta(u)^q\,\mathrm du.
+    \end{equation}
+    Moreover,
+    \begin{equation} \label{eq:ell-kernel-representation}
+        K_\beta(u)
+        =\int_0^\infty
+        \frac{\cosh(x(1/2-u))}{\cosh(x/2)}\,\nu_{2^{q/2}\beta}(\mathrm dx),
+        \qquad
+        \int_0^\infty x^2\,\nu_{2^{q/2}\beta}(\mathrm dx)=4\beta^2.
+    \end{equation}
 
-We next extract the regularity and the first coefficient from the explicit
-formula in that theorem.  In its notation,
-\[
-  \Phi_u(z)=\sum_{v\geq1}\mu_v(u)z^v,
-  \qquad
-  u f_q^{\rm GPSZ}(u)=\Phi_u(t_*(u))-1-\log t_*(u),
-\]
-where $t_*\partial_z\Phi_u(t_*)=1$.  A contributing hypertree has
-$v=1+(q-1)s$ vertices and its coefficient contains
-\[
-  \rho(u)^{v-1},
-  \qquad
-  \rho(u)^{q-1}=\frac{(q-1)!u^2}{2^{q+1}}.
-\]
-More explicitly, $\mathcal T_v^{\rm sim}$ is empty unless
-$v=1+(q-1)s$ for some $s\geq0$.  For $s\geq1$ we may therefore write
-\[
-  \mu_{1+(q-1)s}(u)=c_{q,s}u^{2s},
-\]
-where
-\[
-  c_{q,s}
-  =
-  \frac1{(1+(q-1)s)!}
-  \left(\frac{(q-1)!}{2^{q+1}}\right)^s
-  \sum_{T\in\mathcal T_{1+(q-1)s}^{\rm sim}}b_T.
-\]
-The bounds used in the proof of Proposition 3 of \cite{GPSZ2026} give
-$|c_{q,s}|\leq C_q^s$.  Hence
-\[
-  \Phi_u(z)
-  =
-  z+\sum_{s\geq1}
-  c_{q,s}u^{2s}z^{1+(q-1)s}
-\]
-converges normally for $(u^2,z)$ in a neighborhood of $(0,1)$.  Thus
-$\Phi_u(z)$ is jointly analytic in $(u^2,z)$ there.  At
-$u=0$, $\Phi_0(z)=z$ and $t_*(0)=1$; the derivative with respect to $t$ of
-$t\partial_z\Phi_u(t)-1$ is $1$ at $(u,t)=(0,1)$.  The analytic implicit
-function theorem makes $t_*$, and hence the limiting right-hand side, analytic
-in $u^2$.
+    For $x\geq0$ and $u\in[0,1]$, the inequality $\tanh v\leq v$
+    for $v\geq0$ gives
+    \begin{align*}
+        0
+        &\leq\log\cosh(x/2)-\log\cosh(x(1/2-u))\\
+        &=\int_{x|1/2-u|}^{x/2}\tanh v\,\mathrm dv\\
+        &\leq\frac12\left(\frac{x^2}{4}-x^2(1/2-u)^2\right)
+        =\frac{x^2}{2}u(1-u).
+    \end{align*}
+   Using $1-e^{-a}\leq a$ for $a\geq0$, we obtain
+    \begin{equation*}
+        0\leq
+        1-\frac{\cosh(x(1/2-u))}{\cosh(x/2)}
+        \leq1-e^{-x^2u(1-u)/2}
+        \leq\frac{x^2}{2}u(1-u).
+    \end{equation*}
+    Integrating with respect to $\nu_{2^{q/2}\beta}$ in
+    \eqref{eq:ell-kernel-representation} therefore gives
+    \begin{equation} \label{eq:ell-kernel-bounds}
+        0<K_\beta(u)\leq1,
+        \qquad
+        0\leq1-K_\beta(u)\leq2\beta^2u(1-u).
+    \end{equation}
+    The first inequality and \eqref{eq:ell-kernel-derivative} imply
+    $0<\ell_q'(\beta)\leq\beta/q$.  For the remaining bound, use
+    \begin{equation*}
+        1-a^q=(1-a)\sum_{j=0}^{q-1}a^j\leq q(1-a),
+        \qquad 0\leq a\leq1,
+    \end{equation*}
+    to deduce that
+    \begin{align*}
+        0
+        &\leq\frac\beta q-\ell_q'(\beta)\\
+        &=\frac\beta q\int_0^1\bigl(1-K_\beta(u)^q\bigr)\,\mathrm du\\
+        &\leq\beta\int_0^1\bigl(1-K_\beta(u)\bigr)\,\mathrm du\\
+        &\leq2\beta^3\int_0^1u(1-u)\,\mathrm du
+        =\frac{\beta^3}{3}.
+    \end{align*}
+    This proves \eqref{eq:ell-derivative-bounds}.  Integrating from
+    $0$ to $\beta$ with  $\ell_q(0)= 0$, gives
+    \begin{equation*}
+        0\leq\frac{\beta^2}{2q}-\ell_q(\beta)
+        =\int_0^\beta\left(\frac{s}{q}-\ell_q'(s)\right)\,\mathrm ds
+        \leq\int_0^\beta\frac{s^3}{3}\,\mathrm ds
+        =\frac{\beta^4}{12}.
+    \end{equation*}
+This proves 
+    \eqref{eq:ell-quadratic-error} for $\beta>0$. Since $\ell_q$ is even as we proved,  we have the claim for all $\beta\in\mathbb R$.
 
-The first nontrivial term is the unique one-edge hypertree on $q$ vertices:
-\[
-  \Phi_u(z)=z+\frac{u^2}{q2^{q+1}}z^q+O(u^4).
-\]
-It follows successively that
-\[
-  t_*(u)=1-\frac{u^2}{2^{q+1}}+O(u^4),
-  \qquad
-  u f_q^{\rm GPSZ}(u)=\frac{u^2}{q2^{q+1}}+O(u^4).
-\]
-Using $u=2^{q/2}\beta$ in \eqref{eq:GPSZ-conversion} gives
-\eqref{eq:ell-small-beta}.
+    The bound \eqref{eq:ell-quadratic-error} implies
+    \begin{equation*}
+        \lim_{\beta\to0}
+        \frac{\ell_q(\beta)-\ell_q(0)}{\beta}=0.
+    \end{equation*}
+    Hence $\ell_q'(0)=0$.  On $\mathbb R\setminus\{0\}$, the derivative $\ell_q'$ 
+    is continuous by $p_q\in C^1((0,\infty))$ and the chain rule, and is odd
+    by evenness of $\ell_q$.  By \eqref{eq:ell-derivative-bounds},
+    \begin{equation*}
+        |\ell_q'(\beta)|\leq\frac{|\beta|}{q},
+    \end{equation*}
+    so it is also continuous at zero.  Thus $\ell_q\in C^1(\mathbb R)$.
+    Equations \eqref{eq:ell-derivative-bounds} and
+    \eqref{eq:ell-quadratic-error} give \eqref{eq:ell-small-beta}, and
+    oddness of $\ell_q'$ gives $\beta\ell_q'(\beta)>0$ for $\beta\neq0$.
 
-It remains only to justify the two local-uniform assertions.  Let
-$h_N=N^{-1}\log F_N$.  If
-\[
-  \overline\nu_N(B)=\E\,\tr\mathbf1_{\{H_N\in B\}},
-\]
-then $\mathbb E Z_N(\beta)=\int e^{-\beta x}\overline\nu_N(\mathrm dx)$; hence $h_N$
-is finite, differentiable, and convex.  {Differentiation is
-justified by
-$\norm{H_N(G)}\leq\sigma_N\sum_{I\in\calI_N}|g_I|$ and Gaussian
-exponential integrability.}
-The limiting function just obtained is $C^1$.  Lemma
-\ref{lem:convex-derivatives} now proves both local-uniform convergences.
+    It remains to prove convexity and the two local-uniform convergences.
+    Set
+    \begin{equation*}
+        F_N(\beta):=\E Z_N(\beta),
+        \qquad
+        h_N(\beta):=\frac1N\log F_N(\beta),
+        \qquad
+        \overline\nu_N(B):=\E\tr\mathbf1_B(H_N).
+    \end{equation*}
+    Then $\overline\nu_N$ is a probability measure and
+    \begin{equation*}
+        F_N(\beta)=\int_{\mathbb R}e^{-\beta x}\,
+        \overline\nu_N(\mathrm dx).
+    \end{equation*}
+ In particular,
+    $h_N$ is finite and twice continuously differentiable.  With the
+    probability measure
+    \begin{equation*}
+        \overline\nu_{N,\beta}(\mathrm dx)
+        :=\frac{e^{-\beta x}}{F_N(\beta)}\,
+        \overline\nu_N(\mathrm dx),
+    \end{equation*}
+    we have
+    \begin{equation*}
+        h_N''(\beta)
+        =\frac1N\left(
+            \int_{\mathbb R}x^2\,\overline\nu_{N,\beta}(\mathrm dx)
+            -\left(\int_{\mathbb R}x\,
+            \overline\nu_{N,\beta}(\mathrm dx)\right)^2
+        \right)\geq0.
+    \end{equation*}
+    Thus each $h_N$ is convex, and so is its pointwise limit $\ell_q$.
+    Applying Lemma~\ref{lem:convex-derivatives} with $I=\mathbb R$ proves
+    both \eqref{eq:annealed-free-energy-limit} and
+    \eqref{eq:annealed-derivative-limit} locally uniformly on $\mathbb R$.
 \end{proof}
 
+
 By \eqref{eq:finite-N-FTW-coefficient} and
-\eqref{eq:annealed-derivative-limit},
+\eqref{eq:annealed-derivative-limit}, locally uniformly for
+$\beta\in\mathbb R$,
 \begin{equation*}
   \frac{A_N(\beta)}N\longrightarrow
   \frac\beta2\ell_q'(\beta).
@@ -168,7 +287,7 @@ By \eqref{eq:finite-N-FTW-coefficient} and
 \begin{proof}[Proof of Theorem~\ref{thm:partition-clt}]
 Let
 \[
-  S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\calI_N}(g_I^2-1).
+  S_N:=\frac1{\sqrt{2M_N}}\sum_{I\in\calI_N}(g_I^2-1).
 \]
 The classical i.i.d.\ central limit theorem gives
 $S_N\Rightarrow\xi\sim\N(0,1)$.
@@ -178,9 +297,9 @@ By Lemma~\ref{lem:exact-second-chaos},
   =c_N(\beta)S_N+\mathcal R_N(\beta),
   \qquad
   c_N(\beta)
-  =\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{\sqrt{2M_N}},
+  :=\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{\sqrt{2M_N}},
 \end{equation}
-where $\mathcal R_N=\sum_{r\geq3}P_r Y_N$ is orthogonal to $S_N$.
+where $\mathcal R_N:=\sum_{r\geq3}P_r Y_N$ is orthogonal to $S_N$.
 Since $M_N\sim N^q/q!$, \eqref{eq:annealed-derivative-limit} gives
 \[
   N^{q/2-1}c_N(\beta)
@@ -194,12 +313,186 @@ $N^{q/2-1}\mathcal R_N\to0$ in $L^2$.  This proves
 \[
   \Var(Y_N)=c_N(\beta)^2+\norm{\mathcal R_N(\beta)}_2^2.
 \]
-  Finally,
-$\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough give 
-\eqref{eq:standardized-clt}.
+Finally, for $\beta\neq0$, the identity
+$\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$ and the strict positivity
+$\beta\ell_q'(\beta)>0$ give \eqref{eq:standardized-clt}.
 \end{proof}
 
-\begin{lemma}[Gaussian concentration]
+\footnote{SN: The following is a revised proof}
+\begin{proof}[Proof of Corollary~\ref{cor:free-energy-clt}]
+The case $\beta=0$ is trivial, so assume $\beta\neq0$.  Set
+\[
+a:=\frac q2-1,
+\qquad
+W_N:=\log Y_N(\beta).
+\]
+Then
+\begin{align*}
+N^a\bigl(\log Z_N-\E\log Z_N\bigr)
+&=
+N^a\bigl(W_N-(Y_N-1)\bigr)
++N^a(Y_N-1)
+-N^a\E W_N .
+\end{align*}
+
+By Theorem~\ref{thm:partition-clt},
+\[
+N^a(Y_N-1)
+\Longrightarrow
+\sqrt{\frac{q!}{2}}\,
+\beta\ell_q'(\beta)\,\xi,
+\qquad
+\xi\sim\mathcal N(0,1).
+\]
+Moreover, $Y_N-1\to0$ in probability and
+$N^a(Y_N-1)$ is tight.  Since whenever $|x|\le1/2$, 
+\[
+|\log(1+x)-x|\le x^2,
+\]
+it follows that
+\[
+N^a\bigl(W_N-(Y_N-1)\bigr)
+\xrightarrow{\mathrm p}0.
+\]
+Thus it remains to prove
+\[
+\E W_N=o(N^{-a}).
+\]
+
+Write, as in \eqref{eq:Y-decomposition-final},
+\[
+Y_N-1=c_NS_N+\mathcal R_N,
+\]
+where
+\[
+c_N=\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{\sqrt{2M_N}}= O(N^{-a}),\quad S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\mathcal I_N}(g_I^2-1)
+,\quad
+\|\mathcal R_N\|_2^2=O(N^{-3a})
+\]
+by Proposition~\ref{prop:higher-chaos-closure}. 
+We note that 
+\[
+\sup_N \E S_N^4<\infty.
+\]  Orthogonality therefore
+gives
+\[
+\E(Y_N-1)^2=O(N^{-2a}).
+\]
+On the other hand, we estimate
+\begin{align*}
+\mathbb P(Y_N<1/2)
+&\le
+\mathbb P(|c_NS_N|>1/4)
++
+\mathbb P(|\mathcal R_N|>1/4)\\
+&\le
+C c_N^4\E S_N^4
++
+C\|\mathcal R_N\|_2^2\\
+&=O(N^{-3a}).
+\end{align*}
+
+Next we will prove that 
+\[
+Z_N(\beta;G)\ge1.
+\]
+Choose $x\in I$. 
+The unitary $U_x$ from Lemma~\ref{lem: parity rule lemma} satisfies
+\[
+U_x\psi_IU_x^*=-\psi_I,
+\]
+and hence $\tr\psi_I=0$.  Therefore
+\(
+\tr H_N(G)=0.
+\) 
+Jensen's inequality applied to the eigenvalues of $H_N(G)$ now gives
+\[
+Z_N(\beta;G)
+=
+\tr e^{-\beta H_N(G)}
+\ge
+e^{-\beta\tr H_N(G)}
+=1.
+\]
+
+Define
+\[
+h(y):=y-1-\log y,
+\qquad y>0.
+\]
+Since $\E Y_N=1$,
+\[
+-\E W_N
+=
+\E h(Y_N).
+\]
+On $\{Y_N\ge1/2\}$,
+\[
+h(Y_N)\le (Y_N-1)^2,
+\]
+and therefore
+\[
+\E\!\left[
+h(Y_N)\mathbf 1_{\{Y_N\ge1/2\}}
+\right]
+=O(N^{-2a}).
+\]
+
+On the other hand, if $Y_N<1/2$, then
+\[
+h(Y_N)\le-\log Y_N.
+\]
+Since $Z_N\ge1$,
+\[
+-\log Y_N
+=
+\log\E Z_N-\log Z_N
+\le
+\log\E Z_N.
+\]
+By Proposition~\ref{prop:annealed-free-energy},
+\(
+\log\E Z_N=O(N),
+\) 
+we have
+\begin{align*}
+\E\!\left[
+h(Y_N)\mathbf 1_{\{Y_N<1/2\}}
+\right]
+&\le
+O(N)\,\mathbb P(Y_N<1/2)=
+O(N^{1-3a}).
+\end{align*}
+Since $q\ge4$, we have $a\ge1$, and hence
+\(
+1-3a\le-2a.
+\) 
+Consequently,
+\[
+0\le-\E W_N
+=
+O(N^{-2a})
+=
+O(N^{2-q})
+=
+o(N^{-a}).
+\]
+
+Combining the three terms above and applying Slutsky's theorem yields
+\[
+N^{q/2-1}
+\bigl(
+\log Z_N(\beta)-\E\log Z_N(\beta)
+\bigr)
+\Longrightarrow
+\mathcal N\left(
+0,\frac{q!}{2}\beta^2(\ell_q'(\beta))^2
+\right).
+\]
+\end{proof}
+\iffalse
+{\color{blue} 
+\begin{lemma}\footnote{SN: I think we can remove the blue.}
   Write 
   \begin{equation*}
     W_N \coloneqq \log Y_N(\beta).
@@ -218,9 +511,9 @@ $\Var(Y_N)=\Var(Z_N)/(\E Z_N)^2$, and $\ell'(\beta)>0$ for $\beta$ small enough 
 \begin{proof}
 To apply the Gaussian concentration
   inequality, we view $Z_N(\beta;G)$ as a function of
-  $G = (g_I)_{I \in \calI_N}$ and establish the Lipschitz bound for $W_N$.
+  $G := (g_I)_{I \in \calI_N}$ and establish the Lipschitz bound for $W_N$.
   Fix $I \in \calI_N$.
-  By Duhamel's formula,
+  By the one-variable Duhamel formula \eqref{eq:one-variable-Duhamel-formula},
   we deduce that 
   \begin{align*}
     \partial_{g_I} Z_N 
@@ -259,7 +552,7 @@ To apply the Gaussian concentration
     = 
     \sum_{i \notin S}  \langle A_i \rangle_G^2 A_i^2
     +
-    \sum_{\substack{i,j \notin S}\\ i < j}
+    \sum_{\substack{i,j \notin S \\ i < j}}
     \langle A_i \rangle_G \langle A_j \rangle_G
     (A_iA_j + A_j A_i) 
     = 
@@ -328,8 +621,8 @@ To apply the Gaussian concentration
 The case $\beta=0$ is trivial, so assume $\beta\neq0$.
 Put
 \[
-  a=\frac q2-1,\qquad
-  W_N=\log Y_N(\beta).
+  a:=\frac q2-1,\qquad
+  W_N:=\log Y_N(\beta).
 \]
 It then holds that 
 \begin{align*}
@@ -416,47 +709,41 @@ Therefore, it suffices to show that $\E W_N = o(N^{-a})$.
 %   \leq \exp\left(\frac{\lambda^2\beta^2}{2q}\right).
 % \end{equation}
 
-We claim that 
+We first claim that 
 \begin{equation} \label{eq:EWN range}
   -\frac{\beta^2}{2q}\leq \E W_N\leq0.
 \end{equation}
 Indeed, the upper bound follows from Jensen's inequality,
-while the lower bound follows from \eqref{eq:centered W_N exp} and the identity $\E e^{W_N}=1$.
-Let $K_\beta=\beta^2/(2q)$ and
-$\delta_N \coloneqq (\E (Y_N(\beta)-1)^2)^{1/2}$.
-By Theorem~\ref{thm:partition-clt},
+while the lower bound follows from \eqref{eq:centered W_N exp} with $\lambda=1$ and the identity $\E e^{W_N}=1$.
+ By Theorem~\ref{thm:partition-clt},
 \begin{equation} \label{eq:deltaN asymp}
-  \delta_N^2 = \E (Y_N(\beta)-1)^2\asymp N^{-(q-2)}.
+  \delta_N^2 := \E (Y_N(\beta)-1)^2= O(N^{-(q-2)}).
 \end{equation}
 Henceforth, we consider sufficiently large $N$ so that $\delta_N \leq e^{-1}$.
 Since $e^{W_N}-1=Y_N(\beta)-1$,
-Markov's inequality gives
+Markov's inequality implies that for any $t\geq 1$, 
 \begin{equation} \label{eq:W_N tail1}
   \mathbb P(W_N<-t)
   \leq \frac{\delta_N^2}{(1-e^{-t})^2}
-  \leq C \delta_N^2,
-  \qquad 
-  \forall t \geq 1.
+  \leq C \delta_N^2.
 \end{equation}
+
 On the other hand, 
-by $\E W_N \geq -K_\beta$ and \eqref{eq:centered W_N tail},
+by $-\E W_N \leq K_\beta:= \beta^2/(2q)$ due to \eqref{eq:EWN range} and \eqref{eq:centered W_N tail}, for any $t>K_\beta$,
 \begin{equation} \label{eq:W_N tail2}
   \mathbb P(W_N<-t)
   \leq
-  \exp\left(-\frac{q(t-K_\beta)^2}{2\beta^2}\right),
-  \qquad 
-  \forall t>K_\beta.
+  \exp\left(-\frac{q(t-K_\beta)^2}{2\beta^2}\right).
 \end{equation}
 Set
 \[
-  T_N=\max\left\{
+  T_N:=\max\left\{
     1,\,
     K_\beta+\frac{2|\beta|}{\sqrt q}
     \sqrt{\log(1/\delta_N)}
   \right\}.
 \]
-By the layer-cake representation,
-we have 
+We represent
 \[
   \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
   =
@@ -480,7 +767,7 @@ Consequently,
   \E\bigl[|W_N|\,\mathbf1_{\{W_N<-1\}}\bigr]
   \leq C\delta_N^2\sqrt{\log(1/\delta_N)}.
 \end{equation}
-Now set $h(w)=e^w-1-w$.  
+Now set $h(w):=e^w-1-w$.  
 Note that
 \[
   h(w)\leq C(e^w-1)^2\quad (w\geq-1),
@@ -513,5 +800,6 @@ it follows that
 \]
 which completes the proof.
 \end{proof}
-
+}
+\fi
 \end{document}
