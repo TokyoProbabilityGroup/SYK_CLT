@@ -74,10 +74,12 @@ integrability controls the square, while $`1\le Z_N` bounds the
 logarithm between zero and $`C\|g\|`.
 :::
 
-:::theorem "clt_conditional_annealed_limit" (parent := "central_limit_theorem") (uses := "gaussian_annealed_input") (lean := "SYK.CLT.annealedFreeEnergy_tendsto, SYK.CLT.annealedDerivative_tendsto, SYK.CLT.secondChaosCoefficient_tendsto")
+:::theorem "clt_conditional_annealed_limit" (parent := "central_limit_theorem") (uses := "gaussian_annealed_input") (lean := "SYK.CLT.annealedFreeEnergy_tendsto, SYK.CLT.annealedDerivative_tendsto, SYK.CLT.secondChaosCoefficient_tendsto, SYK.CLT.Setting.secondChaosScaledCoefficient_tendsto")
 Given `S : Setting q` and `hFE : AnnealedInput q S`, Lean proves convergence
 of the annealed pressure and its derivative, and the second-chaos
-coefficient limit, for every real $`\beta`. The input records the even,
+coefficient limit, for every real $`\beta`. The fixed-order binomial
+asymptotic gives the exact scaled coefficient limit
+$`\sqrt{q!/2}\,\beta\ell_q'(\beta)`. The input records the even,
 convex $`C^1` limit and bounds of manuscript Proposition 4.2 for this
 one family. Constructing `hFE` is outside the conditional CLT proof.
 :::
@@ -129,9 +131,8 @@ projection results in `eq: chaos` are recorded in the next node.
 Integration by parts for a pair of Hermite functions is also checked;
 polynomial closure supplies its growth hypotheses.
 
-The manuscript's final specialization to $`Z_N` remains assigned to F04:
-its smoothness and derivative growth estimates are separate unfinished
-inputs.
+The specialization to $`Z_N` is recorded below: its smoothness and
+all-order derivative growth estimates are checked in Lean.
 :::
 
 :::theorem "clt_hermite_polynomial_span" (parent := "central_limit_theorem") (lean := "SYK.CLT.realHermiteBasis, SYK.CLT.polynomialProdEval_mem_hermiteMulti_span, SYK.CLT.mvPolynomial_eval_mem_hermiteMulti_span, SYK.CLT.mvPolynomial_eval_memLp_and_hermiteSpan, SYK.CLT.hermiteOrthonormal_dense_of_mvPolynomialLp_dense")
@@ -218,7 +219,96 @@ Dividing by the positive mean gives the stated coefficient, including at
 $`\beta=0`. These finite-model results require no annealed-limit input.
 :::
 
-:::theorem "clt_second_chaos_and_remainder" (parent := "central_limit_theorem") (uses := "clt_exact_second_chaos, clt_gaussian_hermite_ibp")
+:::theorem "clt_partition_higher_derivatives" (parent := "central_limit_theorem") (uses := "clt_gaussian_hermite_ibp, clt_partition_moments") (lean := "SYK.CLT.Setting.abs_partialMulti_Z_le, SYK.CLT.Setting.partialMulti_Z_exp_growth, SYK.CLT.Setting.hermite_coefficient_Z_eq_integral_partialMulti, SYK.CLT.Setting.abs_inner_hermiteLp_YGaussianLp_le")
+For every interaction multi-index $`\alpha`, the normalized partition
+function satisfies the bound in `eq:Z-derivative-bound`:
+
+$$`
+|\partial_g^\alpha Z_N(\beta;g)|
+\le (|\beta|\sigma_N)^{|\alpha|}Z_N(\beta;g).
+`$$
+
+Here $`\sigma_N` is the coupling scale of the shared model. The proof
+pulls the checked iterated trace-exponential derivative estimate through
+the real part and the linear disorder map. Exponential growth and
+smoothness permit Gaussian Hermite integration by parts for every
+$`\alpha`. The resulting Hermite coefficient of $`Y_N` is bounded by
+$`(|\beta|\sigma_N)^{|\alpha|}`. These Lean declarations have no
+`sorryAx` dependency.
+:::
+
+:::theorem "clt_rademacher_encoding" (parent := "central_limit_theorem") (lean := "SYK.CLT.Rademacher.even_sum_rademacher_moment, SYK.CLT.Rademacher.rademacher_encoding")
+For the degree-$`q` elementary symmetric polynomial $`S_{N,q}` in
+independent Rademacher signs, Lean proves `eq:even-sum-Rademacher-moment`:
+
+$$`
+\sum_{|\alpha|=r,\ \alpha\ \mathrm{even}}\frac1{\alpha!}
+=\frac1{r!}\mathbb E_\varepsilon[S_{N,q}^r].
+`$$
+
+For even $`q\ge4`, it also proves `eq:Rademacher-exponential-moment` with
+constants depending only on $`q` and the stated range
+$`0\le t\le c_q N^{-(q-1)}`. Both declarations were checked without
+`sorryAx`; the full higher-chaos sum remains separate.
+:::
+
+:::theorem "clt_degree_projection_bound" (parent := "central_limit_theorem") (uses := "clt_partition_higher_derivatives, clt_rademacher_encoding, clt_hermite_complete") (lean := "SYK.CLT.Setting.norm_sq_hermiteDegreeProjection_le_even_sum, SYK.CLT.Setting.norm_sq_hermiteDegreeProjection_le_rademacher_moment")
+For every homogeneous degree $`r`, the Gaussian $`L^2` projection of
+$`Y_N` satisfies `eq:Hermite-Rademacher-bound` and its Rademacher form:
+
+$$`
+\|P_rY_N(\beta)\|_2^2
+\le \frac{(\beta^2\sigma_N^2)^r}{r!}
+\mathbb E_\varepsilon[S_{N,q}^r].
+`$$
+
+The result uses the exact factorial norm of each Hermite product, parity
+of the coefficients, the all-order derivative bound, and the finite
+Rademacher counting identity. The next node sums these checked
+finite-degree bounds.
+:::
+
+:::theorem "clt_higher_chaos_moment_sum" (parent := "central_limit_theorem") (uses := "clt_degree_projection_bound, clt_rademacher_encoding") (lean := "SYK.CLT.Setting.sum_higherChaosProjection_le_exp_moment, SYK.CLT.Setting.tsum_higherChaosProjection_le_exp_moment")
+Put $`t_N=\beta^2\sigma_N^2`. The checked infinite-series estimate is
+
+$$`
+\sum_{r\ge3}\|P_rY_N(\beta)\|_2^2
+\le \frac{t_N^3}{6}\mathbb E_\varepsilon
+\left[|S_{N,q}|^3e^{t_N|S_{N,q}|}\right].
+`$$
+
+The proof first bounds finite partial sums using the factorial-weighted
+Rademacher identity and the exponential-series tail inequality, then
+passes to the nonnegative infinite sum. The next node supplies the
+high-temperature radius and the resulting power of $`N`.
+:::
+
+:::theorem "clt_higher_chaos_closure" (parent := "central_limit_theorem") (uses := "clt_higher_chaos_moment_sum, clt_rademacher_encoding") (lean := "SYK.CLT.Setting.tsum_higherChaosProjection_le_power, SYK.CLT.Setting.higherChaosProjection_isLittleO")
+For some $`\beta_{\rm r}>0` and all $`|\beta|<\beta_{\rm r}`,
+
+$$`
+\sum_{r\ge3}\|P_rY_N(\beta)\|_2^2
+=O\bigl(N^{-3(q/2-1)}\bigr)=o(N^{2-q}).
+`$$
+
+Both the uniform pointwise power bound and the little-o statement are
+checked in Lean. The radius comes from the Rademacher exponential-moment
+constant and the coupling variance $`(q-1)!N^{-(q-1)}`.
+:::
+
+:::theorem "clt_gaussian_quadratic_sum" (parent := "central_limit_theorem") (uses := "clt_exact_second_chaos") (lean := "SYK.CLT.Setting.interactionCard_tendsto, SYK.CLT.Setting.normalizedQuadraticSum_clt")
+With $`M_N=\binom Nq`, the centered quadratic Gaussian sum
+
+$$`
+\frac{1}{\sqrt{2M_N}}\sum_{I\in\mathcal I_N}(g_I^2-1)
+`$$
+
+converges in distribution to $`\mathcal N(0,1)` under the shared Gaussian
+coupling measure. The checked proof uses the finite product characteristic
+function, its quadratic Taylor limit, and $`M_N\to\infty`.
+:::
+
+:::theorem "clt_second_chaos_and_remainder" (parent := "central_limit_theorem") (uses := "clt_exact_second_chaos, clt_higher_chaos_closure")
 The manuscript's `lem:exact-second-chaos` identifies the leading Gaussian
 chaos of $`Y_N-1`. Its `prop:higher-chaos-closure` bounds the remainder by
 $`\|\mathcal R_N\|_2^2=O(N^{-3a})`, where $`a=q/2-1`.
@@ -236,12 +326,37 @@ coefficient of $`Y_N` vanishes by
 second-chaos projection as a sum over interactions: the term at $`I` is
 $`\frac12\mathbb E[Y_N(G)(g_I^2-1)](g_I^2-1)` in Gaussian $`L^2`.
 The common coefficient is identified by the checked exact second-chaos
-theorem above. The higher-chaos remainder bound remains unfinished;
-it requires the higher-order partition derivative estimates and the
-Rademacher encoding and moment bounds.
+theorem above. All-order derivatives, Rademacher moments, and the
+infinite-series bound, high-temperature radius, and the
+$`N^{-3(q/2-1)}=o(N^{2-q})` estimate are now checked. The actual $`L^2`$
+remainder is identified by `SYK.CLT.Setting.higherChaosRemainderLp_norm_sq`,
+and its scaled norm tends to zero by
+`SYK.CLT.Setting.scaled_higherChaosRemainderLp_norm_tendsto_zero`.
+`SYK.CLT.Setting.Y_zeroChaos` and `SYK.CLT.Setting.Y_decomposition`
+give the constant projection and the exact quadratic-plus-remainder
+decomposition. `SYK.CLT.Setting.Y_secondChaos_eq_quadraticGaussianLp`
+identifies the quadratic term with the normalized Gaussian-square sum.
+`SYK.CLT.Setting.scaled_Y_decomposition` gives its exact scaled form,
+and `SYK.CLT.Setting.quadraticGaussianLp_clt` gives the sum's limit
+on the product Gaussian space.
+The changing scalar is handled by
+`SYK.CLT.tendstoInDistribution_mul_coeff`, giving
+`SYK.CLT.Setting.scaledQuadraticGaussianLp_clt` under `AnnealedInput`.
+`SYK.CLT.varying_l2_perturb_clt` transfers the vanishing tail despite
+the varying coupling spaces. `SYK.CLT.Setting.relativeFluctuation_clt`
+states the resulting relative CLT on the model's Euclidean coupling space
+with the manuscript's exact `limitVariance`.
+`SYK.CLT.Setting.varianceY_pi_decomposition` gives the exact finite-size
+quadratic-plus-remainder variance, and
+`SYK.CLT.Setting.scaled_varianceZ_over_mean_sq_tendsto` proves convergence
+of the normalized partition variance to `limitVariance`.
+`SYK.CLT.Setting.varianceZ_pos_of_ne_zero` proves finite-size positivity,
+and `SYK.CLT.Setting.standardizedFluctuation_clt` gives the standardized
+Gaussian limit. The partition-function theorem is checked independently
+of the remaining logarithmic transfer.
 :::
 
-:::theorem "partition_function_clt" (parent := "central_limit_theorem") (uses := "clt_second_chaos_and_remainder, clt_conditional_nondegeneracy") (lean := "SYK.CLT.partition_clt, SYK.CLT.partition_and_log_partition_clt")
+:::theorem "partition_function_clt" (parent := "central_limit_theorem") (uses := "clt_second_chaos_and_remainder, clt_gaussian_quadratic_sum, clt_conditional_nondegeneracy") (lean := "SYK.CLT.partition_clt, SYK.CLT.partition_and_log_partition_clt")
 Assume `S : Setting q` and `hFE : AnnealedInput q S`. The Lean statements
 choose $`0<\beta_q` so that, for real
 $`|\beta|<\beta_q`, the annealed pressure converges to $`\ell(\beta)` and
@@ -255,7 +370,8 @@ N^{q/2-1}(Y_N(\beta)-1)
 For $`\beta\ne0`, the statements also require positive limiting variance,
 positive variance at every finite size, and a standardized CLT. At
 $`\beta=0`, the relative limit is degenerate and standardization is excluded.
-The joint declaration and its two projections depend on `sorryAx`.
+The joint declaration and both individual CLTs are Lean-checked without
+`sorryAx`, conditional on `hFE`.
 The manuscript's `thm:partition-clt` includes zero in its standardized
 formula; its parameter range still needs correction before treating the
 manuscript and Lean statements as identical.
@@ -295,14 +411,15 @@ The disorder variance is zero. These identities have Lean proofs without
 `sorryAx`; they do not extend the standardized CLT to $`\beta=0`.
 :::
 
-:::theorem "clt_log_centering_error" (parent := "central_limit_theorem") (uses := "clt_relative_and_log_moments, clt_second_chaos_and_remainder")
+:::theorem "clt_log_centering_error" (parent := "central_limit_theorem") (uses := "clt_relative_and_log_moments, clt_second_chaos_and_remainder") (lean := "SYK.CLT.Setting.scaled_sq_Y_lt_half_tendsto_zero, SYK.CLT.Setting.scaled_integral_logLinearError_tendsto_zero, SYK.CLT.Setting.scaled_centered_logLinearError_l1_tendsto_zero")
 Write $`W_N=\log Y_N` and $`a=q/2-1`. The active manuscript proof combines
 $`\mathbb E(Y_N-1)^2=O(N^{-2a})` with
 $`\mathbb P(Y_N<1/2)=O(N^{-3a})`. On the small event,
 $`Z_N\ge1` gives $`-\log Y_N\le\log\mathbb E Z_N=O(N)`.
 It follows that $`\mathbb E W_N=o(N^{-a})`, which controls the difference
 between centering by $`\mathbb E\log Z_N` and by
-$`\log\mathbb E Z_N`. This estimate is not formalized in Lean.
+$`\log\mathbb E Z_N`. Lean proves the required vanishing scaled
+mean error and centered $`L^1` error under `hFE`.
 :::
 
 :::theorem "log_partition_clt" (parent := "central_limit_theorem") (uses := "partition_function_clt, clt_log_centering_error") (lean := "SYK.CLT.log_partition_clt, SYK.CLT.partition_and_log_partition_clt")
@@ -316,8 +433,9 @@ N^{q/2-1}\bigl(\log Z_N(\beta)-\mathbb E\log Z_N(\beta)\bigr)
 `$$
 
 The current manuscript uses the relative CLT, local linearization of
-$`\log`, and the preceding centering estimate. The Lean joint theorem has
-a `sorry` proof; its log-CLT projection therefore has `sorryAx` as well.
+$`\log`, and the preceding centering estimate. Lean verifies the
+logarithmic CLT and the joint theorem without `sorryAx`, conditional on
+`hFE`.
 :::
 
 :::theorem "free_energy_law_of_large_numbers" (parent := "central_limit_theorem")

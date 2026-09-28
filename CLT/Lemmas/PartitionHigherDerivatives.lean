@@ -1,5 +1,15 @@
 import SYK.CLT.Lemmas.PartitionDerivatives
 
+/-!
+# Higher derivatives of the finite SYK partition function
+
+The checked iterated trace-exponential derivative bound is transported to
+`Setting.Z`, including its coupling scale, real part, smoothness, and Gaussian
+growth. Entry points: `Setting.abs_partialMulti_Z_le`,
+`Setting.hermite_coefficient_Z_eq_integral_partialMulti`, and
+`Setting.abs_inner_hermiteLp_YGaussianLp_le`.
+-/
+
 open MeasureTheory Filter
 open scoped Topology Matrix.Norms.L2Operator InnerProductSpace
 

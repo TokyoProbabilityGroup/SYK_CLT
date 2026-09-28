@@ -66,6 +66,37 @@ private theorem trace_exp_re_ge_card {A : Matrix d d ℂ}
       intro i _
       exact Real.add_one_le_exp _
 
+/-- Strict form of the trace-exponential bound for a nonzero traceless
+Hermitian matrix. -/
+private theorem trace_exp_re_gt_card {A : Matrix d d ℂ}
+    (hA : A.IsHermitian) (htr : Matrix.trace A = 0) (hne : A ≠ 0) :
+    (Fintype.card d : ℝ) < (Matrix.trace (NormedSpace.exp A)).re := by
+  classical
+  have hsum : (∑ i, hA.eigenvalues i) = 0 := by
+    have ht := hA.trace_eq_sum_eigenvalues
+    rw [htr] at ht
+    have := congrArg Complex.re ht
+    simpa using this.symm
+  have hex : ∃ i : d, hA.eigenvalues i ≠ 0 := by
+    by_contra h
+    push Not at h
+    apply hne ((hA.eigenvalues_eq_zero_iff).mp ?_)
+    funext i
+    exact h i
+  rw [trace_exp_eq_sum hA]
+  simp only [Complex.re_sum, Complex.ofReal_re]
+  calc
+    (Fintype.card d : ℝ) = ∑ _i : d, (1 : ℝ) := by simp
+    _ = ∑ i, (hA.eigenvalues i + 1) := by
+      rw [Finset.sum_add_distrib, hsum]
+      simp
+    _ < ∑ i, Real.exp (hA.eigenvalues i) := by
+      apply Finset.sum_lt_sum
+      · intro i _
+        exact Real.add_one_le_exp _
+      · obtain ⟨i, hi⟩ := hex
+        exact ⟨i, Finset.mem_univ i, Real.add_one_lt_exp hi⟩
+
 private theorem trace_exp_re_le_card_exp_norm {A : Matrix d d ℂ}
     (hA : A.IsHermitian) :
     (Matrix.trace (NormedSpace.exp A)).re ≤
@@ -116,6 +147,28 @@ theorem normalizedHamiltonian_trace_eq_zero (P : Params)
     Matrix.trace_smul, interactionOperator_trace_eq_zero P M]
 
 variable [Nonempty d]
+
+/-- A single nonzero Gaussian coupling gives a nonzero Hamiltonian. -/
+theorem normalizedHamiltonian_single_ne_zero (P : Params)
+    (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (s : InteractionIndex P.N P.q) :
+    normalizedHamiltonian P M (WithLp.toLp 2 (Pi.single s (1 : ℝ))) ≠ 0 := by
+  classical
+  have hscale : couplingScale P ≠ 0 := by
+    have hN : (0 : ℝ) < P.N := by
+      exact_mod_cast lt_of_lt_of_le P.q_pos P.q_le_N
+    have hs : 0 < couplingScale P ^ 2 := by
+      rw [couplingScale_sq]
+      positivity
+    nlinarith
+  have hM : M.interactionOperator s ≠ 0 := by
+    intro h
+    have hsq := M.interactionOperator_sq P.q_even s
+    rw [h] at hsq
+    have hh : (0 : Matrix d d ℂ) = 1 := by simpa only [zero_mul] using hsq
+    exact (zero_ne_one : (0 : Matrix d d ℂ) ≠ 1) hh
+  unfold normalizedHamiltonian hamiltonian
+  simp [Pi.single_apply, hscale, hM]
 
 /-- The Hamiltonian also has zero dimension-normalized trace. -/
 theorem normalizedHamiltonian_normalizedTrace_eq_zero (P : Params)
@@ -208,6 +261,44 @@ theorem realPartitionFunction_ge_one (P : Params)
     (le_div_iff₀ hd).mpr (by simpa using h)
   simpa [realPartitionFunction, partitionFunction, normalizedTrace,
     gibbsOperator, A, Complex.div_natCast_re] using hdiv
+
+/-- The lower bound is strict when the Hamiltonian and inverse temperature
+are nonzero. -/
+theorem realPartitionFunction_gt_one_of_hamiltonian_ne_zero (P : Params)
+    (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) (hβ : β ≠ 0)
+    (g : CouplingSpace P.N P.q)
+    (hH : normalizedHamiltonian P M g ≠ 0) :
+    1 < realPartitionFunction P M β g := by
+  let A : Matrix d d ℂ := (β : ℂ) • -normalizedHamiltonian P M g
+  have hA : A.IsHermitian := by
+    change star A = A
+    simp [A, normalizedHamiltonian_self_adjoint]
+  have htr : Matrix.trace A = 0 := by
+    simp [A, normalizedHamiltonian_trace_eq_zero P M g]
+  have hAne : A ≠ 0 := by
+    exact smul_ne_zero (by exact_mod_cast hβ) (neg_ne_zero.mpr hH)
+  have h := trace_exp_re_gt_card hA htr hAne
+  have hd : (0 : ℝ) < Fintype.card d := Nat.cast_pos.mpr Fintype.card_pos
+  have hdiv : 1 < (Matrix.trace (NormedSpace.exp A)).re / (Fintype.card d : ℝ) :=
+    (lt_div_iff₀ hd).mpr (by simpa using h)
+  simpa [realPartitionFunction, partitionFunction, normalizedTrace,
+    gibbsOperator, A, Complex.div_natCast_re] using hdiv
+
+/-- A single interaction already makes the finite-size partition function
+strictly larger than its value at zero coupling. -/
+theorem realPartitionFunction_single_gt_one (P : Params)
+    (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) (hβ : β ≠ 0)
+    (s : InteractionIndex P.N P.q) :
+    1 < realPartitionFunction P M β
+      (WithLp.toLp 2 (Pi.single s (1 : ℝ))) := by
+  exact realPartitionFunction_gt_one_of_hamiltonian_ne_zero P M β hβ _
+    (normalizedHamiltonian_single_ne_zero P M s)
+
+@[simp]
+theorem realPartitionFunction_zero_coupling (P : Params)
+    (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) :
+    realPartitionFunction P M β 0 = 1 := by
+  simp [realPartitionFunction, partitionFunction, normalizedTrace, gibbsOperator]
 
 theorem exists_realPartitionFunction_exp_bound (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) :

@@ -29,6 +29,10 @@ F01–F08・Z01 の後続課題では、主要宣言が実装・統合・検証�
 
 F02（2026-09-27）：個別検査・CLT ビルド・公理依存確認後、`CLT.lean` に `clt_exact_second_chaos` と証明を追加した。全実数の逆温度での一次射影零と二次の共通係数を Lean 宣言へ対応付け、添字対称性・一次部分積分・期待値の微分交換を記録した。高次剰余の未形式化ノードを残し、有限模型にアニール極限を要求しない依存へ修正した。ソース照合のみ実施し、Verso の検査は休止中。
 
+F03–F05 と F06 の先頭（2026-09-28）：個別検査・CLT ビルド・公理依存確認後、`CLT.lean` に `clt_partition_higher_derivatives`、`clt_rademacher_encoding`、`clt_degree_projection_bound`、`clt_higher_chaos_moment_sum`、`clt_higher_chaos_closure`、`clt_gaussian_quadratic_sum` を追加した。原稿の `eq:Z-derivative-bound`、`eq:even-sum-Rademacher-moment`、`eq:Rademacher-exponential-moment`、`eq:Hermite-Rademacher-bound`、`eq:all-higher-chaoses-at-once`、`prop:higher-chaos-closure`、独立ガウス二乗和の CLT に対応する宣言を照合した。最終 CLT への接続は未形式化として残す。Verso の機械的検査は休止中で、宣言参照と依存はソース上だけで照合した。
+
+F06・F07 の統合（2026-09-28）：`CLT.lean` の `partition_function_clt`、`clt_log_centering_error`、`log_partition_clt` を検証済みの相対・対数・共同主定理および中心化誤差の宣言へ接続した。主要定理の `#print axioms` は `[propext, Classical.choice, Quot.sound]` のみ。外部入力 `AnnealedInput` は引き続き仮定であり、F08 の大数則と R02-A・R04-A の原稿上の判断は別に残る。Verso の機械的検査は休止中。
+
 現行の `CLT.lean` は、一般ガウス–エルミート部分積分、直交性、有限射影と、稠密性を仮定した次数和を検証済みの Lean 宣言に対応付けている。無条件のガウス $L^2$ 完全性と `Z_N` への適用は未完成と区別する。宣言参照のソース照合は [F01 取り込み検証](../WORK_HISTORY.md#merge-f01-2026-09-27)、先行する部分積分の検証は [作業履歴](../WORK_HISTORY.md#clt-f01-gaussian) を参照する。Verso による章検査・生成・参照検査は休止中である。
 
 Verso 休止中は、変更した章の数学的主張・Lean 宣言名・依存名をソース上で照合する。Verso を必要とする `lake env lean`、生成入口の実行、`vbp check` は復帰後に休止中の変更を含めてまとめて行う。章を並行して編集しても、統合検証の担当は一人とする。[作業履歴](../WORK_HISTORY.md#chapters-records)の旧コマンドと出力先は当時のものであり、現在の手順とは区別する。

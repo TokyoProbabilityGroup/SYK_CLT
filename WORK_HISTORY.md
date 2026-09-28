@@ -892,3 +892,13 @@ W01 は2026-09-08、W02 は2026-09-12、W03・W04・W05 は2026-09-18に完了�
 Lean 4.32.2 の個別検査と `lake -f lakefile.toml --old build Model SuperConcentration CLT` は成功した。変更後の `Main.lean` と F01 モジュールの同時 import も成功した。共有3宣言と新しい稠密性・無限和5宣言の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみ。追加したソースに `sorry`、`admit`、`axiom` はない。親ワークスペースの古い `lakefile.toml` では `lake build SYK` が Blueprint の休止設定と整合せず `some modules have bad imports` で失敗したため、指定した関連ライブラリを個別に検査した。Verso の生成・参照検査は休止規則に従い未実施である。
 
 研究者は原稿 `eq: chaos` をガウス $L^2$ の等式として読むことを確認した。これにより F01 の収束モードは確定し、F01 を完了とした。現在のソースで `lake -f lakefile.toml --old build CLT`（3188 jobs）と既定ビルド（3858 jobs）が成功した。`hermiteOrthonormal_dense`、`hasSum_hermiteCoefficients_unconditional`、`hasSum_hermiteDegreeProjection_unconditional`、共有 `hermiteMulti_ibp_of_expGrowth` の公理依存はそれぞれ `[propext, Classical.choice, Quot.sound]` のみ。F01 の対象ファイルに `sorry`・`admit`・`axiom` はない。既存の `Main.lean` の共同 CLT には `sorry` が残る。Blueprint は宣言参照をソース上で照合し、Verso の機械的検査は休止中のため実施していない。
+
+<a id="clt-f03-f07-completion-2026-09-28"></a>
+
+## F03–F07 条件付き CLT の統合（2026-09-28）
+
+F03 のラデマッハ評価、F04 の任意階微分、F05 の高次カオス剰余を統合し、F06 では二次カオス係数の漸近、独立ガウス二乗和の CLT、残差の $L^2$ 消失、有限サイズ分散の正値性から相対・標準化 CLT を証明した。F07 ではガウス二乗和の一様四次モーメント、小確率事象、`Z_N≥1` による対数の線形化誤差を組み合わせ、中心化誤差の尺度付き $L^1$ 消失と対数 CLT を証明した。`Main.lean` の共同主定理は同じ高温半径で三つの結論を組み合わせ、既存の `sorry` を除去した。
+
+`lake env lean SYK/CLT/Lemmas/LogAsymptotics.lean`、`lake build SYK.CLT.Main`（3247 jobs）、`lake build CLT`（3253 jobs）は成功した。`partition_and_log_partition_clt`、`partition_clt`、`log_partition_clt`、`Setting.logFluctuation_clt` の `#print axioms` は `[propext, Classical.choice, Quot.sound]` のみ。三つの主定理はすべて `{q : ℕ} (S : Setting q) (hFE : AnnealedInput q S)` を入力とし、実逆温度 `|β|<βq`、尺度 `N^(q/2-1)`、極限分散 `(q!/2)β²(ℓ_q'(β))²` を維持する。標準化 CLT は `β≠0` に限る。`hFE` の構築、F08 の大数則、R02-A・R04-A の原稿上の判断は含まない。Blueprint は宣言参照と依存をソース上で更新し、Verso の機械的検査は休止規則に従い実施していない。
+
+文書・コメント更新後の既定 `lake build` も 3326 jobs で成功した。`CLT` の Lean ソースには `sorry` を残していない。`git diff --check` は成功し、コミットは作成していない。
