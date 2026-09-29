@@ -5,6 +5,7 @@ import Mathlib.Analysis.Matrix.Order
 import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Analysis.SpecialFunctions.Exponential
+import Mathlib.Analysis.SpecialFunctions.Complex.LogDeriv
 import Mathlib.LinearAlgebra.Matrix.Trace
 
 /-!
@@ -242,6 +243,79 @@ theorem partitionFunction_pos [Nonempty d] (β : NNReal)
     0 < (partitionFunction (β : ℂ) H).re := by
   have h := (gibbsOperator_posDef β hH).trace_pos
   exact (RCLike.pos_iff.mp h).1
+
+/-- Positivity extends from physical nonnegative inverse temperature to
+every real temperature by reversing the sign of the Hermitian matrix. -/
+theorem partitionFunction_re_pos_real [Nonempty d] (β : ℝ)
+    {H : Matrix d d ℂ} (hH : star H = H) :
+    0 < (partitionFunction (β : ℂ) H).re := by
+  by_cases hβ : 0 ≤ β
+  · let γ : NNReal := ⟨β, hβ⟩
+    have hγ : (γ : ℂ) = (β : ℂ) := by
+      exact_mod_cast (show (γ : ℝ) = β by rfl)
+    simpa [hγ] using (partitionFunction_pos γ hH)
+  · let γ : NNReal := ⟨-β, le_of_lt (neg_pos.mpr (lt_of_not_ge hβ))⟩
+    have hHneg : star (-H) = -H := by simp [hH]
+    have hβeq : (γ : ℂ) = -(β : ℂ) := by
+      exact_mod_cast (show (γ : ℝ) = -β by rfl)
+    have heq : partitionFunction (β : ℂ) H =
+        partitionFunction (γ : ℂ) (-H) := by
+      rw [hβeq]
+      simp [partitionFunction, gibbsOperator, smul_neg, neg_smul]
+    rw [heq]
+    exact partitionFunction_pos γ hHneg
+
+/-- For a fixed Hermitian matrix and real inverse temperature,
+the partition function has positive real part on some complex disk. The
+radius may depend on both the matrix and the center. -/
+theorem partitionFunction_re_pos_near_real [Nonempty d] (β : ℝ)
+    {H : Matrix d d ℂ} (hH : star H = H) :
+    ∃ ε : ℝ, 0 < ε ∧ ∀ z : ℂ, dist z (β : ℂ) < ε →
+      0 < (partitionFunction z H).re := by
+  have hcont : Continuous (fun z : ℂ ↦ (partitionFunction z H).re) :=
+    Complex.continuous_re.comp (partitionFunction_differentiable H).continuous
+  have hopen : IsOpen {z : ℂ | 0 < (partitionFunction z H).re} :=
+    isOpen_lt continuous_const hcont
+  obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.mp
+    (hopen.mem_nhds (partitionFunction_re_pos_real β hH))
+  exact ⟨ε, hε, fun z hz ↦ hball (Metric.mem_ball.mpr hz)⟩
+
+/-- The local disk supplies the nonvanishing assumption of the complex
+logarithmic-derivative API, without a radius uniform in the matrix. -/
+theorem partitionFunction_ne_zero_near_real [Nonempty d] (β : ℝ)
+    {H : Matrix d d ℂ} (hH : star H = H) :
+    ∃ ε : ℝ, 0 < ε ∧ ∀ z : ℂ, dist z (β : ℂ) < ε →
+      partitionFunction z H ≠ 0 := by
+  obtain ⟨ε, hε, hpos⟩ := partitionFunction_re_pos_near_real β hH
+  refine ⟨ε, hε, fun z hz hzero ↦ ?_⟩
+  have := hpos z hz
+  simp [hzero] at this
+
+/-- The existing pointwise logarithmic-derivative formula holds throughout
+the zero-free disk around a fixed real temperature. -/
+theorem partitionFunction_mul_log_deriv_near_real [Nonempty d] (β : ℝ)
+    {H : Matrix d d ℂ} (hH : star H = H) :
+    ∃ ε : ℝ, 0 < ε ∧ ∀ z : ℂ, dist z (β : ℂ) < ε →
+      partitionFunction z H * logDeriv (fun w : ℂ ↦ partitionFunction w H) z =
+        -Matrix.trace (H * gibbsOperator z H) := by
+  obtain ⟨ε, hε, hzero⟩ := partitionFunction_ne_zero_near_real β hH
+  exact ⟨ε, hε, fun z hz ↦ partitionFunction_mul_log_deriv H z (hzero z hz)⟩
+
+/-- On a possibly smaller local disk, the principal complex logarithm of the
+partition function is holomorphic: its values stay in the right half-plane,
+away from the branch cut. -/
+theorem partitionFunction_log_differentiable_near_real [Nonempty d] (β : ℝ)
+    {H : Matrix d d ℂ} (hH : star H = H) :
+    ∃ ε : ℝ, 0 < ε ∧ DifferentiableOn ℂ
+      (fun z : ℂ ↦ Complex.log (partitionFunction z H))
+      (Metric.ball (β : ℂ) ε) := by
+  obtain ⟨ε, hε, hpos⟩ := partitionFunction_re_pos_near_real β hH
+  refine ⟨ε, hε, ?_⟩
+  intro z hz
+  have hslit : partitionFunction z H ∈ Complex.slitPlane :=
+    Complex.mem_slitPlane_iff.mpr (Or.inl (hpos z (Metric.mem_ball.mp hz)))
+  exact ((Complex.differentiableAt_log hslit).comp z
+    ((partitionFunction_differentiable H) z)).differentiableWithinAt
 
 theorem thermalDensity_isDensityMatrix [Nonempty d] (β : NNReal)
     {H : Matrix d d ℂ} (hH : star H = H) :

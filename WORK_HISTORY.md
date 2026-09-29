@@ -1,5 +1,13 @@
 # SYK の作業履歴
 
+<a id="z01-local-zero-free-2026-09-28"></a>
+
+## Z01：固定有限行列の局所非零円板（2026-09-28）
+
+現行 CLT の Lean 宣言と原稿を照合し、複素対数、`N`・乱数標本に一様な零点のない円板・帯状領域の利用箇所がないことを確認した。研究者が固定 `H` の局所円板を最初の対象として選択した。`Model/FiniteDimensionalGibbs.lean` で、自己共役な固定有限行列 `H` と各 `β∈ℝ` に対し `Re Z_H(β)>0` を証明し、連続性から半径 `ε(H,β)>0` の複素円板で `Re Z_H(z)>0` を得た。`partitionFunction_ne_zero_near_real` は同円板で `Z_H(z)≠0` を供給し、`partitionFunction_mul_log_deriv_near_real` は既存の条件付き対数微分公式を適用する。値が右半平面にあるため `partitionFunction_log_differentiable_near_real` は主値の `Complex.log ∘ Z_H` が円板上で複素微分可能であることを証明する。外部結果、公理、ハミルトニアンのノルム上界を追加していない。半径の `H`・`N`・標本についての一様性や全複素平面での非零性は主張しない。
+
+検証時の HEAD は `e20f361`。`lake -f SYK/workspace/lakefile.toml env lean SYK/Model/FiniteDimensionalGibbs.lean`、`lake -f SYK/workspace/lakefile.toml build Model SuperConcentration CLT`（3325 jobs）、同設定の既定 `lake build`（3326 jobs）は成功した。五つの新定理の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみ。既存の上流・補助モジュールの linter 警告は再表示された。Blueprint は本文・宣言名・依存名をソース照合し、休止中の Verso 生成・参照検査は行っていない。変更は未コミット。
+
 <a id="clt-nonzero-temperature-2026-09-28"></a>
 
 ## CLT の Lean 定理文を非零温度へ統一（2026-09-28）
