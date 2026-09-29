@@ -6,14 +6,14 @@
 
 ## 作業前に読む文書
 
-1. `../EDITING_PLAN.md` の指定 ID の一覧行
-2. `EDITING_PLAN.md` の該当する作業節
+1. `../EDITING_PLAN.md` の該当する残件
+2. `EDITING_PLAN.md` の該当する残件
 3. `ARCHITECTURE.md` と `../Model/ARCHITECTURE.md` の関係する規約・依存関係
-4. 変更対象が Model の共有 API に及ぶ場合は `../Model/EDITING_PLAN.md` の該当節
+4. 変更対象が Model の共有 API に及ぶ場合は `../Model/EDITING_PLAN.md` の該当する残件
 5. 公開用の説明を変更する場合は `README.md`
 6. 旧仕様との比較が必要な場合だけ二つの証明計画書
 
-正確な定理文と検証状態は Lean のソースコード、目標設計は `ARCHITECTURE.md` を優先する。作業単位とその前提・状態は `../EDITING_PLAN.md`、細目と残作業は `EDITING_PLAN.md` を読む。完了済み作業の詳しい検証記録は必要になった場合だけ [作業履歴](../WORK_HISTORY.md) の該当節を読む。
+正確な定理文と検証状態は Lean のソースコード、現行設計は `ARCHITECTURE.md` を優先する。横断的な残件は `../EDITING_PLAN.md`、担当部分の残件は `EDITING_PLAN.md` を読む。完了済み作業の詳しい検証記録は必要になった場合だけ [作業履歴](../WORK_HISTORY.md) の該当節を読む。
 
 汎用ガウス基盤を変更する場合は、`../Probability/GaussianConcentration/AGENTS.md` と同じ場所の `EDITING_PLAN.md` も読む。
 

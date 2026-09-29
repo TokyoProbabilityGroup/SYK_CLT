@@ -6,7 +6,7 @@
 
 ## 作業計画
 
-模型側・利用側への接続を含む全体の順序と状態は [全体計画](../../EDITING_PLAN.md) の指定 ID の行、このディレクトリの3ファイルの編集細目と現行の検証状態は [EDITING_PLAN.md](EDITING_PLAN.md) の該当節を確認する。完了済み作業の詳しい検証経緯は必要時に [作業履歴](../../WORK_HISTORY.md#gaussian-foundation) を参照する。
+横断的な残件は [全体計画](../../EDITING_PLAN.md)、このディレクトリの保守課題は [EDITING_PLAN.md](EDITING_PLAN.md) を確認する。完了済み作業の詳しい検証経緯は必要時に [作業履歴](../../WORK_HISTORY.md#gaussian-foundation) を参照する。
 
 ## 独立性
 
