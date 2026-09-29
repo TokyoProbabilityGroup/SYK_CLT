@@ -25,9 +25,9 @@ pressure and derivative, the explicit quadratic and cubic error bounds,
 and the positive derivative and nonzero-temperature sign. The stated
 small-temperature expansions follow from those bounds.
 
-The structure supplies hypotheses for a specified family. Constructing
-an instance from the manuscript's result for a concrete `Setting q`
-remains a separate task.
+The structure supplies the assumed proposition for a specified abstract
+family. Constructing an instance for a concrete family is outside the
+conditional CLT proof and is not a prerequisite for its completion.
 :::
 
 :::definition "rademacher_annealed_model" (parent := "annealed_free_energy") (uses := "majorana_system") (lean := "SYK.AnnealedFE.admissibleSize, SYK.AnnealedFE.paperHamiltonian, SYK.AnnealedFE.partitionFunction, SYK.AnnealedFE.annealedPressure")

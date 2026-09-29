@@ -1,5 +1,53 @@
 # SYK の作業履歴
 
+<a id="clt-nonzero-temperature-2026-09-28"></a>
+
+## CLT の Lean 定理文を非零温度へ統一（2026-09-28）
+
+研究者の指示により、原稿 `thm:partition-clt`・`cor:free-energy-clt` と対応する Lean の共同定理 `partition_and_log_partition_clt`、個別定理 `partition_clt`・`log_partition_clt`、中間の `Setting.relativeFluctuation_pi_clt`・`Setting.relativeFluctuation_clt`・`Setting.logFluctuation_clt` に、共通して `|β|<βq → β≠0` を明示した。既存の `Setting.standardizedFluctuation_clt` も同じ範囲である。先頭二次カオスの固定温度 CLT `Setting.scaledQuadraticGaussianLp_clt` にも `β≠0` を明示した。有限模型の零温度恒等式、全実数で成り立つ解析・係数・剰余評価、および外部入力 `AnnealedInput` の全実軸での主張は変更していない。共同定理は非零温度の分散正値性と標準化 CLT を同じ量化の下に置き、原稿の三つの結論と整合する。
+
+変更前から前節の原稿・計画・Blueprint 更新は未コミットで存在し、その差分を保持した。ワークスペースのルートから `lake -f SYK/workspace/lakefile.toml build CLT` は 3253 jobs で成功した。共同・個別・中間の八つの CLT 宣言の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみ。既存の上流・補助モジュールの linter 警告は再表示された。Blueprint の数学的主張と宣言名はソース上で照合し、休止中の Verso 機械的検査は行っていない。変更は未コミット。
+
+<a id="clt-r-f-completion-2026-09-28"></a>
+
+## CLT 原稿 R01–R05 と F01–F08 の確認（2026-09-28）
+
+開始 HEAD は `9857962`（`sasayan_task`）、作業開始時の追跡・未追跡差分はなかった。R02-A の手動修正を確認した。`introduction.tex` の `thm:partition-clt` と `cor:free-energy-clt` はいずれも `β∈(-β_q,β_q)\setminus\{0\}` を仮定する。相対・対数 CLT に関しては Lean の零温度を含む主張より狭いが、標準化量の零温度での未定義性は解消している。F06 の `Setting.varianceZ_pos_of_ne_zero` は非零温度における全有限サイズの正値性を与える。R02-B の `S : Setting q` と `hFE : AnnealedInput q S` を入力とする条件付き方針は維持した。
+
+R04-A は方針(i)を採用し、`thm: input` を `N^{-1}E[log Z_N(β)]` と `N^{-1}log E[Z_N(β)]` の決定論的な共通極限へ修正した。標本ごとの概収束表記を除去した。[He2026 v3, Theorem 1.1](https://arxiv.org/html/2607.18998v3) は固定した正の逆温度で期待クエンチ・アニール圧力の極限を述べる。負温度はガウス係数の対称性、零温度は `Z_N(0)=1`、極限関数の `C¹` 正則性は原稿の Proposition 4.2 に基づく。`thm: input` の見出しから直接引用の表示を外し、引用と原稿内の拡張を定理直後に区別した。R01・R03・R05 は既存の監査記録と現行本文を照合し、R01–R05 の状態を完了にそろえた。
+
+F08 は R04-A の決定で概収束の形式化対象がなくなったことを確認し、新規 Lean 宣言を追加せず仕様確定で完了した。`AnnealedInput q S` は期待クエンチ圧力も概収束も要求せず、条件付きの相対・標準化・対数 CLT の入力を維持する。F01–F07 の既存実装・検証記録と合わせて F01–F08 を完了とした。これらの完了は `AnnealedInput` 自体の構築、He2026 の Lean 証明、概収束の Lean 証明を意味しない。
+
+`latexmk -pdf -silent -interaction=nonstopmode -halt-on-error -outdir=/private/tmp/syk-r08-tex.jkAZxk CLT_SYK.tex` は17ページの PDF を一時ディレクトリに生成して成功し、最終ログに未解決引用・参照や組版警告はない。ワークスペースのルートから `lake -f SYK/workspace/lakefile.toml build CLT` は3253 jobs で成功した。既存 Lean ファイルの linter 警告は再表示された。Blueprint の数学的主張と参照はソース上で照合し、休止中の Verso 生成・参照検査は行っていない。変更は未コミット。
+
+<a id="clt-abstract-input-2026-09-27"></a>
+
+## CLT の抽象入力統一（2026-09-27）
+
+開始リビジョンは `c14fce15e06308ad5c370ca5a98e5579ea483c78`。依頼に従い、有限模型の定義・証明を `CLT/FiniteModel.lean` へ移し、`realPartitionFunction_continuous` と `realPartitionFunction_moments` を一般の `Params`・非空有限行列表現 `MajoranaSystem` で証明した。`Setting.partition_moments` はこの有限定理を適用する。標準表現との有限規格化照合 `partitionFunction_standard` は名前と型を保って `CLT/Normalization.lean` に移した。`Main.lean` の import を再帰的に調べ、`Model.StandardRepresentation` と `CLT.Normalization` が依存に含まれないことを確認した。
+
+三つの最終 CLT の入力を `{q : ℕ} (S : Setting q) (hFE : AnnealedInput q S)` にそろえ、`S` のフィールドと重複する偶数性・`4 ≤ q` の引数を除去した。変更前後のソースを比較し、`Setting`・`AnnealedInput` の全フィールドと三定理の結論が同一であることを確認した。Proposition 4.2 の構築を条件付き CLT の完了条件から外す方針を R02-B・F06 と構造文書へ反映した。規格化・温度範囲・極限分散は変更していない。
+
+検証環境は親ワークスペースの Lean 4.32.2 と既存 `lakefile.toml`。既存の `lakefile.lean` と区別するため `lake -f lakefile.toml` を使い、親の設定は変更しなかった。`env lean` による `FiniteModel.lean`、`Main.lean`、`Normalization.lean`、直接 consumer の `Lemmas/Preliminaries.lean` の個別検査、および `build CLT` が成功した（3196 jobs）。最初のビルドでは共有 `.lake` への書き込み権限が不足し、権限付き実行に切り替えた。CLT 全体の初回検査では共有キャッシュのファイル欠落が発生したが、依存を再構築した再検査は成功した。既存の親ワークスペースの既定対象は別プロジェクトの `RSATMain` であり、今回の関連検証には使用していない。
+
+一時ファイルで24宣言の `#print axioms` を実行した。移設・一般化した有限模型の13定理、`Setting` 側のモーメント・相対量・対数の5定理、条件付きアニール極限の3定理は `[propext, Classical.choice, Quot.sound]` のみ。最終 CLT と二つの射影には既存の `sorryAx` が残り、CLT の証明完了を意味しない。有限模型の新規部分に警告はなく、既存の上流・補助モジュールの linter 警告と主 CLT の `sorry` 警告は残る。
+
+Blueprint は検証後に規格化照合を独立ノードへ分離し、有限モーメントと仮定 `hFE` の参照・依存関係をソース上で照合した。Verso の章検査・HTML/PDF 生成・参照検査は休止中のため未実施。作業中に原稿の `introduction.tex` と `main-results.tex` に別途加わった零逆温度除外の差分は編集していない。今回の Lean は相対・対数ゆらぎについて従来の零温度の退化例も含むため、その点では更新中の原稿より広い定理文を保持する。
+
+<a id="clt-r01-r05-audit-2026-09-27"></a>
+
+## CLT 原稿監査 R01–R05（2026-09-27）
+
+R01 では現行の `CLT/refs/sections/` を旧指摘と再照合した。`eq: chaos` は既に完全なガウス $L^2$ 展開式を持ち、Lemma 3.1 と Corollary 1.3 に重複した証明はなく、長い `\iffalse` ブロックも現存しなかった。`ell_p`、`beta_p`、`Y_n`、`sometime`、`resutls` と、ガウスカオス展開の引数区切りを数学的内容を変えずに修正した。一時ディレクトリへ `latexmk -pdf -interaction=nonstopmode -halt-on-error` で17ページを生成し、2回の `pdflatex` 後に成功した。未解決の参照・引用、Overfull/Underfull、LaTeX/Package 警告はない。生成物はリポジトリへ追加していない。
+
+R02 では、相対・対数 CLT が `β=0` で零への退化極限を持つ一方、標準化した量は `Var Z_N(0)=0` のため定義できないことを確認した。原稿の定理文は標準化 CLT にも `β=0` を含めるが、証明と Lean の `partition_clt` は `β≠0` を要求する。従って標準化 CLT だけを `0<|β|<β_q` とする修正を R02-A の研究者判断へ渡した。現行原稿に旧 `\widetilde\beta_q` はなく、明示的な証明半径は高次カオスの `β_{\rm r}` だけである。He2026 の入力は標準既約表現についてのもので、一般 `Setting q` への適用は R02-B・F06 の境界として残す。
+
+R03 では [He2026 v3](https://arxiv.org/abs/2607.18998v3) の Theorem 1.1、Theorem 2.5、Proposition 3.3 を原文照合した。He のハミルトニアンは原稿の `2^{-q/2}H_N` であり、`s=2^{q/2}|β|`、規格化トレース、正の Lehmann 表現、二次モーメント `2^{2-q}s²`、圧力微分公式は原稿の変換と一致する。凸性により各点収束から局所一様収束と導関数収束を得る議論も正しい。probabilists' Hermite と分散1のガウス測度、`η≤α` の成長仮定、反復 Duhamel 公式、規格化 Schatten Hölder、ラデマッハ符号化、Newton/Hoeffding 評価を照合した。`r!` 個の順列と単体体積 `1/r!` は相殺し、`N^{-3(q/2-1)}=o(N^{2-q})` である。二次カオスの対角係数が添字に依らない理由を、サイト置換・ガウス符号対称性・Clifford 自動同型によるトレース不変性として原稿に追記した。
+
+R04 では、He2026 Theorem 1.1 が固定 `β>0` のアニール圧力と期待クエンチ圧力の決定論的極限を述べ、標本ごとの概収束を直接には述べないことを確認した。[GPSZ2026 v1](https://arxiv.org/abs/2605.02768v1) も高温の自由エネルギー極限であり、現行 `thm: input` の全実軸の概収束をそのまま裏付けない。偶数サイズを共通の積確率空間へ結合して Gaussian concentration と Borel--Cantelli で固定温度の概収束を補うか、定理を期待クエンチ圧力の極限へ弱めるかを R04-A の判断待ちとした。CLT 証明が使う外部入力は別の `prop:annealed-free-energy` であり、この判断に依存しない。
+
+R05 では `a=q/2-1≥1` とし、`E(g²-1)²=2`、`E(g²-1)⁴=60` から `E S_N⁴=3+12/M_N≤15` を明記した。`c_N=O(N^{-a})` と `‖R_N‖₂²=O(N^{-3a})` により `P(Y_N<1/2)=O(N^{-3a})`。トレース零と Jensen から `Z_N≥1`、アニール圧力から `log E Z_N=O(N)` が従い、二事象への分割は `-E log Y_N=O(N^{-2a})=o(N^{-a})` を与える。対数の局所二次誤差について tightness と `Y_N-1→0` in probability の積評価を追記した。`β=0` は `Z_N=Y_N=1` で自明であり、標準化 CLT に依存しない。
+
 <a id="clt-f02-completion"></a>
 
 ## F02：一次・二次カオスの同定完了（2026-09-27）
@@ -864,3 +912,13 @@ W01 は2026-09-08、W02 は2026-09-12、W03・W04・W05 は2026-09-18に完了�
 Lean 4.32.2 の個別検査と `lake -f lakefile.toml --old build Model SuperConcentration CLT` は成功した。変更後の `Main.lean` と F01 モジュールの同時 import も成功した。共有3宣言と新しい稠密性・無限和5宣言の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみ。追加したソースに `sorry`、`admit`、`axiom` はない。親ワークスペースの古い `lakefile.toml` では `lake build SYK` が Blueprint の休止設定と整合せず `some modules have bad imports` で失敗したため、指定した関連ライブラリを個別に検査した。Verso の生成・参照検査は休止規則に従い未実施である。
 
 研究者は原稿 `eq: chaos` をガウス $L^2$ の等式として読むことを確認した。これにより F01 の収束モードは確定し、F01 を完了とした。現在のソースで `lake -f lakefile.toml --old build CLT`（3188 jobs）と既定ビルド（3858 jobs）が成功した。`hermiteOrthonormal_dense`、`hasSum_hermiteCoefficients_unconditional`、`hasSum_hermiteDegreeProjection_unconditional`、共有 `hermiteMulti_ibp_of_expGrowth` の公理依存はそれぞれ `[propext, Classical.choice, Quot.sound]` のみ。F01 の対象ファイルに `sorry`・`admit`・`axiom` はない。既存の `Main.lean` の共同 CLT には `sorry` が残る。Blueprint は宣言参照をソース上で照合し、Verso の機械的検査は休止中のため実施していない。
+
+<a id="clt-f03-f07-completion-2026-09-28"></a>
+
+## F03–F07 条件付き CLT の統合（2026-09-28）
+
+F03 のラデマッハ評価、F04 の任意階微分、F05 の高次カオス剰余を統合し、F06 では二次カオス係数の漸近、独立ガウス二乗和の CLT、残差の $L^2$ 消失、有限サイズ分散の正値性から相対・標準化 CLT を証明した。F07 ではガウス二乗和の一様四次モーメント、小確率事象、`Z_N≥1` による対数の線形化誤差を組み合わせ、中心化誤差の尺度付き $L^1$ 消失と対数 CLT を証明した。`Main.lean` の共同主定理は同じ高温半径で三つの結論を組み合わせ、既存の `sorry` を除去した。
+
+`lake env lean SYK/CLT/Lemmas/LogAsymptotics.lean`、`lake build SYK.CLT.Main`（3247 jobs）、`lake build CLT`（3253 jobs）は成功した。`partition_and_log_partition_clt`、`partition_clt`、`log_partition_clt`、`Setting.logFluctuation_clt` の `#print axioms` は `[propext, Classical.choice, Quot.sound]` のみ。三つの主定理はすべて `{q : ℕ} (S : Setting q) (hFE : AnnealedInput q S)` を入力とし、実逆温度 `|β|<βq`、尺度 `N^(q/2-1)`、極限分散 `(q!/2)β²(ℓ_q'(β))²` を維持する。標準化 CLT は `β≠0` に限る。`hFE` の構築、F08 の大数則、R02-A・R04-A の原稿上の判断は含まない。Blueprint は宣言参照と依存をソース上で更新し、Verso の機械的検査は休止規則に従い実施していない。
+
+文書・コメント更新後の既定 `lake build` も 3326 jobs で成功した。`CLT` の Lean ソースには `sorry` を残していない。`git diff --check` は成功し、コミットは作成していない。

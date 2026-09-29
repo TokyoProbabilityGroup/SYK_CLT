@@ -10,6 +10,8 @@ CLT・Annealed_FE の共同実装中は、既存の未形式化ノードを計�
 
 ## 各章の編集細目
 
+- [x] 2026-09-27 の抽象入力統一：個別検査・CLT ビルド・公理依存確認後、`CLT.lean` に `Normalization` の明示 import と独立した有限規格化ノードを追加した。有限モーメントの一般 `MajoranaSystem` 版を参照し、`AnnealedFE.lean` と併せて `hFE` の構築が条件付き CLT の前提作業ではないことを記した。ソース上の宣言・依存照合のみを行い、Verso の機械的検証は実行していない。[検証記録](../WORK_HISTORY.md#clt-abstract-input-2026-09-27) を参照する。
+
 - [x] W01：`Model.lean` に整関数性・複素微分・条件付き対数微分の主要宣言と依存関係を反映した。非零性の仮定を、零点のない領域の証明と混同していない。
 - [x] SuperConcentration の移行前基準：`SuperConcentration.lean` に、一般スケール `𝒥` を含む現行実装の定義、二乗和評価、方向微分、勾配評価、Lipschitz 評価、逆温度が零の場合分け、両側集中不等式を記録した。主張の依存関係と証明だけで使う依存関係を分け、未実装の模型固有 MGF・片側評価を実装済みとして扱っていない。
 - [x] W02：`GaussianConcentration.lean` の import と宣言参照を独立した汎用基盤へ切り替え、MGF・裾の定数と `L=0` の扱いを上流の定理に合わせる。
@@ -27,7 +29,15 @@ F01–F08・Z01 の後続課題では、主要宣言が実装・統合・検証�
 
 F02（2026-09-27）：個別検査・CLT ビルド・公理依存確認後、`CLT.lean` に `clt_exact_second_chaos` と証明を追加した。全実数の逆温度での一次射影零と二次の共通係数を Lean 宣言へ対応付け、添字対称性・一次部分積分・期待値の微分交換を記録した。高次剰余の未形式化ノードを残し、有限模型にアニール極限を要求しない依存へ修正した。ソース照合のみ実施し、Verso の検査は休止中。
 
-現行の `CLT.lean` は、一般ガウス–エルミート部分積分、直交性、有限射影と、稠密性を仮定した次数和を検証済みの Lean 宣言に対応付けている。無条件のガウス $L^2$ 完全性と `Z_N` への適用は未完成と区別する。宣言参照のソース照合は [F01 取り込み検証](../WORK_HISTORY.md#merge-f01-2026-09-27)、先行する部分積分の検証は [作業履歴](../WORK_HISTORY.md#clt-f01-gaussian) を参照する。Verso による章検査・生成・参照検査は休止中である。
+F03–F05 と F06 の先頭（2026-09-28）：個別検査・CLT ビルド・公理依存確認後、`CLT.lean` に `clt_partition_higher_derivatives`、`clt_rademacher_encoding`、`clt_degree_projection_bound`、`clt_higher_chaos_moment_sum`、`clt_higher_chaos_closure`、`clt_gaussian_quadratic_sum` を追加した。原稿の `eq:Z-derivative-bound`、`eq:even-sum-Rademacher-moment`、`eq:Rademacher-exponential-moment`、`eq:Hermite-Rademacher-bound`、`eq:all-higher-chaoses-at-once`、`prop:higher-chaos-closure`、独立ガウス二乗和の CLT に対応する宣言を照合した。最終 CLT への接続は未形式化として残す。Verso の機械的検査は休止中で、宣言参照と依存はソース上だけで照合した。
+
+F06・F07 の統合（2026-09-28）：`CLT.lean` の `partition_function_clt`、`clt_log_centering_error`、`log_partition_clt` を検証済みの相対・対数・共同主定理および中心化誤差の宣言へ接続した。主要定理の `#print axioms` は `[propext, Classical.choice, Quot.sound]` のみ。外部入力 `AnnealedInput` は引き続き仮定であり、この統合時点では F08 と R02-A・R04-A の原稿上の判断が別に残っていた。Verso の機械的検査は休止中。
+
+R02-A・R04-A・F08 の確定（2026-09-28）：`CLT.lean` の分配関数 CLT に、原稿が `β≠0` を仮定し Lean の相対・対数 CLT が零温度も含むことを反映した。`free_energy_law_of_large_numbers` という旧ノードを `clt_expected_pressure_limit` に改め、`thm: input` の決定論的な期待クエンチ・アニール圧力の極限、標準表現の引用範囲、Lean への未導入を記録した。概収束の宣言参照は追加していない。Verso の機械的検査は休止中。
+
+CLT 定理文の温度範囲の統一（2026-09-28）：研究者の指示に従い、Lean の共同・個別・中間の相対・対数 CLT を `β≠0` に限定した。`CLT.lean` の `partition_function_clt` と `log_partition_clt` は原稿と同じ `0<|β|<β_q` を記す。有限模型の零温度恒等式は別の結果として残す。Verso の機械的検査は休止中。
+
+現行の `CLT.lean` は、一般ガウス–エルミート部分積分、直交性、有限射影、有限積ガウス $L^2$ の完全性と無限次数和、`Z_N` への適用を検証済みの Lean 宣言に対応付けている。宣言参照の初期照合は [F01 取り込み検証](../WORK_HISTORY.md#merge-f01-2026-09-27)、先行する部分積分の検証は [作業履歴](../WORK_HISTORY.md#clt-f01-gaussian) を参照する。Verso による章検査・生成・参照検査は休止中である。
 
 Verso 休止中は、変更した章の数学的主張・Lean 宣言名・依存名をソース上で照合する。Verso を必要とする `lake env lean`、生成入口の実行、`vbp check` は復帰後に休止中の変更を含めてまとめて行う。章を並行して編集しても、統合検証の担当は一人とする。[作業履歴](../WORK_HISTORY.md#chapters-records)の旧コマンドと出力先は当時のものであり、現在の手順とは区別する。
 

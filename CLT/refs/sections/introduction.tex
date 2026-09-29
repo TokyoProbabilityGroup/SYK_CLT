@@ -39,7 +39,7 @@ Then $\psi_I$ is Hermitian, $\psi_I^2=\I$, and $\norm{\psi_I}=1$.  Define
 \]
 Here $\tr:=2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
 particular, $Z_N(0;G)=1$.  This normalization does not affect the
-relative fluctuations studied below. We sometime write $Z_N(\beta) := Z_N(\beta;G)$ for brevity. 
+relative fluctuations studied below. We sometimes write $Z_N(\beta) := Z_N(\beta;G)$ for brevity.
 For real $\beta$, set
 \[
  Y_N(\beta):=  Y_N(\beta;G):=\frac{Z_N(\beta;G)}{\mathbb E Z_N(\beta)}.
@@ -48,20 +48,26 @@ Thus $\E Y_N(\beta)=1$.
 Throughout, all limits are taken as $N\to\infty$ through even integers.
 
 \subsection{Main results}
-It is studied the limiting behavior of the logarithmic partition function in high-temperature regime:
-\begin{theorem}[\cite{GPSZ2026,He2026}]\label{thm: input}
-For any $\beta\in \mathbb R$, there exists  $\ell_q(\beta)$ such that
+We first recall the limiting behavior of the logarithmic partition function:
+\begin{theorem}\label{thm: input}
+For every fixed $\beta\in\mathbb R$, there exists $\ell_q(\beta)$ such that
 \begin{align*}
-    \lim_{N\to \infty} N^{-1} \log Z_N=     \lim_{N\to \infty} N^{-1} \log \mathbb E[Z_N] =\ell_p(\beta)\qquad \text{ a.s.}
+    \lim_{N\to\infty}\frac1N\mathbb E[\log Z_N(\beta)]
+    =\lim_{N\to\infty}\frac1N\log\mathbb E[Z_N(\beta)]
+    =\ell_q(\beta).
 \end{align*}
-Moreover, $\ell_p(\beta)$ is differentiable over $\mathbb R$. 
+Moreover, $\ell_q$ is differentiable on $\mathbb R$.
 \end{theorem}
-Our main result is the following fluctuation resutls:
+The fixed positive-temperature limits are given by \cite{He2026}.
+Gaussian symmetry extends them to negative $\beta$, while $Z_N(0)=1$ gives
+the zero-temperature case. The regularity of $\ell_q$ used here is established
+in Proposition~\ref{prop:annealed-free-energy}.
+Our main result is the following fluctuation theorem:
 \begin{theorem}
 \label{thm:partition-clt}
 {
 }
-There exists $\beta_q\in (0,\infty)$ such that for any $\beta\in (-\beta_q,\beta_q)$,
+There exists $\beta_q\in (0,\infty)$ such that for any $\beta\in (-\beta_q,\beta_q)\setminus\{0\}$, we have $|\ell_q'(\beta)|>0$ and 
  \begin{equation}\label{eq:scaled-relative-clt}
   N^{q/2-1}\left(Y_N(\beta)-1\right)
   \Longrightarrow
@@ -76,7 +82,7 @@ Moreover,
 \end{theorem}
 
 \begin{corollary}\label{cor:free-energy-clt}
-With the same $\beta_p$ as in Theorem~\ref{thm:partition-clt}, for any $\beta\in (-\beta_q,\beta_q)$,
+With the same $\beta_q$ as in Theorem~\ref{thm:partition-clt}, for any $\beta\in (-\beta_q,\beta_q)\setminus\{0\}$,
 \[
   N^{q/2-1}\left(
     \log Z_N(\beta)-\E\log Z_N(\beta)
@@ -105,7 +111,7 @@ so both the test function and its derivative depend on \(N\). Therefore, their t
 
 \subsection{Outline of the proof}
 
-Recall that $Y_n(\beta):= {Z_N(\beta)}/{\mathbb E Z_N(\beta)}$.  
+Recall that $Y_N(\beta):= {Z_N(\beta)}/{\mathbb E Z_N(\beta)}$.
 By applying the chaos expansion, since Clifford sign-gauge symmetry eliminates the first Gaussian chaos and
 identifies the second chaos exactly, we have the following:
 \[
