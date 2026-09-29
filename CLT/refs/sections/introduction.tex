@@ -17,11 +17,11 @@ Previous mathematical work has studied the limiting free energy of the SYK model
 
 Fix an even integer $q\geq4$, and let $N$ be even. Set $[N] \coloneqq \{1,2,\ldots,N\}$ and write
 \[
-  \calI_N:=\{I\subset[N]:|I|=q\},\qquad
-  \sigma_N^2:=\frac{(q-1)!}{N^{q-1}},
+  \calI_N \coloneqq \{I\subset[N]:|I|=q\},\qquad
+  \sigma_N^2 \coloneqq \frac{(q-1)!}{N^{q-1}},
 \]
 where $|I|$ denotes the cardinality of the set $I$.
-Let $G:= (g_I)_{I\in\calI_N}$ be a family of independent standard Gaussian random
+Let $G \coloneqq (g_I)_{I\in\calI_N}$ be a family of independent standard Gaussian random
 variables. We denote the corresponding probability measure and expectation by $\mathbb P$ and $\E$, respectively. Following \cite[Section~2]{GPSZ2026}, we let $\psi_1,\ldots,\psi_N$ be Majorana matrices of size $2^{N/2} \times 2^{N/2}$, which satisfy the following anticommutation relation\footnote{\textcolor{red}{Throughout the paper, use a consistent word ``anticommutation relation''}}:
 \begin{equation}
   \label{eq: clifford relation}
@@ -44,7 +44,7 @@ The corresponding partition function is then given by
 \[
   Z_N(\beta) \coloneqq Z_N(\beta;G) \coloneqq \tr e^{-\beta H_N(G)},\qquad \beta \in \mathbb R.
 \]
-Here, $\tr:=2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
+Here, $\tr \coloneqq 2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
 particular, $Z_N(0;G)=1$.  
 
 \subsection{Main results}
@@ -121,16 +121,16 @@ where $P_k Y_N(\beta)$ denotes the $k$-th chaos component.
 \]
 where
 \begin{equation}\label{eq:finite-N-FTW-coefficient}
-      A_N(\beta):=\frac{\beta}{2}\partial_\beta\log \mathbb E Z_N(\beta),
+      A_N(\beta) \coloneqq \frac{\beta}{2}\partial_\beta\log \mathbb E Z_N(\beta),
   \qquad
-    Q_N:=\frac1{|\mathcal I_N|}\sum_{I\in\mathcal I_N}(g_I^2-1).
+    Q_N \coloneqq \frac1{|\mathcal I_N|}\sum_{I\in\mathcal I_N}(g_I^2-1).
 \end{equation}
 Hence, we obtain
 \begin{equation}\label{eq:intro-chaos-expansion}
   Y_N(\beta)-1=
   A_N(\beta)Q_N+\mathcal R_N(\beta),
 \end{equation}
-where $\mathcal R_N(\beta) := \sum_{k \geq 3} P_k Y_N(\beta)$.
+where $\mathcal R_N(\beta) \coloneqq \sum_{k \geq 3} P_k Y_N(\beta)$.
 Theorem~\ref{thm: input} and the convexity of $\log \E Z_N(\beta)$ in $\beta$ imply that
 \begin{equation}\label{eq:intro-A_N-limit}
   \frac{A_N(\beta)}N
