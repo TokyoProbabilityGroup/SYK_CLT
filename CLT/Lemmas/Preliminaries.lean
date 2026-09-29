@@ -1,4 +1,4 @@
-import SYK.CLT.Main
+import SYK.CLT.Basic
 import SYK.CLT.Lemmas.CliffordSignParity
 import SYK.CLT.Lemmas.GaussianHermiteOrthogonality
 import Mathlib.Logic.Equiv.Fintype

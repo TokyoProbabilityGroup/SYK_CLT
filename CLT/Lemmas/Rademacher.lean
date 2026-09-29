@@ -3,6 +3,7 @@ import Mathlib.Algebra.Order.Field.GeomSum
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Series
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.Real.Sqrt
+import Mathlib.Data.Nat.Choose.Multinomial
 import Mathlib.RingTheory.MvPolynomial.Symmetric.NewtonIdentities
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.GCongr
@@ -10,6 +11,7 @@ import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Positivity
 import Mathlib.Tactic.Ring
+import SYK.CLT.Lemmas.GaussianHermiteOrthogonality
 
 /-!
 # Rademacher bounds for higher SYK chaoses
@@ -39,6 +41,12 @@ noncomputable def sgnSum (N : ℕ) (ε : Fin N → Bool) : ℝ := ∑ x, rad (ε
 
 lemma abs_rad (b : Bool) : |rad b| = 1 := by cases b <;> simp [rad]
 
+lemma rad_pow (b : Bool) (j : ℕ) : rad b ^ j = if Even j then 1 else rad b := by
+  have h2 : rad b ^ 2 = 1 := by cases b <;> simp [rad]
+  rcases Nat.even_or_odd j with ⟨m, rfl⟩ | ⟨m, rfl⟩
+  · rw [if_pos ⟨m, rfl⟩, ← two_mul, pow_mul, h2, one_pow]
+  · rw [if_neg (Nat.not_even_iff_odd.mpr ⟨m, rfl⟩), pow_succ, pow_mul, h2, one_pow, one_mul]
+
 lemma abs_sgnSum_le (N : ℕ) (ε : Fin N → Bool) : |sgnSum N ε| ≤ N := by
   unfold sgnSum
   calc |∑ x, rad (ε x)| ≤ ∑ x, |rad (ε x)| := abs_sum_le_sum_abs _ _
@@ -60,18 +68,162 @@ lemma radE_sum (N : ℕ) {ι : Type*} (s : Finset ι) (f : ι → (Fin N → Boo
   unfold radE
   rw [sum_comm, mul_sum]
 
+/-- The finite-subset definition of the Rademacher chaos is the corresponding
+sum over the repository's interaction-index type. -/
+lemma chaos_eq_sum_interactionIndex (N q : ℕ) (ε : Fin N → Bool) :
+    chaos N q ε =
+      ∑ I : InteractionIndex N q, ∏ x ∈ I.1, rad (ε x) := by
+  classical
+  unfold chaos
+  simpa only [InteractionIndex] using
+    (Finset.sum_subtype ((Finset.univ : Finset (Fin N)).powersetCard q)
+      (fun I => by simp) (fun I => ∏ x ∈ I, rad (ε x)))
+
+/-- Regroup an interaction monomial by vertices.  The exponent at a vertex is
+the incidence sum in `IsEvenMultiIndex`. -/
+lemma interactionMonomial_eq_vertexProduct (N q : ℕ)
+    (α : InteractionIndex N q → ℕ) (ε : Fin N → Bool) :
+    (∏ I : InteractionIndex N q,
+        (∏ x ∈ I.1, rad (ε x)) ^ α I) =
+      ∏ x : Fin N, rad (ε x) ^ (∑ I with x ∈ I.1, α I) := by
+  classical
+  calc
+    (∏ I : InteractionIndex N q,
+        (∏ x ∈ I.1, rad (ε x)) ^ α I) =
+        ∏ I : InteractionIndex N q,
+          ∏ x : Fin N, if x ∈ I.1 then rad (ε x) ^ α I else 1 := by
+            apply Finset.prod_congr rfl
+            intro I _
+            rw [← Finset.prod_filter]
+            simp_rw [← Finset.prod_pow]
+            simp
+    _ = ∏ x : Fin N,
+          ∏ I : InteractionIndex N q,
+            if x ∈ I.1 then rad (ε x) ^ α I else 1 := by
+          rw [Finset.prod_comm]
+    _ = ∏ x : Fin N, rad (ε x) ^ (∑ I with x ∈ I.1, α I) := by
+          apply Finset.prod_congr rfl
+          intro x _
+          rw [← Finset.prod_filter]
+          simp only [← Finset.prod_pow_eq_pow_sum]
+
+/-- Orthogonality of independent Rademacher monomials on the explicit finite
+probability space. -/
+lemma radE_vertexProduct (N : ℕ) (m : Fin N → ℕ) :
+    radE N (fun ε => ∏ x, rad (ε x) ^ m x) =
+      if ∀ x, Even (m x) then 1 else 0 := by
+  classical
+  unfold radE
+  rw [← Fintype.prod_sum (fun x b => rad b ^ m x)]
+  by_cases h : ∀ x, Even (m x)
+  · rw [if_pos h]
+    have hs : ∀ x : Fin N, ∑ b : Bool, rad b ^ m x = 2 := by
+      intro x
+      rw [show ∑ b : Bool, rad b ^ m x = (2 : ℝ) by
+        simp [rad_pow, h x]]
+    simp_rw [hs]
+    simp [Finset.prod_const]
+  · rw [if_neg h]
+    push Not at h
+    obtain ⟨x, hx⟩ := h
+    have hodd : Odd (m x) := Nat.not_even_iff_odd.mp hx
+    have hz : ∑ b : Bool, rad b ^ m x = 0 := by
+      simp [rad, hodd.neg_one_pow]
+    rw [Finset.prod_eq_zero (Finset.mem_univ x) hz, mul_zero]
+
+open scoped Classical in
+/-- The expectation of an interaction monomial is one exactly for the even
+multi-indices selected by the Clifford sign rule, and zero otherwise. -/
+lemma radE_interactionMonomial (N q : ℕ)
+    (α : InteractionIndex N q → ℕ) :
+    radE N (fun ε =>
+      ∏ I : InteractionIndex N q,
+        (∏ x ∈ I.1, rad (ε x)) ^ α I) =
+      if IsEvenMultiIndex α then 1 else 0 := by
+  classical
+  have hfun : (fun ε : Fin N → Bool => ∏ I : InteractionIndex N q,
+      (∏ x ∈ I.1, rad (ε x)) ^ α I) =
+      fun ε => ∏ x : Fin N, rad (ε x) ^ (∑ I with x ∈ I.1, α I) := by
+    funext ε
+    exact interactionMonomial_eq_vertexProduct N q α ε
+  rw [hfun]
+  have h := radE_vertexProduct N (fun x => ∑ I with x ∈ I.1, α I)
+  by_cases he : IsEvenMultiIndex α
+  · have he' : ∀ x : Fin N, Even (∑ I with x ∈ I.1, α I) := he
+    simpa [he, he'] using h
+  · have he' : ¬ ∀ x : Fin N, Even (∑ I with x ∈ I.1, α I) := he
+    simpa [he, he'] using h
+
+open scoped Classical in
+/-- Multinomial expansion of the `r`-th moment, with the Rademacher
+orthogonality rule already applied. -/
+theorem radE_chaos_pow_eq_sum_multinomial_even (N q r : ℕ) :
+    radE N (fun ε => chaos N q ε ^ r) =
+      ∑ α ∈ (multiIndices_degree (ι := InteractionIndex N q) r).filter IsEvenMultiIndex,
+        (Nat.multinomial Finset.univ α : ℝ) := by
+  classical
+  let w : (Fin N → Bool) → InteractionIndex N q → ℝ :=
+    fun ε I => ∏ x ∈ I.1, rad (ε x)
+  have hindices :
+      Finset.piAntidiag (Finset.univ : Finset (InteractionIndex N q)) r =
+        multiIndices_degree (ι := InteractionIndex N q) r := by
+    ext α
+    rw [Finset.mem_piAntidiag, mem_multiIndices_degree]
+    constructor
+    · intro h
+      simpa using h.1
+    · intro h
+      exact ⟨by simpa using h, by simp⟩
+  have hexpand (ε : Fin N → Bool) :
+      chaos N q ε ^ r =
+        ∑ α ∈ multiIndices_degree (ι := InteractionIndex N q) r,
+          (Nat.multinomial Finset.univ α : ℝ) * ∏ I, w ε I ^ α I := by
+    rw [chaos_eq_sum_interactionIndex]
+    have h := Finset.sum_pow_eq_sum_piAntidiag
+      (Finset.univ : Finset (InteractionIndex N q)) (w ε) r
+    simpa only [hindices] using h
+  rw [show (fun ε => chaos N q ε ^ r) = fun ε =>
+      ∑ α ∈ multiIndices_degree (ι := InteractionIndex N q) r,
+        (Nat.multinomial Finset.univ α : ℝ) * ∏ I, w ε I ^ α I by
+      funext ε
+      exact hexpand ε]
+  rw [radE_sum]
+  simp_rw [radE_const_mul]
+  dsimp [w]
+  simp_rw [radE_interactionMonomial]
+  simp only [mul_ite, mul_one, mul_zero]
+  rw [Finset.sum_filter]
+
+open scoped Classical in
+/-- `eq:even-sum-Rademacher-moment`: the factorial-weighted sum over even
+multi-indices equals the corresponding Rademacher moment divided by `r!`. -/
+theorem even_sum_rademacher_moment (N q r : ℕ) :
+    (∑ α ∈ (multiIndices_degree (ι := InteractionIndex N q) r).filter IsEvenMultiIndex,
+      (∏ I : InteractionIndex N q, ((α I).factorial : ℝ))⁻¹) =
+      ((r.factorial : ℝ)⁻¹ * radE N (fun ε => chaos N q ε ^ r)) := by
+  classical
+  rw [radE_chaos_pow_eq_sum_multinomial_even, Finset.mul_sum]
+  apply Finset.sum_congr rfl
+  intro α hα
+  simp only [Finset.mem_filter, mem_multiIndices_degree] at hα
+  have hspec := Nat.multinomial_spec (Finset.univ : Finset (InteractionIndex N q)) α
+  rw [hα.1] at hspec
+  have hspecR :
+      (∏ I : InteractionIndex N q, ((α I).factorial : ℝ)) *
+        (Nat.multinomial Finset.univ α : ℝ) = (r.factorial : ℝ) := by
+    exact_mod_cast hspec
+  have hprod : (∏ I : InteractionIndex N q, ((α I).factorial : ℝ)) ≠ 0 := by
+    positivity
+  have hr : (r.factorial : ℝ) ≠ 0 := by positivity
+  field_simp
+  nlinarith
+
 lemma newton (N k : ℕ) (ε : Fin N → Bool) :
     (k : ℝ) * chaos N k ε = (-1) ^ (k + 1) * ∑ a ∈ antidiagonal k with a.1 < k,
       (-1) ^ a.1 * chaos N a.1 ε * ∑ x, rad (ε x) ^ a.2 := by
   have h := congrArg (MvPolynomial.eval (fun x => rad (ε x)))
     (MvPolynomial.mul_esymm_eq_sum (Fin N) ℝ k)
   simpa [chaos, MvPolynomial.esymm, MvPolynomial.psum, map_sum, map_prod] using h
-
-lemma rad_pow (b : Bool) (j : ℕ) : rad b ^ j = if Even j then 1 else rad b := by
-  have h2 : rad b ^ 2 = 1 := by cases b <;> simp [rad]
-  rcases Nat.even_or_odd j with ⟨m, rfl⟩ | ⟨m, rfl⟩
-  · rw [if_pos ⟨m, rfl⟩, ← two_mul, pow_mul, h2, one_pow]
-  · rw [if_neg (Nat.not_even_iff_odd.mpr ⟨m, rfl⟩), pow_succ, pow_mul, h2, one_pow, one_mul]
 
 lemma psum_bound (N j : ℕ) (hj : 1 ≤ j) (ε : Fin N → Bool) :
     |∑ x, rad (ε x) ^ j| ≤ (|sgnSum N ε| + √N) ^ j := by

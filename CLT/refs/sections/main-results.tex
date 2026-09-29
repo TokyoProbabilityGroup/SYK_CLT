@@ -323,7 +323,7 @@ $\beta\ell_q'(\beta)>0$ give \eqref{eq:standardized-clt}.
 \end{proof}
 
 \begin{proof}[Proof of Corollary~\ref{cor:free-energy-clt}]
-The case $\beta=0$ is trivial, so assume $\beta\neq0$.  Set
+Assume $\beta\neq0$.  Set
 \[
 a:=\frac q2-1,
 \qquad
@@ -357,6 +357,12 @@ it follows that
 N^a\bigl(W_N-(Y_N-1)\bigr)
 \xrightarrow{\mathrm p}0.
 \]
+Indeed, on $\{|Y_N-1|\leq1/2\}$ the absolute value is bounded by
+\(
+|N^a(Y_N-1)|\,|Y_N-1|
+\), which converges to zero in probability by tightness of the first factor
+and convergence of the second factor to zero.  The complementary event has
+probability tending to zero.
 Thus it remains to prove
 \[
 \E W_N=o(N^{-a}).
@@ -370,16 +376,17 @@ where
 \[
 c_N=\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{\sqrt{2M_N}}= O(N^{-a}),\quad S_N=\frac1{\sqrt{2M_N}}\sum_{I\in\mathcal I_N}(g_I^2-1)
 ,\quad
-\|\mathcal R_N\|_2^2=o(N^{-2a})
+\|\mathcal R_N\|_2^2=O(N^{-3a})
 \]
 by Proposition~\ref{prop:higher-chaos-closure}. Orthogonality therefore
 gives
 \[
 \E(Y_N-1)^2=c_N^2 \mathbb E[S_N^2] + \mathbb E[\mathcal R_N^2]= O(N^{-2a}).
 \]
-On the other hand, we note that 
+Since $\mathbb E(g_I^2-1)^2=2$ and
+$\mathbb E(g_I^2-1)^4=60$, independence gives
 \[
-\sup_N \E S_N^4<\infty.
+\mathbb E S_N^4=3+\frac{12}{M_N}\leq15.
 \]  
 Hence, we estimate
 \begin{align*}
@@ -392,7 +399,7 @@ Hence, we estimate
 C c_N^4\E S_N^4
 +
 C\|\mathcal R_N\|_2^2\\
-&=o(N^{-2a}).
+&=O(N^{-3a}).
 \end{align*}
 
 We claim that 
@@ -464,16 +471,16 @@ h(Y_N)\mathbf 1_{\{Y_N<1/2\}}
 \right]
 &\le
 O(N)\,\mathbb P(Y_N<1/2)=
-o(N^{1-2a})
-=o(N^{-a}).
+O(N^{1-3a})
+=O(N^{-2a}),
 \end{align*}
+where the last estimate uses $a=q/2-1\geq1$.
 Consequently,
 \[
 0\le-\E W_N
 =
-O(N^{-2a})+o(N^{-a})
-=
-o(N^{-a}).
+O(N^{-2a})
+=o(N^{-a}).
 \]
 
 Combining the three terms above and applying Slutsky's theorem yields

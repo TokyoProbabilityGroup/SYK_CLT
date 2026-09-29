@@ -189,3 +189,15 @@ $$`Z_H(z)\,\operatorname{logDeriv}(Z_H)(z)
 This is a pointwise quotient formula. It neither constructs a zero-free region
 nor chooses a branch of the complex logarithm.
 :::
+
+:::theorem "partition_function_local_zero_free" (parent := "model") (uses := "partition_function_analytic, partition_function_log_derivative") (lean := "SYK.partitionFunction_re_pos_real, SYK.partitionFunction_re_pos_near_real, SYK.partitionFunction_ne_zero_near_real, SYK.partitionFunction_mul_log_deriv_near_real, SYK.partitionFunction_log_differentiable_near_real")
+Fix a nonempty finite-dimensional matrix space and a Hermitian matrix $`H`.
+For every real inverse temperature $`\beta`, there is a radius
+$`\varepsilon(H,\beta)>0` such that
+$`\operatorname{Re}Z_H(z)>0` whenever $`|z-\beta|<\varepsilon(H,\beta)`.
+This supplies $`Z_H(z)\ne0` to the pointwise logarithmic-derivative formula.
+The principal complex logarithm $`\log Z_H` is holomorphic on the same disk,
+because its values lie in the right half-plane. The radius need not be
+uniform in $`H`, matrix dimension, or disorder realization; no such
+uniformity is used by the current real-temperature CLT.
+:::
