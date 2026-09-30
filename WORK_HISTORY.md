@@ -1,5 +1,15 @@
 # SYK の作業履歴
 
+<a id="clt-section4-editorial-20260930"></a>
+
+## CLT 第4節と期待値表記の整理（2026-09-30）
+
+後続の利用者指示により、対数 CLT の結びに `Slutsky's lemma` と `\cite[Theorem~3.1]{Billingsley1999}` を追加した。最終指定の Billingsley, *Convergence of Probability Measures*, 2nd ed. (Wiley, 1999) に書誌を統一し、DOI `10.1002/9780470316962` を登録した。同じコマンドで再コンパイルし、引用の解決とはみ出しがないことを確認した。先に試した van der Vaart の書誌は原稿から除いた。
+
+利用者の指定に従い、`main-results.tex` の Proposition 4.2 の証明冒頭2文、積分の導入文のカンマ、零点での微分の式末尾と `hence`、Slutsky の定理への言及を修正した。修正済みの小節削除、Rockafellar の引用、`\widetilde H_N`・`U_N` は維持した。第2節・第4節の `M_N` 全8か所を `|\mathcal I_N|` に置換し、親ファイルの要旨と全4節の期待値を角括弧付きの `\E` に統一した。序論の長い行は分配関数の比を分数で組み、はみ出しを解消した。構造文書の対応する記号も更新した。作業開始前から存在した序論・第4節の編集は保持した。
+
+`CLT/refs` で `latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=<一時ディレクトリ> CLT_SYK.tex` が成功し、17頁の PDF を生成した。未解決の引用・参照、Overfull/Underfull はない。`microtype` の脚注パッチ警告と Perl のロケール警告は残る。Poppler で序論の修正箇所と第4節を描画し、2頁・12–16頁を目視確認した。原稿内の旧記号と Slutsky の言及の残存検索、および CRLF を行末として扱う `git diff --check` を実施した。数学的主張・Lean 宣言・Blueprint は変更せず、Lean ビルドと休止中の Verso 検査は実施していない。生成物は一時ディレクトリにのみ保存し、コミットは作成していない。
+
 <a id="z01-local-zero-free-2026-09-28"></a>
 
 ## Z01：固定有限行列の局所非零円板（2026-09-28）
