@@ -58,19 +58,18 @@ For any $\beta\in \mathbb R$, there exists  $\ell_q(\beta)$ such that
 Moreover, $\ell_q(\beta)$ is differentiable with respect to $\beta$ on $\mathbb R$.
 \end{theorem}
 
-\textcolor{red}{We also prove that $\beta \ell_q'(\beta)>0$ for every $\beta\in\mathbb R\setminus\{0\}$ (see Proposition~\ref{prop:annealed-free-energy}).}
 
 
-Our first main result concerns the fluctuations of the partition function ${Z_N(\beta)}$. For $a > 0$, we write $\N(0, a)$ for the centered Gaussian distribution with variance $a$.
+Our first main result concerns the fluctuations of the partition function ${Z_N(\beta)}$. For $a > 0$, we write $\N(0, a)$ for the centered Gaussian distribution with variance $a$. We denote by $\Longrightarrow$ convergence in distribution.
 \begin{theorem}
 \label{thm:partition-clt}
-There exists $\beta_q\in (0,\infty)$ such that for any $\beta\in (-\beta_q,\beta_q) \setminus \{0\}$,
+There exists $\beta_q\in (0,\infty)$ such that for any $\beta\in (-\beta_q,\beta_q) \setminus \{0\}$,  
  \begin{equation}\label{eq:scaled-relative-clt}
   N^{q/2-1}\left( \frac{Z_N(\beta)}{\E[Z_N(\beta)]} - 1\right)
   \Longrightarrow
   \,\N\left(0,\frac{q!}{2}\beta^2(\ell_q'(\beta))^2\right),
 \end{equation}
-where the arrow $\Longrightarrow$ means convergence in distribution. Moreover,
+where  $\beta \ell_q'(\beta)>0$ for any $\beta\in \mathbb R\setminus \{0\}$; in particular, the limiting distribution is non-degenerate. Moreover,
 \begin{equation}\label{eq:standardized-clt}
   \frac{Z_N(\beta)-\E[Z_N(\beta)]}
   {\sqrt{\Var Z_N(\beta)}}
