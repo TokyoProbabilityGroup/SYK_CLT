@@ -178,7 +178,7 @@ $\beta\in\mathbb R$,
 \textcolor{red}{We are now in a position to prove Theorems~\ref{thm:partition-clt} and~\ref{thm:free-energy-clt}.}
 
 \begin{proof}[Proof of Theorem~\ref{thm:partition-clt}]
-Let
+Note that $\beta\ell_q'(\beta)>0$ from Proposition~\ref{prop:annealed-free-energy}. Let
 \[
   U_N:=\frac1{\sqrt{2|\mathcal I_N|}}\sum_{I\in\calI_N}(g_I^2-1).
 \]
@@ -206,9 +206,9 @@ $N^{q/2-1}\mathcal R_N\to0$ in $L^2$.  This proves
 \[
   \Var(Y_N)=c_N(\beta)^2+\norm{\mathcal R_N(\beta)}_2^2.
 \]
-Finally, for $\beta\neq0$, the identity
-$\Var(Y_N)=\Var(Z_N)/(\E[Z_N])^2$ and the strict positivity
-$\beta\ell_q'(\beta)>0$ give \eqref{eq:standardized-clt}.
+Finally, using the identity 
+$\Var(Y_N)=\Var(Z_N)/(\E[Z_N])^2$, this  
+ gives \eqref{eq:standardized-clt}.
 \end{proof}
 
 \begin{proof}[Proof of \textcolor{red}{Theorem~\ref{thm:free-energy-clt}}]
