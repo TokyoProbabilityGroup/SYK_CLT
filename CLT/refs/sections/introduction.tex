@@ -48,41 +48,42 @@ Here, $\tr \coloneqq 2^{-N/2}\operatorname{Tr}$ denotes the normalized trace; in
 particular, $Z_N(0;G)=1$.  
 
 \subsection{Main results}
-Here, we state our main results: Theorems~\ref{thm:partition-clt} and~\ref{cor:free-energy-clt}.
+Here, we state our main results: Theorems~\ref{thm:partition-clt} and~\ref{thm:free-energy-clt}.
 We first recall the convergence of the annealed free energy, which was established for sufficiently small $|\beta|$ in \cite{GPSZ2026} and recently extended to all $\beta$ in \cite{He2026}. Moreover, in \cite{He2026}, the limit is identified with the Schwinger--Dyson pressure. Throughout this article, all limits as $N \to \infty$ are taken through even integers.
 \begin{theorem}[{\cite[Theorem~1.1 and Proposition~3.3]{He2026}}]\label{thm: input}
 For any $\beta\in \mathbb R$, there exists  $\ell_q(\beta)$ such that
 \begin{align*}
-    \lim_{N\to \infty} N^{-1} \log \E Z_N =\ell_q(\beta).
+    \lim_{N\to \infty} N^{-1} \log \E[Z_N] =\ell_q(\beta).
 \end{align*}
 Moreover, $\ell_q(\beta)$ is differentiable with respect to $\beta$ on $\mathbb R$.
 \end{theorem}
 
-Our first main result concerns the fluctuations of the normalized partition function $Z_N(\beta)/\E Z_N(\beta)$. For $a > 0$, we write $\N(0, a)$ for the centered Gaussian distribution with variance $a$.
+
+
+Our first main result concerns the fluctuations of the partition function ${Z_N(\beta)}$. For $a > 0$, we write $\N(0, a)$ for the centered Gaussian distribution with variance $a$. We denote by $\Longrightarrow$ convergence in distribution.
 \begin{theorem}
 \label{thm:partition-clt}
-There exists $\beta_q\in (0,\infty)$ such that for any $\beta\in (-\beta_q,\beta_q) \setminus \{0\}$,
+There exists $\beta_q\in (0,\infty)$ such that for any $\beta\in (-\beta_q,\beta_q) \setminus \{0\}$,  
  \begin{equation}\label{eq:scaled-relative-clt}
-  N^{q/2-1}\left( \frac{Z_N(\beta)}{\E Z_N(\beta)} - 1\right)
+  N^{q/2-1}\left( \frac{Z_N(\beta)}{\E[Z_N(\beta)]} - 1\right)
   \Longrightarrow
   \,\N\left(0,\frac{q!}{2}\beta^2(\ell_q'(\beta))^2\right),
 \end{equation}
-where the arrow $\Longrightarrow$ means convergence in distribution.\footnote{\textcolor{red}{It's better to remark that $\ell_q'(\beta) > 0$ to make sure that the limit distribution is non-degenerate.}}
-Moreover,
+where  $\beta \ell_q'(\beta)>0$ for any $\beta\in \mathbb R\setminus \{0\}$; in particular, the limiting distribution is non-degenerate. Moreover,
 \begin{equation}\label{eq:standardized-clt}
-  \frac{Z_N(\beta)-\E Z_N(\beta)}
+  \frac{Z_N(\beta)-\E[Z_N(\beta)]}
   {\sqrt{\Var Z_N(\beta)}}
   \Longrightarrow\N(0,1),
 \end{equation}
 where $\Var Z_N(\beta)$ denotes the variance of $Z_N(\beta)$.
 \end{theorem}
 
-Combining the above theorem with the asymptotic relation $\log x \sim x-1$ as $x \to 1$, we obtain the following result on the fluctuations of the free energy.\footnote{\textcolor{red}{This has been upgraded to a theorem.}}
-\begin{theorem}\label{cor:free-energy-clt}
+Combining the above theorem with the asymptotic relation $\log x \sim x-1$ as $x \to 1$, we obtain the following result on the fluctuations of the free energy.
+\begin{theorem}\label{thm:free-energy-clt}
 With the same $\beta_q$ as in Theorem~\ref{thm:partition-clt}, for any $\beta\in (-\beta_q,\beta_q) \setminus \{0\}$,
 \[
   N^{q/2-1}\left(
-    \log Z_N(\beta)-\E\log Z_N(\beta)
+    \log Z_N(\beta)-\E[\log Z_N(\beta)]
   \right)
   \Longrightarrow
   \,\N\left(0,\frac{q!}{2}\,\beta^2(\ell_q'(\beta))^2\right).
@@ -108,20 +109,20 @@ so both the test function and its derivative depend on \(N\). Therefore, their r
 We give an outline of the proofs of the main results.
 Define the normalized partition function by
 \begin{equation} \label{eq:Y_N}
-  Y_N(\beta) \coloneqq Y_N(\beta; G) \coloneqq {Z_N(\beta)}/{\mathbb E Z_N(\beta)}.
+  Y_N(\beta) \coloneqq Y_N(\beta; G) \coloneqq {Z_N(\beta)}/{\E[Z_N(\beta)]}.
 \end{equation}
 By applying a polynomial chaos expansion to $Y_N(\beta)$, we write 
 \[
   Y_N(\beta) = \sum_{k = 0}^\infty P_kY_N(\beta),
 \]
 where $P_k Y_N(\beta)$ denotes the $k$-th chaos component.
-(The precise definition of the above expansion is given in Section~\ref{sec:chaos-decomposition}.) The normalization gives $P_0 Y_N(\beta) = \E Y_N(\beta) = 1$. Moreover, in Lemma~\ref{lem:exact-second-chaos}, using the anticommutation relation~\eqref{eq: clifford relation} and Gaussian integration by parts, we deduce that $P_1 Y_N(\beta) = 0$ and 
+(The precise definition of the above expansion is given in Section~\ref{sec:chaos-decomposition}.) The normalization gives $P_0 Y_N(\beta) = \E[Y_N(\beta)] = 1$. Moreover, in Lemma~\ref{lem:exact-second-chaos}, using the anticommutation relation~\eqref{eq: clifford relation} and Gaussian integration by parts, we deduce that $P_1 Y_N(\beta) = 0$ and
 \[ 
   P_2Y_N(\beta) = A_N(\beta) Q_N,
 \]
 where
 \begin{equation}\label{eq:finite-N-FTW-coefficient}
-      A_N(\beta) \coloneqq \frac{\beta}{2}\partial_\beta\log \mathbb E Z_N(\beta),
+      A_N(\beta) \coloneqq \frac{\beta}{2}\partial_\beta\log \E[Z_N(\beta)],
   \qquad
     Q_N \coloneqq \frac1{|\mathcal I_N|}\sum_{I\in\mathcal I_N}(g_I^2-1).
 \end{equation}
@@ -131,11 +132,11 @@ Hence, we obtain
   A_N(\beta)Q_N+\mathcal R_N(\beta),
 \end{equation}
 where $\mathcal R_N(\beta) \coloneqq \sum_{k \geq 3} P_k Y_N(\beta)$.
-Theorem~\ref{thm: input} and the convexity of $\log \E Z_N(\beta)$ in $\beta$ imply that
+Theorem~\ref{thm: input} and the convexity of $\log \E[Z_N(\beta)]$ in $\beta$ imply that
 \begin{equation}\label{eq:intro-A_N-limit}
   \frac{A_N(\beta)}N
   = 
-  \frac{\beta}{2}\cdot \frac{1}{N}\partial_\beta\log \E Z_N(\beta)
+  \frac{\beta}{2}\cdot \frac{1}{N}\partial_\beta\log \E[Z_N(\beta)]
   \xlongrightarrow{N \to \infty} \frac{\beta}{2}\ell_q'(\beta),
 \end{equation}
 as shown in Proposition~\ref{prop:annealed-free-energy}.
@@ -144,24 +145,33 @@ Since the usual central limit theorem applies to $Q_N$, Theorem~\ref{thm:partiti
   \E \bigl[ \mathcal R_N(\beta)^2 \bigr]= o(N^{-(q-2)}),\qquad \text{as } N \to \infty,
 \end{equation}
 where $o(\cdot)$ denotes the usual Landau notation.
-The above estimate is proven in Proposition~\ref{prop:higher-chaos-closure} 
-by using a combinatorial argument to bound the number of non-degenerate terms in the higher-order chaoses\footnote{\textcolor{red}{Please check the expression ``non-degenerate terms''. Do you agree with this expression?}}.
+The above estimate is proved in Proposition~\ref{prop:higher-chaos-closure} 
+\textcolor{red}{by using a combinatorial argument to bound the number of index configurations that give a non-zero contribution to the higher-order chaoses.} \footnote{\textcolor{red}{Please check the expression ``non-degenerate terms''. Do you agree with this expression?}}
 
-To obtain Theorem~\ref{cor:free-energy-clt}, observe that
+To obtain Theorem~\ref{thm:free-energy-clt}, observe that
 \begin{align*}
-  &N^{q/2-1}\bigl(\log Z_N(\beta)-\E\log Z_N(\beta)\bigr)\\
+  &N^{q/2-1}\bigl(\log Z_N(\beta)-\E[\log Z_N(\beta)]\bigr)\\
   &=N^{q/2-1}\bigl(\log Y_N(\beta)-(Y_N(\beta)-1)\bigr)
-   +N^{q/2-1}(Y_N(\beta)-1)-N^{q/2-1}\E\log Y_N(\beta).
+   +N^{q/2-1}(Y_N(\beta)-1)-N^{q/2-1}\E[\log Y_N(\beta)].
 \end{align*}
-The Taylor expansion $\log(1+x)-x=O(x^2)$ as $x \to 0$, together with Theorem~\ref{thm:partition-clt}, shows that the first term  on the right-hand side converges to zero in probability. Moreover, using the estimates obtained in the proof of \eqref{eq:intro-higher-chaoses}, we deduce that $\E(Y_N(\beta)-1)^2=O(N^{2-q})$ and
+The Taylor expansion $\log(1+x)-x=O(x^2)$ as $x \to 0$, together with Theorem~\ref{thm:partition-clt}, shows that the first term  on the right-hand side converges to zero in probability. Moreover, using the estimates obtained in the proof of \eqref{eq:intro-higher-chaoses}, we deduce that $\E[(Y_N(\beta)-1)^2]=O(N^{2-q})$ and
 $\mathbb P(Y_N(\beta)<1/2)=O(N^{-3(q/2-1)})$. Together with
 $Z_N(\beta)\geq1$, these estimates give
 \[
-  \E\log Y_N(\beta)=O\!\left(N^{2-q}\right)
+  \E[\log Y_N(\beta)]=O\!\left(N^{2-q}\right)
   =o\!\left(N^{1-q/2}\right).
 \]
-This completes the proof of Theorem~\ref{cor:free-energy-clt}; see Section~4\footnote{\textcolor{red}{Please add a label to Section~4.}} for details.
+This completes the proof of Theorem~\ref{thm:free-energy-clt}; see Section~\ref{sec:main-results} for details.
 
-The rest of the paper is organized as follows.
-\textbf{\textcolor{red}{Please fill in here.}}
+\textcolor{red}{The rest of the paper is organized as follows. In
+Section~\ref{sec:chaos-decomposition}, we introduce the polynomial chaos expansion
+of $Z_N(\beta)$ and compute its first two chaos components. We show that the first
+chaos vanishes and that the second chaos equals $A_N(\beta)Q_N$, where $A_N(\beta)$ and $Q_N$ 
+are defined in~\eqref{eq:finite-N-FTW-coefficient}. In
+Section~\ref{sec:Rademacher-remainder}, we show that the chaos components of order
+three and higher are negligible compared with the second chaos. In Proposition~\ref{prop:annealed-free-energy} of Section~\ref{sec:main-results},
+we derive the asymptotics of $A_N(\beta)$ from the annealed free energy
+estimates of~\cite{He2026} and show that $\beta\ell_q'(\beta)>0$ for all
+$\beta\neq 0$.  Combining these results with the classical central limit theorem for $Q_N$, we prove
+Theorems~\ref{thm:partition-clt} and~\ref{thm:free-energy-clt}.}
 \end{document}

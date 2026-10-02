@@ -20,7 +20,7 @@ orthogonal basis of $L^2(\gamma_{\mathcal I_N})$, where
 $\gamma_{\mathcal I_N}$ denotes standard Gaussian measure on
 $\mathbb R^{\mathcal I_N}$, we have
 \begin{align}\label{eq: chaos}
-Z_N(\beta;G) = \sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\mathbb E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!} H_\alpha(G),
+Z_N(\beta;G) = \sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!} H_\alpha(G),
 \end{align}
 where the second sum runs over all multi-indices $\alpha$ such that $\sum_{I} \alpha_I = k$, and the expectation is taken over an independent copy $G'$ of $G$.  Let $P_r$ denote the orthogonal projection in
 $L^2(\gamma_{\mathcal I_N})$ onto the $r$-th homogeneous Gaussian chaos.
@@ -28,14 +28,14 @@ Then, we can write
 \[
   P_r Z_N(\beta;G)
   =\sum_{|\alpha|=r}
-  \frac{\mathbb E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!}H_\alpha(G).
+  \frac{\E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!}H_\alpha(G).
 \]
-Since $\mathbb E Z_N(\beta)$ is deterministic, we also have
+Since $\E[Z_N(\beta)]$ is deterministic, we also have
 \[
-  P_rY_N(\beta)=\frac{P_rZ_N(\beta)}{\mathbb E Z_N(\beta)}.
+  P_rY_N(\beta)=\frac{P_rZ_N(\beta)}{\E[Z_N(\beta)]}.
 \]
 
-Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \mathbb E Z_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
+Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \E[Z_N(\beta)]$ from \eqref{eq:finite-N-FTW-coefficient}.
  The next lemma proves the exact radial decomposition
 \begin{equation*}
   Y_N(\beta)-1=A_N(\beta)Q_N+\mathcal R_N(\beta),
@@ -61,7 +61,7 @@ $\chi_s(I):=\prod_{x\in I}s_x$.  We have
 
     In particular, if $\alpha$ is odd, then
     \[
-      \mathbb E[Z_N(\beta;G)H_\alpha(G)]=0.
+      \E[Z_N(\beta;G)H_\alpha(G)]=0.
     \]
 \end{lemma}
 \begin{proof}
@@ -151,8 +151,8 @@ $y\neq x$ and $s_x=-1$.  Then,
 \]
 Hence, we have 
 \begin{align*}
-    \mathbb E[Z_N(G') H_\alpha(G')] =     \mathbb E[Z_N(\chi_s G') H_\alpha(\chi_s G')] = -
-    \mathbb E[Z_N(G') H_\alpha(G')], 
+    \E[Z_N(G') H_\alpha(G')] =     \E[Z_N(\chi_s G') H_\alpha(\chi_s G')] = -
+    \E[Z_N(G') H_\alpha(G')],
 \end{align*}
 which gives the second claim. 
 \end{proof}
@@ -170,8 +170,8 @@ have at most exponential growth in $\norm{G}$: for any multi-index $\eta=(\eta_I
 \end{equation*}
 Then
 \begin{equation}\label{eq:Gaussian-Hermite-IBP}
-  \mathbb E\!\left[H_\alpha(G)f(G)\right]
-  =\mathbb E\!\left[\partial_g^\alpha f(G)\right].
+  \E\!\left[H_\alpha(G)f(G)\right]
+  =\E\!\left[\partial_g^\alpha f(G)\right].
 \end{equation}
 In particular, \eqref{eq:Gaussian-Hermite-IBP} holds for
 $f(G)=Z_N(\beta;G)$.
@@ -179,7 +179,7 @@ $f(G)=Z_N(\beta;G)$.
 \begin{proof}
 Recall that the one-dimensional integration-by-parts identity yields 
 \[
-\mathbb{E}\!\left[\operatorname{He}_k(G)f(G)\right] = \mathbb{E}\!\left[f^{(k)}(G)\right],
+\E\!\left[\operatorname{He}_k(G)f(G)\right] = \E\!\left[f^{(k)}(G)\right],
 \]
 for every function $f\in C^k(\mathbb R)$ satisfying the stated growth
 condition~\cite[Equation~(2.3.15)]{S2023}.  Applying this identity successively to the independent Gaussian
@@ -190,11 +190,11 @@ H_\alpha(G)
 \]
 gives
 \begin{align*}
-\mathbb{E}\!\left[
+\E\!\left[
 H_\alpha(G)f(G)
 \right]
 &=
-\mathbb{E}\!\left[
+\E\!\left[
 \left(
 \prod_{I\in\mathcal I_N}
 \operatorname{He}_{\alpha_I}(g_I)
@@ -202,7 +202,7 @@ H_\alpha(G)f(G)
 f(G)
 \right] \\
 &=
-\mathbb{E}\!\left[
+\E\!\left[
 \left(
 \prod_{I\in\mathcal I_N}
 \partial_{g_I}^{\alpha_I}
@@ -210,7 +210,7 @@ f(G)
 f(G)
 \right] \\
 &=
-\mathbb{E}\!\left[
+\E\!\left[
 \partial_g^\alpha f(G)
 \right].
 \end{align*}
@@ -231,7 +231,7 @@ and
 \begin{equation}\label{eq:P2Y-exact}
   P_2 Y_N(\beta)
   =
-  \frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{2M_N}
+  \frac{\beta\,\partial_\beta\log \E[Z_N(\beta)]}{2|\mathcal I_N|}
   \sum_{I\in\calI_N}(g_I^2-1).
 \end{equation}
 \end{lemma}
@@ -242,13 +242,13 @@ For multi-index $\alpha$ with $|\alpha|=1$, since $\alpha$ is always odd, the fi
   In the second chaos it also kills every 
 monomial $g_Ig_J$ with $I\neq J$, since the corresponding multi-index is also odd.  Consequently, since ${\rm He}_2(x)=x^2-1$, 
 \[
-  P_2Z_N(\beta)=\frac{1}{2} \sum_I \mathbb E[Z_N(\beta;G') ((g'_I)^2-1) ] (g_I^2-1).
+  P_2Z_N(\beta)=\frac{1}{2} \sum_I \E[Z_N(\beta;G') ((g'_I)^2-1) ] (g_I^2-1).
 \]
 
 
 The expectation
 \(
-\mathbb E[Z_N(\beta;G)(g_I^2-1)]
+\E[Z_N(\beta;G)(g_I^2-1)]
 \)
 is independent of $I$.  Indeed, a permutation of the sites sends any
 $q$-set to any other one; the induced signs on the Majorana monomials are
@@ -257,12 +257,12 @@ Gaussian couplings, while the normalized trace is invariant under the
 corresponding Clifford automorphism.  It therefore remains to compute the
 common coefficient
 \[
-b_N(\beta):= \frac{1}{2}\mathbb E[Z_N(\beta;G) (g_I^2-1)].
+b_N(\beta):= \frac{1}{2}\E[Z_N(\beta;G) (g_I^2-1)].
 \]
 Applying Gaussian integration by parts yields
 \[
   \E\bigl[Z_N(\beta)(g_I^2-1)\bigr]
-  =\E\,g_I \partial_{g_I} Z_N(\beta).
+  =\E[g_I \partial_{g_I} Z_N(\beta)].
 \]
 On the other hand,  since $
   Z_N(\beta;tG)
@@ -275,8 +275,8 @@ $
 \]
 Hence, we have 
 \begin{align*}
-  2M_Nb_N(\beta)
-  & =\sum_I\E\bigl[g_I\partial_{g_I}Z_N(\beta)\bigr]=\beta\,\partial_\beta\E Z_N(\beta).
+  2|\mathcal I_N|b_N(\beta)
+  & =\sum_I\E\bigl[g_I\partial_{g_I}Z_N(\beta)\bigr]=\beta\,\partial_\beta\E[Z_N(\beta)].
 \end{align*}
 This proves \eqref{eq:P2Y-exact}.
 \end{proof}
