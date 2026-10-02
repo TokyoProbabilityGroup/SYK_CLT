@@ -60,9 +60,10 @@ $\chi_s(I):=\prod_{x\in I}s_x$.  We have
 \end{equation}
 
     In particular, if $\alpha$ is odd, then
-    \[
-      \mathbb E[Z_N(\beta;G)H_\alpha(G)]=0.
-    \]
+   \begin{equation}\label{eq:odd-coefficient-zero}
+  \mathbb E[Z_N(\beta;G)H_\alpha(G)]=0.
+   \end{equation}
+    
 \end{lemma}
 \begin{proof}
 We define the Clifford volume element: 
@@ -231,53 +232,76 @@ and
 \begin{equation}\label{eq:P2Y-exact}
   P_2 Y_N(\beta)
   =
-  \frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{2M_N}
-  \sum_{I\in\calI_N}(g_I^2-1).
+   \textcolor{red}{\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{2|\calI_N|}
+  	\sum_{I\in\calI_N}(g_I^2-1)}\
+  \textcolor{blue}{\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{2M_N}
+  \sum_{I\in\calI_N}(g_I^2-1)}.
 \end{equation}
 \end{lemma}
 
 \begin{proof}
 For multi-index $\alpha$ with $|\alpha|=1$, since $\alpha$ is always odd, the first claim follows from Lemma~\ref{lem: parity rule lemma}. 
-   
+ \textcolor{blue}{
   In the second chaos it also kills every 
 monomial $g_Ig_J$ with $I\neq J$, since the corresponding multi-index is also odd.  Consequently, since ${\rm He}_2(x)=x^2-1$, 
 \[
   P_2Z_N(\beta)=\frac{1}{2} \sum_I \mathbb E[Z_N(\beta;G') ((g'_I)^2-1) ] (g_I^2-1).
 \]
-
-
 The expectation
 \(
 \mathbb E[Z_N(\beta;G)(g_I^2-1)]
 \)
-is independent of $I$.  Indeed, a permutation of the sites sends any
+is independent of $I$.  Indeed,
+a permutation of the sites sends any
 $q$-set to any other one; the induced signs on the Majorana monomials are
 absorbed by the coordinatewise sign symmetry of the independent centered
 Gaussian couplings, while the normalized trace is invariant under the
-corresponding Clifford automorphism.  It therefore remains to compute the
+corresponding Clifford automorphism. It therefore remains to compute the
 common coefficient
 \[
 b_N(\beta):= \frac{1}{2}\mathbb E[Z_N(\beta;G) (g_I^2-1)].
 \]
 Applying Gaussian integration by parts yields
 \[
-  \E\bigl[Z_N(\beta)(g_I^2-1)\bigr]
-  =\E\,g_I \partial_{g_I} Z_N(\beta).
+\E\bigl[Z_N(\beta)(g_I^2-1)\bigr]
+=\E\,g_I \partial_{g_I} Z_N(\beta).
 \]
+}
+\textcolor{red}{Fix any $J,J'\in\calI_N$ and let $\pi\in\mathfrak{S}_N$ such that $\pi(J)=J'$, where $\mathfrak{S}_N$ is the symmetric group of degree $N$. We define $\epsilon_I\in\{\pm 1\}$ for each $I\in\calI_N$ as $\psi_{\pi(I)}=\epsilon_I \psi_{\pi(i_i)}\cdots\psi_{\pi(i_q)}$\footnote{\textcolor{red}{$\pi(I)=\{\pi(i_1),\dots,\pi(i_q)\}$, but $\pi(i_1)<\dots<\pi(i_q)$ does not hold. Since \eqref{eq: clifford relation} holds, the desired $\epsilon_I$ exists.}}, where $I=\{i_1,\dots i_q\}$ with $i_1<\cdots<i_q$. Then, 
+	\[H_N=\sigma_N\sum_{I\in\calI_N}\epsilon_Ig_{\pi(I)}\psi_{\pi(I)}.\]
+Hence, $Z_N(\beta;G)=Z_n(\beta;G_\pi)$, where $G_\pi\coloneqq\{\epsilon_I\}_{I\in\calI_N}$.
+Since $G$ and $G_\pi$ has the same distribution, we obtain
+\begin{align}\label{eq: second-coeffiicient-invariance}
+  \E[Z_N(\beta;G)(g_J^2-1)]
+  =\E[Z_N(\beta;G_\pi)(\epsilon_I^2g_{\pi(J)}^2-1)]=\E[Z_N(\beta;G)(g_{J'}^2-1)]. 
+\end{align}}
+
 On the other hand,  since $
   Z_N(\beta;tG)
   =Z_N(t\beta;G),
 $ 
  differentiating at $t=1$ gives
-\[
-  \sum_Ig_I\partial_{g_I}Z_N(\beta;G)
-  =\beta\,\partial_\beta Z_N(\beta;G).
-\]
+ \begin{equation}\label{eq:partial-derivative-relaton}
+ \sum_Ig_I\partial_{g_I}Z_N(\beta;G)
+=\beta\,\partial_\beta Z_N(\beta;G).
+ \end{equation}
+\textcolor{blue}{
 Hence, we have 
 \begin{align*}
   2M_Nb_N(\beta)
-  & =\sum_I\E\bigl[g_I\partial_{g_I}Z_N(\beta)\bigr]=\beta\,\partial_\beta\E Z_N(\beta).
+  & =\sum_{I\in\calI_N}\E\bigl[g_I\partial_{g_I}Z_N(\beta)\bigr]=\beta\,\partial_\beta\E Z_N(\beta).
+\end{align*}}
+\textcolor{red}{Therefore, substituting ${\rm He}_2(x)=x^2-1$ we obtain
+\begin{align*}
+	P_2Z_N(\beta)&\overset{\eqref{eq:odd-coefficient-zero}}{=}\sum_{I\in\calI_N}\frac{\mathbb{E}[Z_n(\beta;G)(g_I^2-1)]}{2}(g_I^2-1)\\
+	&\overset{\eqref{eq: second-coeffiicient-invariance}}{=}\frac{1}{2|\calI_N|}\mathbb{E}\left[\sum_{I\in\calI_N}Z_n(\beta;G)(g_I^2-1)\right]\sum_{I\in\calI_N}(g_I^2-1)\\
+	&=\frac{1}{2|\calI_N|}\mathbb{E}\left[\sum_{I\in\calI_N}g_I\partial_{g_I}Z_n(\beta;G)\right]\sum_{I\in\calI_N}(g_I^2-1)\\
+	&\overset{\eqref{eq:partial-derivative-relaton}}{=}\frac{\beta\mathbb{E}[\partial_\beta Z_n(\beta,G)]}{2|\calI_N|}\sum_{I\in\calI_N}(g_I^2-1)\\
+	&=\frac{\beta\partial_\beta\mathbb{E}[ Z_n(\beta,G)]}{2|\calI_N|}\sum_{I\in\calI_N}(g_I^2-1)
 \end{align*}
+where the third equality follows from the (one-dimensional) Gaussian integration by parts, and the last equality follows from the dominated convergence theorem because
+\[\sup_{|\beta|<B}|\partial_\beta Z_n(\beta;G)|\le \|H_N(G)\|_\infty e^{B\|H_N(G)\|_\infty},\quad  \|H_N(G)\|_\infty\le \sigma_N\sum_{I\in\calI_N}|g_I|\]
+for every $B>0$.}
 This proves \eqref{eq:P2Y-exact}.
 \end{proof}
 
