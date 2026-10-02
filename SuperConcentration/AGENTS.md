@@ -11,15 +11,15 @@
 3. `ARCHITECTURE.md` と `../Model/ARCHITECTURE.md` の関係する規約・依存関係
 4. 変更対象が Model の共有 API に及ぶ場合は `../Model/EDITING_PLAN.md` の該当する残件
 5. 公開用の説明を変更する場合は `README.md`
-6. 旧仕様との比較が必要な場合だけ二つの証明計画書
+6. 旧仕様との比較が必要な場合だけ [集中評価の旧計画](blueprint_super_concentration.txt) と [ガウス集中の旧計画](GaussianConcentration/blueprint_gaussian_concentration.txt)
 
-正確な定理文と検証状態は Lean のソースコード、現行設計は `ARCHITECTURE.md` を優先する。横断的な残件は `../EDITING_PLAN.md`、担当部分の残件は `EDITING_PLAN.md` を読む。完了済み作業の詳しい検証記録は必要になった場合だけ [作業履歴](../WORK_HISTORY.md) の該当節を読む。
+定理文は Lean ソースと構造文書を照合する。過去の検証根拠は必要時に [作業履歴](../WORK_HISTORY.md) を参照する。
 
 汎用ガウス基盤を変更する場合は、`../Probability/GaussianConcentration/AGENTS.md` と同じ場所の `EDITING_PLAN.md` も読む。
 
 ## 役割の境界
 
-有限の座標添字型に対するガウス測度、Herbst の議論、平滑化、リプシッツ関数に対するガウス集中不等式は、`SYK/Probability/GaussianConcentration/` の独立した基盤部分とする。この基盤部分に `N`、`q`、`InteractionIndex`、`CouplingSpace`、マヨラナ演算子、ハミルトニアンを置かない。
+有限の座標添字型に対するガウス測度、Herbst の議論、平滑化、リプシッツ関数に対するガウス集中不等式は、`SYK/Probability/GaussianConcentration/` の独立した基盤部分とする。模型固有の型・仮定を基盤部分へ持ち込まない。
 
 `CouplingSpace` とその標準ガウス測度は `Model` に置く。このディレクトリには、密度行列に関する評価、相互作用演算子 `Ψ_A` の期待値の絶対値の二乗和の評価、物理的な逆温度での分配関数の対数に対するリプシッツ評価、およびその集中不等式への適用だけを置く。
 
@@ -35,4 +35,4 @@
 
 ## 編集と検証
 
-一度に依存関係の一つの層だけを変更し、各変更ファイルを `lake env lean` で検査する。一つの指示が複数の層を含む場合も、層ごとの検証を通してから次の層へ進む。層の境界をユーザーの再承認や作業終了の境界とはしない。最後に `lake build Model SuperConcentration` と主要な定理の `#print axioms` を確認する。証明の未完成箇所を新たに導入することは許容しない。
+Lean ファイルを変更する場合は、一度に依存関係の一つの層だけを変更し、各変更ファイルを上位規則に従って検査する。一つの指示が複数の層を含む場合も、層ごとの検証を通してから次の層へ進む。Lean 実装の完了時に `lake build Model SuperConcentration` を実行する。

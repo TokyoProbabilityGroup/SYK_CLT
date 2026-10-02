@@ -16,16 +16,14 @@
 
 ## 公開 API
 
-中心となる公開結果は、ユークリッド空間上の標準ガウス測度に関して中心化したリプシッツ関数が、リプシッツ定数の二乗をパラメータとする `HasSubgaussianMGF` を満たすこととする。下側・上側・両側の裾の評価は、mathlib の `HasSubgaussianMGF` API から導く。
-
-モーメント母関数のパラメータの意味と `L = 0` の扱いは `SYK/SuperConcentration/ARCHITECTURE.md` の「共通ガウス集中不等式の定数」を参照する。
+標準ガウスに対する公開 MGF のパラメータ `L^2` と `L = 0` の扱いを保つ。正確な意味と裾評価との関係は [定数の説明](../../SuperConcentration/ARCHITECTURE.md#共通ガウス集中不等式の定数) を参照する。
 
 滑らかな関数の共分散評価、ガウス部分積分、平滑化、可積分性に関する補題は、利用側が実際に使うものだけを共有 API とし、不要な補助定義は公開しない。`gaussianReal_stein` などの既存宣言と重複させない。現在の証明済み内容を、それより弱いポアンカレ不等式やチェビシェフ不等式による評価に置き換えない。
 
 ## モジュールと名前空間
 
-ファイル名は `StandardGaussian.lean`、`Smooth.lean`、`Lipschitz.lean` とし、モジュールのパスは `SYK.Probability.GaussianConcentration.*`、宣言を置く名前空間は `SYK.GaussianConcentration` とする。定理、定義、ファイルの命名は、`SYK/AGENTS.md` を通じて適用される mathlib に沿った命名規則に従う。
+モジュールのパスは `SYK.Probability.GaussianConcentration.*`、宣言を置く名前空間は `SYK.GaussianConcentration` とする。
 
 ## 検証
 
-各ファイルを依存先から順に `lake env lean` で検査し、後続ファイルが import するモジュールは次へ進む前に `lake build +<module>:olean` で成果物を生成する。担当部分の完了時には `lake build SYK` も実行する。公開するモーメント母関数（MGF）の定理では、パラメータが正確に `L^2` であることを確認し、主要な定理の `#print axioms` の結果を報告する。`sorry`、`admit`、`axiom` または同等の未検証な仮定を導入しない。
+Lean ファイルを変更した場合は、各ファイルを依存先から順に `lake env lean` で検査し、後続ファイルが import するモジュールは次へ進む前に `lake build +<module>:olean` で成果物を生成する。Lean 実装の完了時には `lake build SYK` も実行する。公開 MGF の正確な型とパラメータを照合する。

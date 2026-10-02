@@ -43,7 +43,7 @@ partitionFunction z H = Matrix.trace (exp (-z • H))
 | --- | --- |
 | 逆温度 | `Params` から分離し、解析には `z : ℂ`、物理的な結果には `β : ℝ≥0` を明示的に渡す。 |
 | 分配関数 | `partitionFunction` は `z : ℂ` と通常のトレースを使う。規格化が必要な利用側は `normalizedTrace` から局所的に定義する。`partitionFunction 0 H = Fintype.card d`。CLT 側の規格化分配関数は零逆温度で1となり、標準表現と原稿の対応は W06 の `SYK.CLT.partitionFunction_standard` で照合済み。 |
-| 複素解析 | 整関数性・複素微分・非零点での `logDeriv` の公式は W01 で検証済み。Z01 では非空有限次元の固定自己共役行列の各実逆温度を中心とする局所円板で `Re Z>0`、非零性、対数微分公式、主値対数の正則性を証明した。半径は行列・中心に依存する。 |
+| 複素解析 | 整関数性・複素微分・非零点での `logDeriv` の公式は W01 で検証済み。Z01 では非空有限次元の固定した自己共役行列の各実逆温度を中心とする局所円板で `Re Z>0`、非零性、対数微分公式、主値対数の正則性を証明した。半径は行列・中心に依存する。 |
 | ガウス型相互作用 | 係数空間、標準ガウス測度、`couplingScale P` と `normalizedHamiltonian P M g` は `Model.GaussianDisorder` に置く。標準座標 `g_A` と実係数 `J_A = couplingScale P * g_A` を区別する。 |
 | 標準行列表現 | `StandardRepresentation` に Jordan–Wigner 表現を構成し、`StandardBasis (N/2)` の次元、生成子の基本関係、同じ偶数次数の相互作用演算子族の規格化トレース直交性を検証済み。抽象的な `MajoranaSystem` に仮定は追加していない。 |
 
@@ -57,12 +57,12 @@ partitionFunction z H = Matrix.trace (exp (-z • H))
 | --- | --- |
 | `Model.Definitions` | `N`、`q` とその許容条件、相互作用の添字と昇順 |
 | `Model.Majorana` | 抽象的なマヨラナ系、位相付き相互作用演算子、確定的なハミルトニアン |
-| `Model.FiniteDimensionalGibbs` | 有限次元行列に対する分配関数、Gibbs 状態、期待値、およびトレース指数関数の解析 |
+| `Model.FiniteDimensionalGibbs` | 有限次元行列に対する分配関数、ギブス状態、期待値、およびトレース指数関数の解析 |
 | `Model.GaussianDisorder` | `CouplingSpace`、標準ガウス測度、`σ_N` を含む標準規格化ハミルトニアン |
 | `Probability.GaussianConcentration` | 有限次元ユークリッド空間上の標準ガウス集中不等式 |
 | `SuperConcentration` | 密度行列の評価、マヨラナ相互作用演算子の二乗和評価、SYK への集中不等式の適用 |
 
-`IsDensityMatrix` と `expectation` は Gibbs 状態の構成にも使うため `Model.FiniteDimensionalGibbs` に置く。反交換族の二乗和評価は `SuperConcentration` に置く。これにより `Model` が `SuperConcentration` を import する循環を防ぐ。
+`IsDensityMatrix` と `expectation` はギブス状態の構成にも使うため `Model.FiniteDimensionalGibbs` に置く。反交換族の二乗和評価は `SuperConcentration` に置く。これにより `Model` が `SuperConcentration` を import する循環を防ぐ。
 
 非零次元・実逆温度で通常のトレースから規格化トレースへ移ると、`log Z_Tr = log Z_tr + log d` となる。次元は相互作用係数に依存しないため、中心化した対数や相互作用係数による微分ではこの差が消える。一方、`N^(-1) log d` は自由エネルギー密度の極限に残り得る。ギブス期待値は分子・分母を同じ規約で規格化すれば変わらない。
 
