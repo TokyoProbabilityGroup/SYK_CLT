@@ -2,7 +2,7 @@
 
 ## 基準と正式な参照元
 
-有限模型と、三種類の条件付き CLT をまとめた `partition_and_log_partition_clt` は過去の統合検査で Lean に受理されている。`AnnealedInput` 自体の構築は残る。検証時点・公理依存は [作業履歴](../WORK_HISTORY.md#clt-integration-audit-2026-09-29)を参照する。`sec:introduction` と `sec:main-results` の更新後の原稿と現行実装には、以下に記す不一致がある。以下の変更予定は未実装であり、現在の検証根拠は過去の統合記録である。
+有限模型と、三種類の条件付き CLT をまとめた `partition_and_log_partition_clt` は過去の統合検査で Lean に受理されている。今後の入力整理では `prop:annealed-free-energy` の内容を明示的な仮定として受け取り、命題自体の証明は保留する。検証時点・公理依存は [作業履歴](../WORK_HISTORY.md#clt-integration-audit-2026-09-29) を参照する。`sec:introduction` と `sec:main-results` の更新後の原稿と現行実装には、以下に記す不一致がある。入力整理は未実装である。
 
 正確な原稿の主張は `refs/CLT_SYK.tex` と、そこから読み込む `introduction.tex`・`gaussian-chaos.tex`・`higher-chaoses.tex`・`main-results.tex` を参照する。実装の型と証明項は Lean ソース、横断的な状態は [全体計画](../EDITING_PLAN.md)、残作業は [編集計画](EDITING_PLAN.md)、完了済み作業の詳しい検証根拠は [作業履歴](../WORK_HISTORY.md) に置く。原稿内の証明、外部結果、Lean の検証済み証明を区別する。
 
@@ -51,7 +51,9 @@
 - `Lemmas/PartitionHigherDerivatives.lean` は既存の行列トレース指数微分評価を `Setting.Z` の任意階の偏導関数に接続し、原稿 `eq:Z-derivative-bound` の係数、指数増大、ガウス–エルミート部分積分との接続を証明する。`Lemmas/HigherChaosProjection.lean` は各次数の Hermite 射影ノルムを偶多重指数の和、さらに Rademacher モーメントで評価し、無限次数和を指数付き三次モーメントで抑える。`tsum_higherChaosProjection_le_power` と `higherChaosProjection_isLittleO` は高温半径内の原稿 `prop:higher-chaos-closure` のべき評価を証明する。
 - `Lemmas/ConvexDerivatives.lean` は、割線の差の評価と平均値の定理を準備し、凸関数列の導関数を左右の割線で挟む証明を形式化する。主定理 `convex_convergence_deriv_tendstoUniformlyOn` は、開集合 `I` 上の各関数の凸性・微分可能性、関数列の局所一様収束、極限関数の微分可能性と導関数の連続性を仮定し、任意のコンパクト集合 `K ⊆ I` 上で導関数の一様収束を結論する。原稿で必要な各点収束から局所一様収束への導出はこの補題に含まれない。条件付き CLT に必要な局所一様収束は `AnnealedInput` の仮定として受け取る。
 
-`Basic.lean` は `Annealed_FE/main_result.lean` を import せず、`SYK.CLT.AnnealedInput q S` を宣言する。意図する数学的入力は現行原稿の `prop:annealed-free-energy` だが、現行構造体には旧原稿の追加評価も残る。原稿の模型族について入力を構築することは未証明であり、既存の条件付き CLT の完成と区別する。
+## アニール入力の現状と整理後の目標
+
+`Basic.lean` は `Annealed_FE/main_result.lean` を import せず、`SYK.CLT.AnnealedInput q S` を宣言する。意図する数学的入力は現行原稿の `prop:annealed-free-energy` だが、現行構造体には旧原稿の追加評価も残る。整理後は命題の内容を仮定として受け取り、原稿の模型族についての命題そのものは証明済みとしない。現行の条件付き CLT は、整理が終わるまでは原稿の命題より強い入力を仮定する。
 
 | 現行のフィールド | 現行原稿との対応 | 整理後の目標 |
 | --- | --- | --- |
@@ -73,13 +75,13 @@
 
 | TeX ラベル | 主張と監査事項 |
 | --- | --- |
-| `thm: input` | 全実数の固定逆温度でのアニール圧力の極限と、極限関数の全実軸での微分可能性。期待クエンチ圧力の極限や標本ごとの概収束は現行の定理文に含まない |
+| `thm: input` | 各固定実逆温度でのアニール圧力の極限と、極限関数の全実軸での微分可能性。期待クエンチ圧力の極限や標本ごとの概収束は現行の定理文に含まない |
 | `thm:partition-clt` | 原稿と Lean の相対・標準化 CLT はともに小さい `0<\|β\|<β_q` を仮定する。標準化量は逆温度ゼロで未定義。現行原稿に `tilde_beta_q` はない |
-| `thm:free-energy-clt` | 原稿と Lean の中心化した対数 CLT はともに `0<\|β\|<β_q` を仮定する。証明は集中不等式を使わない。Lean コメント・Blueprint には旧ラベル `cor:free-energy-clt` が残る |
+| `thm:free-energy-clt` | 原稿と Lean の中心化した対数 CLT はともに `0<\|β\|<β_q` を仮定する。証明は集中不等式を使わない。Lean コメントには旧ラベル `cor:free-energy-clt` が残る |
 | `lem:convex-derivatives` | 各点収束から関数・導関数の局所一様収束。現行原稿は全実軸で述べ、証明を省略して Rockafellar を引用する。Lean は関数の局所一様収束を仮定し、補題全体は未形式化 |
 | `prop:annealed-free-energy` | 全実軸の圧力・導関数の局所一様収束、偶性・凸性・`C¹`、非零逆温度での符号。明示的な三次・四次誤差上界と零近傍の展開は現行命題から削除されている |
 
-`lem:convex-derivatives` の旧原稿は開集合 `I` 上で述べていたが、`prop:annealed-free-energy` では既に `I=ℝ` として利用していた。全実軸への限定によってこの用途は変わらず、既存の Lean の一般形を削除する必要はない。Rockafellar の引用も旧原稿に存在し、証明省略によって新しい文献依存が増えたわけではない。各点収束から局所一様収束への未形式化部分は原稿更新前から存在する。
+原稿の `lem:convex-derivatives` は全実軸上の主張だが、既存の Lean の開集合上の一般形を維持してよい。原稿の改訂による定義域と証明の扱いの変化は [作業履歴](../WORK_HISTORY.md#clt-manuscript-input-plan-2026-10-03) を参照する。
 
 相対量・スケール・極限分散は
 ```text
@@ -108,7 +110,7 @@ N^a c_N → sqrt(q!/2) β ℓ_q'(β).
 ```
 古典的 CLT と Slutsky を適用し、標準化には直交分解による分散漸近と非退化性を別に使う。
 
-## 対数 CLT の新しい経路
+## 対数 CLT の証明経路
 
 `W_N=log Y_N` とすると
 ```text
@@ -131,17 +133,15 @@ N^a(log Z_N-E log Z_N)
 ```
 分布収束だけからこれらのモーメント評価は推論しない。有限模型の入力と `LogAsymptotics.lean` の減衰極限を用いて、対数 CLT を検証した。原稿の明示的な `O(N^(-2a))` 評価そのものは独立した Lean 定理にしておらず、CLT に必要な、`N^a` を掛けた期待誤差が零に収束することを証明している。
 
-## 外部入力と未完了の構築
+## 仮定する命題と保留した証明
 
-現行原稿は He2026 v3 の Theorem 1.1、Proposition 3.3、Theorem 2.5 を引用し、Schwinger–Dyson 圧力・その微分公式・正の Lehmann 表現を用いる。現行の変換は `H̃_N=2^(-q/2)H_N`、`s=2^(q/2)|β|` であり、規格化トレースを使う。符号の処理にはガウス分布に従う相互作用係数の対称性を使う。R03 の引用照合は過去の監査として保持し、当時扱った Lehmann 測度の二次モーメントと誤差評価を現行原稿の主張として説明しない。
+現行原稿は He2026 v3 の Theorem 1.1、Proposition 3.3、Theorem 2.5 を引用し、Schwinger–Dyson 圧力・その微分公式・正の Lehmann 表現を用いる。現行の変換は `H̃_N=2^(-q/2)H_N`、`s=2^(q/2)|β|` であり、規格化トレースを使う。符号の処理にはガウス分布に従う相互作用係数の対称性を使う。過去の引用照合は [作業履歴](../WORK_HISTORY.md#clt-r01-r05-audit-2026-09-27) を参照する。
 
-現行の `prop:annealed-free-energy` の証明は、圧力・導関数の収束、零での接続、`βℓ_q'(β)>0` を導く。原稿更新後の全主張・引用・Lean 宣言の対応を照合する作業は編集計画に残す。入力構築では、He2026 から受け取る結果と内部で証明する導出を分離し、残る外部仮定を明示する。He2026 の定理自体の全面的な形式化は現在の計画に含めない。
-
-`thm: input` は現在アニール圧力の決定論的極限と極限関数の微分可能性を述べる。期待クエンチ圧力との共通極限についての過去の説明を、この定理文に読み込まない。過去の引用監査と概収束を除いた経緯は [作業履歴](../WORK_HISTORY.md#clt-r01-r05-audit-2026-09-27) を参照する。
+現行の `prop:annealed-free-energy` の証明は、圧力・導関数の収束、零での接続、`βℓ_q'(β)>0` を導く。当面の Lean の対象はこの命題を仮定した条件付き CLT と具体模型への条件付き適用であり、原稿更新後の主張・引用・Lean 宣言の照合は編集計画に残す。命題の証明を再開する場合は、He2026 から受け取る結果と内部で証明する導出を分離し、残る外部仮定を明示する。He2026 の定理自体の全面的な形式化は現在の計画に含めない。
 
 ## 依存関係と実装の分担
 
-次の図は証明に使う数学的な入力の関係を表す。Lean の import グラフではない。汎用のガウス–エルミート部分積分は有限模型を数学的な前提としない。
+次の図は現行実装の証明に使う数学的な入力の関係を表す。Lean の import グラフではない。入力は現行の `AnnealedInput` であり、原稿の命題との違いと整理後の目標は上の入力表に記す。汎用のガウス–エルミート部分積分は有限模型を数学的な前提としない。
 
 ```mermaid
 flowchart TD
@@ -157,7 +157,7 @@ flowchart TD
     second --> remainder
     derivatives --> remainder
     rademacher["ラデマッハ評価"] --> remainder
-    external["原稿の prop:annealed-free-energy"] --> annealed["凸性・アニール係数漸近"]
+    external["明示的な仮定 AnnealedInput"] --> annealed["凸性・アニール係数漸近"]
     second --> clt["相対・標準化 CLT"]
     remainder --> clt
     annealed --> clt
@@ -167,12 +167,12 @@ flowchart TD
     annealed --> logclt
 ```
 
-ガウス–エルミート部分積分には、共有基盤の `gaussianReal_stein` と `pi_gaussian_stein_coord` を用いる。設計時に SpinGlass のガウス解析を流用候補としたが、F01 では既存の補題で原稿の標準分散1の入力を満たせることを確認して移植しなかった。候補の版・宣言と採否の経緯は [作業履歴](../WORK_HISTORY.md#clt-f01-completion-2026-09-27) に残す。移植後の保守性を比較した記録は確認できない。
+ガウス–エルミート部分積分には、共有基盤の `gaussianReal_stein` と `pi_gaussian_stein_coord` を用いる。流用候補の調査と採否は [作業履歴](../WORK_HISTORY.md#clt-f01-completion-2026-09-27) を参照する。
 
 原稿の `lem:Gaussian-Hermite-IBP` は `f ∈ C^{|α|}` を仮定し、成分ごとに `η ≤ α` を満たす各偏導関数について、ある `C_η > 0` による `|∂^η f(G)| ≤ C_η exp(C_η ‖G‖)` を要求する。この一般部分は同じ仮定のまま共有 `Smooth.lean` で証明した。共有 `pi_gaussian_stein_coord` は選択座標だけの成長評価を使い、偏導順序の交換と Hermite 因子の成長評価から反復の入力を導く。両辺の可積分性も `hermiteMulti_ibp_integrable` で証明済み。`Z_N` の正則性・成長評価と特殊化は `PartitionHigherDerivatives.lean` で証明した。有限射影、有限積ガウス $L^2$ 完全性、無限次数和の収束も証明済み。原稿の `eq: chaos` は研究者の確認に従いガウス $L^2$ の等式として解釈する。
 
 模型から独立したガウス基盤は利用側を import しない。Model が CLT を import する依存も作らない。`SuperConcentration` は既存の独立成果として維持し、新しい対数 CLT の必須入力にはしない。現行 `Main.lean` は `Annealed_FE` を import せず、アニール入力を `AnnealedInput q S` として受け取る。
 
-有限模型の定義・証明は `FiniteModel.lean` に、標準表現との規格化照合は `Normalization.lean` に置く。必要な補題の再利用先が増えた場合は、実際の型と利用関係を確認して共有層への移設を検討する。原稿の `prop:annealed-free-energy` の入力は `Basic.lean` の `AnnealedInput q S` が受け取り、`Main.lean` はそれを仮定して主定理を証明する。主要補題の所在は上の索引を参照する。
+有限模型の定義・証明は `FiniteModel.lean` に、標準表現との規格化照合は `Normalization.lean` に置く。必要な補題の再利用先が増えた場合は、実際の型と利用関係を確認して共有層への移設を検討する。整理後は原稿の `prop:annealed-free-energy` に対応する入力を `Basic.lean` の `AnnealedInput q S` が受け取り、`Main.lean` はそれを仮定して主定理を証明する。命題自体の証明は [その他の残件](EDITING_PLAN.md#その他の残件) に置く。主要補題の所在は上の索引を参照する。
 
 Blueprint の更新細目は [Chapters の計画](../Chapters/EDITING_PLAN.md) に置く。

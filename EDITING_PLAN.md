@@ -22,9 +22,9 @@ Verso は一時休止中である。Blueprint の本文・宣言参照はソー�
 
 ## 残る作業
 
-W01–W06、R01–R05、F01–F08 は、それぞれの履歴に記録した範囲で完了した。その後の CLT 原稿更新との整合は新しい作業として扱う。Z01 は非空有限次元の固定した自己共役行列について、各実逆温度を中心とする局所円板で完了した。F01 では SpinGlass の候補を照合し、既存の共有ガウス補題を再利用した。成果と検証は [W 単位の履歴](WORK_HISTORY.md#w-completion-notes)、[CLT 原稿・形式化の履歴](WORK_HISTORY.md#clt-r-f-completion-2026-09-28)、[Z01 の履歴](WORK_HISTORY.md#z01-local-zero-free-2026-09-28) を参照する。
+W01–W06、R01–R05、F01–F08、Z01 は、それぞれの履歴に記録した範囲で完了した。その後の CLT 原稿更新との整合は新しい作業として扱う。成果と検証は [W 単位の履歴](WORK_HISTORY.md#w-completion-notes)、[CLT 原稿・形式化の履歴](WORK_HISTORY.md#clt-r-f-completion-2026-09-28)、[Z01 の履歴](WORK_HISTORY.md#z01-local-zero-free-2026-09-28) を参照する。
 
-CLT の作業状態と担当は次の表だけで管理する。数学的な仕様と完了条件は [CLT の詳細計画](CLT/EDITING_PLAN.md) に置く。Lean の実装は別セッションで依頼する。統合担当は未指定であり、分担開始前に一人を指定する。
+現在進める CLT 作業の状態と担当は次の表で管理する。保留する課題は「その他の残件」に置く。数学的な仕様と完了条件は [CLT の詳細計画](CLT/EDITING_PLAN.md) に置く。Lean の実装は別セッションで依頼する。統合担当は未指定であり、分担開始前に一人を指定する。
 
 状態は「仕様未確定」「割当可能」「作業中」「判断待ち」「統合待ち」「完了」とする。「割当可能」は先行成果が統合され、目的・数学的な仕様（調査では対象と提出物）・編集範囲・検証条件が定まった状態であり、担当や開始ソースの確定前でも使える。着手時には担当と統合担当、参照原稿・Lean ソース一式を確定し、先行成果がそのソースに含まれることを確認する。分担者の検証後は「統合待ち」とし、統合・必要な文書更新・指定した原稿の版との照合を終えて「完了」とする。
 
@@ -32,33 +32,26 @@ CLT の作業状態と担当は次の表だけで管理する。数学的な仕�
 | --- | --- | --- | --- | --- |
 | `CLT-AUDIT` | 原稿全体と Lean の対応の照合 | 割当可能 | 未割当 | 着手時の原稿と実装 |
 | `CLT-INPUT` | アニール入力の整理と条件付き CLT の再検証 | 仕様未確定 | 未割当 | `CLT-AUDIT` |
-| `CLT-CONVEX` | `lem:convex-derivatives` の補完 | 仕様未確定 | 未割当 | `CLT-AUDIT` |
-| `CLT-EXTERNAL` | 入力構築の仕様と外部仮定の調査 | 仕様未確定 | 未割当 | `CLT-AUDIT` |
 | `CLT-LOG` | 対数の期待誤差の明示的評価 | 仕様未確定 | 未割当 | `CLT-INPUT` |
-| `CLT-ANNEALED` | 外部入力からアニール入力を構築 | 仕様未確定 | 未割当 | `CLT-INPUT`・`CLT-CONVEX`・`CLT-EXTERNAL` と外部仮定の承認 |
-| `CLT-APPLY` | 具体的な標準模型族への適用 | 仕様未確定 | 未割当 | `CLT-ANNEALED` |
+| `CLT-APPLY` | `prop:annealed-free-energy` を仮定した標準模型族への適用 | 仕様未確定 | 未割当 | `CLT-INPUT` |
 | `CLT-REFACTOR` | CLT・共有層・利用側のリファクタリング | 仕様未確定 | 未割当 | `CLT-LOG`・`CLT-APPLY` と数学的実装範囲の確定 |
 
 ```mermaid
 flowchart TD
     audit["CLT-AUDIT"] --> input["CLT-INPUT"]
-    audit --> convex["CLT-CONVEX"]
-    audit --> external["CLT-EXTERNAL"]
     input --> log["CLT-LOG"]
-    input --> annealed["CLT-ANNEALED"]
-    convex --> annealed
-    external --> annealed
-    annealed --> application["CLT-APPLY"]
+    input --> application["CLT-APPLY"]
     log --> refactor["CLT-REFACTOR"]
     application --> refactor
 ```
 
-監査後は INPUT・CONVEX・EXTERNAL を別担当で並行できる。LOG と ANNEALED も先行成果がそろえば並行できる。図は作業間の依存関係を表し、同じファイルの同時編集を認めるものではない。
+INPUT の統合後は LOG と APPLY を別担当で並行できる。図は現在進める作業間の依存関係を表し、同じファイルの同時編集を認めるものではない。
 
-数学的な残件をリファクタリング後へ繰り越す順序にはしない。実装中に循環依存などの解消が必要な場合だけ、必要最小限の構造変更を先行させる。He2026 の定理自体の全面的な形式化はこの順序に含めず、外部仮定と内部で証明する導出を区別する。
+リファクタリングは現在の数学的実装を終えてから行う。保留した命題の証明を再開する場合は、それも含めた数学的実装を終えてからリファクタリングする。実装中に循環依存などの解消が必要な場合だけ、必要最小限の構造変更を先行させる。
 
 | その他の残件 | 現在の境界・参照先 |
 | --- | --- |
+| `prop:annealed-free-energy` の証明 | 当面は命題の内容を Lean の明示的な仮定として受け取り、命題自体は証明済みとしない。証明を再開する場合は、`lem:convex-derivatives` の補完（保留中の `CLT-CONVEX`）、引用元と外部仮定の調査（`CLT-EXTERNAL`）、入力の構築（`CLT-ANNEALED`）を仕様化する。[CLT の詳細計画](CLT/EDITING_PLAN.md#その他の残件)を参照。 |
 | ガウス基盤の保守 | 既存の局所的な `aesop`・`grind` 使用の整理は [汎用ガウス基盤の計画](Probability/GaussianConcentration/EDITING_PLAN.md) に残す。数学的実装後の独立した保守単位とする。 |
 | `Annealed_FE`・`Universality` の既定ビルドへの復帰 | 両ライブラリの個別ビルドが成功してから既定対象へ戻す。 |
 | Verso の復帰 | 保存した依存設定を復元後、休止中に編集した章も含めて機械的検査を行う。[Chapters の計画](Chapters/EDITING_PLAN.md)を参照。 |
@@ -89,7 +82,7 @@ flowchart TD
 
 配布単位は `SYK/` の Git リビジョンと、その後の全差分である。統合担当は配布時に `git -C SYK rev-parse HEAD` と `git -C SYK status --short` を記録し、未コミット差分と未追跡ファイルを含む同一のソース一式を各担当者へ渡す。開始リビジョンが受領側から取得できることを確認し、既定の `main` にまだない場合は取得可能なブランチまたは Git bundle なども指定する。受領側は差分適用後の状態を照合し、欠けた文書・ソースを推測で補わない。コミットや公開は別途指示に従う。
 
-別環境では [配布用ワークスペースの手順](workspace/README.md#collaborator-setup)に従い、ワークスペースのルートから Lake を実行する。既存の親ワークスペースに他の研究プロジェクトがある場合、`workspace/` の設定で上書きしない。Lean/toolchain、manifest、利用する Lake 設定の整合と `lake build` の対象を確認する。Verso は休止中なので関連する生成・参照検査を依頼しない。既定ビルドは証明の完成判定ではなく、対象の公開定理の型と公理依存を別に確認する。
+別環境では [配布用ワークスペースの手順](workspace/README.md#collaborator-setup) に従い、ワークスペースのルートから Lake を実行する。既存の親ワークスペースに他の研究プロジェクトがある場合、`workspace/` の設定で上書きしない。Lean のバージョン、`lean-toolchain`、`lake-manifest.json`、使用する Lake 設定の整合と `lake build` の対象を確認する。Verso は休止中なので関連する生成・参照検査を依頼しない。既定ビルドは証明の完成判定ではなく、対象の公開定理の型と公理依存を別に確認する。
 
 別環境へ渡す依頼には、作業IDと担当、課題の目的、取得可能な開始コミットと追加差分、編集可能なファイル、先行する入力宣言、統合担当、検証条件を明記する。並行する読み取り調査は独立に進められるが、同じファイルへの編集や未確定の公開 API を使う実装は直列に受け渡す。並行候補の記載は複数エージェントの起動許可ではない。
 
