@@ -27,7 +27,7 @@ orthogonal basis of $L^2(\gamma_{\mathcal I_N})$, where
 $\gamma_{\mathcal I_N}$ denotes \textcolor{red}{the} standard Gaussian measure on
 $\mathbb R^{\mathcal I_N}$, we have
 \begin{align}\label{eq: chaos}
-Z_N(\beta;G) =\textcolor{red}{\sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\mathbb E[Z_N(\beta;G)H_\alpha(G)]}{\alpha!} H_\alpha(G)}\quad \textcolor{blue}{\sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\mathbb E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!} H_\alpha(G)},
+Z_N(\beta;G) =\textcolor{red}{\sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\E[Z_N(\beta;G)H_\alpha(G)]}{\alpha!} H_\alpha(G)}\quad \textcolor{blue}{\sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!} H_\alpha(G)},
 \end{align}
 where the second sum runs over all multi-indices $\alpha$ such that $\sum_{I} \alpha_I = k$\textcolor{blue}{, and the expectation is taken over an independent copy $G'$ of $G$}.  Let $P_r$ denote the orthogonal projection in
 $L^2(\gamma_{\mathcal I_N})$ onto the $r$-th \textcolor{blue}{homogeneous Gaussian} chaos \textcolor{red}{component}.
@@ -35,9 +35,9 @@ Then, we can write
 \[
   P_r Z_N(\beta;G)
   =\textcolor{red}{\sum_{|\alpha|=r}
-  	\frac{\mathbb E[Z_N(\beta;G)H_\alpha(G)]}{\alpha!}H_\alpha(G)}\
+  	\frac{\E[Z_N(\beta;G)H_\alpha(G)]}{\alpha!}H_\alpha(G)}\
   	\textcolor{blue}{\sum_{|\alpha|=r}
-  \frac{\mathbb E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!}H_\alpha(G)}.
+  \frac{\E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!}H_\alpha(G)}.
 \]
 \textcolor{red}{The aim of this section is to prove the following proposition for the normalized partition function.
 \begin{proposition}\label{prop:exact-second-chaos}
@@ -50,11 +50,11 @@ Then, we can write
 \end{proposition}
 }
 \textcolor{blue}{
-Since $\mathbb E Z_N(\beta)$ is deterministic, we also have
+Since $\E Z_N(\beta)$ is deterministic, we also have
 \[
   P_rY_N(\beta)=\frac{P_rZ_N(\beta)}{\E[Z_N(\beta)]}.
 \]
-Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \mathbb E Z_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
+Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \E Z_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
  The next lemma proves the exact radial decomposition
 \begin{equation*}
   Y_N(\beta)-1=A_N(\beta)Q_N+\mathcal R_N(\beta),
@@ -98,7 +98,7 @@ Then, for every $\beta\in\mathbb R$ and $G\in\mathbb R^{\calI_N}$,
 \end{equation}}
     In particular, if $\alpha$ is odd, then
    \begin{equation}\label{eq:odd-coefficient-zero}
-  \mathbb E[Z_N(\beta;G)H_\alpha(G)]=0.
+  \E[Z_N(\beta;G)H_\alpha(G)]=0.
    \end{equation}
     
 \end{lemma}
@@ -272,10 +272,10 @@ By~\eqref{eq:signed-permutation-invariance} with $\pi=\mathrm{id}$,
 $Z_N(\beta;T_{\mathrm{id},s}G)=Z_N(\beta;G)$.
 Since $T_{\mathrm{id},s}G$ and $G$ have the same distribution} \textcolor{blue}{Hence}, we have
 \begin{align*}\textcolor{red}{
-\mathbb E[Z_N(G) H_\alpha(G)] = \mathbb E[Z_N(\chi_s G) H_\alpha(\chi_s G)] = 
-\mathbb E[Z_N(G) H_\alpha(G)]}\\
+\E[Z_N(G) H_\alpha(G)] = \E[Z_N(\chi_s G) H_\alpha(\chi_s G)] = 
+\E[Z_N(G) H_\alpha(G)]}\\
 \textcolor{blue}{
-\mathbb E[Z_N(G') H_\alpha(G')] =\mathbb E[Z_N(\chi_s G') H_\alpha(\chi_s G')]=\mathbb E[Z_N(G') H_\alpha(G')]}, 
+\E[Z_N(G') H_\alpha(G')] =\E[Z_N(\chi_s G') H_\alpha(\chi_s G')]=\E[Z_N(G') H_\alpha(G')]}, 
 \end{align*}
 which gives the second claim. 
 \end{proof}
@@ -302,8 +302,8 @@ $f(G)=Z_N(\beta;G)$.
 \begin{proof}
 Recall that the one-dimensional integration-by-parts identity yields 
 \[\textcolor{red}{
-\mathbb{E}\!\left[\operatorname{He}_k(g)h(g)\right] = \mathbb{E}\!\left[h^{(k)}(g)\right]}\ \textcolor{blue}{
-\mathbb{E}\!\left[\operatorname{He}_k(G)f(G)\right] = \mathbb{E}\!\left[f^{(k)}(G)\right]},
+\E\!\left[\operatorname{He}_k(g)h(g)\right] = \E\!\left[h^{(k)}(g)\right]}\ \textcolor{blue}{
+\E\!\left[\operatorname{He}_k(G)f(G)\right] = \E\!\left[f^{(k)}(G)\right]},
 \]
 for every function $\textcolor{red}{h}\ \textcolor{blue}{f}\in C^k(\mathbb R)$ satisfying the stated growth
 condition~\cite[Equation~(2.3.15)]{S2023}. \textcolor{red}{Here, $g$ is a standard Gaussian random variable.} \textcolor{red}{By the definition of $H_\alpha(G)$, applying} \textcolor{blue}{Applying} this identity successively to the independent Gaussian
@@ -354,7 +354,7 @@ and
 \begin{equation}\label{eq:P2Y-exact}
   P_2 Y_N(\beta)
   =
-\frac{\beta\,\partial_\beta\log \mathbb E Z_N(\beta)}{2M_N}
+\frac{\beta\,\partial_\beta\log \E Z_N(\beta)}{2M_N}
   \sum_{I\in\calI_N}(g_I^2-1).
 \end{equation}
 \end{lemma}}
@@ -413,11 +413,11 @@ $
  \end{equation}
 \textcolor{red}{Therefore, substituting ${\rm He}_2(x)=x^2-1$ we obtain
 \begin{align*}
-	P_2Z_N(\beta)&\overset{\eqref{eq:odd-coefficient-zero}}{=}\sum_{I\in\calI_N}\frac{\mathbb{E}[Z_N(\beta;G)(g_I^2-1)]}{2}(g_I^2-1)\\
-	&\overset{\eqref{eq: second-coeffiicient-invariance}}{=}\frac{1}{2|\calI_N|}\mathbb{E}\left[\sum_{I\in\calI_N}Z_N(\beta;G)(g_I^2-1)\right]\sum_{I\in\calI_N}(g_I^2-1)\\
-	&=\frac{1}{2|\calI_N|}\mathbb{E}\left[\sum_{I\in\calI_N}g_I\partial_{g_I}Z_N(\beta;G)\right]\sum_{I\in\calI_N}(g_I^2-1)\\
-	&\overset{\eqref{eq:partial-derivative-relaton}}{=}\frac{\beta\mathbb{E}[\partial_\beta Z_N(\beta;G)]}{2|\calI_N|}\sum_{I\in\calI_N}(g_I^2-1)\\
-	&=\frac{\beta\partial_\beta\mathbb{E}[ Z_N(\beta;G)]}{2|\calI_N|}\sum_{I\in\calI_N}(g_I^2-1)
+	P_2Z_N(\beta)&\overset{\eqref{eq:odd-coefficient-zero}}{=}\sum_{I\in\calI_N}\frac{\E[Z_N(\beta;G)(g_I^2-1)]}{2}(g_I^2-1)\\
+	&\overset{\eqref{eq: second-coeffiicient-invariance}}{=}\frac{1}{2|\calI_N|}\E\left[\sum_{I\in\calI_N}Z_N(\beta;G)(g_I^2-1)\right]\sum_{I\in\calI_N}(g_I^2-1)\\
+	&=\frac{1}{2|\calI_N|}\E\left[\sum_{I\in\calI_N}g_I\partial_{g_I}Z_N(\beta;G)\right]\sum_{I\in\calI_N}(g_I^2-1)\\
+	&\overset{\eqref{eq:partial-derivative-relaton}}{=}\frac{\beta\E[\partial_\beta Z_N(\beta;G)]}{2|\calI_N|}\sum_{I\in\calI_N}(g_I^2-1)\\
+	&=\frac{\beta\partial_\beta\E[ Z_N(\beta;G)]}{2|\calI_N|}\sum_{I\in\calI_N}(g_I^2-1)
 \end{align*}
 where the third equality follows from the (one-dimensional) Gaussian integration by parts, and the last equality follows from the dominated convergence theorem because
 \[\sup_{|\beta|<B}|\partial_\beta Z_N(\beta;G)|\le \|H_N(G)\|_\infty e^{B\|H_N(G)\|_\infty},\quad  \|H_N(G)\|_\infty\le \sigma_N\sum_{I\in\calI_N}|g_I|\]
