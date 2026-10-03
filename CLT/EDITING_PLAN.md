@@ -56,12 +56,6 @@ R02-A（2026-09-28 に手動修正を確認）：`introduction.tex` の `thm:par
 
 R02-B（F06 の入力境界、2026-09-27 に方針確定）：抽象的な `S : Setting q` に対し、`hFE : AnnealedInput q S` を仮定する。命題の構築、標準模型への特殊化、表現独立性の証明は条件付き CLT の完了条件にしない。有限規格化の bridge は `Normalization.lean` に保持し、抽象証明から import しない。これは任意の一般表現について外部入力を証明したという意味ではない。
 
-
-<a id="finite-size-condition"></a>
-### 最終原稿点検の判断待ち：有限サイズの範囲（2026-10-03）
-
-`introduction.tex` は `N` の偶数性だけを明示するが、`Q_N` と Proposition `prop:exact-second-chaos` の計算は `|I_N| = choose(N,q)` で割るため `N ≥ q` を必要とする。修正した証明はこの範囲で整合する。提案は導入の設定を「`N ≥ q` は偶数」とすること。仮定の明示に関わるため本文は変更せず、研究者の判断待ちとする。誤植・参照更新・文書照合・PDF 更新は完了しており、この判断待ちとは分ける。
-
 <a id="r03"></a>
 
 ## R03：Theorem 1.2 の監査
@@ -79,14 +73,7 @@ R02-B（F06 の入力境界、2026-09-27 に方針確定）：抽象的な `S : 
 
 完了条件：現在の原稿内の結果と、明示した外部入力だけから Theorem 1.2 が証明される。
 
-2026-09-27 に証明監査を完了。旧 `lem:exact-second-chaos`（現 `prop:exact-second-chaos`）の原稿には、対角 Hermite 係数が相互作用添字に依らない理由をサイト置換・ガウス符号対称性から追記した。R02-A の原稿定理文は 2026-09-28 に確認した。
-
-2026-10-03 の指定原稿編集：`lem: parity rule lemma` を符号付き置換に対する分配関数の不変性へ一般化し、共通の反射公式から座標符号反転と互換を構成した。`prop:exact-second-chaos` の証明ではこの補題を引用して二次係数の添字独立性を示す。個人作業前の本文（黒字＋青字）は空白を除いて保存し、変更を赤字、削除を青字、置換を赤→青で記録した。赤青併記版と修正後版の節単独 LaTeX 検査は成功し、新規節内参照は解決した。初回の親原稿検査は TeX Live 2019 の古い mathtools による `\xlongrightarrow` 未定義で停止したが、原稿の不具合ではない。2026-10-03 に TeX Live 2026 を明示して親原稿と節を再コンパイルし、既存 PDF を上書きした。親原稿の参照・引用は解決し、既存の Overfull hbox が1件残る。節単独では他節の参照と親ファイルの文献への警告が残る。Blueprint は原稿上の共通反射構成と既存 Lean 結果の区別をソースに記し、Lean の追加実装・再検証および休止中の Verso 検査は行っていない。
-
-2026-10-03 の追加整理：承認された方針に従い、修正後本文の不変性の主張・引用を `eq:signed-permutation-invariance` に統一した。偶奇則では `π=id`、二次係数では `s=1` を明示し、対数 CLT の `U_x` の引用元を補題の証明とした。旧式・旧引用は青字履歴のみとし、変更した2ファイルの黒字＋青字の保存を確認した。TeX Live 2026 で親原稿・節の PDF を上書きし、親原稿の参照・引用は解決済み。組込みコンパイラは subfile の親ファイルを取得できないため使用不可であり、検証は TeX Live 2026 のログに基づく。
-
-
-2026-10-03 の最終点検：TeX 本文から関連ファイルの順で照合し、修正後本文の旧 Lemma への引用を Proposition に統一した。一次元部分積分の記号・成長条件の英文、偶多重指数の定義参照、可積分性・正規化の説明を修正した。全 subfile の修正後本文の参照検査と TeX Live 2026 の親原稿・各節のビルドは成功した。有限サイズ条件は上記の判断待ち事項とし、詳細な検証は [作業履歴](../WORK_HISTORY.md#clt-chaos-final-audit-20261003) に記す。
+2026-09-27 に証明監査を完了。`lem:exact-second-chaos` の原稿には、対角 Hermite 係数が相互作用添字に依らない理由をサイト置換・ガウス符号対称性から追記した。R02-A の原稿定理文は 2026-09-28 に確認した。
 
 <a id="r04"></a>
 
@@ -141,7 +128,7 @@ R02・R03 の該当入力の確定後に、有効な本文の新証明を監査�
 | ID | 成果と照合する原稿 | 主な依存関係・完了条件 |
 | --- | --- | --- |
 | F01 | ガウス–エルミート展開の完全性、次数ごとの直交射影・無限和、`lem:Gaussian-Hermite-IBP` の汎用的な部分 | 完了。R03 の該当監査、SpinGlass・既存 API との照合と共有配置、直交性・階乗ノルム、有限射影、$L^2$ 完全性と無限次数和を検証済み。`eq: chaos` はガウス $L^2$ の等式として解釈する。`Z_N` への特殊化は F04 で検証済み |
-| F02 | 符号ゲージ変換・偶奇則と一次・二次カオスの厳密な同定。`lem: parity rule lemma`、`prop:exact-second-chaos` | F01 と必要な F04 の入力。有限の `N` で係数・規格化が原稿と一致する |
+| F02 | 符号ゲージ変換・偶奇則と一次・二次カオスの厳密な同定。`lem: parity rule lemma`、`lem:exact-second-chaos` | F01 と必要な F04 の入力。有限の `N` で係数・規格化が原稿と一致する |
 | F03 | ラデマッハ符号化と一様な指数モーメント。`lem:Rademacher-encoding` | R03 の該当監査。`N` と指数パラメータの範囲、`q` のみに依存する定数を明示する |
 | F04 | 任意階の Duhamel 公式、非可換 Hölder 評価、`lem:Z-derivative-bound` | W06 と R03 の該当監査。共有すべき行列解析を CLT に複製せず、F01 の部分積分へ渡す正則性・各偏導関数の指数増大と、微分・積分交換の仮定も検査する |
 | F05 | `prop:higher-chaos-closure` の剰余項評価 | F01–F04。無限和の操作と `O(N^(-3(q/2-1))) = o(N^(2-q))` を検査する |
@@ -229,7 +216,7 @@ F06 の接続開始にあたり、`Main.lean` の共通定義・`AnnealedInput`�
 
 各 F の原稿監査と先行成果が揃ってから、上の依存順に着手する。`Preliminaries.lean` と `SecondChaos.lean` には F02 の有限サイズ結果を実装済みで、`GaussianConcentration.lean` は宣言のない雛形である。F03–F05 は完了した。F06 は `SecondChaosAsymptotic.lean` で `choose N q ∼ N^q/q!` と厳密な二次カオス係数のスケール極限を証明し、`GaussianQuadraticCLT.lean` で独立なガウス二乗和の分布収束を共有の `CouplingSpace` 上で証明した。`HigherChaosRemainder.lean` は射影級数の直交性・Parseval 等式・高温で尺度付き残差の `L²` ノルムが 0 に収束することを証明した。`ZeroChaos.lean` は正規化から定数カオスが 1 であること、一次カオスが消えることを用いた正確な分解を証明した。`QuadraticBridge.lean` は二次項を規格化したガウス二乗和と同定し、有限サイズの正確な係数、尺度付きの厳密な分解、積ガウス空間上での二乗和 CLT を与える。`DistributionTransfer.lean` の変動係数に対する弱収束補題を用い、`scaledQuadraticGaussianLp_clt` で主要二次項の条件付き CLT を検証した。`LpDistributionTransfer.lean` はサイズごとに異なる確率空間でも消える `L²` 誤差が分布収束を保つことを証明した。`RelativeCLT.lean` は高次残差を含む相対 CLT を積ガウス空間上で証明し、`EuclideanRelativeCLT.lean` は原稿の `CouplingSpace` と正確な `limitVariance` へ移した。`QuadraticGaussianVariance.lean` は有限サイズの分散を二次項の係数二乗と高次残差ノルム二乗に分解し、`N^{q-2} Var(Z_N)/(E Z_N)^2` が `limitVariance` に収束することを証明した。`FiniteVariancePositivity.lean` は β≠0 の全有限サイズ分散の正値性を全台性から証明し、`StandardizedCLT.lean` は規格化分散の極限と相対 CLT から標準化 CLT を証明した。`partition_clt` は共同主定理の `sorry` を経由しない直接証明に変更され、`sorryAx` に依存しない。F06 の条件付き分配関数 CLT は Lean で検証済み。F07 は `LogTaylor.lean` で `Y≥1/2` における二次誤差、`Y<1/2` における `log E Z_N` 上界、可積分性、中心化した対数変動と相対変動の厳密な差を検証した。その後 F07 で四次モーメント、小確率事象、期待誤差と中心化誤差の評価を検証し、対数 CLT と共同主定理の `sorry` を除去した。主要定理の公理依存と CLT ビルドを確認した。
 
-F02 完了（2026-09-27）：`Preliminaries.lean` は規格化模型への符号対称性・偶奇則・一次カオス零と、符号付き頂点転置による対角係数の添字独立性を証明した。`PartitionDerivatives.lean` は `Setting.Z` の滑らかさ、一次微分の指数増大、ガウス部分積分、放射方向微分恒等式、期待値との微分交換を証明した。`SecondChaos.lean` の `Setting.Y_secondChaos_eq` は任意の実数 `β` と有限サイズで、原稿 旧 `lem:exact-second-chaos`（現 `prop:exact-second-chaos`）の係数 `β * deriv (log meanZ) / (2 * choose N q)` をガウス $L^2$ の等式として与える。対称性・微分交換を追加仮定として受け取らず、`AnnealedInput` も使わない。
+F02 完了（2026-09-27）：`Preliminaries.lean` は規格化模型への符号対称性・偶奇則・一次カオス零と、符号付き頂点転置による対角係数の添字独立性を証明した。`PartitionDerivatives.lean` は `Setting.Z` の滑らかさ、一次微分の指数増大、ガウス部分積分、放射方向微分恒等式、期待値との微分交換を証明した。`SecondChaos.lean` の `Setting.Y_secondChaos_eq` は任意の実数 `β` と有限サイズで、原稿 `lem:exact-second-chaos` の係数 `β * deriv (log meanZ) / (2 * choose N q)` をガウス $L^2$ の等式として与える。対称性・微分交換を追加仮定として受け取らず、`AnnealedInput` も使わない。
 
 R03 の今回の監査では、原稿で省略されていた対角係数の添字独立性を転置の推移性から補った。規格化トレース、`couplingScale`、実部、二つのガウス測度、`H₂(x)=x²-1` と階乗 `2` を照合した。一次の部分積分だけで F02 に十分であり、任意階の導関数評価・部分積分の特殊化は F04 に残る。今回 `Main.lean` から補助モジュールを import する必要はなく、`Basic.lean` への分離はまだ行わない。個別検査、CLT ビルド、主要8宣言の公理依存検査、既定ビルドは成功した。詳細と既存警告・環境の範囲は [検証記録](../WORK_HISTORY.md#clt-f02-completion) を参照する。Blueprint はソース照合のみで、Verso の機械的検査は未実施。
 

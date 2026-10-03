@@ -197,7 +197,7 @@ with the manuscript's Hermite and Gaussian normalizations.
 
 :::theorem "clt_exact_second_chaos" (parent := "central_limit_theorem") (uses := "clt_partition_moments, clt_gaussian_hermite_ibp") (lean := "SYK.CLT.Setting.Y_firstChaos_eq_zero, SYK.CLT.Setting.Y_secondChaos_eq")
 For every real inverse temperature and every finite model in `Setting q`,
-the manuscript's `prop:exact-second-chaos` holds in Gaussian $`L^2`:
+the manuscript's `lem:exact-second-chaos` holds in Gaussian $`L^2`:
 $`P_1Y_N=0` and
 $`P_2Y_N=\frac{\beta\partial_\beta\log\mathbb E Z_N}{2M_N}\sum_I(g_I^2-1)`.
 The normalization is $`M_N=\binom Nq`, with $`H_2(x)=x^2-1`
@@ -205,15 +205,6 @@ and $`\mathbb E H_2(g_I)^2=2`.
 :::
 
 :::proof "clt_exact_second_chaos" (uses := "clt_partition_moments, clt_gaussian_hermite_ibp")
-The manuscript's generalized `lem: parity rule lemma` treats sign changes
-and vertex permutations together. For a real unit vector $`v`, write
-$`C_v=\sum_jv_j\psi_j` and $`U_v=\Gamma C_v`. The common identity
-$`U_v\psi_jU_v^*=\psi_j-2v_jC_v` gives a coordinate sign change for
-$`v=e_x` and a transposition for $`v=(e_a-e_b)/\sqrt2`.
-Composing these unitaries and using invariance of the normalized trace
-proves the manuscript's signed-permutation invariance. This common
-reflection construction is a manuscript proof, not a newly checked Lean
-declaration; the checked finite-model results used below are unchanged.
 Sign-gauge symmetry removes odd Hermite coefficients and all off-diagonal
 quadratic terms. Signed vertex transpositions preserve the normalized trace
 and Gaussian measure. Their transitivity on interactions proves equality
@@ -318,7 +309,7 @@ function, its quadratic Taylor limit, and $`M_N\to\infty`.
 :::
 
 :::theorem "clt_second_chaos_and_remainder" (parent := "central_limit_theorem") (uses := "clt_exact_second_chaos, clt_higher_chaos_closure")
-The manuscript's `prop:exact-second-chaos` identifies the leading Gaussian
+The manuscript's `lem:exact-second-chaos` identifies the leading Gaussian
 chaos of $`Y_N-1`. Its `prop:higher-chaos-closure` bounds the remainder by
 $`\|\mathcal R_N\|_2^2=O(N^{-3a})`, where $`a=q/2-1`.
 The intended proof uses parity symmetry, Gaussian integration by parts,

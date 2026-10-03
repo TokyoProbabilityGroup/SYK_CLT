@@ -181,7 +181,7 @@ W06 の有限模型の定義・証明は、抽象入力統一により `FiniteMo
 | `Main.lean` | `Setting`、条件付きアニール入力、`thm:partition-clt`、`cor:free-energy-clt` |
 | `Lemmas/Preliminaries.lean` | `lem: parity rule lemma` の `Setting.Z` への接続、一次カオス零、二次の非対角係数零。相互作用添字間の対称性も証明済み |
 | `Lemmas/PartitionDerivatives.lean` | `Setting.Z` の滑らかさ・一次微分評価、二次係数への部分積分と期待値の微分交換。任意階の評価は `PartitionHigherDerivatives.lean` に置く |
-| `Lemmas/SecondChaos.lean` | `prop:exact-second-chaos` の共通係数まで実装済み。`prop:higher-chaos-closure`、`prop:annealed-free-energy` は未完了 |
+| `Lemmas/SecondChaos.lean` | `lem:exact-second-chaos` の共通係数まで実装済み。`prop:higher-chaos-closure`、`prop:annealed-free-energy` は未完了 |
 | `../Probability/GaussianConcentration/Smooth.lean` | 汎用のガウス–エルミート部分積分。`lem:Gaussian-Hermite-IBP` の `Z_N` への適用は `PartitionHigherDerivatives.lean` で検証済み |
 | `Lemmas/CliffordSignParity.lean` | 符号ゲージと Hermite 偶奇則。共有分配関数を直接利用し、`Preliminaries.lean` に接続する |
 | `Lemmas/SingularValues.lean`・`Lemmas/MatrixTraceExponential.lean`・`Lemmas/TraceExpDerivatives.lean` | 一般行列の特異値・Schatten 評価と高階微分評価。`PartitionHigherDerivatives.lean` が `Setting.Z` へ接続する |

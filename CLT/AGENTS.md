@@ -53,10 +53,6 @@ R01–R05 は原稿・外部入力の監査、F01–F08 は成果の枠であり
 
 複数担当で作業するときは同じ開始時点の独立した作業領域を使い、共有作業ツリー上の同時編集を避ける。同じファイルへの変更は担当補題と入力 API を先に分け、一人の統合担当が直列に取り込む。全体の進捗・Blueprint の更新もその担当に集約する。Lean 実装担当は原稿を編集せず、不一致は根拠付きで報告する。Blueprint は統合・検証済みの宣言に合わせて更新し、既存の未形式化ノードは計画として区別して残す。Verso の機械的検査は休止したままとする。明示的に別の作業を依頼された場合は、その範囲と承認条件を先に確認する。
 
-## 原稿の LaTeX コンパイル
-
-メモ：`\xrightarrow` が TeX Live 2019 では外部パッケージを要求するため、TeX Live 2026 を優先する。コンピュータの設定と競合する場合はユーザーに確認する。
-
 ## Lean の依存関係
 
 `SYK.CLT` は共有の `SYK.Probability.GaussianConcentration`・`SYK.Model` と、必要な場合の `SYK.SuperConcentration` を利用し、共有部分から CLT への `import` は作らない。現行 `Main.lean` は `SYK.Annealed_FE.main_result` を import せず、`prop:annealed-free-energy` に合わせた `AnnealedInput q S` を宣言する。
