@@ -379,7 +379,7 @@ Put
 By the Hermite expansion \eqref{eq: chaos} and its orthogonality relation,
 \[
   \norm{P_r Y_N(\beta)}_2^2
-  =\frac1{(\E Z_N(\beta))^2}
+  =\frac1{(\E[Z_N(\beta)])^2}
     \sum_{|\alpha|=r}\frac1{\alpha!}
     \left|\E\!\left[Z_N(\beta)H_\alpha(G)\right]\right|^2.
 \]
@@ -388,23 +388,23 @@ By Lemmas~\ref{lem: parity rule lemma} and~\ref{lem:Gaussian-Hermite-IBP},
   \E\!\left[Z_N(\beta)H_\alpha(G)\right]
   =\begin{cases}
     0,&\alpha\text{ is odd},\\
-    \E\partial_g^\alpha Z_N(\beta),&\alpha\text{ is even}.
+    \E[\partial_g^\alpha Z_N(\beta)],&\alpha\text{ is even}.
   \end{cases}
 \]
 Moreover, Lemma~\ref{lem:Z-derivative-bound} gives, for $|\alpha|=r$,
 \[
-  \left|\E\partial_g^\alpha Z_N(\beta)\right|
-  \leq\E\left|\partial_g^\alpha Z_N(\beta)\right|
-  \leq (|\beta|\sigma_N)^r\E Z_N(\beta)
-  =t_N^{r/2}\E Z_N(\beta).
+  \left|\E[\partial_g^\alpha Z_N(\beta)]\right|
+  \leq\E\!\left[\left|\partial_g^\alpha Z_N(\beta)\right|\right]
+  \leq (|\beta|\sigma_N)^r\E[Z_N(\beta)]
+  =t_N^{r/2}\E[Z_N(\beta)].
 \]
-Since $\E Z_N(\beta)>0$, it follows that
+Since $\E[Z_N(\beta)]>0$, it follows that
 \begin{align}
   \norm{P_r Y_N(\beta)}_2^2
-  &=\frac1{(\E Z_N(\beta))^2}
+  &=\frac1{(\E[Z_N(\beta)])^2}
     \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
     \frac1{\alpha!}
-    \left|\E\partial_g^\alpha Z_N(\beta)\right|^2 \leq t_N^r
+    \left|\E[\partial_g^\alpha Z_N(\beta)]\right|^2 \leq t_N^r
     \sum_{\substack{|\alpha|=r\\ \alpha\ \mathrm{even}}}
     \frac1{\alpha!}.
   \label{eq:Hermite-Rademacher-bound}

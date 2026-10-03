@@ -52,7 +52,7 @@ Then, we can write
 \textcolor{blue}{
 Since $\mathbb E Z_N(\beta)$ is deterministic, we also have
 \[
-  P_rY_N(\beta)=\frac{P_rZ_N(\beta)}{\mathbb E Z_N(\beta)}.
+  P_rY_N(\beta)=\frac{P_rZ_N(\beta)}{\E[Z_N(\beta)]}.
 \]
 Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \mathbb E Z_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
  The next lemma proves the exact radial decomposition
@@ -293,8 +293,8 @@ have at most exponential growth in \textcolor{red}{$|G|$} \textcolor{blue}{$\nor
 \end{equation*}
 Then
 \begin{equation}\label{eq:Gaussian-Hermite-IBP}
-  \mathbb E\!\left[H_\alpha(G)f(G)\right]
-  =\mathbb E\!\left[\partial_g^\alpha f(G)\right].
+  \E\!\left[H_\alpha(G)f(G)\right]
+  =\E\!\left[\partial_g^\alpha f(G)\right].
 \end{equation}
 In particular, \eqref{eq:Gaussian-Hermite-IBP} holds for
 $f(G)=Z_N(\beta;G)$.
@@ -314,11 +314,11 @@ H_\alpha(G)
 \]}
 gives
 \begin{align*}
-\mathbb{E}\!\left[
+\E\!\left[
 H_\alpha(G)f(G)
 \right]
 &=
-\mathbb{E}\!\left[
+\E\!\left[
 \left(
 \prod_{I\in\mathcal I_N}
 \operatorname{He}_{\alpha_I}(g_I)
@@ -326,7 +326,7 @@ H_\alpha(G)f(G)
 f(G)
 \right] \\
 &=
-\mathbb{E}\!\left[
+\E\!\left[
 \left(
 \prod_{I\in\mathcal I_N}
 \partial_{g_I}^{\alpha_I}
@@ -334,7 +334,7 @@ f(G)
 f(G)
 \right] \\
 &=
-\mathbb{E}\!\left[
+\E\!\left[
 \partial_g^\alpha f(G)
 \right].
 \end{align*}
@@ -379,11 +379,11 @@ Since $G$ and $G_\pi$ have the same distribution, we obtain
   In the second chaos it also kills every 
 monomial $g_Ig_J$ with $I\neq J$, since the corresponding multi-index is also odd.  Consequently, since ${\rm He}_2(x)=x^2-1$, 
 \[
-  P_2Z_N(\beta)=\frac{1}{2} \sum_I \mathbb E[Z_N(\beta;G') ((g'_I)^2-1) ] (g_I^2-1).
+  P_2Z_N(\beta)=\frac{1}{2} \sum_I \E[Z_N(\beta;G') ((g'_I)^2-1) ] (g_I^2-1).
 \]
 The expectation
 \(
-\mathbb E[Z_N(\beta;G)(g_I^2-1)]
+\E[Z_N(\beta;G)(g_I^2-1)]
 \)
 is independent of $I$.  Indeed,
 a permutation of the sites sends any
@@ -393,7 +393,7 @@ Gaussian couplings, while the normalized trace is invariant under the
 corresponding Clifford automorphism. It therefore remains to compute the
 common coefficient
 \[
-b_N(\beta):= \frac{1}{2}\mathbb E[Z_N(\beta;G) (g_I^2-1)].
+b_N(\beta):= \frac{1}{2}\E[Z_N(\beta;G) (g_I^2-1)].
 \]
 Applying Gaussian integration by parts yields
 \[
