@@ -105,12 +105,12 @@ coordinate set and independent standard Gaussian coordinates. Let
 $`\alpha` be a nonnegative integer multi-index and let
 $`f\in C^{|\alpha|}(\mathbb R^\iota;\mathbb R)`. For each
 $`\eta\le\alpha` componentwise, assume there is $`C_\eta>0` such that
-$`|\partial^\eta f(g)|\le C_\eta\exp(C_\eta\|g\|_2)` for every $`g`.
+$`|\partial_G^\eta f(G)|\le C_\eta\exp(C_\eta\|G\|_2)` for every $`G`.
 Then both expectations below are integrable and
 
 $$`
 \mathbb E\left[\left(\prod_{i\in\iota}\operatorname{He}_{\alpha_i}(G_i)\right)
-f(G)\right]=\mathbb E[\partial^\alpha f(G)].
+f(G)\right]=\mathbb E[\partial_G^\alpha f(G)].
 `$$
 
 The Hermite polynomials have the probabilists' normalization. The proof
@@ -233,13 +233,15 @@ For every interaction multi-index $`\alpha`, the normalized partition
 function satisfies the bound in `eq:Z-derivative-bound`:
 
 $$`
-|\partial_g^\alpha Z_N(\beta;g)|
-\le (|\beta|\sigma_N)^{|\alpha|}Z_N(\beta;g).
+|\partial_G^\alpha Z_N(\beta;G)|
+\le (|\beta|\sigma_N)^{|\alpha|}Z_N(\beta;G).
 `$$
 
 Here $`\sigma_N` is the coupling scale of the shared model. The proof
 pulls the checked iterated trace-exponential derivative estimate through
-the real part and the linear disorder map. Exponential growth and
+the real part and the linear disorder map. The matrix estimate is proved
+using its power series and Schatten bounds. The manuscript's Duhamel
+simplex integral representation is not separately formalized. Exponential growth and
 smoothness permit Gaussian Hermite integration by parts for every
 $`\alpha`. The resulting Hermite coefficient of $`Y_N` is bounded by
 $`(|\beta|\sigma_N)^{|\alpha|}`. These Lean declarations have no
@@ -322,7 +324,7 @@ The manuscript's `prop:exact-second-chaos` identifies the leading Gaussian
 chaos of $`Y_N-1`. Its `prop:higher-chaos-closure` bounds the remainder by
 $`\|\mathcal R_N\|_2^2=O(N^{-3a})`, where $`a=q/2-1`.
 The intended proof uses parity symmetry, Gaussian integration by parts,
-Duhamel derivatives, and Rademacher encoding of the higher-chaos sum.
+the trace-exponential derivative bound, and Rademacher encoding of the higher-chaos sum.
 The sign-gauge symmetry of the scaled, normalized finite-model partition
 function is checked as `SYK.CLT.Setting.Z_sign_gauge`. The odd Hermite
 coefficient vanishes for its Gaussian coupling measure by
@@ -383,7 +385,7 @@ $`\beta=0`, the relative fluctuation vanishes and standardization is undefined;
 this point is outside the CLT statements.
 The joint declaration and both individual CLTs are Lean-checked without
 `sorryAx`, conditional on `hFE`.
-The manuscript and Lean impose the same nonzero-temperature restriction.
+The manuscript and Lean impose the same nonzero-inverse-temperature restriction.
 :::
 
 :::theorem "clt_trace_lower_bound" (parent := "central_limit_theorem") (uses := "clt_finite_partition_properties") (lean := "SYK.CLT.interactionOperator_trace_eq_zero, SYK.CLT.normalizedHamiltonian_normalizedTrace_eq_zero, SYK.CLT.realPartitionFunction_ge_one")
@@ -453,7 +455,7 @@ deterministic limit of $`N^{-1}\log\mathbb E Z_N(\beta)` and
 differentiability of the limiting function on $`\mathbb R`.
 The manuscript uses the positive-temperature input from He2026 v3,
 Gaussian symmetry, and $`Z_N(0)=1`. The stronger regularity, locally uniform
-pressure and derivative convergence, and nonzero-temperature sign are
+pressure and derivative convergence, and nonzero-inverse-temperature sign are
 stated in `prop:annealed-free-energy`. The current `thm: input` states
 neither an expected quenched-pressure limit nor an almost-sure claim.
 Lean's conditional CLT assumes `AnnealedInput q S`, which still contains

@@ -208,8 +208,10 @@ noncomputable def traceExp (A : Matrix n n 𝕜) : 𝕜 :=
 /--
 General higher-derivative estimate for a Hermitian base point.
 
-This packages the repeated Duhamel formula, the simplex volume cancellation, and Schatten Hölder:
-each inserted direction contributes only its operator norm.
+The proof uses the trace-exponential power series and Schatten bounds:
+each inserted direction contributes only its operator norm. This is the
+estimate used in `lem:Z-derivative-bound`; the manuscript proves it through
+a repeated Duhamel integral, whose simplex representation is not formalized here.
 -/
 theorem iterDirectionalFDeriv_traceExp_bound
     [Nonempty n]

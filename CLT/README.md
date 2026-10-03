@@ -13,11 +13,11 @@ This directory contains the manuscript and Lean formalization work for the centr
 - `EDITING_PLAN.md`: internal manuscript-audit and formalization plan.
 - `AGENTS.md`: topic-specific instructions for Codex.
 
-The internal planning documents are written in Japanese for collaboration between the researcher and Codex. Public mathematical artifacts, including this README, the manuscript, and future Lean source files, are written in English.
+The internal planning documents are written in Japanese for collaboration between the researcher and Codex. Public mathematical artifacts, including this README, the manuscript, and Lean source files, are written in English.
 
 ## Finding a lemma
 
-Start with a declaration name and its callers: `rg -n 'NAME' CLT Probability Model`. For an unfamiliar file, search its `theorem`, `lemma`, `def`, and `namespace` lines before reading proofs. Each lemma module's opening docstring lists its role and main entry points.
+From the shared workspace root, start with a declaration name and its callers: `rg -n 'NAME' SYK/CLT SYK/Probability SYK/Model`. For an unfamiliar file, search its `theorem`, `lemma`, `def`, and `namespace` lines before reading proofs. Each lemma module's opening docstring lists its role and main entry points.
 
 The principal import paths are:
 
@@ -36,13 +36,13 @@ The principal import paths are:
 
 `partition_and_log_partition_clt` and both individual CLT theorems are Lean-checked without `sorryAx`, conditional on `AnnealedInput`. The finite-model proofs establish tracelessness, `Z ≥ 1`, `partition_moments`, positivity and expectation one of `Y`, square integrability, integrability of both logarithms, and equality of their centered versions. Specialization to the standard representation gives the manuscript trace normalization. The finite-model results do not depend on `AnnealedInput`. `TraceExpDerivatives.lean` supplies the derivative estimates used in the chaos proof. The logarithmic CLT uses the chaos remainder and the lower bound `Z ≥ 1`.
 
-The sign-gauge module imports alongside `Main` and uses the shared `SYK.partitionFunction` directly. F02 proves parity for `Setting.Z`, vanishing first chaos, and the exact second-chaos coefficient for every real inverse temperature in Gaussian $L^2$, without `AnnealedInput`. `Preliminaries.lean`, `PartitionDerivatives.lean`, and `SecondChaos.lean` supply the symmetry, dominated differentiation, and coefficient identification; see the [completed integration record](../WORK_HISTORY.md#clt-f02-completion) and the [import audit](../WORK_HISTORY.md#merge-f01-2026-09-27).
+The sign-gauge module uses the shared `SYK.partitionFunction` directly. Parity for `Setting.Z`, vanishing first chaos, and the exact second-chaos coefficient are proved for every real inverse temperature in Gaussian $L^2$, without `AnnealedInput`. `Preliminaries.lean`, `PartitionDerivatives.lean`, and `SecondChaos.lean` supply the symmetry, dominated differentiation, and coefficient identification.
 
 The manuscript develops the partition-function CLT through an exact second-chaos decomposition and a direct Rademacher estimate for all higher chaoses. It also develops the transfer to the centered log-partition function.
 
-The current manuscript's `thm: input` states the deterministic annealed-pressure limit at every fixed real inverse temperature and differentiability of the limiting function. Its statement contains neither an expected quenched-pressure limit nor an almost-sure assertion. He2026 supplies the positive-temperature input; Gaussian symmetry and the identity at zero extend it to real temperatures. The manuscript's and Lean's relative, standardized, and logarithmic CLTs all exclude zero inverse temperature. The logarithmic theorem now has label `thm:free-energy-clt`; Lean comments still retain the old label.
+The current manuscript's `thm: input` states the deterministic annealed-pressure limit at every fixed real inverse temperature and differentiability of the limiting function. Its statement contains neither an expected quenched-pressure limit nor an almost-sure assertion. He2026 supplies the positive-temperature input; Gaussian symmetry and the identity at zero extend it to real temperatures. The manuscript's and Lean's relative, standardized, and logarithmic CLTs all exclude zero inverse temperature.
 
-The conditional formalization passed the recorded integration checks, but alignment with the updated manuscript remains work in progress. The planned input cleanup will align `AnnealedInput` with `prop:annealed-free-energy`, whose content will remain an explicit assumption for the conditional CLTs and their application to a specified model family. The proof of the proposition itself and the formalization of the pointwise-to-locally-uniform step in `lem:convex-derivatives` are deferred, while the explicit `O(N^(-2a))` logarithmic mean-error bound remains in scope. See [the editing plan](EDITING_PLAN.md) for acceptance criteria; mathematical implementation precedes the final refactoring of CLT and its shared foundations.
+The remaining work is to align `AnnealedInput` with `prop:annealed-free-energy`, add the explicit `O(N^(-2a))` logarithmic mean-error bound, and apply the conditional CLTs to the standard model family. The proposition remains an explicit assumption. Its proof and the pointwise-to-locally-uniform step in `lem:convex-derivatives` are deferred. See [the editing plan](EDITING_PLAN.md) for specifications and acceptance criteria.
 
 For individual proof files and their main declarations, see the [lemma index](ARCHITECTURE.md#補助-lean-ファイルの役割).
 
@@ -62,7 +62,7 @@ latexmk -pdf introduction.tex
 
 Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-references and citations whose definitions lie in other subfiles remain unresolved in a standalone build; the complete manuscript build resolves them.
 
-The conditional CLT is integrated into `Main.lean`. The current `GaussianIBP.lean` diagnostics include deprecated Mathlib names and linter warnings. See [the work history](../WORK_HISTORY.md#clt-integration-audit-2026-09-29) for the integration checks. After modifying a Lean file, check it from the shared workspace root:
+The conditional CLT is integrated into `Main.lean`. The current `GaussianIBP.lean` diagnostics include deprecated Mathlib names and linter warnings. See [the work history](../WORK_HISTORY.md#clt-audit-2026-10-04) for the completed verification checks. After modifying a Lean file, check it from the shared workspace root:
 
 ```bash
 lake env lean SYK/CLT/path/to/File.lean

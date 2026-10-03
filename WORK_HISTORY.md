@@ -1,5 +1,28 @@
 # SYK の作業履歴
 
+完了済み作業の検証結果と旧計画を保存する。現行の残件は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
+
+<a id="clt-audit-2026-10-04"></a>
+
+## CLT 原稿全体の監査と文書同期（2026-10-04）
+
+開始時の HEAD は `6b36c7c96be98f81f49f82a03b8189ae51a5ca76`、未コミット変更はなかった。原稿ルート `CLT/refs/CLT_SYK.tex` と全4節を読み、研究者の指定に従い赤字を採用案として Lean・関連文書・Blueprint と照合した。前回の文書整理時点からの原稿差分の比較には `ce28cc1` を用いた。主要 CLT の温度範囲、中心化、規格化、スケーリング、極限分散と、高次剰余の評価次数は維持され、数学的実装の大枠は変更しない。符号付き置換の一般形と Duhamel 積分表示を、既存の Lean の個別の対称性・高階微分評価と同一視しないことを構造文書へ記した。
+
+原稿の5つの Git 管理下のソースは編集せず、元のバイト列と一致する。
+
+構造文書、CLT の詳細計画・README、全体計画、章の計画と CLT 章の説明を同期した。数学ライブラリでは `Basic.lean`、`Main.lean`、`ConvexDerivatives.lean`、空の `GaussianConcentration.lean`、`QuadraticBridge.lean`、`QuadraticGaussianVariance.lean`、`TraceExpDerivatives.lean` のコメントだけを変更した。コメントを除いたソースは変更前と一致し、宣言名・型・仮定・証明項・import は変更していない。
+
+検証は共有ワークスペースのルートから行った。
+
+- 変更した数学ライブラリの7ファイルと直接の利用先 `FiniteVariancePositivity.lean`、`LpDistributionTransfer.lean`、`PartitionDerivatives.lean`、`Preliminaries.lean` に `lake env lean` を実行し、11ファイルすべて成功した。個別検査の警告は `TraceExpDerivatives.lean` の既存の `ContinuousLinearMap.smul_apply` の非推奨警告1件である。
+- `lake build CLT` は 3253 jobs で成功した。既存の linter・非推奨警告が再表示され、再表示を含む警告メッセージは540件だった。定理の未完成箇所や新しい検査エラーはない。
+- `partition_and_log_partition_clt`、`partition_clt`、`log_partition_clt`、`Setting.Y_firstChaos_eq_zero`、`Setting.Y_secondChaos_eq`、`Setting.tsum_higherChaosProjection_le_power`、`Setting.higherChaosProjection_isLittleO`、`Setting.scaled_integral_logLinearError_tendsto_zero`、`partitionFunction_standard` の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみだった。
+- CLT 章の参照先85宣言を、Verso を import しない検査入力の `#check` で確認した。Blueprint の依存名の欠落と重複、現行 Markdown の内部リンク、Lean コメントの原稿ラベルをソース上で検査した。Verso による章検査・生成・`vbp check` は休止中のため行っていない。
+- 監査段階の LaTeX 全体ビルドは一時ディレクトリへの出力で成功し、最終ログに未解決参照・引用はなかった。赤青併記では60ラベル・112参照が解決するが、赤字だけを採用する読み方では56ラベル・106参照のうち `eq:even-multi-index` の参照が1件未解決になる。この訂正は原稿担当に委ねる。
+- ルートと配布用の Lake 設定・manifest・toolchain は改行を正規化して一致した。`Main` の SYK 内依存は41モジュールで、標準表現・規格化照合・`Annealed_FE`・`SuperConcentration` への依存や、共有層から CLT への逆依存はない。共有のガウス部分積分基盤は利用している。
+
+監査は指定した原稿への対応の調査・文書反映として完了した。数学的実装の完了を意味しない。現行の CLT は追加6フィールドを含む `AnnealedInput q S` を仮定しており、原稿の命題のみからの検証は `CLT-INPUT` 後に確認する。対数期待誤差の明示的な次数評価と標準模型族への条件付き適用は後続課題である。引用元の原文再監査、命題の証明、凸関数列の補完と、既定ビルド対象外の `Annealed_FE` にある10箇所の `sorry` は今回の検証対象に含めない。
+
 <a id="clt-manuscript-input-plan-2026-10-03"></a>
 
 ## CLT 原稿更新後の監査と入力方針（2026-10-03）
@@ -99,8 +122,6 @@ R05 では `a=q/2-1≥1` とし、`E(g²-1)²=2`、`E(g²-1)⁴=60` から `E S_
 `#print axioms` で `Setting.Z_sign_gauge`、`integral_Z_mul_hermite_eq_zero`、`Y_firstChaos_eq_zero`、`integral_Y_mul_sq_sub_one_eq`、`meanZ_hasDerivAt`、`integral_Z_mul_sq_sub_one_ibp`、`sum_integral_Y_mul_sq_sub_one`、`Y_secondChaos_eq` を確認した。いずれも `propext`、`Classical.choice`、`Quot.sound` のみで、`sorryAx` はない。最終定理の型に残る入力は `Setting q`、実数 `β`、有限サイズ添字 `n` のみ。
 
 既存の最終 CLT の `sorry`、`Tool.lean` の非推奨名警告、共有ガウス基盤等の linter 警告は残る。新規ファイルには Lake の行長警告があるが、証明エラーはない。Blueprint には一次・二次射影の検証済みノードを追加し、未完了の高次剰余と区別した。数学的主張・宣言名・依存名はソース照合済み。Verso 休止に従い、章の Lean 検査・HTML/PDF 生成・参照検査は実行していない。
-
-完了済み作業の検証結果と旧計画を保存する。現行の残件は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
 
 関係する節： [CLT の W06・統合監査](#clt-w06)、[ガウス部分積分](#clt-f01-gaussian)、[W06 後の F01](#clt-f01-after-w06)、[F01 取り込み検証](#merge-f01-2026-09-27)、[Tool](#clt-tool)、[主結果の定理文](#clt-main-statements)、[Model の W01–W04](#model-w01)、[旧段階](#model-legacy)、[ワークスペースの移設](#workspace-migration)。
 

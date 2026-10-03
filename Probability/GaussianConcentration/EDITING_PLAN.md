@@ -2,12 +2,12 @@
 
 ## 現在の作業
 
-W02 の汎用基盤の独立化と F01 のガウス–エルミート部分積分の共有配置は完了した。現行 API と正確な仮定は [StandardGaussian.lean](StandardGaussian.lean)、[Smooth.lean](Smooth.lean)、[Lipschitz.lean](Lipschitz.lean)、基盤の構成と MGF・裾評価の定数は [構造説明](../../SuperConcentration/ARCHITECTURE.md#汎用的な基盤部分の分離) を参照する。移設・照合・検証の経緯は [ガウス基盤の履歴](../../WORK_HISTORY.md#gaussian-foundation) と [F01 の履歴](../../WORK_HISTORY.md#clt-f01-completion-2026-09-27) に保存した。SpinGlass の候補を調べた上で既存の SYK 側の補題を再利用した経緯も後者に記録した。
+W02 の汎用基盤の独立化と F01 のガウス–エルミート部分積分の共有配置は完了した。現行 API と正確な仮定は [StandardGaussian.lean](StandardGaussian.lean)、[Smooth.lean](Smooth.lean)、[Lipschitz.lean](Lipschitz.lean)、基盤の構成と MGF・裾評価の定数は [構造説明](../../SuperConcentration/ARCHITECTURE.md#汎用的な基盤部分の分離) を参照する。移設・照合・検証の経緯は [ガウス基盤の履歴](../../WORK_HISTORY.md#gaussian-foundation) と [F01 の履歴](../../WORK_HISTORY.md#clt-f01-completion-2026-09-27) に保存した。
 
 残る保守課題は、既存の局所証明における `aesop`・`grind` の使用を、対象と利用箇所を確認しながら整理することである。これは W02 の完了条件ではない。公開定理の仮定、`L²` の MGF パラメータ、`L=0` の扱いを変える場合は、利用側と定理文を照合し、変更ファイルを個別に検査して関連ビルド・公理依存を確認する。
 
 ## CLT の数学的実装後の整理
 
-[全体計画](../../EDITING_PLAN.md#残る作業) に従い、CLT の原稿整合、対数誤差の評価、命題を仮定した具体模型への適用を終え、保留課題を実装するか判断してから共有ガウス基盤と CLT の依存・重複を調査する。命題の証明を再開する場合は、その実装後に行う。詳細は [CLT の計画](../../CLT/EDITING_PLAN.md#数学的実装後のリファクタリング) を参照する。
+共有ガウス基盤と CLT の依存・重複の調査は [全体計画](../../EDITING_PLAN.md#残る作業) の順序に従う。調査仕様は [CLT の計画](../../CLT/EDITING_PLAN.md#数学的実装後のリファクタリング) を参照する。
 
-汎用 Hermite 補題と模型固有の対称性の結合、四次モーメント補題から CLT への依存、重複するガウス定義・変換を確認する。共有化は実際の利用関係と数学的役割から判断し、汎用基盤に模型固有の入力や利用側への import を追加しない。`aesop`・`grind` の整理は数学的実装後の独立した保守単位とし、原稿整合の完了条件に混ぜない。変更後は利用側を含む関連ビルドと公理依存を確認する。
+汎用 Hermite 補題と模型固有の対称性の結合、四次モーメント補題から CLT への依存、重複するガウス定義・変換を確認する。共有化は実際の利用関係と数学的役割から判断し、汎用基盤に模型固有の入力や利用側への import を追加しない。`aesop`・`grind` の整理は数学的実装後の独立した保守単位とし、原稿との整合性確認の完了条件に混ぜない。変更後は利用側を含む関連ビルドと公理依存を確認する。

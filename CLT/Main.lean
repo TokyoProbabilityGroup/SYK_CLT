@@ -20,7 +20,7 @@ local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) 
   unfold standardGaussianMeasure
   infer_instance
 
-/-- `thm:partition-clt` and `cor:free-energy-clt` for one matrix Majorana family.
+/-- `thm:partition-clt` and `thm:free-energy-clt` for one matrix Majorana family.
 
 For nonzero inverse temperature the limit is the identity random variable
 on `ℝ` with law `gaussianReal 0 (limitVariance q ℓ β)`. Thus the conclusion
@@ -65,7 +65,7 @@ theorem partition_and_log_partition_clt {q : ℕ}
   exact ⟨hpos β hβpos hβ0, S.varianceZ_pos_of_ne_zero β hβ0,
     hstd β hβstd hβ0⟩
 
-/-- The partition-function part of `thm:partition-clt` at nonzero temperature.
+/-- The partition-function part of `thm:partition-clt` at nonzero inverse temperature.
 The joint theorem above additionally supplies the logarithmic CLT. -/
 theorem partition_clt {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
@@ -92,7 +92,7 @@ theorem partition_clt {q : ℕ}
   exact ⟨hpos β hβpos hβ0, S.varianceZ_pos_of_ne_zero β hβ0,
     hstd β hβstd hβ0⟩
 
-/-- The centered log-partition CLT of `cor:free-energy-clt`.
+/-- The centered log-partition CLT of `thm:free-energy-clt`.
 The joint theorem supplies the same radius and variance for both CLTs. -/
 theorem log_partition_clt {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :

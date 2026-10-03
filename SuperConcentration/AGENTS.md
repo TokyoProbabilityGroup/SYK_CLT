@@ -2,7 +2,7 @@
 
 ## 適用範囲
 
-このファイルは `SYK/SuperConcentration/` 以下に適用する。ワークスペースのルート、`SYK/AGENTS.md`、共有模型の `AGENTS.md` の規則も適用する。
+このファイルは `SYK/SuperConcentration/` 以下に適用する。ワークスペースのルートと `SYK/AGENTS.md` の規則も適用する。共有模型を利用するときは [模型規約](../Model/ARCHITECTURE.md#固定する模型規約) を照合し、Model 内のファイルも編集する場合は、そのファイルに [Model の規則](../Model/AGENTS.md) を適用する。
 
 ## 作業前に読む文書
 
