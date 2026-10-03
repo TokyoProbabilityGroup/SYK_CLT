@@ -5,7 +5,7 @@ import SYK.CLT.Lemmas.PartitionDerivatives
 # Exact second chaos of the SYK partition function
 
 The parity selection rule reduces the degree-two projection in
-`lem:exact-second-chaos` to the diagonal Hermite multi-indices. Signed vertex
+`prop:exact-second-chaos` to the diagonal Hermite multi-indices. Signed vertex
 permutations and first-order Gaussian integration by parts identify the common
 coefficient at every real inverse temperature. Main entry point: `Setting.Y_secondChaos_eq`.
 -/
@@ -132,7 +132,7 @@ theorem Setting.Y_secondChaos_eq_integral_sum {q : ℕ} (S : Setting q)
           hermiteLp (Pi.single I 2) := by
   simpa only [S.inner_single_two_Y_eq_integral] using S.Y_secondChaos_eq_half_sum β n
 
-/-- The algebraic conclusion of `lem:exact-second-chaos`. The two inputs are
+/-- The algebraic conclusion of `prop:exact-second-chaos`. The two inputs are
 the interaction-index symmetry of the diagonal coefficient and the radial
 derivative identity for its sum. -/
 theorem Setting.Y_secondChaos_eq_common_of_symmetry_and_sum {q : ℕ} (S : Setting q)
@@ -182,7 +182,7 @@ theorem Setting.Y_secondChaos_eq_common_of_symmetry_and_sum {q : ℕ} (S : Setti
   congr 1
   field_simp
 
-/-- `lem:exact-second-chaos`, with symmetry and derivative exchange proved for
+/-- `prop:exact-second-chaos`, with symmetry and derivative exchange proved for
 the finite model. The equality is in Gaussian `L²`, for every real `β`. -/
 theorem Setting.Y_secondChaos_eq {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     hermiteDegreeProjection 2 (S.YGaussianLp β n) =

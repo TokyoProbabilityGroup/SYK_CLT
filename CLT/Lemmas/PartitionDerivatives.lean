@@ -5,7 +5,7 @@ import Mathlib.Analysis.Calculus.ParametricIntegral
 /-!
 # Finite partition-function derivatives
 
-The first-order analytic inputs for `lem:exact-second-chaos` are proved for
+The first-order analytic inputs for `prop:exact-second-chaos` are proved for
 the existing normalized model, at every real inverse temperature.
 Entry points: `Setting.Z_contDiff_couplings`, `Setting.Z_hasDerivAt_beta`,
 `Setting.coordDeriv_Z_eq`, `Setting.integral_Z_mul_sq_sub_one_ibp`,

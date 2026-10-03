@@ -3,82 +3,139 @@
 
 \begin{document}
 
-\section{Gaussian-chaos decomposition}
+\section{\textcolor{red}{Polynomial chaos expansion}\ \textcolor{blue}{Gaussian-chaos decomposition}}
 \label{sec:chaos-decomposition}
-We call $\alpha=(\alpha_I)_{I\in\mathcal I_N} \in (\mathbb N\cup\{0\})^{|\mathcal I_N|}$  a multi-index. 
- We define the order of $\alpha$ as $|\alpha| := \sum_{I\in\mathcal I_N} \alpha_I $.
- 
- We use the probabilists' Hermite polynomials
+We call $\alpha=(\alpha_I)_{I\in\mathcal I_N} \in (\mathbb N\cup\{0\})^{\mathcal I_N}$  a multi-index. We define the order of $\alpha$ as $|\alpha| := \sum_{I\in\mathcal I_N} \alpha_I $.
+ \textcolor{blue}{We use the probabilists' Hermite polynomials}
+ \textcolor{red}{For $k\in\mathbb Z_{\geq0}$, the probabilists' Hermite
+ polynomial of degree $k$ is defined by
+ \[
+   {\rm He}_k(x):=(-1)^k e^{x^2/2}\frac{d^k}{dx^k}e^{-x^2/2}.
+ \]
+ These polynomials are orthogonal with respect to the standard Gaussian
+ measure; in particular, ${\rm He}_0(x)=1$, ${\rm He}_1(x)=x$, and
+ ${\rm He}_2(x)=x^2-1$.  Their multivariate products satisfy}
 \begin{equation*}
   H_\alpha(G):=\prod_{I\in\calI_N}{\rm He}_{\alpha_I}(g_I),
   \qquad
   \E[H_\alpha H_\eta]
   =\alpha!\,\mathbf 1_{\{\alpha=\eta\}},
 \end{equation*}
-where $\alpha!:=\prod_I\alpha_I!$.  Since the $H_\alpha$ form a complete
+where $\alpha!:=\prod_I\alpha_I!$\textcolor{red}{, and
+$\mathbf 1_{\{\alpha=\eta\}}$ is the indicator function}. Since the $H_\alpha$ form a complete
 orthogonal basis of $L^2(\gamma_{\mathcal I_N})$, where
-$\gamma_{\mathcal I_N}$ denotes standard Gaussian measure on
+$\gamma_{\mathcal I_N}$ denotes \textcolor{red}{the} standard Gaussian measure on
 $\mathbb R^{\mathcal I_N}$, we have
 \begin{align}\label{eq: chaos}
-Z_N(\beta;G) = \sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!} H_\alpha(G),
+Z_N(\beta;G) =\textcolor{red}{\sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\E[Z_N(\beta;G)H_\alpha(G)]}{\alpha!} H_\alpha(G)}\quad \textcolor{blue}{\sum_{k=0}^\infty \sum_{\alpha:|\alpha|=k} \frac{\E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!} H_\alpha(G)},
 \end{align}
-where the second sum runs over all multi-indices $\alpha$ such that $\sum_{I} \alpha_I = k$, and the expectation is taken over an independent copy $G'$ of $G$.  Let $P_r$ denote the orthogonal projection in
-$L^2(\gamma_{\mathcal I_N})$ onto the $r$-th homogeneous Gaussian chaos.
+where the second sum runs over all multi-indices $\alpha$ such that $\sum_{I} \alpha_I = k$\textcolor{blue}{, and the expectation is taken over an independent copy $G'$ of $G$}.  Let $P_r$ denote the orthogonal projection in
+$L^2(\gamma_{\mathcal I_N})$ onto the $r$-th \textcolor{blue}{homogeneous Gaussian} chaos \textcolor{red}{component}.
 Then, we can write
 \[
   P_r Z_N(\beta;G)
-  =\sum_{|\alpha|=r}
-  \frac{\E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!}H_\alpha(G).
+  =\textcolor{red}{\sum_{|\alpha|=r}
+  	\frac{\E[Z_N(\beta;G)H_\alpha(G)]}{\alpha!}H_\alpha(G)}\
+  	\textcolor{blue}{\sum_{|\alpha|=r}
+  \frac{\E[Z_N(\beta;G')H_\alpha(G')]}{\alpha!}H_\alpha(G)}.
 \]
-Since $\E[Z_N(\beta)]$ is deterministic, we also have
+\textcolor{red}{The aim of this section is to prove the following proposition for the normalized partition function.
+\begin{proposition}\label{prop:exact-second-chaos}
+	For every $\beta\in \mathbb R$,
+	\[
+	P_1Y_N(\beta)=0\quad \text{and} \quad P_2 Y_N(\beta)
+	=A_N(\beta)Q_N,
+	\]
+	where $A_N(\beta)$ and $Q_N$ are defined by \eqref{eq:finite-N-FTW-coefficient}.
+\end{proposition}
+}
+\textcolor{blue}{
+Since $\E Z_N(\beta)$ is deterministic, we also have
 \[
   P_rY_N(\beta)=\frac{P_rZ_N(\beta)}{\E[Z_N(\beta)]}.
 \]
-
-Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \E[Z_N(\beta)]$ from \eqref{eq:finite-N-FTW-coefficient}.
+Recall $A_N(\beta):=\frac{\beta}{2}\,\partial_\beta\log \E Z_N(\beta)$ from \eqref{eq:finite-N-FTW-coefficient}.
  The next lemma proves the exact radial decomposition
 \begin{equation*}
   Y_N(\beta)-1=A_N(\beta)Q_N+\mathcal R_N(\beta),
   \qquad
   \mathcal R_N:=\sum_{r\geq3}P_r Y_N.
-\end{equation*}
+\end{equation*}}
 
 
-\subsection{Gauge symmetry and the parity selection rule}
- 
-Call a multi-index $\alpha$ \emph{even} if \text{for every }$x\in[N],$
+\textcolor{blue}{\subsection{Gauge symmetry and the parity selection rule}}
+ \textcolor{red}{We call} \textcolor{blue}{
+Call} a multi-index $\alpha$ \emph{even} if \textcolor{red}{$\sum_{I\colon x \in I}
+\alpha_I$ is even for every $x\in[N]$, and odd otherwise}\ \textcolor{blue}{for every $x\in[N],$
 \begin{equation}\label{eq:even-multi-index}
   \sum_{I\colon x \in I}
   \alpha_I\equiv0\pmod2.
 \end{equation}
-Otherwise, we call $\alpha$ odd. 
+Otherwise, we call $\alpha$ odd}. \textcolor{red}{We write $\mathfrak{S}_N$ for the symmetric group of degree $N$.}
 \begin{lemma}\label{lem: parity rule lemma}
     For $s=(s_1,\ldots,s_N)\in\{\pm1\}^N$, define
-$\chi_s(I):=\prod_{x\in I}s_x$.  We have 
+$\chi_s(I):=\prod_{x\in I}s_x$.
+\textcolor{red}{For $\pi\in\mathfrak S_N$ and $I=\{i_1,\ldots,i_q\}\in\calI_N$ with $i_1<\cdots<i_q$, we also
+define $\epsilon_\pi(I)\in\{\pm1\}$ by
+\[
+  \mathrm i^{q/2}\psi_{\pi(i_1)}\cdots\psi_{\pi(i_q)}
+  =\epsilon_\pi(I)\psi_{\pi(I)},
+\]
+whose existence follows from the anticommutation relation \eqref{eq: clifford relation}.
+Set
+\[
+  T_{\pi,s}G
+  :=\bigl(\chi_s(I)\epsilon_\pi(I)g_{\pi(I)}\bigr)_{I\in\calI_N}.
+\]
+Then, for every $\beta\in\mathbb R$ and $G\in\mathbb R^{\calI_N}$,
+\begin{equation}\label{eq:signed-permutation-invariance}
+  Z_N(\beta;T_{\pi,s}G)=Z_N(\beta;G).
+\end{equation}
+}
+\textcolor{blue}{We have
 \begin{equation}\label{eq:sign-gauge-invariance}
   Z_N(\beta;G)=Z_N\bigl(\beta;(\chi_s(I)g_I)_I\bigr).
-\end{equation}
-
+\end{equation}}
     In particular, if $\alpha$ is odd, then
-    \[
-      \E[Z_N(\beta;G)H_\alpha(G)]=0.
-    \]
+   \begin{equation}\label{eq:odd-coefficient-zero}
+  \E[Z_N(\beta;G)H_\alpha(G)]=0.
+   \end{equation}
+    
 \end{lemma}
 \begin{proof}
-We define the Clifford volume element: 
+We define \textcolor{blue}{the Clifford volume element:} 
 \[
   \Gamma
   := 
   \psi_1\cdots\psi_N.
 \]
-Note that $\Gamma^*\Gamma$ is identity map, so $\Gamma$ is unitary. Since $N$ is even, moving $\psi_j$ through the other $N-1$ Majorana
-generators produces the sign $(-1)^{N-1}=-1$.  Hence, for any $j\in[N],$
+Note that $\Gamma^*\Gamma$ is \textcolor{red}{the} identity \textcolor{red}{matrix} \textcolor{blue}{map}, so $\Gamma$ is unitary. Since $N$ is even, moving $\psi_j$ through the other $N-1$ Majorana
+\textcolor{red}{matrices} \textcolor{blue}{generators} produces the sign $(-1)^{N-1}=-1$.  Hence, for any $j\in[N],$
 \[
   \Gamma\psi_j\Gamma^*=  -\psi_j \Gamma \Gamma^* =-\psi_j.
 \]
-For each $x\in[N]$, consider a single-coordinate reflection
+\textcolor{red}{For a real unit vector $v=(v_1,\ldots,v_N)$, set
+\[
+  C_v:=\sum_{j=1}^N v_j\psi_j,
+  \qquad U_v:=\Gamma C_v.
+\]
+The anticommutation relation~\eqref{eq: clifford relation} gives
+\[
+  C_v^*=C_v,\qquad C_v^2=\mathbb I,\qquad
+  C_v\psi_j+\psi_jC_v=2v_j\mathbb I\quad(j\in[N]).
+\]
+Thus $C_v$ and $U_v$ are unitary, and
+\begin{equation}\label{eq:reflection-conjugation}
+  U_v\psi_jU_v^*
+  =\Gamma(2v_jC_v-\psi_j)\Gamma^*
+  =\psi_j-2v_jC_v.
+\end{equation}
+In particular, taking $v=e_x$, where $e_x$ is the $x$-th
+standard basis vector of $\mathbb R^N$, gives
+$U_x:=\Gamma\psi_x$ and}
+\textcolor{blue}{For each $x\in[N]$,  consider a single-coordinate reflection
 $$U_x:=\Gamma\psi_x.$$
-This is unitary because $U_x^* U_x=\Gamma\psi_x \psi_x^* \Gamma^* =\mathbb I$.  The Clifford relations \eqref{eq: clifford relation}  give
+This is unitary because $U_x^* U_x=\ \psi_x^* \Gamma^*\Gamma\psi_x  =\mathbb I$.  The  Clifford relations \eqref{eq: clifford relation} give
 \[
   \psi_x\psi_j\psi_x
   =
@@ -88,6 +145,7 @@ This is unitary because $U_x^* U_x=\Gamma\psi_x \psi_x^* \Gamma^* =\mathbb I$.  
   \end{cases}
 \]
 Hence, we obtain
+}
 \begin{align}\label{eq: conjugation rule}
       U_x\psi_jU_x^*
   =
@@ -106,7 +164,66 @@ where the product is in any fixed order.  Applying \eqref{eq: conjugation rule} 
 \[
   U_s\psi_jU_s^*=s_j\psi_j.
 \]
-Recall that $\psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}$ for  $I=\{i_1<\cdots<i_q\}$. Hence, the above identity yields 
+\textcolor{red}{For distinct $a,b\in[N]$, taking
+$v=(e_a-e_b)/\sqrt2$ in~\eqref{eq:reflection-conjugation} gives
+\begin{equation}\label{eq:unitary-transposition}
+ V_{ab}:=\Gamma\frac{\psi_a-\psi_b}{\sqrt2},
+\qquad
+V_{ab}\psi_jV_{ab}^*
+=\begin{cases}
+	\psi_b,&j=a,\\
+	\psi_a,&j=b,\\
+	\psi_j,&j\notin\{a,b\}.
+\end{cases}
+\end{equation}
+Writing $\pi=\tau_m\circ\cdots\circ\tau_1$ as a product of
+transpositions and setting $V_\pi:=V_{\tau_m}\cdots V_{\tau_1}$,
+we obtain $V_\pi\psi_jV_\pi^*=\psi_{\pi(j)}$ by \eqref{eq:unitary-transposition}.
+For $\pi=\mathrm{id}$, we take $V_\pi=\mathbb I$.
+The unitary $V_{\pi,s}:=V_\pi U_s$ therefore satisfies
+\[
+  V_{\pi,s}\psi_jV_{\pi,s}^*=s_j\psi_{\pi(j)}.
+\]
+Recall that $\psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}$
+for $I=\{i_1,\ldots,i_q\}$ with $i_1<\cdots<i_q$.
+By the definitions of $\chi_s(I)$ and $\epsilon_\pi(I)$,
+\begin{align*}
+  V_{\pi,s}\psi_IV_{\pi,s}^*
+  &=\mathrm i^{q/2}
+    (V_{\pi,s}\psi_{i_1}V_{\pi,s}^*)\cdots
+    (V_{\pi,s}\psi_{i_q}V_{\pi,s}^*)\\
+  &=\chi_s(I)\epsilon_\pi(I)\psi_{\pi(I)}.
+\end{align*}
+Since $I\mapsto\pi(I)$ is a permutation of $\calI_N$, we have
+\begin{align*}
+  V_{\pi,s}H_N(T_{\pi,s}G)V_{\pi,s}^*
+  &=\sigma_N\sum_{I\in\calI_N}
+    \chi_s(I)\epsilon_\pi(I)g_{\pi(I)}
+    V_{\pi,s}\psi_IV_{\pi,s}^*\\
+  &=\sigma_N\sum_{I\in\calI_N}
+    \bigl(\chi_s(I)\epsilon_\pi(I)\bigr)^2
+    g_{\pi(I)}\psi_{\pi(I)}
+    =H_N(G).
+\end{align*}
+Hence, we conclude that
+\[
+Z_N(\beta;T_{\pi,s}G)
+=\tr\!\left(
+V_{\pi,s}e^{-\beta H_N(T_{\pi,s}G)}V_{\pi,s}^*
+\right)
+=\tr e^{-\beta H_N(G)}
+=Z_N(\beta;G),
+\]
+because the normalized trace is invariant under unitary conjugation
+and
+\[
+V_{\pi,s}e^{-\beta H_N(T_{\pi,s}G)}V_{\pi,s}^*
+=e^{-\beta V_{\pi,s}H_N(T_{\pi,s}G)V_{\pi,s}^*}
+=e^{-\beta H_N(G)}.
+\]
+This proves~\eqref{eq:signed-permutation-invariance}.}
+
+\textcolor{blue}{Recall that $\psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}$ for  $I=\{i_1<\cdots<i_q\}$. Hence, the above identity yields
 \begin{align*}
   U_s\psi_IU_s^*
   &=
@@ -137,6 +254,7 @@ Finally, since the trace is invariant under unitary conjugation, we conclude
   =Z_N(\beta;G),
 \]
 which proves \eqref{eq:sign-gauge-invariance}.
+}
 
 Assume that $\alpha$ is odd so that  we can take $x$ such that
 $\sum_{I:x\in I}\alpha_I$ is odd.  We take $s$ such that $s_y=1$ for
@@ -146,27 +264,32 @@ $y\neq x$ and $s_x=-1$.  Then,
   =
   \left(
     \prod_{x=1}^N
-    s_x^{\sum_{I\ni x}\alpha_I}
+    s_x^{\textcolor{red}{\sum_{I:x\in I}}\textcolor{blue}{\sum_{I\ni x}}\alpha_I}
   \right)H_\alpha(G) = -H_\alpha(G).
 \]
-Hence, we have 
-\begin{align*}
-    \E[Z_N(G') H_\alpha(G')] =     \E[Z_N(\chi_s G') H_\alpha(\chi_s G')] = -
-    \E[Z_N(G') H_\alpha(G')],
+\textcolor{red}{
+By~\eqref{eq:signed-permutation-invariance} with $\pi=\mathrm{id}$,
+$Z_N(\beta;T_{\mathrm{id},s}G)=Z_N(\beta;G)$.
+Since $T_{\mathrm{id},s}G$ and $G$ have the same distribution} \textcolor{blue}{Hence}, we have
+\begin{align*}\textcolor{red}{
+\E[Z_N(G) H_\alpha(G)] = \E[Z_N(\chi_s G) H_\alpha(\chi_s G)] = 
+\E[Z_N(G) H_\alpha(G)]}\\
+\textcolor{blue}{
+\E[Z_N(G') H_\alpha(G')] =\E[Z_N(\chi_s G') H_\alpha(\chi_s G')]=\E[Z_N(G') H_\alpha(G')]}, 
 \end{align*}
 which gives the second claim. 
 \end{proof}
 
-\subsection{Gaussian integration by parts}
+\textcolor{blue}{\subsection{Gaussian integration by parts}}
 
 For a multi-index $\alpha \in \{0,1,\ldots\}^{\mathcal I_N}$, we denote the associated multi-index partial derivative of a function $f\colon \mathbb R^{\mathcal I_N} \to \mathbb R$ as $\partial^\alpha f$.
 
 \begin{lemma}\label{lem:Gaussian-Hermite-IBP}
 Let $f\colon\mathbb R^{\mathcal I_N}\to\mathbb R$ be of class $C^{|\alpha|}$,
 and suppose that $f$ and its multi-index partial derivatives up to order $\alpha$
-have at most exponential growth in $\norm{G}$: for any multi-index $\eta=(\eta_I)_{I\in\mathcal I_N}$ with $\eta_I\leq \alpha_I$, there exists a  constant $C_\eta>0$ such that
+have at most exponential growth in \textcolor{red}{$|G|$} \textcolor{blue}{$\norm{G}$}\textcolor{red}{, where $|G|$ denotes the Euclidean norm}: for any multi-index $\eta=(\eta_I)_{I\in\mathcal I_N}$ with $\eta_I\leq \alpha_I$, there exists a  constant $C_\eta>0$ such that
 \begin{equation*}
-  |(\partial^\eta f)(G)| \leq C_\eta e^{C_\eta \|G\|}.
+  |(\partial^\eta f)(G)| \leq \textcolor{red}{C_\eta e^{C_\eta |G|}}\ \textcolor{blue}{C_\eta e^{C_\eta \|G\|}}.
 \end{equation*}
 Then
 \begin{equation}\label{eq:Gaussian-Hermite-IBP}
@@ -178,16 +301,17 @@ $f(G)=Z_N(\beta;G)$.
 \end{lemma}
 \begin{proof}
 Recall that the one-dimensional integration-by-parts identity yields 
-\[
-\E\!\left[\operatorname{He}_k(G)f(G)\right] = \E\!\left[f^{(k)}(G)\right],
+\[\textcolor{red}{
+\E\!\left[\operatorname{He}_k(g)h(g)\right] = \E\!\left[h^{(k)}(g)\right]}\ \textcolor{blue}{
+\E\!\left[\operatorname{He}_k(G)f(G)\right] = \E\!\left[f^{(k)}(G)\right]},
 \]
-for every function $f\in C^k(\mathbb R)$ satisfying the stated growth
-condition~\cite[Equation~(2.3.15)]{S2023}.  Applying this identity successively to the independent Gaussian
-coordinates $(g_I)_{I\in\mathcal I_N}$ and using
+for every function $\textcolor{red}{h}\ \textcolor{blue}{f}\in C^k(\mathbb R)$ satisfying the stated growth
+condition~\cite[Equation~(2.3.15)]{S2023}. \textcolor{red}{Here, $g$ is a standard Gaussian random variable.} \textcolor{red}{By the definition of $H_\alpha(G)$, applying} \textcolor{blue}{Applying} this identity successively to the independent Gaussian
+coordinates $(g_I)_{I\in\mathcal I_N}$ \textcolor{blue}{and using
 \[
 H_\alpha(G)
 =\prod_{I\in\mathcal I_N}\operatorname{He}_{\alpha_I}(g_I),
-\]
+\]}
 gives
 \begin{align*}
 \E\!\left[
@@ -214,14 +338,13 @@ f(G)
 \partial_g^\alpha f(G)
 \right].
 \end{align*}
-
-The growth assumption justifies all integrations by parts.  Finally, for fixed
+The growth assumption justifies all integrations by parts. Finally, for fixed
 $N$ and $\beta$, the partition function $Z_N(\beta;G)$ is a smooth function
 of finitely many Gaussian coordinates, and all of its derivatives have at
-most exponential growth in $\norm{G}$.  Thus it satisfies the assumption.
+most exponential growth in  \textcolor{red}{$|G|$} \textcolor{blue}{$\norm{G}$}.  
+Thus it satisfies the assumption.
 \end{proof}
-\subsection{First and second moment}
-
+\textcolor{blue}{\subsection{First and second moment}
 \begin{lemma}\label{lem:exact-second-chaos}
 For every $\beta\in \mathbb R$,
 \[
@@ -231,54 +354,81 @@ and
 \begin{equation}\label{eq:P2Y-exact}
   P_2 Y_N(\beta)
   =
-  \frac{\beta\,\partial_\beta\log \E[Z_N(\beta)]}{2|\mathcal I_N|}
+\frac{\beta\,\partial_\beta\log \E Z_N(\beta)}{2M_N}
   \sum_{I\in\calI_N}(g_I^2-1).
 \end{equation}
-\end{lemma}
+\end{lemma}}
 
-\begin{proof}
-For multi-index $\alpha$ with $|\alpha|=1$, since $\alpha$ is always odd, the first claim follows from Lemma~\ref{lem: parity rule lemma}. 
-   
+\begin{proof}[{Proof \textcolor{red}{ of Proposition \ref{prop:exact-second-chaos}}}]
+For \textcolor{red}{any} multi-index $\alpha$ with $|\alpha|=1$, since $\alpha$ is always odd, the first claim follows from Lemma~\ref{lem: parity rule lemma}. 
+
+\textcolor{red}{Note that, if a multi-index $\alpha$ satisfies $|\alpha|=2$ and $\alpha_I=\alpha_J=1$ for some $I,J\in\calI_N$ with $I\ne J$, then $\sum_{K: x\in K} \alpha_K=1$ for any $x\in I\setminus J$, and hence $\alpha$ is odd.
+Fix any $J,J'\in\calI_N$ and choose $\pi\in\mathfrak S_N$
+such that $\pi(J)=J'$.
+Let $G_\pi:=T_{\pi,\mathbf 1}G$, where $\mathbf 1=(1,\ldots,1)$.
+By~\eqref{eq:signed-permutation-invariance} with $s=\mathbf 1$,
+$Z_N(\beta;G_\pi)=Z_N(\beta;G)$.
+Since $G$ and $G_\pi$ have the same distribution, we obtain
+\begin{align}\label{eq: second-coeffiicient-invariance}
+  \E[Z_N(\beta;G)(g_J^2-1)]
+  &=\E\!\left[Z_N(\beta;G_\pi)
+    \bigl((\epsilon_\pi(J)g_{\pi(J)})^2-1\bigr)\right]\notag\\
+  &=\E[Z_N(\beta;G)(g_{J'}^2-1)].
+\end{align}}
+\textcolor{blue}{
   In the second chaos it also kills every 
 monomial $g_Ig_J$ with $I\neq J$, since the corresponding multi-index is also odd.  Consequently, since ${\rm He}_2(x)=x^2-1$, 
 \[
   P_2Z_N(\beta)=\frac{1}{2} \sum_I \E[Z_N(\beta;G') ((g'_I)^2-1) ] (g_I^2-1).
 \]
-
-
 The expectation
 \(
 \E[Z_N(\beta;G)(g_I^2-1)]
 \)
-is independent of $I$.  Indeed, a permutation of the sites sends any
+is independent of $I$.  Indeed,
+a permutation of the sites sends any
 $q$-set to any other one; the induced signs on the Majorana monomials are
 absorbed by the coordinatewise sign symmetry of the independent centered
 Gaussian couplings, while the normalized trace is invariant under the
-corresponding Clifford automorphism.  It therefore remains to compute the
+corresponding Clifford automorphism. It therefore remains to compute the
 common coefficient
 \[
 b_N(\beta):= \frac{1}{2}\E[Z_N(\beta;G) (g_I^2-1)].
 \]
 Applying Gaussian integration by parts yields
 \[
-  \E\bigl[Z_N(\beta)(g_I^2-1)\bigr]
-  =\E[g_I \partial_{g_I} Z_N(\beta)].
+\E\bigl[Z_N(\beta)(g_I^2-1)\bigr]
+=\E\,g_I \partial_{g_I} Z_N(\beta).
 \]
+}
+
 On the other hand,  since $
   Z_N(\beta;tG)
   =Z_N(t\beta;G),
 $ 
  differentiating at $t=1$ gives
-\[
-  \sum_Ig_I\partial_{g_I}Z_N(\beta;G)
-  =\beta\,\partial_\beta Z_N(\beta;G).
-\]
-Hence, we have 
+ \begin{equation}\label{eq:partial-derivative-relaton}
+ \sum_Ig_I\partial_{g_I}Z_N(\beta;G)
+=\beta\,\partial_\beta Z_N(\beta;G).
+ \end{equation}
+\textcolor{red}{Therefore, substituting ${\rm He}_2(x)=x^2-1$ we obtain
 \begin{align*}
-  2|\mathcal I_N|b_N(\beta)
-  & =\sum_I\E\bigl[g_I\partial_{g_I}Z_N(\beta)\bigr]=\beta\,\partial_\beta\E[Z_N(\beta)].
+	P_2Z_N(\beta)&\overset{\eqref{eq:odd-coefficient-zero}}{=}\sum_{I\in\calI_N}\frac{\E[Z_N(\beta;G)(g_I^2-1)]}{2}(g_I^2-1)\\
+	&\overset{\eqref{eq: second-coeffiicient-invariance}}{=}\frac{1}{2|\calI_N|}\E\left[\sum_{I\in\calI_N}Z_N(\beta;G)(g_I^2-1)\right]\sum_{I\in\calI_N}(g_I^2-1)\\
+	&=\frac{1}{2|\calI_N|}\E\left[\sum_{I\in\calI_N}g_I\partial_{g_I}Z_N(\beta;G)\right]\sum_{I\in\calI_N}(g_I^2-1)\\
+	&\overset{\eqref{eq:partial-derivative-relaton}}{=}\frac{\beta\E[\partial_\beta Z_N(\beta;G)]}{2|\calI_N|}\sum_{I\in\calI_N}(g_I^2-1)\\
+	&=\frac{\beta\partial_\beta\E[ Z_N(\beta;G)]}{2|\calI_N|}\sum_{I\in\calI_N}(g_I^2-1)
 \end{align*}
-This proves \eqref{eq:P2Y-exact}.
+where the third equality follows from the (one-dimensional) Gaussian integration by parts, and the last equality follows from the dominated convergence theorem because
+\[\sup_{|\beta|<B}|\partial_\beta Z_N(\beta;G)|\le \|H_N(G)\|_\infty e^{B\|H_N(G)\|_\infty},\quad  \|H_N(G)\|_\infty\le \sigma_N\sum_{I\in\calI_N}|g_I|\]
+for every $B>0$, and the bound is Gaussian integrable.} \textcolor{blue}{
+Hence, we have
+\begin{align*}
+  2M_Nb_N(\beta)
+  & =\sum_{I\in\calI_N}\E\bigl[g_I\partial_{g_I}Z_N(\beta)\bigr]=\beta\,\partial_\beta\E Z_N(\beta).
+\end{align*}}
+This proves \textcolor{red}{$P_2 Y_N(\beta)
+	=A_N(\beta)Q_N$, because $P_2Y_N(\beta)=P_2Z_N(\beta)/\E Z_N(\beta)$} \textcolor{blue}{\eqref{eq:P2Y-exact}}.
 \end{proof}
 
 \end{document}

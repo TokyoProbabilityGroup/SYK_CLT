@@ -60,7 +60,7 @@ R05 では `a=q/2-1≥1` とし、`E(g²-1)²=2`、`E(g²-1)⁴=60` から `E S_
 
 ## F02：一次・二次カオスの同定完了（2026-09-27）
 
-開始時の HEAD は `ffd041a67e5c50b0b50f1bb469267751bbf3133e`。既存の未コミット実装を保持して検証・統合した。`Preliminaries.lean` の符号付き頂点転置と固定濃度集合への推移性により、対角 Hermite 係数が相互作用添字によらないことを証明した。`PartitionDerivatives.lean` は一次微分の指数評価、ガウス部分積分、放射方向微分恒等式、局所的な可積分支配による期待値の微分交換を実装する。`CLTComponents.lean` の `Setting.Y_secondChaos_eq` は `lem:exact-second-chaos` の二次射影を全実数 `β` について証明する。一次射影は `Setting.Y_firstChaos_eq_zero`。原稿の係数 `1/(2M_N)`、`H₂(x)=x²-1`、分散1のガウス測度、実際の表現次元による規格化を照合した。標準表現、外部極限入力、非零逆温度を追加要求しない。
+開始時の HEAD は `ffd041a67e5c50b0b50f1bb469267751bbf3133e`。既存の未コミット実装を保持して検証・統合した。`Preliminaries.lean` の符号付き頂点転置と固定濃度集合への推移性により、対角 Hermite 係数が相互作用添字によらないことを証明した。`PartitionDerivatives.lean` は一次微分の指数評価、ガウス部分積分、放射方向微分恒等式、局所的な可積分支配による期待値の微分交換を実装する。`CLTComponents.lean` の `Setting.Y_secondChaos_eq` は 旧 `lem:exact-second-chaos`（現 `prop:exact-second-chaos`）の二次射影を全実数 `β` について証明する。一次射影は `Setting.Y_firstChaos_eq_zero`。原稿の係数 `1/(2M_N)`、`H₂(x)=x²-1`、分散1のガウス測度、実際の表現次元による規格化を照合した。標準表現、外部極限入力、非零逆温度を追加要求しない。
 
 原稿が省略する対角係数の同一性を証明で補い、定理文・模型規約は変更していない。F02 には一次部分積分で足りるため、任意階の評価と特殊化は F04 に残る。`Main.lean` の線形 Hamiltonian と指数評価を公開して再利用し、`Tool.lean` は現行 mathlib の特異値を利用する。`Annealed_FE/main_result.lean` の開始時からの差分は今回の対象外として保持した。
 
@@ -930,3 +930,15 @@ F03 のラデマッハ評価、F04 の任意階微分、F05 の高次カオス�
 `lake env lean SYK/CLT/Lemmas/LogAsymptotics.lean`、`lake build SYK.CLT.Main`（3247 jobs）、`lake build CLT`（3253 jobs）は成功した。`partition_and_log_partition_clt`、`partition_clt`、`log_partition_clt`、`Setting.logFluctuation_clt` の `#print axioms` は `[propext, Classical.choice, Quot.sound]` のみ。三つの主定理はすべて `{q : ℕ} (S : Setting q) (hFE : AnnealedInput q S)` を入力とし、実逆温度 `|β|<βq`、尺度 `N^(q/2-1)`、極限分散 `(q!/2)β²(ℓ_q'(β))²` を維持する。標準化 CLT は `β≠0` に限る。`hFE` の構築、F08 の大数則、R02-A・R04-A の原稿上の判断は含まない。Blueprint は宣言参照と依存をソース上で更新し、Verso の機械的検査は休止規則に従い実施していない。
 
 文書・コメント更新後の既定 `lake build` も 3326 jobs で成功した。`CLT` の Lean ソースには `sorry` を残していない。`git diff --check` は成功し、コミットは作成していない。
+
+
+<a id="clt-chaos-final-audit-20261003"></a>
+## gaussian-chaos 最終原稿点検（2026-10-03）
+
+- TeX 本文を先に確認し、Introduction と main-results の旧 Lemma 引用を `Proposition~\ref{prop:exact-second-chaos}` に更新した。higher-chaoses の青字定義式への参照を、定義がある節への参照に変更した。
+- 一次元部分積分を `He_k(g)h(g)` に統一し、関数の成長条件と標準ガウス変数の説明を分離した。修正した反射・符号付き置換・偶奇則・二次係数の証明を再点検し、有限サイズ `N ≥ q` の下で、位相・合成順序・階乗係数・微分交換・正規化が整合することを確認した。
+- カオス展開の Gaussian L² 収束と指数可積分性、部分積分の Fubini の適用、Z の導関数評価への参照を補足した。後続の Duhamel 証明は部分積分に依存しないため、前方参照による循環はない。
+- 編集計画・構造文書・Lean コメントの現行原稿ラベルを更新し、過去の記録は旧ラベルと現ラベルの対応を明示した。Lean のコメント除去後のソース比較で、宣言・証明コードに変更がないことを確認した。新たな Lean 検証は行っていない。Blueprint の既存の現ラベルと原稿証明／Lean 検証済み範囲の区別も確認した。Verso の機械的検査は休止中。
+- 変更した4 subfile の「黒字＋青字」は編集開始時と空白を除いて一致する。全4 subfile と親原稿の「黒字＋赤字」を抽出した静的検査では、未定義ラベルと現行本文の旧 Lemma 引用はない。
+- `/usr/local/texlive/2026/bin/universal-darwin` の latexmk・pdflatex を明示して親原稿と4 subfile をコンパイルし、既存 PDF を上書きした。親原稿では参照・引用の未解決はなく、既存の Overfull hbox が1件残る。節単独では他節・親ファイルの文献への未解決参照警告が残る。組込みコンパイラは subfile の親ファイルを取り込めず、検証には使用できなかった。
+- `N ≥ q` の明示は仮定に関わるため未変更。詳細計画と全体計画に判断待ちとして記録した。
