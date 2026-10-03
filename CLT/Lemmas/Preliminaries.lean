@@ -99,7 +99,7 @@ theorem interaction_function_constant_of_swap {N q : ℕ}
   simpa only [himage] using hinv e.extendSubtype I
 
 /-- Interaction-index independence of the diagonal second-chaos coefficient.
-This supplies the symmetry omitted in the proof of `lem:exact-second-chaos`. -/
+This supplies the symmetry used in the proof of `prop:exact-second-chaos`. -/
 theorem Setting.integral_Y_mul_sq_sub_one_eq {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (I J : InteractionIndex (S.N n) q) :
     (∫ g : InteractionIndex (S.N n) q → ℝ,
