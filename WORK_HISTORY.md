@@ -90,7 +90,7 @@ R05 では `a=q/2-1≥1` とし、`E(g²-1)²=2`、`E(g²-1)⁴=60` から `E S_
 
 ## F02：一次・二次カオスの同定完了（2026-09-27）
 
-開始時の HEAD は `ffd041a67e5c50b0b50f1bb469267751bbf3133e`。既存の未コミット実装を保持して検証・統合した。`Preliminaries.lean` の符号付き頂点転置と固定濃度集合への推移性により、対角 Hermite 係数が相互作用添字によらないことを証明した。`PartitionDerivatives.lean` は一次微分の指数評価、ガウス部分積分、放射方向微分恒等式、局所的な可積分支配による期待値の微分交換を実装する。`CLTComponents.lean` の `Setting.Y_secondChaos_eq` は `lem:exact-second-chaos` の二次射影を全実数 `β` について証明する。一次射影は `Setting.Y_firstChaos_eq_zero`。原稿の係数 `1/(2M_N)`、`H₂(x)=x²-1`、分散1のガウス測度、実際の表現次元による規格化を照合した。標準表現、外部極限入力、非零逆温度を追加要求しない。
+開始時の HEAD は `ffd041a67e5c50b0b50f1bb469267751bbf3133e`。既存の未コミット実装を保持して検証・統合した。`Preliminaries.lean` の符号付き頂点転置と固定濃度集合への推移性により、対角 Hermite 係数が相互作用添字によらないことを証明した。`PartitionDerivatives.lean` は一次微分の指数評価、ガウス部分積分、放射方向微分恒等式、局所的な可積分支配による期待値の微分交換を実装する。`CLTComponents.lean` の `Setting.Y_secondChaos_eq` は 旧 `lem:exact-second-chaos`（現 `prop:exact-second-chaos`）の二次射影を全実数 `β` について証明する。一次射影は `Setting.Y_firstChaos_eq_zero`。原稿の係数 `1/(2M_N)`、`H₂(x)=x²-1`、分散1のガウス測度、実際の表現次元による規格化を照合した。標準表現、外部極限入力、非零逆温度を追加要求しない。
 
 原稿が省略する対角係数の同一性を証明で補い、定理文・模型規約は変更していない。F02 には一次部分積分で足りるため、任意階の評価と特殊化は F04 に残る。`Main.lean` の線形 Hamiltonian と指数評価を公開して再利用し、`Tool.lean` は現行 mathlib の特異値を利用する。`Annealed_FE/main_result.lean` の開始時からの差分は今回の対象外として保持した。
 
