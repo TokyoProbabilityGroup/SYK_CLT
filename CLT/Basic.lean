@@ -18,8 +18,9 @@ nonnegative-temperature restriction. The relative, standardized, and
 logarithmic CLTs all exclude zero inverse temperature; finite-model
 zero-inverse-temperature identities remain available separately.
 
-The explicit annealed input is `AnnealedInput`, modeled on
-`prop:annealed-free-energy` in the CLT manuscript. The Gaussian chaos and
+The explicit annealed input is `AnnealedInput`, containing the assertions of
+`prop:annealed-free-energy` for the given family in the CLT manuscript.
+The proposition itself is assumed. The Gaussian chaos and
 logarithmic-transfer arguments are proved in the supporting lemma modules
 and assembled in `Main.lean`.
 The almost-sure free-energy law of large numbers is outside this module's
@@ -248,9 +249,10 @@ end Setting
 /-! ## Main results -/
 
 /-- `prop:annealed-free-energy` for one Gaussian SYK model family.
-The current structure retains six additional fields beyond the proposition.
-Their removal is planned in `CLT-INPUT`; the conditional CLTs currently
-assume the full structure. -/
+This structure receives the proposition's assertions as an explicit input:
+an even convex `C¹` limit, locally uniform pressure and derivative convergence
+on the whole real line, and the sign at every nonzero inverse temperature.
+The proposition itself and construction of this input are not proved here. -/
 structure AnnealedInput (q : ℕ) (S : Setting q) where
   ℓ : ℝ → ℝ
   even : ∀ β : ℝ, ℓ (-β) = ℓ β
@@ -261,16 +263,6 @@ structure AnnealedInput (q : ℕ) (S : Setting q) where
   derivative_limit : TendstoLocallyUniformlyOn
     (fun n β ↦ deriv (fun b ↦ Real.log (S.meanZ b n)) β / (S.N n : ℝ))
     (deriv ℓ) atTop Set.univ
-  derivative_pos : ∀ β : ℝ, 0 < β → 0 < deriv ℓ β
-  derivative_le : ∀ β : ℝ, 0 < β → deriv ℓ β ≤ β / (q : ℝ)
-  derivative_error_nonneg : ∀ β : ℝ, 0 < β →
-    0 ≤ β / (q : ℝ) - deriv ℓ β
-  derivative_error_le : ∀ β : ℝ, 0 < β →
-    β / (q : ℝ) - deriv ℓ β ≤ β ^ 3 / 3
-  pressure_error_nonneg : ∀ β : ℝ,
-    0 ≤ β ^ 2 / (2 * (q : ℝ)) - ℓ β
-  pressure_error_le : ∀ β : ℝ,
-    β ^ 2 / (2 * (q : ℝ)) - ℓ β ≤ β ^ 4 / 12
   sign : ∀ β : ℝ, β ≠ 0 → 0 < β * deriv ℓ β
 
 /-- Annealed pressure convergence follows from the permitted input. -/

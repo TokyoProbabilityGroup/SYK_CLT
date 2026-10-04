@@ -12,9 +12,8 @@
 
 `Model.lean`、`GaussianConcentration.lean`、`SuperConcentration.lean` は共有模型と集中評価の検証済み宣言を参照する。`Model.lean` は Z01 の局所非零円板と主値対数の正則性も参照する。`CLT.lean` は有限模型、ガウス–エルミート展開、高次剰余、および三種類の条件付き CLT をまとめた定理と個別定理を参照する。三つの主 CLT は `0<|β|<β_q` に限定し、`AnnealedInput` の構築を内部証明として扱わない。`AnnealedFE.lean` の未形式化部分は計画として明示する。
 
-CLT 原稿と章・Lean 宣言の対応はソース上で照合済みである。現在の対応と未形式化部分は [CLT の構造文書](../CLT/ARCHITECTURE.md#現行原稿の主張)、照合した版と検証結果は [監査記録](../WORK_HISTORY.md#clt-audit-2026-10-04) を参照する。残る対応修正は次のとおりであり、関係する実装単位に含める。
+CLT 原稿と章・Lean 宣言の対応はソース上で照合済みである。`CLT-INPUT` の入力整理に伴い、`AnnealedFE.lean` と `CLT.lean` のアニール入力の説明も実装へ合わせた。現在の対応と未形式化部分は [CLT の構造文書](../CLT/ARCHITECTURE.md#現行原稿の主張)、照合した版と検証結果は [監査記録](../WORK_HISTORY.md#clt-audit-2026-10-04) と [入力整理の記録](../WORK_HISTORY.md#clt-input-2026-10-04) を参照する。残る対応修正は次のとおりであり、関係する実装単位に含める。
 
-- `AnnealedFE.lean` と `CLT.lean` のアニール入力の説明を、追加6フィールドの削除と Lean の再検証後に実装へ合わせる。それまでは削除予定を実装済みとして記さない。
 - 対数の期待誤差の明示的評価と、`prop:annealed-free-energy` を仮定した具体模型への適用は、それぞれの実装・検証後に対応する数学的主張、宣言参照、残る仮定を更新する。`lem:convex-derivatives` の補完と命題自体の証明は保留し、再開・実装した場合に同様に更新する。命題を仮定した結果を無条件の主定理として記さない。
 - 共有層の再配置に伴う章の参照変更は数学的実装後のリファクタリングに含める。作業順序は [全体計画](../EDITING_PLAN.md#残る作業)、数学的な仕様は [CLT の計画](../CLT/EDITING_PLAN.md) を参照する。
 

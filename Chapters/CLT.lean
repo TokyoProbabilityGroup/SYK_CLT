@@ -80,7 +80,7 @@ coefficient limit, for every real $`\beta`. The fixed-order binomial
 asymptotic gives the exact scaled coefficient limit
 $`\sqrt{q!/2}\,\beta\ell_q'(\beta)`. The input contains the convergence,
 regularity, and sign assertions of `prop:annealed-free-energy` for this
-one family, together with six additional fields whose removal is planned.
+one family, with no additional pressure or derivative bounds as assumptions.
 Constructing `hFE` is outside the conditional CLT proof.
 :::
 
@@ -458,7 +458,7 @@ Gaussian symmetry, and $`Z_N(0)=1`. The stronger regularity, locally uniform
 pressure and derivative convergence, and nonzero-inverse-temperature sign are
 stated in `prop:annealed-free-energy`. The current `thm: input` states
 neither an expected quenched-pressure limit nor an almost-sure claim.
-Lean's conditional CLT assumes `AnnealedInput q S`, which still contains
-six additional fields beyond the current proposition's statement. It does
-not import a quenched-pressure limit.
+Lean's conditional CLT assumes the assertions of `prop:annealed-free-energy`
+for `S` through `AnnealedInput q S`. The proposition itself remains unproved
+in Lean, and no quenched-pressure limit is assumed.
 :::

@@ -2,6 +2,31 @@
 
 完了済み作業の検証結果と旧計画を保存する。現行の残件は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
 
+<a id="clt-input-2026-10-04"></a>
+
+## CLT-INPUT：アニール入力の整理と統合（2026-10-04）
+
+担当・統合担当は Kamijima。開始点は `kamijima` の HEAD `f87e0a064cd527bd58f7354eed32c83cbd33cfee` で、着手時の追跡・未追跡差分はなかった。同 HEAD の Lean ソース一式と、原稿 `CLT/refs/CLT_SYK.tex`・そこから読み込む全4節を基準とし、`CLT-AUDIT` の成果を含むことを確認した。検証対象はこの HEAD に本単位の未コミット差分を加えたソースである。
+
+`Basic.lean` の `AnnealedInput q S` から `derivative_pos`、`derivative_le`、`derivative_error_nonneg`、`derivative_error_le`、`pressure_error_nonneg`、`pressure_error_le` の6フィールドを削除した。残る7フィールドは `ℓ`、`even`、`convex`、`contDiff_one`、`pressure_limit`、`derivative_limit`、`sign` である。削除した評価を別の仮定・宣言として残していない。構造体のコメントと `Main.lean` の説明を、命題文の内容を明示的な仮定として受け取る方針に合わせた。
+
+原稿の `prop:annealed-free-energy` と各フィールドを照合した。全実軸の偶・凸な `C¹` 極限、`eq:annealed-free-energy-limit`・`eq:annealed-derivative-limit` の局所一様収束、すべての非零実逆温度での `βℓ_q'(β)>0` に対応する。極限関数の存在は、関数 `ℓ` を含む構造体を入力として受け取る形で表す。命題は原稿の模型族についての主張であり、Lean は指定した一つの一般表現族 `S : Setting q` についてその内容を仮定する。標準模型族への適用や一般表現への外部極限定理の適用可能性を、この整理で証明したとは扱わない。
+
+相対・標準化・対数 CLT の結論を維持した。`Main.lean` はコメントを除くと開始時と完全に一致し、定理文・証明項・import は変更していない。`Basic.lean` もコメントと6フィールドの削除以外は一致する。`Setting`、`N^(q/2-1)` の尺度、`(q!/2)β²(ℓ_q'(β))²` の極限分散、`0<|β|<β_q` の温度条件、中心化、有限サイズの分散正値性を保持した。有限模型の `Z_N≥1`、二次・四次モーメント、高次カオス剰余の評価は変更していない。
+
+主な依存は、導関数収束から二次カオス係数の極限を得る `annealedDerivative_tendsto` と `secondChaosCoefficient_tendsto`、符号条件から極限分散の正値性を得る `exists_small_temperature_variance_pos`、相対・標準化・対数の個別 CLT である。三つの個別結果を共通の小温度半径でまとめる既存の証明を再利用した。
+
+共有ワークスペースのルートから次を検証した。
+
+- `lake env lean SYK/CLT/Basic.lean`、直接の利用先の `lake env lean SYK/CLT/Lemmas/Preliminaries.lean`、`lake env lean SYK/CLT/Main.lean` はすべて成功し、個別検査の警告はなかった。利用先の検査前に `lake build SYK.CLT.Basic` で変更した入力の生成物を更新した。
+- `lake build CLT` は 3253 jobs で成功した。既存の linter・非推奨警告540件が再表示された。対象は `StandardGaussian.lean`、`Smooth.lean`、`FiniteDimensionalGibbs.lean`、`SingularValues.lean`、`MatrixTraceExponential.lean`、`TraceExpDerivatives.lean`、`Rademacher.lean`、`GaussianIBP.lean`、`Preliminaries.lean`、`PartitionDerivatives.lean` であり、変更した `Basic.lean`・`Main.lean` の新しい警告はない。未解決の証明目標・検査エラーはない。
+- 再ビルド後の `#print AnnealedInput` と三つの主定理の `#print` により、削除後の入力と、残る仮定・量化・型・結論を確認した。`partition_and_log_partition_clt`、`partition_clt`、`log_partition_clt`、`Setting.relativeFluctuation_clt`、`Setting.standardizedFluctuation_clt`、`Setting.logFluctuation_clt` の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみだった。
+- `annealedFreeEnergy_tendsto`、`annealedDerivative_tendsto`、`secondChaosCoefficient_tendsto`、`exists_small_temperature_sign`、`exists_small_temperature_variance_pos`、`Setting.Y_firstChaos_eq_zero`、`Setting.Y_secondChaos_eq`、`Setting.higherChaosProjection_isLittleO`、`Setting.scaled_integral_logLinearError_tendsto_zero` の公理依存も同じ通常公理のみだった。合計15宣言に `sorryAx` はない。
+- CLT の README・構造文書・詳細計画、全体計画、章の計画、`Chapters/CLT.lean`・`Chapters/AnnealedFE.lean` の説明を更新した。両章の参照先100宣言を、Verso を import しない一時検査入力の `#check` で確認した。Blueprint の66宣言と157の依存・親・証明参照をソース上で照合し、参照の欠落・宣言の重複はなかった。変更箇所の TeX ラベル、文書の内部リンク、差分も確認した。
+- 統合時にも原稿の5ソースが開始時の HEAD とバイト単位で一致することを確認した。原稿・共有設定・依存設定は編集していない。Verso の章検査・生成・`vbp check` は休止中のため行っていない。
+
+`CLT-INPUT` は実装・検証・文書と Blueprint の統合まで完了した。`hFE : AnnealedInput q S` は明示的な仮定として残り、命題自体と入力の構築は未証明である。対数期待誤差の明示的な次数評価、標準模型族への条件付き適用、凸関数列の補完、外部入力の調査は後続・保留課題である。`CLT-LOG` は先行成果の統合により割当可能とし、`CLT-APPLY` は仕様未確定のままとした。後続の実装には着手していない。既定対象外の `Annealed_FE`・`Universality` は今回のビルドによる検証対象に含めない。コミットは作成していない。
+
 <a id="clt-audit-2026-10-04"></a>
 
 ## CLT 原稿全体の監査と文書同期（2026-10-04）
