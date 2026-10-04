@@ -1,9 +1,12 @@
 /-!
 # Gaussian concentration for the SYK model
 
-This module will contain the currently unlabeled Gaussian concentration result
-characterized by `eq:centered W_N tail` and `eq:centered W_N exp`, together with
-related concentration results from the manuscript.
+This empty module is retained from an earlier concentration-based plan.
+The current manuscript proves `thm:free-energy-clt` using the chaos remainder
+and the lower bound `Z_N ≥ 1`; it requires no concentration result here.
+Shared Gaussian concentration results live in
+`SYK.Probability.GaussianConcentration` and their SYK application in
+`SYK.SuperConcentration`.
 -/
 
 namespace SYK.CLT

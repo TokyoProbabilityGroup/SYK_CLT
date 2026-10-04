@@ -149,7 +149,7 @@ theorem Setting.quadraticGaussianLp_clt {q : ℕ} (S : Setting q) :
 
 /-- The leading scaled chaos has the conditional Gaussian limit on the
 product coupling space at nonzero inverse temperature. The coefficient
-calculation itself remains valid at zero temperature. -/
+calculation itself remains valid at zero inverse temperature. -/
 theorem Setting.scaledQuadraticGaussianLp_clt {q : ℕ} (S : Setting q)
     (hFE : AnnealedInput q S) (β : ℝ) (_hβ : β ≠ 0) :
     TendstoInDistribution

@@ -2,13 +2,11 @@
 
 ## 目的
 
-共有 SYK 模型のうち物理的なギブス状態を扱う層と、模型に依存しないガウス集中不等式の基盤部分を接続し、通常のトレースで定義した SYK 分配関数の対数に対する集中不等式を証明する。W05 では `DensityMatrix`・`MajoranaBound`・`Main` に評価を分割し、MGF・上下・両側の裾を供給する。実行単位と待ち合わせは [全体計画](../EDITING_PLAN.md)、細目と検証根拠は [編集計画](EDITING_PLAN.md) に集約する。
+共有 SYK 模型のうち物理的なギブス状態を扱う層と、模型に依存しないガウス集中不等式の基盤部分を接続し、通常のトレースで定義した SYK 分配関数の対数に対する集中不等式を証明する。`DensityMatrix`・`MajoranaBound`・`Main` に評価を分け、MGF・上下・両側の裾を供給する。残る作業は [編集計画](EDITING_PLAN.md)、過去の検証根拠は [作業履歴](../WORK_HISTORY.md#super-w05) を参照する。
 
 ## 依存関係
 
 `Main.lean` は `Model.GaussianDisorder` の標準ハミルトニアンと、共有模型の通常の分配関数の対数を扱い、一般スケール `𝒥` の引数を持たない。図の矢印は「上流の結果を下流が利用する」という意味である。
-
-再設計の比較元は Git コミット `1b5a64cc9860f36876cc30b1a13d66ad4bfe8047` とする。旧版は Git 履歴で保持し、現行ファイルを直接改修する。既存の定理文、規格化、証明の着想を比較に使う一方、証明スクリプトは重複の除去、mathlib の利用、可読性の改善のために書き換えてよい。旧 API を維持する別モジュール、別名前空間、互換用の別名は作らない。
 
 ```mermaid
 flowchart TD
@@ -32,9 +30,9 @@ flowchart TD
 
 ## 汎用的な基盤部分の分離
 
-新基盤の編集・証明の細目は [汎用基盤の計画](../Probability/GaussianConcentration/EDITING_PLAN.md)、旧配置の整理と SYK への適用は [このディレクトリの計画](EDITING_PLAN.md#w02) に記録する。以下は移設の設計理由と境界であり、作業状態の一覧ではない。
+共有ガウス基盤と SYK に固有の部分の境界は次のとおりである。
 
-`CouplingSpace`、`couplingSpace_card`、`standardGaussianMeasure` は `Model.GaussianDisorder` に置く。W02 で汎用測度を `Probability/GaussianConcentration/StandardGaussian.lean` に移し、模型の測度をその有限添字型への特殊化として定義した。同一性を述べる `standardGaussianMeasure_eq_onEuclidean` は Model 側に置き、汎用部分から Model への依存と `N, q` への特殊化を除いた。
+`CouplingSpace`、`couplingSpace_card`、`standardGaussianMeasure` は `Model.GaussianDisorder` に置く。汎用測度は `Probability/GaussianConcentration/StandardGaussian.lean` に置き、模型の測度をその有限添字型への特殊化として定義する。同一性を述べる `standardGaussianMeasure_eq_onEuclidean` は Model 側に置き、汎用部分から Model への依存と `N, q` への特殊化を除いた。
 
 残る基盤部分では、座標を添字付ける任意の有限型 `ι` だけについて量化し、中心となる結果をモーメント母関数の評価 `HasSubgaussianMGF` として述べる。上側・下側・両側の裾の評価は、mathlib の劣ガウス確率変数に関する API から導く。
 
@@ -63,24 +61,11 @@ L = β / sqrt q,
 
 `X = log Z - E[log Z]` とすると、モーメント母関数の評価とは、すべての実数 `s` に対する `E[exp(s X)] <= exp(s^2 β^2 / (2q))` を指す。劣ガウス性のパラメータ `β^2/q` は分散そのものではなく上界の定数である。`β > 0`、`t > 0` では上下それぞれの裾に `exp(-q t^2/(2β^2))`、両側の裾にその2倍を得る。`β = 0` では `X = 0` を直接使い、この分母を持つ式には代入しない。
 
-W03 で標準スケールとハミルトニアンを `Model.GaussianDisorder` へ共有し、一般スケール `𝒥` を基本 API から除いた。W05 の公開 MGF・上下・両側の裾評価は、標準ガウス座標に対するリプシッツ性を内部で証明する。`logPartitionLipschitzConstant` は単一の公開リプシッツ定数であり、有限サイズの途中計算用定数は非公開とする。通常のトレースと規格化トレースの差が中心化で消える理由は `../Model/ARCHITECTURE.md` を参照する。
+標準スケールとハミルトニアンは `Model.GaussianDisorder` に置き、一般スケール `𝒥` は基本 API に含めない。公開 MGF・上下・両側の裾評価は、標準ガウス座標に対するリプシッツ性を内部で証明する。`logPartitionLipschitzConstant` は単一の公開リプシッツ定数であり、有限サイズの途中計算用定数は非公開とする。通常のトレースと規格化トレースの差が中心化で消える理由は `../Model/ARCHITECTURE.md` を参照する。
 
 複素数 `z` に対する分配関数の整関数性や対数微分は、`Model` の解析部分で扱う。この証明には正の実数値を取る分配関数が必要なので、複素逆温度に対して非零性を仮定する API は経由しない。
 
-## 廃止する構造
-
-- `Core.lean` 内で再定義されていた相互作用演算子は
-  `Model/Majorana.lean` へ移設済みである。W04 では生成子の二乗、語の並べ替え・
-  随伴との積、相互作用の二乗の補題も同じ共有層へ移した。
-- `Gibbs.lean` 内で再定義されていた有限次元行列の Gibbs 状態と
-  トレース微分は `Model/FiniteDimensionalGibbs.lean` へ移設し、旧ファイルは
-  削除済みである。
-- `exactLipschitzSq` と `simpleLipschitzConstant` の二重公開
-- 基本定理に含まれる一般のスケール `𝒥`
-- 物理的なヒルベルト空間が空である場合の分岐
-- 証明計画書にある `N^(q/2)` の目標と旧来のファイル構成
-
-抽象的なマヨラナ系に対する証明と、標準的な行列表現への特殊化は区別する。ただし、同じ定義を重複して持たない。現行の `syk_sum_sq_expectation_le` と対数分配関数の評価は抽象的な `MajoranaSystem` を使うため、W05 は W04 の標準表現やトレース直交性を待たずに進められる。必要な前提は共有の行列解析・標準ハミルトニアン・汎用ガウス集中である。
+抽象的なマヨラナ系に対する二乗和評価と対数分配関数の評価には、標準行列表現やトレース直交性を要求しない。必要な入力は共有の行列解析、標準ハミルトニアン、汎用ガウス集中である。旧配置と削除済み API の経緯は [作業履歴](../WORK_HISTORY.md#super-legacy) を参照する。
 
 ## モジュールと名前空間
 

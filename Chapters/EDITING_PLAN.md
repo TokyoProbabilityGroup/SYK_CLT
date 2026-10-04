@@ -2,44 +2,30 @@
 
 ## 担当範囲
 
-この文書は、このディレクトリの `Model.lean`、`GaussianConcentration.lean`、`SuperConcentration.lean`、`AnnealedFE.lean`、`CLT.lean` に記す主要な主張と Lean 宣言の対応を管理する。全体の実行順序・状態・非同期実行の可否は [全体計画](../EDITING_PLAN.md)、守る条件は [SYK の作業規則](../AGENTS.md) の Blueprint の節を参照する。
+この文書は、このディレクトリの `Model.lean`、`GaussianConcentration.lean`、`SuperConcentration.lean`、`AnnealedFE.lean`、`CLT.lean` に記す主要な主張と Lean 宣言の対応を管理する。全体の実行順序・状態・並行作業の可否は [全体計画](../EDITING_PLAN.md)、守る条件は [SYK の作業規則](../AGENTS.md) の Blueprint の節を参照する。
 
 各章の更新は対応する実装単位に含める。ここでは上流の数学的な証明を再実装せず、未実装の宣言を実装済みとして参照しない。本文は公開用の英語で記述する。
 
-CLT・Annealed_FE の共同実装中は、既存の未形式化ノードを計画として残す。担当ブランチ上の提案や未統合の宣言を根拠に章を先行編集しない。統合担当が Lean コードを取り込み、個別検査・関連ビルド・主要宣言の公理依存と定理文の照合を終えた時点で、その実装済み範囲に限って証明状態・宣言参照・依存関係を編集する。Lean に残る外部仮定と `sorryAx` を、Blueprint 上でも内部証明と区別する。
+章の編集は全体計画で指定した統合担当一人が行う。分担者は修正案を提出し、統合担当がコードの統合・検証と原稿照合を終えた範囲について証明状態・宣言参照・依存関係を更新する。Lean に残る外部仮定と `sorryAx` は内部証明と区別する。
 
-## 各章の編集細目
+## 現行の章と残件
 
-- [x] 2026-09-27 の抽象入力統一：個別検査・CLT ビルド・公理依存確認後、`CLT.lean` に `Normalization` の明示 import と独立した有限規格化ノードを追加した。有限モーメントの一般 `MajoranaSystem` 版を参照し、`AnnealedFE.lean` と併せて `hFE` の構築が条件付き CLT の前提作業ではないことを記した。ソース上の宣言・依存照合のみを行い、Verso の機械的検証は実行していない。[検証記録](../WORK_HISTORY.md#clt-abstract-input-2026-09-27) を参照する。
+`Model.lean`、`GaussianConcentration.lean`、`SuperConcentration.lean` は共有模型と集中評価の検証済み宣言を参照する。`Model.lean` は Z01 の局所非零円板と主値対数の正則性も参照する。`CLT.lean` は有限模型、ガウス–エルミート展開、高次剰余、および三種類の条件付き CLT をまとめた定理と個別定理を参照する。三つの主 CLT は `0<|β|<β_q` に限定し、`AnnealedInput` の構築を内部証明として扱わない。`AnnealedFE.lean` の未形式化部分は計画として明示する。
 
-- [x] W01：`Model.lean` に整関数性・複素微分・条件付き対数微分の主要宣言と依存関係を反映した。非零性の仮定を、零点のない領域の証明と混同していない。
-- [x] Z01（2026-09-28）：`Model.lean` に固定した自己共役有限行列・各実逆温度を中心とする局所非零円板、条件付き対数微分 API への接続、主値の複素対数の正則性を反映した。五つの新宣言は個別検査、`lake build Model SuperConcentration CLT`、公理依存確認後に参照した。`N`・乱数標本に一様な領域とは区別し、Verso の機械的検査は休止中。
-- [x] SuperConcentration の移行前基準：`SuperConcentration.lean` に、一般スケール `𝒥` を含む現行実装の定義、二乗和評価、方向微分、勾配評価、Lipschitz 評価、逆温度が零の場合分け、両側集中不等式を記録した。主張の依存関係と証明だけで使う依存関係を分け、未実装の模型固有 MGF・片側評価を実装済みとして扱っていない。
-- [x] W02：`GaussianConcentration.lean` の import と宣言参照を独立した汎用基盤へ切り替え、MGF・裾の定数と `L=0` の扱いを上流の定理に合わせる。
-- [x] W03：`Model.lean` と必要な `SuperConcentration.lean` の説明を共有の標準ハミルトニアンに合わせ、一般スケールを含む旧基本 API の参照を残さない。
-- [x] W04：`Model.lean` に標準表現・次元・基本関係・トレース直交性の主要宣言を反映する。抽象的な系の性質と具体的な表現の性質を区別する。
-- [x] W05：`SuperConcentration.lean` の参照と依存関係を新配置に合わせ、標準規格化の MGF・片側・両側の裾評価を公開宣言へ対応付ける。
-- [x] 2026-09-25 の現行ソース照合：`AnnealedFE.lean` を追加し、Rademacher 原稿の極限と CLT のガウス入力構造を分けた。`CLT.lean` に実装済みの有限模型・条件付き漸近、未完了のモーメント・最終 CLT、改訂原稿の対数 CLT 経路を反映した。`thm: input` の概収束は原典からの追加論証が必要と記録した。Verso の機械的検査は休止中。
-- [x] W06 の有限模型の個別検証後（2026-09-26）：`CLT.lean` のモーメント・トレース零・`Z≥1`・対数の恒等式を、実際に完成した宣言へ対応付け、証明状態を更新する。現行の `AnnealedInput` と原稿の外部結果の差を維持し、旧集中評価を必須依存に戻さない。
+CLT 原稿と章・Lean 宣言の対応はソース上で照合済みである。現在の対応と未形式化部分は [CLT の構造文書](../CLT/ARCHITECTURE.md#現行原稿の主張)、照合した版と検証結果は [監査記録](../WORK_HISTORY.md#clt-audit-2026-10-04) を参照する。残る対応修正は次のとおりであり、関係する実装単位に含める。
 
-今回の章更新では `Blueprint.lean` に `AnnealedFE.lean` を組み込み、既存の長文設計案 `Annealed_FE/annealed_blueprint.txt` の冒頭に現行配置と未完成状態を明記した。`CLT/ARCHITECTURE.md` も新しい章構成に合わせた。原稿、CLT・Annealed_FE の数学 Lean ソース、および共有 Lake 設定は変更していない。
+- `AnnealedFE.lean` と `CLT.lean` のアニール入力の説明を、追加6フィールドの削除と Lean の再検証後に実装へ合わせる。それまでは削除予定を実装済みとして記さない。
+- 対数の期待誤差の明示的評価と、`prop:annealed-free-energy` を仮定した具体模型への適用は、それぞれの実装・検証後に対応する数学的主張、宣言参照、残る仮定を更新する。`lem:convex-derivatives` の補完と命題自体の証明は保留し、再開・実装した場合に同様に更新する。命題を仮定した結果を無条件の主定理として記さない。
+- 共有層の再配置に伴う章の参照変更は数学的実装後のリファクタリングに含める。作業順序は [全体計画](../EDITING_PLAN.md#残る作業)、数学的な仕様は [CLT の計画](../CLT/EDITING_PLAN.md) を参照する。
 
-F01–F08・Z01 の後続課題では、主要宣言が実装・統合・検証された時点で対応する章の編集細目をここに追加する。現時点で仮の宣言参照は作らない。
+## 原稿改訂への対応
+
+原稿のどの箇所の改訂でも [全体計画の同期手順](../EDITING_PLAN.md#原稿改訂と実装の同期) に従う。統合担当は改訂された主張・証明・引用と、[CLT 原稿との対応](../CLT/ARCHITECTURE.md#原稿改訂と実装の対応) を確認し、章の説明・依存関係・TeX ラベル・Lean 宣言との対応を更新する。原稿の記号変更だけを理由に Lean 宣言の改名を要求しない。
+
+実装の証明状態を変えない記法・参照の修正は、原稿との対応確認後に反映してよい。未統合の実装を検証済みとして記載する変更とは区別する。改訂中または未照合の差分が残る場合は、照合した原稿の範囲と未確認箇所を明記する。
 
 ## 検証と記録
 
-F02（2026-09-27）：個別検査・CLT ビルド・公理依存確認後、`CLT.lean` に `clt_exact_second_chaos` と証明を追加した。全実数の逆温度での一次射影零と二次の共通係数を Lean 宣言へ対応付け、添字対称性・一次部分積分・期待値の微分交換を記録した。高次剰余の未形式化ノードを残し、有限模型にアニール極限を要求しない依存へ修正した。ソース照合のみ実施し、Verso の検査は休止中。
+Verso 休止中は、変更した章の数学的主張・Lean 宣言名・依存名をソース上で照合する。Verso を必要とする章と生成入口の Lean 検査、生成、`vbp check` は復帰後に休止中の変更を含めて行う。分担者の修正案を統合担当が直列に反映する。
 
-F03–F05 と F06 の先頭（2026-09-28）：個別検査・CLT ビルド・公理依存確認後、`CLT.lean` に `clt_partition_higher_derivatives`、`clt_rademacher_encoding`、`clt_degree_projection_bound`、`clt_higher_chaos_moment_sum`、`clt_higher_chaos_closure`、`clt_gaussian_quadratic_sum` を追加した。原稿の `eq:Z-derivative-bound`、`eq:even-sum-Rademacher-moment`、`eq:Rademacher-exponential-moment`、`eq:Hermite-Rademacher-bound`、`eq:all-higher-chaoses-at-once`、`prop:higher-chaos-closure`、独立ガウス二乗和の CLT に対応する宣言を照合した。最終 CLT への接続は未形式化として残す。Verso の機械的検査は休止中で、宣言参照と依存はソース上だけで照合した。
-
-F06・F07 の統合（2026-09-28）：`CLT.lean` の `partition_function_clt`、`clt_log_centering_error`、`log_partition_clt` を検証済みの相対・対数・共同主定理および中心化誤差の宣言へ接続した。主要定理の `#print axioms` は `[propext, Classical.choice, Quot.sound]` のみ。外部入力 `AnnealedInput` は引き続き仮定であり、この統合時点では F08 と R02-A・R04-A の原稿上の判断が別に残っていた。Verso の機械的検査は休止中。
-
-R02-A・R04-A・F08 の確定（2026-09-28）：`CLT.lean` の分配関数 CLT に、原稿が `β≠0` を仮定し Lean の相対・対数 CLT が零温度も含むことを反映した。`free_energy_law_of_large_numbers` という旧ノードを `clt_expected_pressure_limit` に改め、`thm: input` の決定論的な期待クエンチ・アニール圧力の極限、標準表現の引用範囲、Lean への未導入を記録した。概収束の宣言参照は追加していない。Verso の機械的検査は休止中。
-
-CLT 定理文の温度範囲の統一（2026-09-28）：研究者の指示に従い、Lean の共同・個別・中間の相対・対数 CLT を `β≠0` に限定した。`CLT.lean` の `partition_function_clt` と `log_partition_clt` は原稿と同じ `0<|β|<β_q` を記す。有限模型の零温度恒等式は別の結果として残す。Verso の機械的検査は休止中。
-
-現行の `CLT.lean` は、一般ガウス–エルミート部分積分、直交性、有限射影、有限積ガウス $L^2$ の完全性と無限次数和、`Z_N` への適用を検証済みの Lean 宣言に対応付けている。宣言参照の初期照合は [F01 取り込み検証](../WORK_HISTORY.md#merge-f01-2026-09-27)、先行する部分積分の検証は [作業履歴](../WORK_HISTORY.md#clt-f01-gaussian) を参照する。Verso による章検査・生成・参照検査は休止中である。
-
-Verso 休止中は、変更した章の数学的主張・Lean 宣言名・依存名をソース上で照合する。Verso を必要とする `lake env lean`、生成入口の実行、`vbp check` は復帰後に休止中の変更を含めてまとめて行う。章を並行して編集しても、統合検証の担当は一人とする。[作業履歴](../WORK_HISTORY.md#chapters-records)の旧コマンドと出力先は当時のものであり、現在の手順とは区別する。
-
-過去の章検証・生成結果は [作業履歴](../WORK_HISTORY.md#chapters-records) に保存した。新しい検証では対象コミット・差分、照合した宣言、コマンド、結果、警告、未解決の参照を記録する。
+検証記録は [全体計画](../EDITING_PLAN.md#識別情報と検証対象の記録) に従い、章では照合した宣言と未解決の参照も記録する。過去の検証結果と旧コマンドは [作業履歴](../WORK_HISTORY.md#chapters-records) を参照する。

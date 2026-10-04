@@ -1,12 +1,65 @@
 # SYK の作業履歴
 
+完了済み作業の検証結果と旧計画を保存する。現行の残件は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
+
+<a id="clt-audit-2026-10-04"></a>
+
+## CLT 原稿全体の監査と文書同期（2026-10-04）
+
+開始時の HEAD は `6b36c7c96be98f81f49f82a03b8189ae51a5ca76`、未コミット変更はなかった。原稿ルート `CLT/refs/CLT_SYK.tex` と全4節を読み、研究者の指定に従い赤字を採用案として Lean・関連文書・Blueprint と照合した。前回の文書整理時点からの原稿差分の比較には `ce28cc1` を用いた。主要 CLT の温度範囲、中心化、規格化、スケーリング、極限分散と、高次剰余の評価次数は維持され、数学的実装の大枠は変更しない。符号付き置換の一般形と Duhamel 積分表示を、既存の Lean の個別の対称性・高階微分評価と同一視しないことを構造文書へ記した。
+
+原稿の5つの Git 管理下のソースは編集せず、元のバイト列と一致する。
+
+構造文書、CLT の詳細計画・README、全体計画、章の計画と CLT 章の説明を同期した。数学ライブラリでは `Basic.lean`、`Main.lean`、`ConvexDerivatives.lean`、空の `GaussianConcentration.lean`、`QuadraticBridge.lean`、`QuadraticGaussianVariance.lean`、`TraceExpDerivatives.lean` のコメントだけを変更した。コメントを除いたソースは変更前と一致し、宣言名・型・仮定・証明項・import は変更していない。
+
+検証は共有ワークスペースのルートから行った。
+
+- 変更した数学ライブラリの7ファイルと直接の利用先 `FiniteVariancePositivity.lean`、`LpDistributionTransfer.lean`、`PartitionDerivatives.lean`、`Preliminaries.lean` に `lake env lean` を実行し、11ファイルすべて成功した。個別検査の警告は `TraceExpDerivatives.lean` の既存の `ContinuousLinearMap.smul_apply` の非推奨警告1件である。
+- `lake build CLT` は 3253 jobs で成功した。既存の linter・非推奨警告が再表示され、再表示を含む警告メッセージは540件だった。定理の未完成箇所や新しい検査エラーはない。
+- `partition_and_log_partition_clt`、`partition_clt`、`log_partition_clt`、`Setting.Y_firstChaos_eq_zero`、`Setting.Y_secondChaos_eq`、`Setting.tsum_higherChaosProjection_le_power`、`Setting.higherChaosProjection_isLittleO`、`Setting.scaled_integral_logLinearError_tendsto_zero`、`partitionFunction_standard` の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみだった。
+- CLT 章の参照先85宣言を、Verso を import しない検査入力の `#check` で確認した。Blueprint の依存名の欠落と重複、現行 Markdown の内部リンク、Lean コメントの原稿ラベルをソース上で検査した。Verso による章検査・生成・`vbp check` は休止中のため行っていない。
+- 監査段階の LaTeX 全体ビルドは一時ディレクトリへの出力で成功し、最終ログに未解決参照・引用はなかった。赤青併記では60ラベル・112参照が解決するが、赤字だけを採用する読み方では56ラベル・106参照のうち `eq:even-multi-index` の参照が1件未解決になる。この訂正は原稿担当に委ねる。
+- ルートと配布用の Lake 設定・manifest・toolchain は改行を正規化して一致した。`Main` の SYK 内依存は41モジュールで、標準表現・規格化照合・`Annealed_FE`・`SuperConcentration` への依存や、共有層から CLT への逆依存はない。共有のガウス部分積分基盤は利用している。
+
+監査は指定した原稿への対応の調査・文書反映として完了した。数学的実装の完了を意味しない。現行の CLT は追加6フィールドを含む `AnnealedInput q S` を仮定しており、原稿の命題のみからの検証は `CLT-INPUT` 後に確認する。対数期待誤差の明示的な次数評価と標準模型族への条件付き適用は後続課題である。引用元の原文再監査、命題の証明、凸関数列の補完と、既定ビルド対象外の `Annealed_FE` にある10箇所の `sorry` は今回の検証対象に含めない。
+
+<a id="clt-manuscript-input-plan-2026-10-03"></a>
+
+## CLT 原稿更新後の監査と入力方針（2026-10-03）
+
+`lem:convex-derivatives` の旧原稿は開集合 `I` 上の主張だったが、`prop:annealed-free-energy` では既に `I=ℝ` として利用していた。全実軸への限定によってこの用途は変わらず、既存の Lean の一般形を削除する必要はない。Rockafellar の引用も旧原稿にあり、証明省略によって新しい文献依存は増えていない。各点収束から局所一様収束への未形式化部分は原稿更新前から存在した。
+
+研究者の指示により、命題の内容を明示的な仮定として受け取る方針を計画へ反映し、命題の証明とそのための調査・補題を「その他の残件」へ移した。この時点の `AnnealedInput` には旧原稿の追加6フィールドが残る。今回の修正は設定文書と Blueprint の説明を対象とし、数学ライブラリの定義・定理文・証明は変更していない。Blueprint は原稿・宣言・依存名をソース上で照合し、休止中の Verso による機械的検査は行っていない。
+
+<a id="z01-doc-integration-2026-09-29"></a>
+
+## Z01 と設定文書の統合（2026-09-29）
+
+`kamijima` の HEAD `1221b18` に Z01 が取り込まれた後、`c20e415` を基点とする stash の文書整理と作業用 Lean ファイルの削除を適用した。競合した六つの文書は、固定した自己共役有限行列の局所非零円板と主値対数の正則性を Z01 の完了範囲とし、現行 CLT に `N`・標本一様な非零領域を要求しない形に統合した。`lake build` はワークスペースのルートで 3326 jobs を完了し、既存の linter・非推奨警告を再表示した。Verso の生成・参照検査は休止中である。
+
 <a id="z01-local-zero-free-2026-09-28"></a>
 
 ## Z01：固定有限行列の局所非零円板（2026-09-28）
 
-現行 CLT の Lean 宣言と原稿を照合し、複素対数、`N`・乱数標本に一様な零点のない円板・帯状領域の利用箇所がないことを確認した。研究者が固定 `H` の局所円板を最初の対象として選択した。`Model/FiniteDimensionalGibbs.lean` で、自己共役な固定有限行列 `H` と各 `β∈ℝ` に対し `Re Z_H(β)>0` を証明し、連続性から半径 `ε(H,β)>0` の複素円板で `Re Z_H(z)>0` を得た。`partitionFunction_ne_zero_near_real` は同円板で `Z_H(z)≠0` を供給し、`partitionFunction_mul_log_deriv_near_real` は既存の条件付き対数微分公式を適用する。値が右半平面にあるため `partitionFunction_log_differentiable_near_real` は主値の `Complex.log ∘ Z_H` が円板上で複素微分可能であることを証明する。外部結果、公理、ハミルトニアンのノルム上界を追加していない。半径の `H`・`N`・標本についての一様性や全複素平面での非零性は主張しない。
+現行 CLT の Lean 宣言と原稿を照合し、複素対数、`N`・乱数標本に一様な零点のない円板・帯状領域の利用箇所がないことを確認した。研究者が固定 `H` の局所円板を最初の対象として選択した。`Model/FiniteDimensionalGibbs.lean` で、`[Nonempty d]` を仮定した自己共役な固定有限行列 `H` と各 `β∈ℝ` に対し `Re Z_H(β)>0` を証明し、連続性から半径 `ε(H,β)>0` の複素円板で `Re Z_H(z)>0` を得た。`partitionFunction_ne_zero_near_real` は同円板で `Z_H(z)≠0` を供給し、`partitionFunction_mul_log_deriv_near_real` は既存の条件付き対数微分公式を適用する。値が右半平面にあるため `partitionFunction_log_differentiable_near_real` は主値の `Complex.log ∘ Z_H` が円板上で複素微分可能であることを証明する。外部結果、公理、ハミルトニアンのノルム上界を追加していない。半径の `H`・`N`・標本についての一様性や全複素平面での非零性は主張しない。
 
-検証時の HEAD は `e20f361`。`lake -f SYK/workspace/lakefile.toml env lean SYK/Model/FiniteDimensionalGibbs.lean`、`lake -f SYK/workspace/lakefile.toml build Model SuperConcentration CLT`（3325 jobs）、同設定の既定 `lake build`（3326 jobs）は成功した。五つの新定理の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみ。既存の上流・補助モジュールの linter 警告は再表示された。Blueprint は本文・宣言名・依存名をソース照合し、休止中の Verso 生成・参照検査は行っていない。変更は未コミット。
+検証時の HEAD は `e20f361`。`lake -f SYK/workspace/lakefile.toml env lean SYK/Model/FiniteDimensionalGibbs.lean`、`lake -f SYK/workspace/lakefile.toml build Model SuperConcentration CLT`（3325 jobs）、同設定の既定 `lake build`（3326 jobs）は成功した。五つの新定理の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみ。既存の上流・補助モジュールの linter 警告は再表示された。Blueprint は本文・宣言名・依存名をソース照合し、休止中の Verso 生成・参照検査は行っていない。この検証時点では変更は未コミットだった。
+
+<a id="clt-workspace-scratch-audit-2026-09-29"></a>
+
+## 配布設定と作業用 Lean ファイルの点検（2026-09-29）
+
+ルートと `SYK/workspace/` の `lakefile.toml`・`lake-manifest.json`・`lean-toolchain` は、改行を正規化するとそれぞれ同一であり、manifest の JSON データも一致した。ルートの前二者は CRLF、配布用は LF である。依存設定・CI の発火条件は変更していない。
+
+Git 管理下の `F02Audit.lean` は F02 の定理文と公理依存を表示する一時検査ファイルで、個別 Lean 検査に成功した。8件の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみで、結果は既存の F02 検証記録にもある。`F03Scratch.lean` の補題群は `CLT/Lemmas/Rademacher.lean` に統合済みで、末尾の階乗付き恒等式は `even_sum_rademacher_moment` と同じ主張である。この作業用ファイルは現行の `Rademacher.lean` を import すると重複宣言のため個別 Lean 検査に失敗する。両ファイルは現行ライブラリの import と Lake のビルド対象から参照されないため、作業用のコピーを削除した。証明は現行モジュールに保持され、過去の作業用ファイルは Git 履歴から参照できる。
+
+<a id="clt-integration-audit-2026-09-29"></a>
+
+## CLT 統合後の再検証（2026-09-29）
+
+統合済み HEAD `c20e415` に対し、ワークスペースのルートから `lake -f SYK/workspace/lakefile.toml build CLT`（3253 jobs）と既定の `lake -f SYK/workspace/lakefile.toml build`（3326 jobs）が成功した。主要定理 `partition_and_log_partition_clt`・`partition_clt`・`log_partition_clt`・`Setting.logFluctuation_clt` の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみで、`sorryAx` への依存はない。ビルドでは既存の linter・非推奨警告が多数再表示された。
+
+原稿 `thm:partition-clt`・`cor:free-energy-clt` と `CLT/Main.lean` の三つの結論を照合した。逆温度は実数の `0<|β|<β_q`、尺度は `N^{q/2-1}`、極限分散は `(q!/2)β²(ℓ_q'(β))²` で一致する。原稿と Lean の双方で相対ゆらぎ・標準化ゆらぎ・中心化した対数ゆらぎを述べ、Lean の共同定理は三者に共通する半径と分散正値性も与える。Lean は `S : Setting q` と `hFE : AnnealedInput q S` を仮定する条件付き結果であり、`AnnealedInput` の構築や引用元の定理自体を証明したものではない。既定対象のビルドは設定で除外された `Annealed_FE`・`Universality` の個別検証を含まず、Verso の章検査・生成・参照検査も休止設定に従い行っていない。ソース・文書の差分は本記録の追加のみ。
 
 <a id="clt-nonzero-temperature-2026-09-28"></a>
 
@@ -69,8 +122,6 @@ R05 では `a=q/2-1≥1` とし、`E(g²-1)²=2`、`E(g²-1)⁴=60` から `E S_
 `#print axioms` で `Setting.Z_sign_gauge`、`integral_Z_mul_hermite_eq_zero`、`Y_firstChaos_eq_zero`、`integral_Y_mul_sq_sub_one_eq`、`meanZ_hasDerivAt`、`integral_Z_mul_sq_sub_one_ibp`、`sum_integral_Y_mul_sq_sub_one`、`Y_secondChaos_eq` を確認した。いずれも `propext`、`Classical.choice`、`Quot.sound` のみで、`sorryAx` はない。最終定理の型に残る入力は `Setting q`、実数 `β`、有限サイズ添字 `n` のみ。
 
 既存の最終 CLT の `sorry`、`Tool.lean` の非推奨名警告、共有ガウス基盤等の linter 警告は残る。新規ファイルには Lake の行長警告があるが、証明エラーはない。Blueprint には一次・二次射影の検証済みノードを追加し、未完了の高次剰余と区別した。数学的主張・宣言名・依存名はソース照合済み。Verso 休止に従い、章の Lean 検査・HTML/PDF 生成・参照検査は実行していない。
-
-完了済み作業の検証結果と旧計画を保存する。現行の状態・着手条件・担当票は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
 
 関係する節： [CLT の W06・統合監査](#clt-w06)、[ガウス部分積分](#clt-f01-gaussian)、[W06 後の F01](#clt-f01-after-w06)、[F01 取り込み検証](#merge-f01-2026-09-27)、[Tool](#clt-tool)、[主結果の定理文](#clt-main-statements)、[Model の W01–W04](#model-w01)、[旧段階](#model-legacy)、[ワークスペースの移設](#workspace-migration)。
 
@@ -377,11 +428,11 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 
 新基盤の測度が確定した後、`GaussianDisorder.lean` の模型側の定義を接続する。受け渡しの順序は全体計画に従う。
 
-- [x] `standardGaussianMeasure` を、[汎用基盤](Probability/GaussianConcentration/EDITING_PLAN.md#w02) の有限型に対する測度を使う定義に揃え、積測度を重複定義しない。`CouplingSpace` とその次元の定義は再利用する。
+- [x] `standardGaussianMeasure` を、[汎用基盤](WORK_HISTORY.md#gaussian-foundation) の有限型に対する測度を使う定義に揃え、積測度を重複定義しない。`CouplingSpace` とその次元の定義は再利用する。
 - [x] 模型の測度と汎用測度の一致を利用側で扱えることを確認する。同一性の既存結果を移す場合は Model 側に置き、汎用側が Model を import する依存を除く。
 - [x] `GaussianDisorder.lean` の個別検査と Model のビルドを行い、定義・必要な測度の性質と import を確認する。
 
-担当部分の完了条件：Model が独立した汎用測度を利用し、通常の標準ガウス座標の規約を維持している。利用側の import 切替は [SuperConcentration の W02](SuperConcentration/EDITING_PLAN.md#w02) で管理する。
+担当部分の完了条件：Model が独立した汎用測度を利用し、通常の標準ガウス座標の規約を維持している。利用側の import 切替は [SuperConcentration の W02](WORK_HISTORY.md#gaussian-foundation) で管理する。
 
 `GaussianDisorder.lean` の個別検査と `+SYK.Model.GaussianDisorder:olean` は成功した。`standardGaussianMeasure_eq_onEuclidean` の公理依存は `propext`、`Classical.choice`、`Quot.sound` のみである。親ワークスペースの `lakefile.lean` に `Model`、`SuperConcentration`、`CLT` の個別ターゲットを追加した後、`lake build Model SuperConcentration` は3194 jobsで成功した。2026-09-12には Blueprint の直接生成と参照検査も成功し、manifest と HTML cache は各52件、エラーは0件であった。
 
@@ -399,7 +450,7 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 
 - [x] 移設済みの `CouplingSpace` と標準ガウス測度を再利用し、`σ_N² = (q-1)! / N^(q-1)` に対応する標準スケールを `Model.GaussianDisorder` に置く。
 - [x] 標準規格化ハミルトニアンを共有する確定的ハミルトニアンから定義し、線形性・自己共役性など利用側で必要な既存の結果を移す。
-- [x] Model の基本 API は標準スケールに限定し、一般スケール `𝒥` や互換用の別名を重複して公開しない。移行元の削除と微分・リプシッツ・裾評価の追従は [SuperConcentration の W03](SuperConcentration/EDITING_PLAN.md#w03) で管理する。
+- [x] Model の基本 API は標準スケールに限定し、一般スケール `𝒥` や互換用の別名を重複して公開しない。移行元の削除と微分・リプシッツ・裾評価の追従は [SuperConcentration の W03](WORK_HISTORY.md#super-w03) で管理する。
 - [x] 個別検査、Model と移行済み利用側のビルド、主要定理の公理依存、このディレクトリ内の対応文書の更新を完了する。
 
 担当部分の完了条件：標準の相互作用係数とハミルトニアンが Model の一つの定義系列になる。W03 全体は直接の利用側への移行と統合検証まで含めて完了する。各係数の分散と、ガウス座標 `g_A` に関する評価であることを明記する。
@@ -429,7 +480,7 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 
 - [x] 偶数 `N` に対する Jordan–Wigner 表現を `StandardRepresentation.lean` に構成し、次元 `2^(N/2)`、反交換関係、自己共役性を証明する。
 - [x] 規格化トレースの内積について、対象とする相互作用演算子族の直交性を証明する。昇順積と位相が共有定義に一致することを確認する。
-- [x] 必要な代数補題は Model 内の適切な共有層に置く。`Model` から `SuperConcentration` を import しない。既存補題を移す場合、移設元と利用側の修正は [SuperConcentration の担当部分](SuperConcentration/EDITING_PLAN.md#w04) と合わせて統合する。
+- [x] 必要な代数補題は Model 内の適切な共有層に置く。`Model` から `SuperConcentration` を import しない。既存補題を移す場合、移設元と利用側の修正は [SuperConcentration の担当部分](WORK_HISTORY.md#super-w04) と合わせて統合する。
 - [x] 個別検査、関連ビルド、主要定理の公理依存、次元・仮定の照合、このディレクトリ内の対応文書の更新を完了する。
 
 担当部分の完了条件：具体的な表現と直交性が仮置きの証明なしに検査され、抽象的なマヨラナ系に標準表現の性質を暗黙に追加していない。表現の構成と直交性でコミット候補を分けても、指示単位は W04 のままとする。
@@ -639,7 +690,7 @@ Model・SuperConcentration・Chapters と VersoBlueprint の既存の警告は�
 
 ## 旧計画との対応
 
-2026-09-18：一般 `MajoranaSystem` に対する `CLT/Main.lean` の設定と二種類の CLT の定理文を、`sorry` を許可する明示的な依頼に従って追加する作業を実施した。実数の `|β|` 条件を今回の宣言に採用し、共有模型や原稿は変更しない。これは W06・F06・F07 の完了ではなく、証明付き形式化に先立つ定理文の追加である。詳細・検証は [CLT の記録](CLT/EDITING_PLAN.md#main-statements-2026-09-18) に集約する。
+2026-09-18：一般 `MajoranaSystem` に対する `CLT/Main.lean` の設定と二種類の CLT の定理文を、`sorry` を許可する明示的な依頼に従って追加する作業を実施した。実数の `|β|` 条件を今回の宣言に採用し、共有模型や原稿は変更しない。これは W06・F06・F07 の完了ではなく、証明付き形式化に先立つ定理文の追加である。詳細・検証は [CLT の記録](WORK_HISTORY.md#main-statements-2026-09-18) に集約する。
 
 | 旧計画 | 新しい管理先 |
 | --- | --- |
@@ -795,7 +846,7 @@ Verso 4.32.0 は Windows 上で同梱検索資産の相対接頭辞を除けず�
 
 2026-09-25：現行の親原稿が読み込む CLT の有効な節と `Annealed_FE/refs/SYK-HT-arxiv.tex`、対応する Lean ソースを照合した。`lake env lean --stdin` で新しい両章の `lean :=` が指す宣言をすべて解決した。全章の 50 ノード・121 件の親子・利用・参照関係に ID 重複、参照切れ、依存循環は検出されなかった。`#print axioms` により CLT の有限模型・条件付きアニール補題と凸性補題は通常公理のみ、`Setting.partition_moments` と最終 CLT は `sorryAx` を含むことを確認した。Annealed_FE の Rademacher 模型の `paperHamiltonian` と主たる極限定理は `sorryAx` を含む。Verso が休止中のため、章自体の Lean 検査と HTML・参照検査は行っていない。
 
-2026-09-18：明示的に `sorry` を許可された `CLT/Main.lean` の定理文追加に合わせ、`CLT.lean` に一般の非空有限次元 Majorana 表現・次元による規格化・アニール極限・両 CLT の式と共同半径・非零逆温度での標準化条件を記した。Lean 宣言への対応を付け、未証明状態を明示した。W06・F06・F07 の完了記録ではない。Verso の生成・参照検査は休止中のため行わない。関連検証は [CLT の記録](CLT/EDITING_PLAN.md#main-statements-2026-09-18) に集約する。
+2026-09-18：明示的に `sorry` を許可された `CLT/Main.lean` の定理文追加に合わせ、`CLT.lean` に一般の非空有限次元 Majorana 表現・次元による規格化・アニール極限・両 CLT の式と共同半径・非零逆温度での標準化条件を記した。Lean 宣言への対応を付け、未証明状態を明示した。W06・F06・F07 の完了記録ではない。Verso の生成・参照検査は休止中のため行わない。関連検証は [CLT の記録](WORK_HISTORY.md#main-statements-2026-09-18) に集約する。
 
 
 対象コミット・差分、照合した宣言、コマンド、結果、警告、未解決の参照をこの節に記録する。`Annealed_FE` と `Universality` は既定ビルドから一時的に除外されているため、その成功を両ライブラリの検証結果として扱わない。Verso 復帰後は Blueprint の生成と参照検査を行う。
@@ -808,7 +859,7 @@ SuperConcentration の移行前基準では、`lake env lean SYK/Chapters/SuperC
 
 2026-09-08 に `Annealed_FE` と `Universality` を既定ビルドから一時除外した後、`lake exe vbp build` と `lake exe vbp check` は成功した。manifest と HTML cache は各50件で整合した。既存の宣言に対するドキュメント文字列の warning と VersoBlueprint の universe に関する warning は残る。
 
-2026-09-11 の生成入口移設後の検証は、全体計画の「ビルド入口のプロジェクト内への移設」に記録する。章の本文・宣言参照は変更していない。
+2026-09-11 の生成入口移設後の検証は、[ビルド入口の移設記録](#workspace-migration)に保存した。章の本文・宣言参照は変更していない。
 
 W02 では `GaussianConcentration.lean` の import と宣言参照を新しい名前空間へ切り替え、正の `L` の定数と零の場合の別定理を記録した。`SYK.Chapters.GaussianConcentration` の olean 構築と `lake build SYK` は成功した。2026-09-12、Windows で Verso 4.32.0 の同梱検索資産の相対接頭辞が残る問題に対し、`BlueprintMain.lean` に Windows 限定の準備とコピーを追加した。所定の直接生成コマンドは成功し、`lake exe vbp check --site SYK/_out/site` は manifest と HTML cache が各52件、エラー0件で成功した。既存の docstring と universe の warning は残る。
 
@@ -841,13 +892,23 @@ W02 では `GaussianConcentration.lean` の import と宣言参照を新しい�
 
 有限模型30定理の公理依存確認と Main の個別ビルド成功後、モーメント・トレース零・`Z≥1` の状態を更新し、相対量と対数の中心化、零逆温度のノードを追加した。標準表現との規格化の対応もリンクした。古い `SYK.CLT.GaussianIBP` import は実在する `SYK.CLT.Lemmas.GaussianIBP` に訂正した。今回追加・変更した宣言参照とノード依存をソース照合した。当時の Tool の `RequestProject` 依存による CLT ビルド失敗は、Tool を現行 mathlib に再実装した後の `lake build CLT` 成功で解消した。Tool は現在も Blueprint の宣言参照に統合されていないため、章の有限模型ノードと W06 の範囲は変えない。Verso の章検査・生成・参照検査は休止中につき未実施。詳しい検証根拠は [W06 の作業履歴](#clt-w06) に保存した。
 
+### 2026-09-25–28 の CLT 章更新
+
+2026-09-25：`Blueprint.lean` に `AnnealedFE.lean` を組み込み、`Annealed_FE/annealed_blueprint.txt` の冒頭に現行配置と当時の未完成状態を記した。`CLT.lean` では、当時完成していた有限模型・条件付き漸近と、未完成だったモーメント・最終 CLT を区別し、原稿の対数 CLT への経路を記した。`thm: input` の概収束には原典からの追加論証が必要と記録した。その後、R04-A で原稿から概収束を除いた。
+
+2026-09-27：抽象入力の統一後、`CLT.lean` に `Normalization` の明示的な `import` と独立した有限規格化ノードを追加した。有限モーメントは一般の `MajoranaSystem` に対する宣言を参照し、`AnnealedFE.lean` と合わせて、`hFE` の構築が条件付き CLT の前提作業ではないことを記した。個別検査・CLT ビルド・公理依存の確認後に宣言と依存をソース上で照合した。詳細は [抽象入力統一の記録](#clt-abstract-input-2026-09-27)を参照する。同日、F02 の `clt_exact_second_chaos` も追加し、全実数の逆温度での一次射影零・二次の共通係数を、添字対称性、一次部分積分、期待値の微分交換とともに対応付けた。当時は高次剰余を未形式化ノードとし、有限模型にアニール極限を要求しない依存へ直した。
+
+2026-09-28：F03–F05 と F06 の先行部分に合わせ、`CLT.lean` に `clt_partition_higher_derivatives`、`clt_rademacher_encoding`、`clt_degree_projection_bound`、`clt_higher_chaos_moment_sum`、`clt_higher_chaos_closure`、`clt_gaussian_quadratic_sum` を追加した。原稿の `eq:Z-derivative-bound`、`eq:even-sum-Rademacher-moment`、`eq:Rademacher-exponential-moment`、`eq:Hermite-Rademacher-bound`、`eq:all-higher-chaoses-at-once`、`prop:higher-chaos-closure` と独立ガウス二乗和の CLT に対応付け、当時は最終 CLT への接続を未形式化として残した。その後、F06・F07 の統合で `partition_function_clt`、`clt_log_centering_error`、`log_partition_clt` を検証済みの相対・対数・共同主定理と中心化誤差に接続した。主要定理の公理依存は `[propext, Classical.choice, Quot.sound]` のみで、`AnnealedInput` は引き続き仮定とした。
+
+同日、R02-A・R04-A・F08 の判断を章に反映し、`free_energy_law_of_large_numbers` という旧ノードを `clt_expected_pressure_limit` に改めた。期待クエンチ・アニール圧力の決定論的極限、標準表現に限る引用範囲、Lean には導入していない入力を区別し、概収束の宣言参照は追加しなかった。原稿と Lean の主 CLT をともに `0<|β|<β_q` に統一し、逆温度ゼロでの有限模型の恒等式を別の結果として保持した。以上の章更新では宣言参照と依存をソース上で照合し、Verso による章検査・生成・参照検査は休止規則に従い実施していない。
+
 <a id="w-completion-notes"></a>
 
 ## W01–W06 の完了後の照合
 
-出典：`EDITING_PLAN.md`。以下は移動時点の記録であり、現行の状態は全体計画の表を参照する。
+出典：`EDITING_PLAN.md`。以下は移動時点の記録であり、現行の残件は [全体計画](EDITING_PLAN.md)を参照する。
 
-W01 当時の検証結果と Blueprint 全体生成の失敗は、[Model の検証記録](WORK_HISTORY.md#model-w01) と [Chapters の検証記録](Chapters/EDITING_PLAN.md#検証と記録) に履歴として残す。現在の既定ビルド範囲は、この文書の「完了とコミットの区切り」に記す。
+W01 当時の検証結果と Blueprint 全体生成の失敗は、[Model の検証記録](WORK_HISTORY.md#model-w01) と [Chapters の検証記録](#chapters-records) に履歴として残す。現行の既定ビルド範囲は [全体計画](EDITING_PLAN.md#既定ビルドからの一時除外)を参照する。
 
 W03 を W02 の後に置くのは、ガウス測度の共有方法と `SuperConcentration/Main.lean` の移行を競合させないためであり、数学的な必須順序ではない。W05 は標準表現ではなく抽象的な `MajoranaSystem` を使うので、W04 の完了を待つ必要はない。W06 は2026-09-24に現行原稿と手作業の実装を基準に再計画した。有限模型の未完了部分を完成し、集中評価の移送を必須成果にしない。
 
@@ -863,7 +924,7 @@ flowchart LR
 
 W01 は2026-09-08、W02 は2026-09-12、W03・W04・W05 は2026-09-18に完了した。W04 は標準表現の規格化トレース直交性を証明した。W05 は標準規格化の MGF と上下・両側の裾評価を供給した。W02 の既存証明に残る `aesop`・`grind` の整理は保守課題であり、完了状態を変更しない。W06 は2026-09-26に完了し、有限模型30定理の公理依存と CLT のビルドを確認した。`Tool.lean` の CLT への接続は F04 に残る。詳しい経緯は [作業履歴](#clt-w06) に保存した。
 
-`84bfde3` の統合監査では、`CliffordSignParity` と Main の同時 import が分配関数の宣言名衝突で失敗した。F02 への接続前にこの障害を解消する。再現方法と規格化の差は [統合監査の記録](#clt-w06)、現在の残件は [CLT の計画](CLT/EDITING_PLAN.md#integration-audit-2026-09-26) に置く。
+`84bfde3` の統合監査では、`CliffordSignParity` と Main の同時 import が分配関数の宣言名衝突で失敗した。後続の作業でこの障害を解消した。再現方法と規格化の差は [統合監査の記録](#clt-w06)、解消後の検証は [F01 取り込み検証](#merge-f01-2026-09-27) に記録した。
 
 設定・運用文書の追加照合は [作業履歴](WORK_HISTORY.md#docs-audit-2026-09-26) に保存した。
 
@@ -871,7 +932,7 @@ W01 は2026-09-08、W02 は2026-09-12、W03・W04・W05 は2026-09-18に完了�
 
 ## W06 後に先行した F01 の部分成果
 
-出典：`main` の `CLT/EDITING_PLAN.md`。統合時点の現行状態と残件は [F01 の担当票](CLT/EDITING_PLAN.md#ticket-f01-h)を参照する。以下は当時の検証記録である。
+出典：`main` の `CLT/EDITING_PLAN.md`。F01 の完了結果は [後続の記録](#clt-f01-completion-2026-09-27)を参照する。以下は当時の検証記録である。
 
 ### F01 の今回の作業票と部分検証（2026-09-26）
 
@@ -905,7 +966,7 @@ W01 は2026-09-08、W02 は2026-09-12、W03・W04・W05 は2026-09-18に完了�
 
 最初の同時 import 検査は、`CliffordSignParity.lean` と共有 Model の `SYK.partitionFunction.eq_1` の衝突で失敗した。この段階では個別ビルド成功だけでは障害を検出できなかった。F01 の無条件の $L^2$ 完全性と無限次数和、R03 の原稿監査、共有配置も未完了である。
 
-その後、`CliffordSignParity.lean` の重複した分配関数定義を除き、符号ゲージ不変性と偶奇則の定理で共有 `SYK.partitionFunction` を直接使うようにした。前後の式は定義上同じ通常トレースの指数であり、定理の仮定・量化順序・数学的結論は変えていない。変更ファイルの `lake env lean`、`lake build CLT`、`Main.lean` と `GaussianChaos.lean` の同時 import は成功した。二定理の `#print axioms` は `[propext, Classical.choice, Quot.sound]` のみで、既存の共同 CLT は `sorryAx` に依存する。符号結果と `Setting.Z` の規格化・スケール・実部・測度の対応は [F02 統合](CLT/EDITING_PLAN.md#ticket-integration) に残る。
+その後、`CliffordSignParity.lean` の重複した分配関数定義を除き、符号ゲージ不変性と偶奇則の定理で共有 `SYK.partitionFunction` を直接使うようにした。前後の式は定義上同じ通常トレースの指数であり、定理の仮定・量化順序・数学的結論は変えていない。変更ファイルの `lake env lean`、`lake build CLT`、`Main.lean` と `GaussianChaos.lean` の同時 import は成功した。二定理の `#print axioms` は `[propext, Classical.choice, Quot.sound]` のみで、既存の共同 CLT は `sorryAx` に依存する。符号結果と `Setting.Z` の規格化・スケール・実部・測度の対応は [F02 統合](WORK_HISTORY.md#clt-f02-completion) に残る。
 
 最終の既定 `lake build` は3262 jobsで成功した。新しい F01 ノードを含む `Chapters/CLT.lean` の宣言参照をソースと照合し、実在しない `hermiteDegreeProjection_eq_starProjection` の参照を除いた。Verso を除く同章の import と59件の宣言参照は Lean で検査済みである。Verso の章検査・生成・参照検査は休止中のため実行していない。原稿 `CLT_SYK.tex` は一時領域への `latexmk -pdf` で17ページの PDF を生成し、警告・未解決参照なしで成功した。
 
@@ -913,7 +974,7 @@ W01 は2026-09-08、W02 は2026-09-12、W03・W04・W05 は2026-09-18に完了�
 
 ## F01 の共有配置とガウス $L^2$ 完全性（2026-09-27）
 
-原稿 `lem:Gaussian-Hermite-IBP` の一般部分を `CLT/Lemmas/GaussianIBP.lean` から共有 `Probability/GaussianConcentration/Smooth.lean` に移した。`hermiteMulti_ibp_of_expGrowth`、両辺の可積分性、`hermiteMulti_pair_ibp`、多重指数の偏導関数と Hermite 積の補題を同じ名前空間 `SYK.GaussianConcentration` に置いた。CLT 側の参照と import、および Blueprint の宣言名を更新した。原稿が要求する成分ごとの `η ≤ α`、Euclidean ノルムによる指数増大、独立な分散1のガウス座標は維持した。SpinGlass の `dc1d3820af6e443c09bd1177ec3e409cf0640d5c` にある指数増大 API と分散一般の Stein 定理を既存 `gaussianReal_stein`・`pi_gaussian_stein_coord` と照合し、今回の証明には上流コードを流用しなかった。約6,500行の旧前半は独立した API として残した。
+原稿 `lem:Gaussian-Hermite-IBP` の一般部分を `CLT/Lemmas/GaussianIBP.lean` から共有 `Probability/GaussianConcentration/Smooth.lean` に移した。`hermiteMulti_ibp_of_expGrowth`、両辺の可積分性、`hermiteMulti_pair_ibp`、多重指数の偏導関数と Hermite 積の補題を同じ名前空間 `SYK.GaussianConcentration` に置いた。CLT 側の参照と import、および Blueprint の宣言名を更新した。原稿が要求する成分ごとの `η ≤ α`、Euclidean ノルムによる指数増大、独立な分散1のガウス座標は維持した。当初の F01 計画では SpinGlass `Common` の必要な証明を選んで共有ガウス基盤に移植する予定だった。対象コミット `dc1d3820af6e443c09bd1177ec3e409cf0640d5c` の `ExpGrowth.lean` にある `HasExpGrowth`・可積分性の補題と、`GaussianIntegrationByParts.lean` の `stein_lemma_gaussianReal_of_expGrowth'` を候補とした。先方の Lean/mathlib は `4.34.0-rc2`、当時の SYK ワークスペースは `4.32.2`。候補の指数増大 API と分散一般の Stein 定理を既存 `gaussianReal_stein`・`pi_gaussian_stein_coord` と照合し、原稿の標準分散1の入力を既存の補題で満たせるため、上流コードは移植しなかった。移植後の保守性を比較した記録は確認できない。約6,500行の旧前半は独立した API として残した。
 
 原稿 `eq: chaos` の有限積標準ガウスを対象に、`GaussianPolynomialDensity.lean` で一変数の `gaussianMonomialLp_dense` と有限積の `mvPolynomialLp_dense` を証明した。後者では任意の連続線形写像を多変数多項式で表し、直交条件から正負の重み付き測度の全射影モーメントの一致を得る。指数モーメントによる一変数測度の一意性と特性関数の一意性から重み付き測度そのものを同定し、直交補空間を零にする。`hermiteOrthonormal_dense` が条件付きの稠密性入力を供給し、`hasSum_hermiteCoefficients_unconditional` と `hasSum_hermiteDegreeProjection_unconditional` が任意の実 $L^2$ クラスについて階乗係数の和と次数別の和の収束を与える。測度と probabilists' Hermite の規格化は `GaussianChaos.lean` の照合を使う。これらは $L^2$ の等式であり、`Z_N` への正則性・成長評価の適用は F04 に残す。
 
@@ -930,15 +991,3 @@ F03 のラデマッハ評価、F04 の任意階微分、F05 の高次カオス�
 `lake env lean SYK/CLT/Lemmas/LogAsymptotics.lean`、`lake build SYK.CLT.Main`（3247 jobs）、`lake build CLT`（3253 jobs）は成功した。`partition_and_log_partition_clt`、`partition_clt`、`log_partition_clt`、`Setting.logFluctuation_clt` の `#print axioms` は `[propext, Classical.choice, Quot.sound]` のみ。三つの主定理はすべて `{q : ℕ} (S : Setting q) (hFE : AnnealedInput q S)` を入力とし、実逆温度 `|β|<βq`、尺度 `N^(q/2-1)`、極限分散 `(q!/2)β²(ℓ_q'(β))²` を維持する。標準化 CLT は `β≠0` に限る。`hFE` の構築、F08 の大数則、R02-A・R04-A の原稿上の判断は含まない。Blueprint は宣言参照と依存をソース上で更新し、Verso の機械的検査は休止規則に従い実施していない。
 
 文書・コメント更新後の既定 `lake build` も 3326 jobs で成功した。`CLT` の Lean ソースには `sorry` を残していない。`git diff --check` は成功し、コミットは作成していない。
-
-
-<a id="clt-chaos-final-audit-20261003"></a>
-## gaussian-chaos 最終原稿点検（2026-10-03）
-
-- TeX 本文を先に確認し、Introduction と main-results の旧 Lemma 引用を `Proposition~\ref{prop:exact-second-chaos}` に更新した。higher-chaoses の青字定義式への参照を、定義がある節への参照に変更した。
-- 一次元部分積分を `He_k(g)h(g)` に統一し、関数の成長条件と標準ガウス変数の説明を分離した。修正した反射・符号付き置換・偶奇則・二次係数の証明を再点検し、有限サイズ `N ≥ q` の下で、位相・合成順序・階乗係数・微分交換・正規化が整合することを確認した。
-- カオス展開の Gaussian L² 収束と指数可積分性、部分積分の Fubini の適用、Z の導関数評価への参照を補足した。後続の Duhamel 証明は部分積分に依存しないため、前方参照による循環はない。
-- 編集計画・構造文書・Lean コメントの現行原稿ラベルを更新し、過去の記録は旧ラベルと現ラベルの対応を明示した。Lean のコメント除去後のソース比較で、宣言・証明コードに変更がないことを確認した。新たな Lean 検証は行っていない。Blueprint の既存の現ラベルと原稿証明／Lean 検証済み範囲の区別も確認した。Verso の機械的検査は休止中。
-- 変更した4 subfile の「黒字＋青字」は編集開始時と空白を除いて一致する。全4 subfile と親原稿の「黒字＋赤字」を抽出した静的検査では、未定義ラベルと現行本文の旧 Lemma 引用はない。
-- `/usr/local/texlive/2026/bin/universal-darwin` の latexmk・pdflatex を明示して親原稿と4 subfile をコンパイルし、既存 PDF を上書きした。親原稿では参照・引用の未解決はなく、既存の Overfull hbox が1件残る。節単独では他節・親ファイルの文献への未解決参照警告が残る。組込みコンパイラは subfile の親ファイルを取り込めず、検証には使用できなかった。
-- `N ≥ q` の明示は仮定に関わるため未変更。詳細計画と全体計画に判断待ちとして記録した。

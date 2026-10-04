@@ -18,16 +18,18 @@ an input structure, not a consequence proved from the Rademacher result.
 :::
 
 :::definition "gaussian_annealed_input" (parent := "annealed_free_energy") (lean := "SYK.CLT.AnnealedInput")
-For one Gaussian model family `S : Setting q`, this structure records
-`prop:annealed-free-energy` (Proposition 4.2): an even convex $`C^1` limit
-on the whole real line, locally uniform convergence of the normalized
-pressure and derivative, the explicit quadratic and cubic error bounds,
-and the positive derivative and nonzero-temperature sign. The stated
-small-temperature expansions follow from those bounds.
+For one Gaussian model family `S : Setting q`, this structure contains
+the convergence, regularity, and sign assertions of
+`prop:annealed-free-energy`: an even convex $`C^1` limit on the whole real
+line, locally uniform convergence of the normalized pressure and derivative,
+and $`\beta\ell_q'(\beta)>0` for nonzero real $`\beta`.
 
-The structure supplies the assumed proposition for a specified abstract
-family. Constructing an instance for a concrete family is outside the
-conditional CLT proof and is not a prerequisite for its completion.
+The current Lean structure also retains six additional fields beyond the
+current proposition's statement, including cubic derivative-error and
+quartic pressure-error bounds. Their removal is planned; the current
+conditional CLTs still assume the full structure. Constructing an instance
+for a concrete family is outside the conditional CLT proof. The current
+plan defers the proof of the proposition itself.
 :::
 
 :::definition "rademacher_annealed_model" (parent := "annealed_free_energy") (uses := "majorana_system") (lean := "SYK.AnnealedFE.admissibleSize, SYK.AnnealedFE.paperHamiltonian, SYK.AnnealedFE.partitionFunction, SYK.AnnealedFE.annealedPressure")

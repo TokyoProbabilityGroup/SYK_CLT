@@ -19,7 +19,6 @@ This directory contains the files to copy to the parent directory of the cloned 
     ├── Chapters/
     ├── CLT/
     ├── Model/
-    ├── Universality/
     ├── SuperConcentration/
     └── workspace/
 ```
@@ -98,7 +97,7 @@ Do not blindly overwrite root files when the workspace contains other projects. 
 
 When migrating from the old layout, review the imports in the root `SYK.lean` and cover the required modules with Lake targets. Compare `SYKMain.lean` with `SYK/BlueprintMain.lean` and preserve local renderer changes. Update the root Lake configuration, then remove the two obsolete root files. Their template copies are no longer distributed. Existing output under the root `_out/site/` is from the old layout and is not used by the new commands.
 
-Run `lake build` for the targets listed in `defaultTargets`. Individual targets such as `lake build Model SuperConcentration CLT` are unchanged. `lake build SYK` checks the shared foundations under `SYK/Probability/`, and their dependencies (Blueprint and chapter modules are temporarily excluded); it does not replace the individual mathematical library targets. CI uses the same `defaultTargets` rather than maintaining a separate list. `Annealed_FE` and `Universality` are temporarily excluded as targets. `CLT.Main` does not import `Annealed_FE.main_result`, so a successful default build does not validate either excluded library. Existing proof placeholders remain; a successful build does not certify the completed mathematical results.
+Run `lake build` for the targets listed in `defaultTargets`. Individual targets such as `lake build Model SuperConcentration CLT` are unchanged. `lake build SYK` checks the shared foundations under `SYK/Probability/`, and their dependencies (Blueprint and chapter modules are temporarily excluded); it does not replace the individual mathematical library targets. CI uses the same `defaultTargets` rather than maintaining a separate list. `Annealed_FE` and `Universality` remain registered but are temporarily excluded as targets; `Universality` currently has no source directory. `CLT.Main` does not import `Annealed_FE.main_result`, so a successful default build does not validate either excluded library. The main CLTs are Lean-checked conditional on `AnnealedInput`; construction of that input remains separate. A successful build alone does not establish that the formal statements match every claim in the manuscript.
 
 After restoring Verso, uncomment and use the `lake lean` renderer command shown above, followed by `lake exe vbp check --site SYK/_out/site`. Lake builds the renderer's imports automatically. This explicitly selects the repository's renderer because the installed `vbp build` only discovers root-level entry points. Generated output stays under `SYK/_out/site/` and is ignored by Git. Append `--pdf` to the renderer command for an optional PDF. See the project README for local serving instructions and the reason for invoking the server separately.
 
@@ -114,6 +113,6 @@ Do not place `.lake/`, copied mathlib sources, compiled artifacts, editor or mac
 
 Verso is temporarily disabled in the dependency configuration, the `SYK` build globs, and the Blueprint CI steps. The Blueprint sources remain intact. `lake-manifest.verso.json` preserves the full dependency manifest from before the pause; JSON does not support comments. The active manifest contains only mathlib and its dependencies, with their revisions unchanged.
 
-To restore, uncomment the Verso dependency in `lakefile.toml`, restore the commented `SYK` globs (replacing the active globs), and use `lake-manifest.verso.json` to reconcile the manifest without discarding dependency revisions added during the pause. Apply both files to the workspace root, review dependency revisions if other dependencies have changed, and run `lake update` if needed. Uncomment the two Blueprint CI steps and the renderer/check commands in the documentation. Update the pause instructions in `SYK/AGENTS.md` and `SYK/EDITING_PLAN.md`, then run `lake build` and the Blueprint commands for all chapters changed during the pause.
+To restore, uncomment the Verso dependency in `lakefile.toml`, restore the commented `SYK` globs (replacing the active globs), and use `lake-manifest.verso.json` to reconcile the manifest without discarding dependency revisions added during the pause. Apply both files to the workspace root, review dependency revisions if other dependencies have changed, and run `lake update` if needed. Uncomment the Blueprint site build and output check steps in CI and the renderer/check commands in the documentation. Update the pause instructions in `SYK/AGENTS.md` and `SYK/EDITING_PLAN.md`, then run `lake build` and the Blueprint commands for all chapters changed during the pause.
 
 Existing workspaces must apply the same configuration changes separately. This repository's CI uses the versioned template; a parent workspace with other projects is not changed automatically.

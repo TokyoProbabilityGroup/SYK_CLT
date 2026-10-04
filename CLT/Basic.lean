@@ -10,13 +10,13 @@ import Mathlib.Topology.UniformSpace.LocallyUniformConvergence
 The setting uses an arbitrary nonempty finite-dimensional matrix Majorana
 system, the shared Gaussian Hamiltonian, and normalized trace. The main
 statements in `Main.lean` correspond to `thm:partition-clt` and
-`cor:free-energy-clt`.
+`thm:free-energy-clt`.
 
 Inverse temperature is real, and the main CLT statements use
 `|β| < βq` together with `β ≠ 0`. This supersedes the planned
 nonnegative-temperature restriction. The relative, standardized, and
 logarithmic CLTs all exclude zero inverse temperature; finite-model
-zero-temperature identities remain available separately.
+zero-inverse-temperature identities remain available separately.
 
 The explicit annealed input is `AnnealedInput`, modeled on
 `prop:annealed-free-energy` in the CLT manuscript. The Gaussian chaos and
@@ -194,7 +194,7 @@ theorem Y_pos (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
   div_pos (lt_of_lt_of_le zero_lt_one (S.Z_ge_one β n g))
     (S.partition_moments β n).2.2
 
-/-- The normalization in `subsec:SYK-model` has expectation one. -/
+/-- The normalization in `eq:Y_N` has expectation one. -/
 theorem integral_Y (β : ℝ) (n : ℕ) :
     (∫ g, S.Y β n g ∂standardGaussianMeasure (S.N n) q) = 1 := by
   change (∫ g, S.Z β n g / S.meanZ β n ∂standardGaussianMeasure (S.N n) q) = 1
@@ -229,7 +229,7 @@ theorem integral_log_Y (β : ℝ) (n : ℕ) :
   rw [integral_sub (S.partition_moments β n).2.1 (integrable_const _)]
   simp [meanLogZ]
 
-/-- The two logarithmic centerings agree in `cor:free-energy-clt`. -/
+/-- The two logarithmic centerings agree in `thm:free-energy-clt`. -/
 theorem centered_log_Y_eq (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
     Real.log (S.Y β n g) -
         (∫ x, Real.log (S.Y β n x) ∂standardGaussianMeasure (S.N n) q) =
@@ -237,7 +237,7 @@ theorem centered_log_Y_eq (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
   rw [S.log_Y_eq, S.integral_log_Y]
   ring
 
-/-- Pointwise input for the small-event estimate in `cor:free-energy-clt`. -/
+/-- Pointwise input for the small-event estimate in `thm:free-energy-clt`. -/
 theorem neg_log_Y_le_log_meanZ (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
     -Real.log (S.Y β n g) ≤ Real.log (S.meanZ β n) := by
   rw [S.log_Y_eq]
@@ -248,7 +248,9 @@ end Setting
 /-! ## Main results -/
 
 /-- `prop:annealed-free-energy` for one Gaussian SYK model family.
-The small-temperature expansions follow from the stated global error bounds. -/
+The current structure retains six additional fields beyond the proposition.
+Their removal is planned in `CLT-INPUT`; the conditional CLTs currently
+assume the full structure. -/
 structure AnnealedInput (q : ℕ) (S : Setting q) where
   ℓ : ℝ → ℝ
   even : ∀ β : ℝ, ℓ (-β) = ℓ β
@@ -297,14 +299,14 @@ It is allowed to vanish, in particular at `β = 0`. -/
 noncomputable def limitVariance (q : ℕ) (ℓ : ℝ → ℝ) (β : ℝ) : ℝ≥0 :=
   ⟨(q.factorial : ℝ) / 2 * β ^ 2 * (deriv ℓ β) ^ 2, by positivity⟩
 
-/-- `prop:annealed-free-energy` gives the sign at every nonzero temperature. -/
+/-- `prop:annealed-free-energy` gives the sign at every nonzero inverse temperature. -/
 theorem exists_small_temperature_sign {q : ℕ} {S : Setting q}
     (hFE : AnnealedInput q S) :
     ∃ r : ℝ, 0 < r ∧
       ∀ β : ℝ, |β| < r → β ≠ 0 → 0 < β * deriv hFE.ℓ β := by
   exact ⟨1, by norm_num, fun β _ hβ0 ↦ hFE.sign β hβ0⟩
 
-/-- The limiting variance is positive at the small nonzero temperatures
+/-- The limiting variance is positive at the small nonzero inverse temperatures
 selected by `prop:annealed-free-energy`. -/
 theorem exists_small_temperature_variance_pos {q : ℕ} {S : Setting q}
     (hFE : AnnealedInput q S) :

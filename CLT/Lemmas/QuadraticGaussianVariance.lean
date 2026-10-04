@@ -176,7 +176,7 @@ theorem Setting.varianceZ_eq_mean_sq_varianceY_pi {q : ℕ}
   rfl
 
 /-- Exact normalization of the partition-function variance has the predicted
-nonzero-temperature limit. -/
+nonzero-inverse-temperature limit. -/
 theorem Setting.scaled_varianceZ_over_mean_sq_tendsto {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
     ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →

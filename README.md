@@ -35,7 +35,6 @@ This produces the following directory structure:
 │   ├── BlueprintMain.lean
 │   ├── Chapters/
 │   ├── ...
-│   ├── Universality/
 │   ├── workspace/
 │   ├── .gitignore
 │   └── README.md
@@ -59,7 +58,7 @@ lake build
 
 `defaultTargets` in `lakefile.toml` selects the libraries built by `lake build`.
 The mathematical topics have individual targets such as `Model`, `SuperConcentration`, and `CLT`; the `SYK` target currently checks shared foundations under `SYK/Probability/` and their dependencies. Blueprint and chapter modules are temporarily excluded.
-`Annealed_FE` and `Universality` remain registered but are temporarily excluded from the default targets. `CLT.Main` does not import `Annealed_FE.main_result`, so a successful default build does not validate either excluded library. A successful build does not establish completion of the CLT or annealed proofs; existing proof placeholders remain.
+The main CLTs are Lean-checked conditional on `AnnealedInput`; constructing that input remains a separate task. A successful build alone does not establish that the formal statements match every claim in the manuscript.
 There is no aggregate Lean import file: Lake manages the build targets directly.
 All project-specific Lean sources remain inside the repository; only the shared Lake configuration, dependency manifest, and toolchain file are copied to the workspace root.
 To build one library separately, run a command such as `lake build Model`.

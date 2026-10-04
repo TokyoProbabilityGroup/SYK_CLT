@@ -20,8 +20,7 @@ open Informal
 :::group "central_limit_theorem"
 Gaussian SYK partition-function and log-partition fluctuations at fixed even
 $`q\ge4`. The manuscript is `CLT/refs/CLT_SYK.tex` with its four included
-sections. The active log-CLT proof is in `main-results.tex`; the argument
-inside `\iffalse` is historical.
+sections. The proof of `thm:free-energy-clt` is in `main-results.tex`.
 
 Finite-model results, conditional consequences of an external annealed input,
 and the external expected-pressure statement have different status below.
@@ -79,9 +78,10 @@ Given `S : Setting q` and `hFE : AnnealedInput q S`, Lean proves convergence
 of the annealed pressure and its derivative, and the second-chaos
 coefficient limit, for every real $`\beta`. The fixed-order binomial
 asymptotic gives the exact scaled coefficient limit
-$`\sqrt{q!/2}\,\beta\ell_q'(\beta)`. The input records the even,
-convex $`C^1` limit and bounds of manuscript Proposition 4.2 for this
-one family. Constructing `hFE` is outside the conditional CLT proof.
+$`\sqrt{q!/2}\,\beta\ell_q'(\beta)`. The input contains the convergence,
+regularity, and sign assertions of `prop:annealed-free-energy` for this
+one family, together with six additional fields whose removal is planned.
+Constructing `hFE` is outside the conditional CLT proof.
 :::
 
 :::theorem "clt_convex_derivative_transfer" (parent := "central_limit_theorem") (lean := "SYK.CLT.convex_convergence_deriv_tendstoUniformlyOn")
@@ -89,7 +89,7 @@ The Lean convexity lemma gives locally uniform convergence of derivatives
 when locally uniform convergence of differentiable convex functions to a
 $`C^1` limit is already known. The manuscript's `lem:convex-derivatives`
 also derives locally uniform convergence of the functions from pointwise
-convergence. That first step remains separate from the linked Lean result.
+convergence. That first step remains unformalized and is deferred.
 :::
 
 :::theorem "clt_conditional_nondegeneracy" (parent := "central_limit_theorem") (uses := "clt_conditional_annealed_limit") (lean := "SYK.CLT.exists_small_temperature_sign, SYK.CLT.exists_small_temperature_variance_pos")
@@ -105,12 +105,12 @@ coordinate set and independent standard Gaussian coordinates. Let
 $`\alpha` be a nonnegative integer multi-index and let
 $`f\in C^{|\alpha|}(\mathbb R^\iota;\mathbb R)`. For each
 $`\eta\le\alpha` componentwise, assume there is $`C_\eta>0` such that
-$`|\partial^\eta f(g)|\le C_\eta\exp(C_\eta\|g\|_2)` for every $`g`.
+$`|\partial_G^\eta f(G)|\le C_\eta\exp(C_\eta\|G\|_2)` for every $`G`.
 Then both expectations below are integrable and
 
 $$`
 \mathbb E\left[\left(\prod_{i\in\iota}\operatorname{He}_{\alpha_i}(G_i)\right)
-f(G)\right]=\mathbb E[\partial^\alpha f(G)].
+f(G)\right]=\mathbb E[\partial_G^\alpha f(G)].
 `$$
 
 The Hermite polynomials have the probabilists' normalization. The proof
@@ -233,13 +233,15 @@ For every interaction multi-index $`\alpha`, the normalized partition
 function satisfies the bound in `eq:Z-derivative-bound`:
 
 $$`
-|\partial_g^\alpha Z_N(\beta;g)|
-\le (|\beta|\sigma_N)^{|\alpha|}Z_N(\beta;g).
+|\partial_G^\alpha Z_N(\beta;G)|
+\le (|\beta|\sigma_N)^{|\alpha|}Z_N(\beta;G).
 `$$
 
 Here $`\sigma_N` is the coupling scale of the shared model. The proof
 pulls the checked iterated trace-exponential derivative estimate through
-the real part and the linear disorder map. Exponential growth and
+the real part and the linear disorder map. The matrix estimate is proved
+using its power series and Schatten bounds. The manuscript's Duhamel
+simplex integral representation is not separately formalized. Exponential growth and
 smoothness permit Gaussian Hermite integration by parts for every
 $`\alpha`. The resulting Hermite coefficient of $`Y_N` is bounded by
 $`(|\beta|\sigma_N)^{|\alpha|}`. These Lean declarations have no
@@ -322,7 +324,7 @@ The manuscript's `prop:exact-second-chaos` identifies the leading Gaussian
 chaos of $`Y_N-1`. Its `prop:higher-chaos-closure` bounds the remainder by
 $`\|\mathcal R_N\|_2^2=O(N^{-3a})`, where $`a=q/2-1`.
 The intended proof uses parity symmetry, Gaussian integration by parts,
-Duhamel derivatives, and Rademacher encoding of the higher-chaos sum.
+the trace-exponential derivative bound, and Rademacher encoding of the higher-chaos sum.
 The sign-gauge symmetry of the scaled, normalized finite-model partition
 function is checked as `SYK.CLT.Setting.Z_sign_gauge`. The odd Hermite
 coefficient vanishes for its Gaussian coupling measure by
@@ -383,11 +385,11 @@ $`\beta=0`, the relative fluctuation vanishes and standardization is undefined;
 this point is outside the CLT statements.
 The joint declaration and both individual CLTs are Lean-checked without
 `sorryAx`, conditional on `hFE`.
-The manuscript and Lean impose the same nonzero-temperature restriction.
+The manuscript and Lean impose the same nonzero-inverse-temperature restriction.
 :::
 
 :::theorem "clt_trace_lower_bound" (parent := "central_limit_theorem") (uses := "clt_finite_partition_properties") (lean := "SYK.CLT.interactionOperator_trace_eq_zero, SYK.CLT.normalizedHamiltonian_normalizedTrace_eq_zero, SYK.CLT.realPartitionFunction_ge_one")
-In the active proof of `cor:free-energy-clt`, conjugation by a Majorana
+In the proof of `thm:free-energy-clt`, conjugation by a Majorana
 generator makes every even-degree interaction traceless. Hence
 $`\operatorname{tr}H_N=0`, and Jensen's inequality gives
 $`Z_N(\beta;g)\ge1` for real $`\beta`. These statements are proved
@@ -409,7 +411,7 @@ $$`
 
 Moreover, $`\log Z_N\ge0`, $`\log\mathbb E Z_N\ge0`, and
 $`-\log Y_N\le\log\mathbb E Z_N`. These finite-model inputs to
-`cor:free-energy-clt` are proved without `sorryAx`. They do not supply
+`thm:free-energy-clt` are proved without `sorryAx`. They do not supply
 the asymptotic estimate $`\log\mathbb E Z_N=O(N)`.
 :::
 
@@ -449,12 +451,14 @@ logarithmic CLT and the joint theorem without `sorryAx`, conditional on
 
 :::theorem "clt_expected_pressure_limit" (parent := "central_limit_theorem")
 The manuscript's `thm: input` states, for each fixed real $`\beta`, the
-deterministic common limit of $`N^{-1}\mathbb E\log Z_N(\beta)` and
-$`N^{-1}\log\mathbb E Z_N(\beta)`. He2026 Theorem 1.1 gives both
-limits at fixed positive temperature for the standard representation;
-Gaussian symmetry and $`Z_N(0)=1` cover nonpositive temperatures.
-The regularity of the limiting function is established in manuscript
-Proposition 4.2. There is no almost-sure claim. Lean's conditional CLT
-uses only the annealed proposition through `AnnealedInput q S`, which
-remains an assumed input; it does not import a quenched-pressure limit.
+deterministic limit of $`N^{-1}\log\mathbb E Z_N(\beta)` and
+differentiability of the limiting function on $`\mathbb R`.
+The manuscript uses the positive-temperature input from He2026 v3,
+Gaussian symmetry, and $`Z_N(0)=1`. The stronger regularity, locally uniform
+pressure and derivative convergence, and nonzero-inverse-temperature sign are
+stated in `prop:annealed-free-energy`. The current `thm: input` states
+neither an expected quenched-pressure limit nor an almost-sure claim.
+Lean's conditional CLT assumes `AnnealedInput q S`, which still contains
+six additional fields beyond the current proposition's statement. It does
+not import a quenched-pressure limit.
 :::
