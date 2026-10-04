@@ -24,12 +24,10 @@ the convergence, regularity, and sign assertions of
 line, locally uniform convergence of the normalized pressure and derivative,
 and $`\beta\ell_q'(\beta)>0` for nonzero real $`\beta`.
 
-The current Lean structure also retains six additional fields beyond the
-current proposition's statement, including cubic derivative-error and
-quartic pressure-error bounds. Their removal is planned; the current
-conditional CLTs still assume the full structure. Constructing an instance
-for a concrete family is outside the conditional CLT proof. The current
-plan defers the proof of the proposition itself.
+The conditional CLTs receive these assertions as an explicit assumption
+for `S`. Constructing an instance for a concrete family is outside the
+conditional CLT proof. The current plan defers the proof of the proposition
+itself.
 :::
 
 :::definition "rademacher_annealed_model" (parent := "annealed_free_energy") (uses := "majorana_system") (lean := "SYK.AnnealedFE.admissibleSize, SYK.AnnealedFE.paperHamiltonian, SYK.AnnealedFE.partitionFunction, SYK.AnnealedFE.annealedPressure")

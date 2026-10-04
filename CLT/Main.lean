@@ -28,7 +28,8 @@ expresses weak convergence of probability laws. The limiting function is
 the one supplied by the annealed proposition. The limiting and finite-size
 variances are positive throughout the stated range.
 
-The annealed proposition is assumed through `hFE`.
+The assertions of `prop:annealed-free-energy` for `S` are assumed through
+`hFE`; the proposition itself and construction of this input are not proved here.
 The interaction-order assumptions are supplied only by `S`. -/
 theorem partition_and_log_partition_clt {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
