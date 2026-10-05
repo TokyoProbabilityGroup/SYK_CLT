@@ -3,6 +3,7 @@ import VersoManual
 import VersoBlueprint
 import SYK.CLT.Main
 import SYK.CLT.Normalization
+import SYK.CLT.StandardModel
 import SYK.CLT.Lemmas.ConvexDerivatives
 import SYK.CLT.Lemmas.GaussianIBP
 import SYK.CLT.Lemmas.GaussianChaos
@@ -323,7 +324,7 @@ function, its quadratic Taylor limit, and $`M_N\to\infty`.
 The manuscript's `prop:exact-second-chaos` identifies the leading Gaussian
 chaos of $`Y_N-1`. Its `prop:higher-chaos-closure` bounds the remainder by
 $`\|\mathcal R_N\|_2^2=O(N^{-3a})`, where $`a=q/2-1`.
-The intended proof uses parity symmetry, Gaussian integration by parts,
+The proof uses parity symmetry, Gaussian integration by parts,
 the trace-exponential derivative bound, and Rademacher encoding of the higher-chaos sum.
 The sign-gauge symmetry of the scaled, normalized finite-model partition
 function is checked as `SYK.CLT.Setting.Z_sign_gauge`. The odd Hermite
@@ -365,7 +366,7 @@ of the normalized partition variance to `limitVariance`.
 `SYK.CLT.Setting.varianceZ_pos_of_ne_zero` proves finite-size positivity,
 and `SYK.CLT.Setting.standardizedFluctuation_clt` gives the standardized
 Gaussian limit. The partition-function theorem is checked independently
-of the remaining logarithmic transfer.
+of the logarithmic transfer.
 :::
 
 :::theorem "partition_function_clt" (parent := "central_limit_theorem") (uses := "clt_second_chaos_and_remainder, clt_gaussian_quadratic_sum, clt_conditional_nondegeneracy") (lean := "SYK.CLT.partition_clt, SYK.CLT.partition_and_log_partition_clt")
@@ -422,19 +423,22 @@ The disorder variance is zero. These identities have Lean proofs without
 `sorryAx`; they do not extend the standardized CLT to $`\beta=0`.
 :::
 
-:::theorem "clt_log_centering_error" (parent := "central_limit_theorem") (uses := "clt_relative_and_log_moments, clt_second_chaos_and_remainder") (lean := "SYK.CLT.Setting.scaled_sq_Y_lt_half_tendsto_zero, SYK.CLT.Setting.scaled_integral_logLinearError_tendsto_zero, SYK.CLT.Setting.scaled_centered_logLinearError_l1_tendsto_zero")
+:::theorem "clt_log_centering_error" (parent := "central_limit_theorem") (uses := "clt_relative_and_log_moments, clt_second_chaos_and_remainder") (lean := "SYK.CLT.Setting.cubed_scale_Y_lt_half_bounded, SYK.CLT.Setting.integral_log_Y_isBigO, SYK.CLT.Setting.scaled_sq_Y_lt_half_tendsto_zero, SYK.CLT.Setting.scaled_integral_logLinearError_tendsto_zero, SYK.CLT.Setting.scaled_centered_logLinearError_l1_tendsto_zero")
 Write $`W_N=\log Y_N` and $`a=q/2-1`. The active manuscript proof combines
 $`\mathbb E(Y_N-1)^2=O(N^{-2a})` with
 $`\mathbb P(Y_N<1/2)=O(N^{-3a})`. On the small event,
 $`Z_N\ge1` gives $`-\log Y_N\le\log\mathbb E Z_N=O(N)`.
-It follows that $`\mathbb E W_N=o(N^{-a})`, which controls the difference
+Lean proves $`\mathbb E W_N=O(N^{-2a})`, hence $`o(N^{-a})`, under
+`hFE` for each fixed nonzero sufficiently small real $`\beta`, as in
+the proof of `thm:free-energy-clt`. The constant may depend on $`\beta`.
+This controls the difference
 between centering by $`\mathbb E\log Z_N` and by
 $`\log\mathbb E Z_N`. Lean proves the required vanishing scaled
 mean error and centered $`L^1` error under `hFE`.
 :::
 
 :::theorem "log_partition_clt" (parent := "central_limit_theorem") (uses := "partition_function_clt, clt_log_centering_error") (lean := "SYK.CLT.log_partition_clt, SYK.CLT.partition_and_log_partition_clt")
-Under the same `hFE`, $`\beta_q`, and real $`0<|\beta|<\beta_q`, the intended
+Under the same `hFE`, $`\beta_q`, and real $`0<|\beta|<\beta_q`, the
 conclusion is
 
 $$`
@@ -447,6 +451,20 @@ The current manuscript uses the relative CLT, local linearization of
 $`\log`, and the preceding centering estimate. Lean verifies the
 logarithmic CLT and the joint theorem without `sorryAx`, conditional on
 `hFE`.
+:::
+
+:::theorem "clt_standard_model_application" (parent := "central_limit_theorem") (uses := "partition_function_clt, log_partition_clt") (lean := "SYK.CLT.standardSetting, SYK.CLT.standardSetting_size_iff, SYK.CLT.standardSetting_Z, SYK.CLT.standard_partition_and_log_partition_clt, SYK.CLT.standard_partition_clt, SYK.CLT.standard_log_partition_clt")
+`standardSetting` uses the standard Majorana representation at sizes
+$`N_n=q+2n`. Every even size at least $`q` occurs exactly once, and
+$`N_n` tends to infinity. `standardSetting_Z` identifies the partition
+function with the normalized trace in `subsec:SYK-model`.
+
+Assuming `AnnealedInput` for this same family, the joint theorem gives
+`thm:partition-clt` and `thm:free-energy-clt` with one common radius,
+the manuscript scaling and centering, and positive limiting and
+finite-size variances. The two individual theorems are projections of
+that result. These are conditional applications: the annealed
+proposition and representation independence are not proved here.
 :::
 
 :::theorem "clt_expected_pressure_limit" (parent := "central_limit_theorem")

@@ -2,27 +2,61 @@
 
 ## 現在の範囲
 
-現在の条件付き CLT は実装済みであり、`AnnealedInput` は現行原稿の `prop:annealed-free-energy` の命題文に対応する内容を仮定として受け取る。残る実装は対数の期待誤差の明示的評価と具体模型への条件付き適用である。命題自体の証明と、そのための外部入力の調査・凸関数列の補題の補完は「その他の残件」とする。原稿との対応と証明状態は [構造文書](ARCHITECTURE.md)、入力整理の検証は [作業履歴](../WORK_HISTORY.md#clt-input-2026-10-04) を参照する。
+現在の条件付き CLT は実装済みであり、`AnnealedInput` は現行原稿の `prop:annealed-free-energy` の命題文に対応する内容を仮定として受け取る。対数の期待誤差の明示的評価と標準模型族への条件付き適用も実装・検証済みである。次はリファクタリングの範囲を確定する。命題自体の証明と、そのための外部入力の調査・凸関数列の補題の補完は「その他の残件」とする。原稿との対応と証明状態は [構造文書](ARCHITECTURE.md)、入力整理の検証は [作業履歴](../WORK_HISTORY.md#clt-input-2026-10-04) を参照する。
 
-## 原稿との整合性と不足部分の実装
+## 現在の検証状況
 
-現在進める作業の ID・状態・担当・依存関係は [全体計画](../EDITING_PLAN.md#残る作業) に集約する。以下は各作業の仕様と完了条件である。
+`CLT-LOG`・`CLT-APPLY` は完了した。Lean 4.32.2 で変更した2ファイルと直接の利用先 `Main.lean` の個別検査、`lake build CLT`、定理文・公理依存の確認を行った。参照原稿、開始時の差分、修正内容、警告と検証結果は [完了記録](../WORK_HISTORY.md#clt-log-apply-completion-2026-10-05) に集約する。`hFE : AnnealedInput` は明示的な仮定として残る。Verso の機械的検査は休止中である。
+
+## 完了した実装の仕様
+
+作業の ID・状態・担当・依存関係は [全体計画](../EDITING_PLAN.md#残る作業) に集約する。以下は完了した LOG・APPLY の仕様と検証範囲である。
 
 ### 対数の期待誤差の明示的評価
 
-対象は `CLT-LOG`。分担者の編集範囲は `Lemmas/LogTaylor.lean`、`Lemmas/LogEventBound.lean`、`Lemmas/LogAsymptotics.lean`。統合済みの入力を使い、上流の定義や仮定を変更しない。
+対象は完了した `CLT-LOG`。実装は `Setting.cubed_scale_Y_lt_half_bounded` と `Setting.integral_log_Y_isBigO` にある。承認された編集範囲は `Lemmas/LogTaylor.lean`、`Lemmas/LogEventBound.lean`、`Lemmas/LogAsymptotics.lean`。統合済みの入力を使い、上流の定義や仮定を変更しない。
 
-`a=q/2-1`、`Y_N=Z_N/E Z_N` とし、原稿の非零の小さい実逆温度で `E[log Y_N]=O(N^(-2a))` を明示的な Lean 定理にする。`N^a` を掛けた期待誤差が零に収束することは実装済みであり、この評価の追加は条件付き CLT 自体の未完成証明を埋める作業ではない。
+割当時の参照原稿・Lean ソース一式は [割当記録](../WORK_HISTORY.md#clt-log-apply-plan-2026-10-05) に記録した。入力は `S : Setting q` と `hFE : AnnealedInput q S`。`Setting.integral_logLinearError_le_variance_tail`、`Setting.scaled_varianceY_tendsto` と既存の小確率事象の評価を接続した。統合担当は実装後にこの計画・構造文書・全体計画・作業履歴と `Chapters/CLT.lean` を更新した。
+
+`a=q/2-1`、`Y_N=Z_N/E Z_N` とし、原稿の非零の小さい実逆温度で `E[log Y_N]=O(N^(-2a))` を明示的な Lean 定理にした。`N^a` を掛けた期待誤差が零に収束することは実装済みであり、この評価の追加は条件付き CLT 自体の未完成証明を埋める作業ではない。
 
 `LogTaylor.lean`・`LogEventBound.lean`・`LogAsymptotics.lean` の二次モーメント、小確率事象、`Z_N≥1` と `log E Z_N=O(N)` を再利用する。分布収束だけからモーメント評価を推論しない。完了条件は、原稿の評価と同じ指数・中心化・温度条件を照合し、個別検査・関連ビルド・公理依存確認を終えることである。
 
 ### 命題を仮定した具体模型への適用
 
-対象は `CLT-APPLY`。`CLT-INPUT` の成果を基に、具体的な公開定理と編集範囲を確定してから割り当てる。
+対象は完了した `CLT-APPLY`。2026-10-05 に以下の仕様を確定し、実装・検証した。割当時の参照原稿・Lean ソース一式は [割当記録](../WORK_HISTORY.md#clt-log-apply-plan-2026-10-05) を参照する。
 
-抽象的な `Setting q` から原稿のガウス SYK 模型族への適用条件を明示する。有限サイズの標準表現と規格化は `Normalization.lean` で照合済みだが、それだけで対象模型族への `prop:annealed-free-energy` の適用は得られない。標準模型族、偶数サイズの極限、規格化、表現独立性の要否を照合したうえで、当該模型族について命題の内容に対応する `hFE : AnnealedInput q S` を明示的な仮定とする定理文を確定する。
+#### 標準模型族と編集範囲
 
-完了条件は、その仮定の下で三種類の CLT をまとめた定理と個別定理を具体模型族へ適用し、原稿との対応、残る仮定、公理依存を確認することである。`hFE` の構築や命題の証明を、この条件付き適用の完了条件に含めない。
+新規 `StandardModel.lean` に標準模型族の構成、有限サイズの規格化との接続、条件付き CLT の具体的適用をまとめた。`SYK.CLT.Main` と `SYK.CLT.Normalization` を import する利用側とし、抽象的な `Main.lean` や共有 Model から逆向きに import していない。以下の模型族と原稿への対応を実装した。
+
+公開した模型族の型は `standardSetting (q : ℕ) (hq : Even q) (hq4 : 4 ≤ q) : Setting q` である。`N n = q + 2 * n`、`d n = SYK.StandardBasis ((q + 2 * n) / 2)`、`majorana n = SYK.standardMajoranaSystem (q + 2 * n) ...` とし、有限性・非空性・偶数性・`q ≤ N n`・`Tendsto N atTop atTop` を既存定義と自然数の算術から構成した。`Setting` に仮定を追加していない。
+
+任意の偶数 `N ≥ q` が一意に `q + 2 * n` と書けることを補題にし、原稿の偶数サイズ全体の極限との対応を示した。尺度は添字 `n` のべきに置き換えず、常に `(q + 2 * n)^(q/2-1)` とする。`partitionFunction_standard` から、この族の `Z` が `2^(-N/2) Tr(exp(-β H_N))` の実数値であることを示した。標準ガウス座標、係数分散 `(q-1)!/N^(q-1)`、位相 `i^(q/2)` と指数の負号を維持した。
+
+数学ライブラリの編集範囲は新規 `CLT/StandardModel.lean` のみとした。既存 `Basic.lean`・`Main.lean`・`Normalization.lean`、LOG の3ファイル、共有模型・ビルド設定は変更を必要としなかった。統合担当は実装後に `CLT/ARCHITECTURE.md`、本計画、全体計画、作業履歴、`Chapters/CLT.lean` の対応を更新した。
+
+#### 公開定理の仕様
+
+名前空間は `SYK.CLT`。各定理は `{q : ℕ} (hq : Even q) (hq4 : 4 ≤ q)` と `hFE : AnnealedInput q (standardSetting q hq hq4)` を入力とする。`hq`・`hq4` は模型族を構成するために一度渡し、構成後の抽象 CLT 適用時には追加しない。以下の結論は `S := standardSetting q hq hq4` とした既存定理の結論を正確に使う。
+
+| 新規公開定理 | 適用する既存定理と結論 |
+| --- | --- |
+| `standard_partition_and_log_partition_clt` | `partition_and_log_partition_clt S hFE`。一つの `∃ βq > 0` の下で、すべての実数 `β`、`abs β < βq`、`β ≠ 0` に対し、アニール圧力の収束、相対 CLT、中心化した対数 CLT、極限分散の正値性、全 `n` の `S.varianceZ β n > 0`、標準化 CLT を同時に結論する。 |
+| `standard_partition_clt` | `partition_clt` の結論を上の共同定理から射影する。アニール圧力、相対 CLT、極限・有限サイズ分散の正値性、標準化 CLT を含む。 |
+| `standard_log_partition_clt` | `log_partition_clt` の結論を上の共同定理から射影する。アニール圧力と中心化した対数 CLT を含む。 |
+
+共同定理で同一の高温半径を供給し、個別定理はその証人を利用する。相対・対数 CLT の極限測度は `gaussianReal 0 (limitVariance q hFE.ℓ β)`、標準化 CLT は `gaussianReal 0 1`、極限確率変数は `fun x : ℝ ↦ x` とする。サイズごとの確率測度は `standardGaussianMeasure (q + 2 * n) q`。収束は `n → atTop` の `TendstoInDistribution` とし、共通確率空間や概収束を仮定しない。
+
+`limitVariance` は `(q!/2) β² (deriv hFE.ℓ β)²`、相対変動は `N^(q/2-1) (Z/E Z-1)`、対数変動は `N^(q/2-1) (log Z-E log Z)`、標準化は `(Z-E Z)/sqrt(Var Z)` である。原稿の `subsec:SYK-model`、`eq:Y_N`、`eq:scaled-relative-clt`、`eq:standardized-clt`、`thm:partition-clt`、`thm:free-energy-clt` と照合する。
+
+`hFE` はこの標準模型族に対する `prop:annealed-free-energy` の命題文の内容を仮定する。入力の構築、命題の証明、他の表現との表現独立性、任意のサイズ部分列への新しい API、LOG の明示的評価は本単位に含めない。一般表現への外部定理の適用を仮定せず、標準表現自体を対象にする。
+
+#### 完了条件と検証
+
+模型族の全フィールド、偶数サイズ全体との対応、規格化の橋渡し、上記3定理を実装し、原稿との対応と残る `hFE` を文書・Blueprint に反映した。具体模型族の構成と適用も検査した。
+
+共有ワークスペースのルートで新規モジュールの依存をビルドしたうえで `lake env lean SYK/CLT/StandardModel.lean` と `lake build CLT` を実行した。`lake build CLT` には新規 `SYK.CLT.StandardModel` のビルドが含まれる。`#print` で3定理の型・仮定・尺度・分散を照合し、`#print axioms` で3定理と模型族・対応補題に `sorryAx` や新規公理がないことを確認した。Blueprint の本文・宣言参照はソース上で照合した。Verso の機械的検査は休止中である。検証結果の詳細は [完了記録](../WORK_HISTORY.md#clt-log-apply-completion-2026-10-05) を参照する。
 
 ## その他の残件
 
@@ -56,7 +90,7 @@ He2026 の定理自体の全面的な Lean 形式化は現在の計画に含め�
 
 対象は `CLT-REFACTOR`。実装成果の統合後に対象宣言・担当ファイルを確定し、同じ共有ファイルを複数担当へ割り当てない。
 
-残る実装対象の `CLT-LOG`、`CLT-APPLY` を終え、その他の残件を実装するか判断してから、CLT・Model・汎用ガウス基盤・共有 API の利用側を調査する。命題の証明を再開する場合は、その実装後にリファクタリングする。旧作業の未完成部分とは区別した新しい設計課題とする。実装中に循環依存などの解消が必要になった場合だけ、必要最小限の構造変更を先行させる。
+`CLT-LOG`、`CLT-APPLY` は完了した。その他の残件を実装するか判断し、対象範囲を確定してから、CLT・Model・汎用ガウス基盤・共有 API の利用側を調査する。命題の証明を再開する場合は、その実装後にリファクタリングする。旧作業の未完成部分とは区別した新しい設計課題とする。実装中に循環依存などの解消が必要になった場合だけ、必要最小限の構造変更を先行させる。
 
 実際の利用先と import を基に、重複定義、過剰な依存、不要な変換、補題の所属とファイルの責務を調べる。重点対象は、汎用 Hermite 補題と模型固有の符号対称性、四次モーメント補題から CLT への依存、有限行列解析と規格化トレースの所属である。移設を先に決めず、各変更の対象宣言、移設先、利用側、数学的利点、変更前後の依存、検証対象を確定する。
 

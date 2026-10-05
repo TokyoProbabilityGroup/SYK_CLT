@@ -2,6 +2,52 @@
 
 完了済み作業の検証結果と旧計画を保存する。現行の残件は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
 
+<a id="clt-log-apply-completion-2026-10-05"></a>
+
+## CLT-LOG・CLT-APPLY の実装と検証（2026-10-05–06）
+
+担当・統合担当は Noda。開始点は割当時と同じ HEAD `5b7b401b4cc7188787f68329e5e914862eb2f3a4`。最初の実装着手時の追跡差分は割当・仕様確定で更新した4文書、未追跡は `CLT/refs/out/CLT_SYK.pdf` のみだった。検証再開時はこれに LOG・APPLY の未検証実装案と進捗文書の差分が加わっていた。参照原稿は同 HEAD の `CLT/refs/CLT_SYK.tex` と全4節であり、本単位では原稿を編集していない。
+
+当初は親ワークスペースの設定と指定 toolchain が未構築だったため、ソース実装案を未検証として保存した。ユーザーの環境更新後、親の `lake env lean --version` で Lean 4.32.2（Windows、commit `f3b06c705e6c85f5314019d5d3baab0fec5b580c`）を確認し、mathlib と配布用と同じ対象の Lake 設定を使用して検証した。初回の個別検査は SYK のコンパイル済みモジュールがなく失敗したため、必要な依存をビルドした。依存の版・共有設定は変更していない。
+
+LOG は `Lemmas/LogAsymptotics.lean` に `Setting.cubed_scale_Y_lt_half_bounded` と `Setting.integral_log_Y_isBigO` を追加した。二次カオス係数の尺度付き極限と四次モーメント、高次カオス剰余の定量評価から `N^(3a) P(Y_N<1/2)` の終局的有界性を得る。分散の尺度付き極限、`log E Z_N=O(N)`、`N≤N^a` と既存の対数線形化誤差の上界を使い、非零の小さい固定実逆温度で `E[log Y_N]=O(N^(-2a))` を証明した。右辺は自然数べきの逆数 `((N : ℝ)^(2*(q/2-1)))⁻¹` で表す。偶数 `q≥4` では `2*(q/2-1)=q-2` であり、`thm:free-energy-clt` の証明の指数と一致する。定数の逆温度についての一様性は主張しない。
+
+APPLY は `StandardModel.lean` の `standardSetting` に `N n=q+2*n` の標準表現族を構成した。`standardSetting_size_iff` は任意の偶数 `N≥q` が一意に現れることを示し、`standardSetting_Z` は規格化トレースとの一致を与える。`standard_partition_and_log_partition_clt` と個別の `standard_partition_clt`・`standard_log_partition_clt` が、この模型族に対する `AnnealedInput` の下で3種類の CLT を適用する。確率測度の型は依存型を揃えるため `standardGaussianMeasure (S.N n) q` と記し、`S.N n=q+2*n` は定義による。標準表現を抽象 `Main.lean` の import 先には加えていない。
+
+初回検査で判明した LOG の実数指数と自然数指数の変換、不等式の接続、APPLY の確率測度インスタンスと依存型の表記を修正した。仮定・結論・規格化は変更していない。原稿の `subsec:SYK-model`、`eq:Y_N`、`eq:scaled-relative-clt`、`eq:standardized-clt`、`thm:partition-clt`、`thm:free-energy-clt`、`prop:annealed-free-energy` と、サイズの極限、温度範囲、尺度、中心化、分散を照合した。
+
+共有ワークスペースのルートで以下を検証した。
+
+- `lake env lean SYK/CLT/Lemmas/LogAsymptotics.lean`、`lake env lean SYK/CLT/StandardModel.lean`、直接利用先の `lake env lean SYK/CLT/Main.lean` はすべて成功し、個別検査の警告はなかった。
+- `lake build CLT` は3254 jobsで成功し、新規 `SYK.CLT.StandardModel` のビルドも含む。既存の linter・非推奨警告540件が表示された。今回変更した2モジュールに新しい警告はない。既定対象外の `Annealed_FE`・`Universality` の検証は含まない。
+- 新規8宣言（LOG の2定理、標準模型族、サイズ対応、規格化、3つの適用定理）と既存の `partition_and_log_partition_clt` の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみ。`sorryAx` はない。`#print` で LOG の Big-O 定理と標準模型族の3定理の型・残る仮定・結論を確認した。
+- 全体計画、CLT の詳細計画・構造文書・案内、章の計画、`Chapters/CLT.lean` に成果を反映した。Blueprint は対数期待誤差の明示的次数を追記し、標準模型族への条件付き適用のノードを追加した。Verso を import しない一時検査入力で同章の93宣言を #check し、エラー・警告なしで成功した。追加したノードの依存先と履歴リンクをソース上で確認し、git diff --check も成功した。Verso の章検査・生成・`vbp check` は休止中のため実施していない。
+
+アニール命題の内容は `hFE` として残る。命題自体の証明、入力の構築、表現独立性は本単位の成果に含まない。LOG・APPLY の完了後も `CLT-REFACTOR` は範囲・担当の確定前であり、リファクタリングには着手していない。コミットは作成していない。
+
+### 完了記述の第1巡照合（2026-10-06）
+
+完了した `CLT-LOG`・`CLT-APPLY` の文書監査で、`CLT/EDITING_PLAN.md` の完了仕様に残っていた実装・検証・文書更新の未来形を実績の記述へ直した。`Chapters/EDITING_PLAN.md` の導入は完了済み項目と残件の双方を示す表現へ改めた。`Chapters/CLT.lean` の証明経路と対数 CLT の説明から、未完了を示唆する `intended`・`remaining` を除いた。既存の完了記録と過去の割当記録は当時の記録として保持した。
+
+修正箇所の数式・定理名・宣言参照・依存名・`hFE` の条件は変更していない。LOG の次数 `O(N^(-2a))`、標準模型族 `N=q+2n` と条件付き3定理の記述を実装ソースと照合し、文書内リンクの参照先と差分を確認した。今回の編集は説明文のみで、既存の Lean 個別検査・`lake build CLT`・公理依存・Blueprint 93 宣言の参照検査は上記完了記録を参照する。Verso の章検査・生成・`vbp check` は休止中のため行っていない。
+
+Astra の第2巡は指摘なし。Sol の修正は第1巡のみで、追加修正は不要だった。最終確認で変更範囲を確認し、`git diff --check` は成功した。
+
+
+<a id="clt-log-apply-plan-2026-10-05"></a>
+
+## CLT-LOG の割当と CLT-APPLY の仕様確定（2026-10-05）
+
+ユーザーの指定に従い、`CLT-LOG` と `CLT-APPLY` の担当・統合担当を Noda とした。この単位は割当・仕様確定・関連文書の更新であり、両課題の Lean 実装は未着手である。先行成果の統合と仕様確定により両課題を「割当可能」とし、割当済みであることを全体計画に明記した。
+
+割当時の開始点は HEAD `5b7b401b4cc7188787f68329e5e914862eb2f3a4`。`git status --short` では追跡ファイルの差分はなく、未追跡は `CLT/refs/out/CLT_SYK.pdf` のみだった。同 HEAD の Lean ソース一式、`CLT/refs/CLT_SYK.tex` と `sections/` の全4節を両課題の参照ソースとする。未追跡 PDF は参照原稿の版を定めるソースに含めない。今回の追加差分は全体計画、`CLT/EDITING_PLAN.md`、`CLT/ARCHITECTURE.md`、本履歴の4文書である。実装開始時にはこの開始点からの差分を確認し、原稿または入力が変わっていれば同期手順を適用する。
+
+`CLT-LOG` は既存の3ファイルの編集範囲と `E[log Y_N] = O(N^(-2a))` の完了条件を保持し、既存の期待誤差・分散の入口を詳細計画に追記した。`main-results.tex` の `thm:free-energy-clt` の証明で、二次モーメント、小確率事象、`Z_N ≥ 1`、`log E Z_N = O(N)`、`a ≥ 1` による `N^(1-3a) ≤ N^(-2a)` が評価を与えることを確認した。
+
+`CLT-APPLY` は `N n = q + 2 * n` の標準模型族、全偶数サイズとの対応、標準表現の規格化、3つの公開定理、編集範囲と検証条件を確定した。原稿の `subsec:SYK-model`、`eq:Y_N`、`eq:scaled-relative-clt`、`eq:standardized-clt`、`thm:partition-clt`、`thm:free-energy-clt`、`prop:annealed-free-energy` を `Setting`・`AnnealedInput`・`Main.lean`・`Normalization.lean`・共有標準表現の型とソース上で照合した。極限の取り方、温度条件、中心化、尺度、極限分散、有限サイズの分散正値性を保持する。入力はこの族の `AnnealedInput` とし、命題の証明や表現独立性を完了条件に追加しない。
+
+確認は文書・原稿・宣言のソース照合である。`git diff --check` は成功し、`git diff --stat`・`git status --short` で変更が上記4文書に限られることを確認した。追加したリンクの参照先・履歴アンカーと担当記載も照合した。新規模型族・定理の Lean 検査、公理依存確認、関連ビルド、Blueprint の実装成果の反映は後続の実装単位に残る。今回の作業で Lean や原稿の証明状態は変わっていない。Verso の機械的検査も行っていない。
+
 <a id="clt-input-2026-10-04"></a>
 
 ## CLT-INPUT：アニール入力の整理と統合（2026-10-04）
