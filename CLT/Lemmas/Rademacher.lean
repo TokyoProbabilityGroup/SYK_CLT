@@ -12,6 +12,7 @@ import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Positivity
 import Mathlib.Tactic.Ring
 import SYK.CLT.Lemmas.GaussianHermiteOrthogonality
+import SYK.CLT.Lemmas.CliffordSignParity
 
 /-!
 # Rademacher bounds for higher SYK chaoses

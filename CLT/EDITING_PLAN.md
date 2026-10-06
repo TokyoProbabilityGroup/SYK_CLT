@@ -2,11 +2,13 @@
 
 ## 現在の範囲
 
-現在の条件付き CLT は実装済みであり、`AnnealedInput` は現行原稿の `prop:annealed-free-energy` の命題文に対応する内容を仮定として受け取る。対数の期待誤差の明示的評価と標準模型族への条件付き適用も実装・検証済みである。次はリファクタリングの範囲を確定する。命題自体の証明と、そのための外部入力の調査・凸関数列の補題の補完は「その他の残件」とする。原稿との対応と証明状態は [構造文書](ARCHITECTURE.md)、入力整理の検証は [作業履歴](../WORK_HISTORY.md#clt-input-2026-10-04) を参照する。
+現在の条件付き CLT は実装済みであり、`AnnealedInput` は現行原稿の `prop:annealed-free-energy` の命題文に対応する内容を仮定として受け取る。対数の期待誤差の明示的評価と標準模型族への条件付き適用も実装・検証済みである。`CLT-REFACTOR` は現行実装を対象とする整理と監査・統合を完了した。命題自体の証明と、そのための外部入力の調査・凸関数列の補題の補完は「その他の残件」とする。原稿との対応と証明状態は [構造文書](ARCHITECTURE.md)、入力整理の検証は [作業履歴](../WORK_HISTORY.md#clt-input-2026-10-04) を参照する。
 
 ## 現在の検証状況
 
 `CLT-LOG`・`CLT-APPLY` は完了した。Lean 4.32.2 で変更した2ファイルと直接の利用先 `Main.lean` の個別検査、`lake build CLT`、定理文・公理依存の確認を行った。参照原稿、開始時の差分、修正内容、警告と検証結果は [完了記録](../WORK_HISTORY.md#clt-log-apply-completion-2026-10-05) に集約する。`hFE : AnnealedInput` は明示的な仮定として残る。Verso の機械的検査は休止中である。
+
+`CLT-REFACTOR` の第1巡は、新規2ファイルと変更・直接利用側を含む13ファイルの個別 Lean 検査、`lake build CLT`、移設12公開宣言の型・定義の比較、24主要宣言の公理依存確認を終えた。使用量の限度による停止から Kamijima を担当・統合担当として再開し、第1巡監査を終えて統合した。必須修正・任意提案・未解決事項はすべて0件で、追加の数学的変更・Lean 検証・監査巡回は行っていない。警告・原稿対応・残る仮定は [第1巡の記録](../WORK_HISTORY.md#clt-refactor-2026-10-06) を参照する。
 
 ## 完了した実装の仕様
 
@@ -88,11 +90,22 @@ He2026 の定理自体の全面的な Lean 形式化は現在の計画に含め�
 
 ## 数学的実装後のリファクタリング
 
-対象は `CLT-REFACTOR`。実装成果の統合後に対象宣言・担当ファイルを確定し、同じ共有ファイルを複数担当へ割り当てない。
+対象は `CLT-REFACTOR`。2026-10-06 の依頼により、現在の数学的実装を対象に範囲を確定した。担当・統合担当は Kamijima。作業・監査は最大3巡とする。保留中の `CLT-CONVEX`・`CLT-EXTERNAL`・`CLT-ANNEALED` は再開しない。開始点と参照原稿は [第1巡の記録](../WORK_HISTORY.md#clt-refactor-2026-10-06) に記す。
 
-`CLT-LOG`、`CLT-APPLY` は完了した。その他の残件を実装するか判断し、対象範囲を確定してから、CLT・Model・汎用ガウス基盤・共有 API の利用側を調査する。命題の証明を再開する場合は、その実装後にリファクタリングする。旧作業の未完成部分とは区別した新しい設計課題とする。実装中に循環依存などの解消が必要になった場合だけ、必要最小限の構造変更を先行させる。
+### 調査から確定した編集範囲
 
-実際の利用先と import を基に、重複定義、過剰な依存、不要な変換、補題の所属とファイルの責務を調べる。重点対象は、汎用 Hermite 補題と模型固有の符号対称性、四次モーメント補題から CLT への依存、有限行列解析と規格化トレースの所属である。移設を先に決めず、各変更の対象宣言、移設先、利用側、数学的利点、変更前後の依存、検証対象を確定する。
+| 対象宣言・ファイル | 移設先・利用側 | 数学的役割と前後の依存 | 検証対象 |
+| --- | --- | --- | --- |
+| `CliffordSignParity` の `SYK.hermiteMulti`、`gaussianCouplings`、`hermite_aeval_neg`、`hermite_aeval_sign`、`integral_gaussianCouplings_sign`・`_perm`・`_signed_perm` | 新規 `Lemmas/GaussianHermiteBasic.lean`。`GaussianChaos` と `CliffordSignParity` が直接利用。模型の `IsEvenMultiIndex` を使う `Rademacher` は `CliffordSignParity` を明示 import | 任意の有限型上の Hermite 積と独立標準ガウスの対称性を、マヨラナ系の符号ゲージ・頂点偶奇則から分離する。従来の `GaussianChaos → CliffordSignParity → Model` を `GaussianChaos → GaussianHermiteBasic ← CliffordSignParity` に変え、汎用 Hermite 展開の模型依存を除く | 新規モジュール、両直接利用側、`GaussianHermiteOrthogonality`、`Preliminaries`、`Rademacher`、`HigherChaosProjection` |
+| `GaussianQuadraticCLT` の `centeredGaussianSquare`、平均・二次モーメント、`normalizedQuadraticSum`、`normalizedQuadraticSum_law` とその局所補助 | 新規 `Lemmas/GaussianQuadraticObservable.lean`。`GaussianQuadraticCLT` と `GaussianFourthMoment` が直接利用。`IndependentFourthMoment` は `Setting` のため `Basic` を明示 import | 有限サイズのガウス二乗観測量と法則の移送を漸近 CLT から分離する。`GaussianFourthMoment → GaussianQuadraticCLT → SecondChaosAsymptotic` を、両者から観測量モジュールへの依存に変える。四次モーメントと独立和の評価が CLT を前提としなくなる | 新規モジュール、両直接利用側、`IndependentFourthMoment`、`QuadraticBridge`、`LogEventBound` |
+| `SingularValues`・`MatrixTraceExponential`・`TraceExpDerivatives` | 現行配置を維持 | 外部の実利用先は `PartitionDerivatives` だけであり、共有 Model はこの層を利用していない。将来の利用のためだけにこの基盤を移さない | 関連 CLT ビルドと主要微分評価の型・公理依存 |
+| `SYK.normalizedTrace` と `MatrixAnalysis.Matrix.normalizedTrace` | 現行配置を維持 | 前者は `ℂ`・非空型・`trace/card`、後者は一般の `RCLike`・空型可・`card⁻¹*trace`。規格化は利用側で照合済みであり、型と公開定義を保持した再編で統合しない | `PartitionDerivatives` の規格化接続と原稿 `eq:Z-derivative-bound` を照合 |
+
+新規2ファイルは既存 `CLT` のグロブに含まれる。宣言名・名前空間・型・仮定・属性・規格化と証明の数学的内容を保持し、旧パスの互換モジュール・別名は作らない。共有ガウス基盤への移設は、同じ内容の部分積分 API が既にあり、今回の記法を使う実際の利用側が CLT 内に限られるため採用しない。共有基盤から CLT への import は作らない。
+
+変更ファイル・直接利用側を依存順に `lake env lean` で検査し、必要な `olean` を生成して `lake build CLT` を実行する。主要移設宣言、微分評価、抽象・標準模型の CLT の型と公理依存を再確認する。構造文書・案内・全体計画・作業履歴と Blueprint の依存説明を更新する。章はソースだけを照合し、Verso の検査・生成は行わない。
+
+実際の利用先と import を基に、重複定義、過剰な依存、不要な変換、補題の所属とファイルの責務を調査した。重点3項目すべての採否は上表に記す。今回の整理は `CLT-LOG`・`CLT-APPLY` の統合済み成果を対象とし、旧作業の未完成部分を実装する課題とは区別する。
 
 純粋な整理では宣言名・型・仮定・結論・規格化を保持する。将来の利用だけを見込んだ抽象化、互換用別名、共有層から CLT への逆依存は導入しない。ガウス基盤の `aesop`・`grind` の整理は独立した保守課題として扱う。完了条件は、変更ファイルと利用側の検査、関連ビルド、共有層の変更時の既定ビルド、主要定理の公理依存と定理文の再照合である。
 

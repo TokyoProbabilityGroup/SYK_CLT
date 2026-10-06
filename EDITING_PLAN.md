@@ -34,7 +34,7 @@ W01–W06、R01–R05、F01–F08、Z01 は、それぞれの履歴に記録し�
 | `CLT-INPUT` | アニール入力の整理と条件付き CLT の再検証 | 完了 | Kamijima（担当・統合） | `CLT-AUDIT` |
 | `CLT-LOG` | 対数の期待誤差の明示的評価 | 完了 | Noda（担当・統合） | `CLT-INPUT` |
 | `CLT-APPLY` | `prop:annealed-free-energy` を仮定した標準模型族への適用 | 完了 | Noda（担当・統合） | `CLT-INPUT` |
-| `CLT-REFACTOR` | CLT・共有層・利用側のリファクタリング | 仕様未確定 | 未割当 | `CLT-LOG`・`CLT-APPLY` と数学的実装範囲の確定 |
+| `CLT-REFACTOR` | CLT・共有層・利用側のリファクタリング | 完了 | Kamijima（担当・統合） | `CLT-LOG`・`CLT-APPLY` と現行数学的実装 |
 
 ```mermaid
 flowchart TD
@@ -49,7 +49,7 @@ flowchart TD
 
 完了した `CLT-INPUT` の開始点、参照原稿、成果と検証は [入力整理の記録](WORK_HISTORY.md#clt-input-2026-10-04) を参照する。`CLT-LOG`・`CLT-APPLY` は Noda（担当・統合）が実装・Lean 検証・原稿照合・文書と Blueprint の統合を完了した。開始点と成果・検証は [完了記録](WORK_HISTORY.md#clt-log-apply-completion-2026-10-05) を参照する。
 
-次の課題は `CLT-REFACTOR` の範囲・担当・検証条件の確定である。LOG・APPLY の先行成果は統合済みだが、リファクタリング自体は未着手である。アニール命題の証明などの保留課題は別に残る。
+`CLT-REFACTOR` は第1巡の実装・検証・文書更新と監査を終え、統合を完了した。監査の必須修正・任意提案・未解決事項はすべて0件で、追加の実装・Lean 検証・監査巡回は不要だった。調査で確定した移設宣言・前後の依存・検証対象は [CLT の詳細計画](CLT/EDITING_PLAN.md#調査から確定した編集範囲)、成果・中断と再開の経緯・監査結果は [作業履歴](WORK_HISTORY.md#clt-refactor-2026-10-06) に記す。共有 Model・ガウス基盤・行列解析は現行配置を維持した。アニール命題の証明などの保留課題は別に残る。
 
 リファクタリングは現在の数学的実装を終えてから行う。保留した命題の証明を再開する場合は、それも含めた数学的実装を終えてからリファクタリングする。実装中に循環依存などの解消が必要な場合だけ、必要最小限の構造変更を先行させる。
 

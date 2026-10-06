@@ -2,6 +2,35 @@
 
 完了済み作業の検証結果と旧計画を保存する。現行の残件は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
 
+<a id="clt-refactor-2026-10-06"></a>
+
+## CLT-REFACTOR の第1巡実装・検証（2026-10-06）
+
+担当・統合担当は Kamijima。最大3巡の作業・監査という依頼に従う。以下の実装・検証記録は、第1巡提出時点から監査再開前までの状態を記したものである。第1巡監査は使用量の限度で実施前に停止した。再開時の指示により、担当・統合担当を Kamijima に統一した。その時点では既存の第1巡成果を保持し、状態を監査未了の統合待ちとした。開始 HEAD は `96f846e58a45abda31d404c3e84370d92e150246`、開始時の差分と未追跡ファイルはなかった。参照原稿は同 HEAD の `CLT/refs/CLT_SYK.tex` と全4節（`introduction.tex`、`gaussian-chaos.tex`、`higher-chaoses.tex`、`main-results.tex`）。この5ファイルを開始 HEAD とバイト比較し、SHA-256 も一致することを確認した。原稿・`SYK/README.md`・共有 Model・ガウス基盤・Lake 設定は編集していない。保留中の命題証明・外部入力調査・凸収束補題は再開していない。
+
+調査した重点3項目の採否・移設宣言・前後の依存・検証対象を、編集前に `CLT/EDITING_PLAN.md` へ記録した。`GaussianHermiteBasic.lean` に任意有限型の Hermite 積、積ガウス測度、符号反転・置換不変性の7公開宣言を `CliffordSignParity.lean` から抽出した。`GaussianChaos` はこの基礎を利用し、模型固有の符号ゲージを import しなくなった。頂点偶奇則を実際に使う `Rademacher` は `CliffordSignParity` を明示 import する。
+
+`GaussianQuadraticObservable.lean` に `centeredGaussianSquare`、平均零・二次モーメント1、`normalizedQuadraticSum` と法則対応の5公開宣言、および4個の private 補助を抽出した。`GaussianFourthMoment` と `GaussianQuadraticCLT` はこれを直接利用する。`IndependentFourthMoment` は `Setting` のため `Basic` を明示 import する。ソースの再帰 import 調査により、`GaussianChaos` から Model・`CliffordSignParity` が外れ、`GaussianFourthMoment` と `IndependentFourthMoment` から `GaussianQuadraticCLT`・`SecondChaosAsymptotic` が外れたことを確認した。
+
+有限行列解析3ファイルの利用先は CLT 内の `PartitionDerivatives` だけであり、共有 Model への先行移設は採用しなかった。2種類の規格化トレースは `ℂ` と一般 `RCLike`、非空型の仮定、定義式が異なるため保持した。`Setting.Z_eq_traceExp` と `Setting.norm_traceExp_disorder` の接続、および原稿 `subsec:SYK-model`・`eq:Z-derivative-bound` の規格化を照合した。
+
+移設した12公開宣言と4 private 補助の元ソースブロックが、移設先にそのまま含まれることを確認した。private の `centeredGaussianSquare_measurable` は `@[fun_prop]` と証明項を保って観測量ファイルへ移した。二次 CLT 内でこの private 名を直接使っていた箇所は、同じ可測性の局所証明に接続した。元ソースから再検査した一時入力と移設後の `#print` を比較し、12公開宣言の型・定義が一致した。公開名・名前空間・仮定・量化・属性・規格化を変更せず、互換用別名・旧パスは追加していない。
+
+Lean 4.32.2、Lake 5.0.0（commit `f3b06c7`）で、共有ワークスペースのルートから以下を検証した。環境の PATH に Lake がなかったため、既存の `/home/yoshi/.elan/bin/lake` を明示して実行した。
+
+- `lake env lean SYK/CLT/Lemmas/<名前>.lean` は、新規2ファイルと `CliffordSignParity`、`GaussianChaos`、`GaussianQuadraticCLT`、`GaussianFourthMoment`、`IndependentFourthMoment`、`Rademacher`、直接利用側の `GaussianHermiteOrthogonality`、`Preliminaries`、`QuadraticBridge`、`LogEventBound`、`HigherChaosProjection` の計13ファイルですべて成功した。必要な `olean` は `lake build +<module>:olean` で依存順に生成した。
+- 最終 `lake build CLT` は3256 jobsで成功した。エラー0件、既存の linter・非推奨警告540件（直前の LOG・APPLY 記録と同数）。内訳は `StandardGaussian` 264、`Smooth` 183、`GaussianIBP` 74、`SingularValues` 2、`MatrixTraceExponential` 6、`TraceExpDerivatives` 2、`PartitionDerivatives` 5、`Preliminaries` 2、`Rademacher` 1、`FiniteDimensionalGibbs` 1。関連する警告は既存の長い行、非推奨の線形写像補題、`show`・柔軟な `simp` の使用、未使用の型クラス仮定である。新規2ファイルと移設元に新しい警告はない。共有層・設定を変更していないため既定ビルドは本単位の検証対象に含めず、既定対象外の `Annealed_FE`・`Universality` も検査していない。
+- 24宣言の `#print` と `#print axioms` が成功した。対象は移設12公開宣言、Hermite 部分積分、四次モーメントと一様上界、行列トレース指数の方向微分評価、二次和 CLT、抽象3 CLT、LOG の Big-O 定理、標準模型3 CLT。すべて `[propext, Classical.choice, Quot.sound]` のみで、`sorryAx`・新規公理はない。主定理の `hFE : AnnealedInput` と実逆温度 `0<|β|<βq`、尺度 `N^(q/2-1)`、極限分散 `(q!/2)β²(ℓ_q'(β))²`、標準化分散1を再照合した。
+- 全体計画、CLT の詳細計画・構造文書・案内、章の計画と `Chapters/CLT.lean` を更新した。Blueprint の有限二次観測量と四次モーメントを別の節にし、二次 CLT は平均・二次モーメント・法則対応、対数中心化誤差は四次モーメントを参照する依存にした。追加した宣言名・依存名と原稿 `lem:Gaussian-Hermite-IBP`・`eq:Gaussian-Hermite-IBP`・`eq: chaos`・`thm:free-energy-clt` をソース上で照合した。Verso の章 Lean 検査・生成・`vbp check` は休止中のため実施していない。関係する差分を確認し、`git diff --check` も成功した。
+
+初回の個別検査では private の可測性属性の推移利用を検出し、定義とともに移設して解消した。初回の CLT ビルドでは `Rademacher` の `InteractionIndex`・`IsEvenMultiIndex` の推移 import 依存を検出し、模型固有の import を明示して解消した。いずれも定理文・数学的前提の変更は必要なかった。最終検証に残るエラー・未完成証明・未解決目標はない。`hFE` の命題自体は引き続き外部からの明示的な仮定であり、その構築や表現独立性は証明していない。コミットは作成していない。
+
+### 第1巡監査と統合完了
+
+実作業には Sol、監査には Astra を用いた。再開後に第1巡の完成成果を読み取り監査した。必須修正0件、任意提案0件、未解決事項0件で、追加の Lean 検証要求はなかった。監査では12公開宣言と4 private 補助のブロック・型・属性の保持、import 閉包と循環・共有層への逆依存の不在、行列解析と規格化トレースの非移設判断、原稿との対応、13個別検査・3256 jobsのビルド・24宣言の公理確認、540既存警告、Blueprint と文書の参照・担当・Verso 休止の境界を確認した。
+
+指摘なしの結論を受け、担当・統合担当の Kamijima が現行計画を完了へ更新した。この最終更新は状態と履歴のみで、数学的ソースや定理文・仮定・規格化を追加変更せず、Lean 検証も繰り返していない。関係する差分・リンク・状態の整合を確認し、`git diff --check` は成功した。実際の作業・監査は第1巡のみで完了した。使用量の限度による監査実施前の失敗は監査巡回に数えない。`hFE : AnnealedInput` は引き続き明示的な仮定で、Verso の機械的検査は休止中である。コミットは作成していない。
+
 <a id="clt-log-apply-completion-2026-10-05"></a>
 
 ## CLT-LOG・CLT-APPLY の実装と検証（2026-10-05–06）

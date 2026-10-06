@@ -15,7 +15,7 @@
 CLT 原稿と章・Lean 宣言の対応はソース上で照合済みである。`CLT-INPUT` の入力整理に伴い、`AnnealedFE.lean` と `CLT.lean` のアニール入力の説明も実装へ合わせた。現在の対応と未形式化部分は [CLT の構造文書](../CLT/ARCHITECTURE.md#現行原稿の主張)、照合した版と検証結果は [監査記録](../WORK_HISTORY.md#clt-audit-2026-10-04) と [入力整理の記録](../WORK_HISTORY.md#clt-input-2026-10-04) を参照する。対応状況と残る修正は次のとおりである。
 
 - 対数の期待誤差の明示的評価と、`prop:annealed-free-energy` を仮定した標準模型族への適用は実装・検証を終え、`CLT.lean` の数学的主張、宣言参照、残る仮定を更新した。[完了記録](../WORK_HISTORY.md#clt-log-apply-completion-2026-10-05) を参照する。`lem:convex-derivatives` の補完と命題自体の証明は保留し、再開・実装した場合に同様に更新する。命題を仮定した結果を無条件の主定理として記さない。
-- 共有層の再配置に伴う章の参照変更は数学的実装後のリファクタリングに含める。作業順序は [全体計画](../EDITING_PLAN.md#残る作業)、数学的な仕様は [CLT の計画](../CLT/EDITING_PLAN.md) を参照する。
+- `CLT-REFACTOR` では `CLT.lean` に有限ガウス二乗観測量と独立和の四次モーメントの節を追加し、二次 CLT と対数中心化誤差の依存を分けた。移設宣言の名前は保持し、Hermite 基本定義と二次観測量を明示 import した。数学的な主張と宣言・依存名はソース上で照合した。Verso の機械的検査は引き続き休止中である。作業状態は [全体計画](../EDITING_PLAN.md#残る作業)、数学的な仕様は [CLT の計画](../CLT/EDITING_PLAN.md) を参照する。
 
 ## 原稿改訂への対応
 

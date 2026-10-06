@@ -1,4 +1,4 @@
-import SYK.CLT.Lemmas.GaussianQuadraticCLT
+import SYK.CLT.Lemmas.GaussianQuadraticObservable
 
 /-! # Fourth moments of centered Gaussian squares -/
 

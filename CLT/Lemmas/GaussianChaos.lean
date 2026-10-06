@@ -1,12 +1,13 @@
 import SYK.Probability.GaussianConcentration.Smooth
-import SYK.CLT.Lemmas.CliffordSignParity
+import SYK.CLT.Lemmas.GaussianHermiteBasic
 
 /-!
-# Gaussian Hermite coefficients for the SYK couplings
+# Gaussian Hermite coefficients for finite product Gaussians
 
-The general integration-by-parts theorem and the sign-parity theorem use
+The general integration-by-parts theorem and `GaussianHermiteBasic` use
 separately defined Hermite functions. This module identifies their
-normalizations and measures and transfers the coefficient formula.
+normalizations and measures and transfers the coefficient formula without
+depending on the Majorana sign-parity theorem.
 Entry points: `hermiteMulti_eq_signParity`, `gaussianCouplings_eq_pi`,
 `hermite_coefficient_ibp`. Orthogonality and completeness are downstream.
 -/

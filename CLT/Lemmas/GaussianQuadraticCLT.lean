@@ -1,49 +1,11 @@
 import SYK.CLT.Lemmas.SecondChaosAsymptotic
+import SYK.CLT.Lemmas.GaussianQuadraticObservable
 import Mathlib.Probability.CentralLimitTheorem
 
 open MeasureTheory ProbabilityTheory Filter
 open scoped Topology
 
 namespace SYK.CLT
-
-/-- One centered, variance-one quadratic Gaussian observable. -/
-noncomputable def centeredGaussianSquare (x : ℝ) : ℝ :=
-  (x ^ 2 - 1) / Real.sqrt 2
-
-@[fun_prop] private theorem centeredGaussianSquare_measurable :
-    Measurable centeredGaussianSquare := by
-  unfold centeredGaussianSquare
-  fun_prop
-
-private theorem hermite_two_eval (x : ℝ) :
-    Polynomial.aeval x (Polynomial.hermite 2) = x ^ 2 - 1 := by
-  rw [show 2 = 1 + 1 by decide, Polynomial.hermite_succ, Polynomial.hermite_one]
-  simp
-  ring
-
-theorem centeredGaussianSquare_mean :
-    (∫ x, centeredGaussianSquare x ∂gaussianReal 0 1) = 0 := by
-  have h := hermite_pair_integral_real 2 0
-  simp only [if_neg (by decide : 2 ≠ 0)] at h
-  simp only [Polynomial.hermite_zero, map_one, mul_one,
-    hermite_two_eval] at h
-  unfold centeredGaussianSquare
-  rw [integral_div, h, zero_div]
-
-theorem centeredGaussianSquare_second_moment :
-    (∫ x, centeredGaussianSquare x ^ 2 ∂gaussianReal 0 1) = 1 := by
-  have h := hermite_pair_integral_real 2 2
-  norm_num at h
-  have heq : (fun x : ℝ => centeredGaussianSquare x ^ 2) =
-      fun x => ((x ^ 2 - 1) * (x ^ 2 - 1)) / 2 := by
-    funext x
-    unfold centeredGaussianSquare
-    rw [div_pow, Real.sq_sqrt (by norm_num)]
-    ring
-  have h' : (∫ x : ℝ, (x ^ 2 - 1) * (x ^ 2 - 1) ∂gaussianReal 0 1) = 2 := by
-    simpa only [pow_two] using h
-  rw [heq, integral_div, h']
-  norm_num
 
 private theorem charFun_centeredGaussianSquares {ι : Type*} [Fintype ι]
     (t : ℝ) :
@@ -55,9 +17,9 @@ private theorem charFun_centeredGaussianSquares {ι : Type*} [Fintype ι]
   let μ : ι → Measure ℝ := fun _ => gaussianReal 0 1
   have hindep : iIndepFun (fun i (g : ι → ℝ) => centeredGaussianSquare (g i))
       (Measure.pi μ) :=
-    iIndepFun_pi (fun _ => centeredGaussianSquare_measurable.aemeasurable)
+    iIndepFun_pi (fun _ => (by fun_prop : Measurable centeredGaussianSquare).aemeasurable)
   have hmeas (i : ι) : Measurable (fun g : ι → ℝ => centeredGaussianSquare (g i)) :=
-    centeredGaussianSquare_measurable.comp (by fun_prop)
+    (by fun_prop : Measurable centeredGaussianSquare).comp (by fun_prop)
   have hsum : Measurable (fun g : ι → ℝ => ∑ i, centeredGaussianSquare (g i)) :=
     Finset.measurable_fun_sum _ (fun i _ => hmeas i)
   have hchar := hindep.charFun_map_fun_sum_eq_prod (fun i => (hmeas i).aemeasurable)
@@ -70,7 +32,7 @@ private theorem charFun_centeredGaussianSquares {ι : Type*} [Fintype ι]
       (Measure.pi μ).map (fun g => centeredGaussianSquare (g i)) =
         (gaussianReal 0 1).map centeredGaussianSquare := by
     change (Measure.pi μ).map (centeredGaussianSquare ∘ fun g => g i) = _
-    rw [← Measure.map_map centeredGaussianSquare_measurable (by fun_prop)]
+    rw [← Measure.map_map (by fun_prop : Measurable centeredGaussianSquare) (by fun_prop)]
     rw [(measurePreserving_eval μ i).map_eq]
   simp_rw [hmap]
   simp
@@ -86,40 +48,11 @@ theorem Setting.centeredGaussianSquares_charFun_tendsto (t : ℝ) :
           ∑ i : InteractionIndex (S.N n) q, centeredGaussianSquare (g i))) t) atTop
       (𝓝 (charFun (gaussianReal 0 1) t)) := by
   have ht := (tendsto_charFun_inv_sqrt_mul_pow
-    centeredGaussianSquare_measurable.aemeasurable
+    (by fun_prop : Measurable centeredGaussianSquare).aemeasurable
     centeredGaussianSquare_mean centeredGaussianSquare_second_moment t).comp
       S.interactionCard_tendsto
   simp_rw [charFun_centeredGaussianSquares]
   simpa [charFun_gaussianReal, Function.comp_def, neg_div] using ht
-
-/-- The normalized quadratic fluctuation of the Gaussian interaction coordinates. -/
-noncomputable def normalizedQuadraticSum (N q : ℕ) (g : CouplingSpace N q) : ℝ :=
-  (Real.sqrt (Fintype.card (InteractionIndex N q) : ℝ))⁻¹ *
-    ∑ i : InteractionIndex N q, centeredGaussianSquare (g i)
-
-private theorem normalizedQuadraticSum_measurable (N q : ℕ) :
-    Measurable (normalizedQuadraticSum N q) := by
-  unfold normalizedQuadraticSum centeredGaussianSquare
-  fun_prop
-
-private theorem normalizedQuadraticSum_raw_measurable (N q : ℕ) :
-    Measurable (fun g : InteractionIndex N q → ℝ =>
-      (Real.sqrt (Fintype.card (InteractionIndex N q) : ℝ))⁻¹ *
-        ∑ i : InteractionIndex N q, centeredGaussianSquare (g i)) := by
-  unfold centeredGaussianSquare
-  fun_prop
-
-theorem normalizedQuadraticSum_law (N q : ℕ) :
-    (standardGaussianMeasure N q).map (normalizedQuadraticSum N q) =
-    (gaussianCouplings (InteractionIndex N q)).map (fun g =>
-      (Real.sqrt (Fintype.card (InteractionIndex N q) : ℝ))⁻¹ *
-        ∑ i : InteractionIndex N q, centeredGaussianSquare (g i)) := by
-  unfold standardGaussianMeasure GaussianConcentration.standardGaussianMeasureOnEuclidean
-  rw [Measure.map_map (normalizedQuadraticSum_measurable N q)
-    (WithLp.measurable_toLp 2 (InteractionIndex N q → ℝ))]
-  change (gaussianCouplings (InteractionIndex N q)).map
-    (normalizedQuadraticSum N q ∘ WithLp.toLp 2) = _
-  congr 1
 
 local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
   unfold standardGaussianMeasure
@@ -130,7 +63,11 @@ theorem Setting.normalizedQuadraticSum_clt {q : ℕ} (S : Setting q) :
     TendstoInDistribution
       (fun n => normalizedQuadraticSum (S.N n) q) atTop (fun x : ℝ => x)
       (fun n => standardGaussianMeasure (S.N n) q) (gaussianReal 0 1) where
-  forall_aemeasurable n := (normalizedQuadraticSum_measurable (S.N n) q).aemeasurable
+  forall_aemeasurable n := by
+    have hm : Measurable (normalizedQuadraticSum (S.N n) q) := by
+      unfold normalizedQuadraticSum centeredGaussianSquare
+      fun_prop
+    exact hm.aemeasurable
   tendsto := by
     refine ProbabilityMeasure.tendsto_iff_tendsto_charFun.2 fun t => ?_
     have h := S.centeredGaussianSquares_charFun_tendsto t

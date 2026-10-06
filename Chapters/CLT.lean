@@ -7,6 +7,9 @@ import SYK.CLT.StandardModel
 import SYK.CLT.Lemmas.ConvexDerivatives
 import SYK.CLT.Lemmas.GaussianIBP
 import SYK.CLT.Lemmas.GaussianChaos
+import SYK.CLT.Lemmas.GaussianHermiteBasic
+import SYK.CLT.Lemmas.GaussianQuadraticObservable
+import SYK.CLT.Lemmas.IndependentFourthMoment
 import SYK.CLT.Lemmas.GaussianHermiteOrthogonality
 import SYK.CLT.Lemmas.GaussianHermiteDensity
 import SYK.CLT.Lemmas.GaussianPolynomialDensity
@@ -308,7 +311,26 @@ checked in Lean. The radius comes from the Rademacher exponential-moment
 constant and the coupling variance $`(q-1)!N^{-(q-1)}`.
 :::
 
-:::theorem "clt_gaussian_quadratic_sum" (parent := "central_limit_theorem") (uses := "clt_exact_second_chaos") (lean := "SYK.CLT.Setting.interactionCard_tendsto, SYK.CLT.Setting.normalizedQuadraticSum_clt")
+:::theorem "clt_gaussian_quadratic_observable" (parent := "central_limit_theorem") (lean := "SYK.CLT.centeredGaussianSquare_mean, SYK.CLT.centeredGaussianSquare_second_moment, SYK.CLT.normalizedQuadraticSum_law")
+For a standard Gaussian $`g`, the observable $`(g^2-1)/\sqrt2` has
+mean zero and second moment $`1`. The normalized finite sum has the
+same law on the product-Gaussian space and the shared Euclidean
+coupling space. These statements require neither an asymptotic CLT
+nor `AnnealedInput`.
+:::
+
+:::theorem "clt_gaussian_quadratic_moments" (parent := "central_limit_theorem") (uses := "clt_gaussian_quadratic_observable") (lean := "SYK.CLT.centeredGaussianSquare_fourth_moment, SYK.CLT.normalizedGaussianSquares_fourth_moment, SYK.CLT.Setting.normalizedQuadraticSum_fourth_moment_le")
+For a standard Gaussian $`g`, the observable $`(g^2-1)/\sqrt2` has
+mean zero, second moment $`1`, and fourth moment $`15`. For $`M>0`
+independent coordinates, the normalized sum has fourth moment
+$`3+12/M\le15`. Its product-Gaussian law agrees with its law on the
+shared Euclidean coupling space. These finite moment identities are
+checked independently of the quadratic CLT and `AnnealedInput`.
+They provide the fourth-moment bound used in the logarithmic transfer
+in the manuscript's proof of `thm:free-energy-clt`.
+:::
+
+:::theorem "clt_gaussian_quadratic_sum" (parent := "central_limit_theorem") (uses := "clt_gaussian_quadratic_observable") (lean := "SYK.CLT.Setting.interactionCard_tendsto, SYK.CLT.Setting.normalizedQuadraticSum_clt")
 With $`M_N=\binom Nq`, the centered quadratic Gaussian sum
 
 $$`
@@ -423,7 +445,7 @@ The disorder variance is zero. These identities have Lean proofs without
 `sorryAx`; they do not extend the standardized CLT to $`\beta=0`.
 :::
 
-:::theorem "clt_log_centering_error" (parent := "central_limit_theorem") (uses := "clt_relative_and_log_moments, clt_second_chaos_and_remainder") (lean := "SYK.CLT.Setting.cubed_scale_Y_lt_half_bounded, SYK.CLT.Setting.integral_log_Y_isBigO, SYK.CLT.Setting.scaled_sq_Y_lt_half_tendsto_zero, SYK.CLT.Setting.scaled_integral_logLinearError_tendsto_zero, SYK.CLT.Setting.scaled_centered_logLinearError_l1_tendsto_zero")
+:::theorem "clt_log_centering_error" (parent := "central_limit_theorem") (uses := "clt_relative_and_log_moments, clt_second_chaos_and_remainder, clt_gaussian_quadratic_moments") (lean := "SYK.CLT.Setting.cubed_scale_Y_lt_half_bounded, SYK.CLT.Setting.integral_log_Y_isBigO, SYK.CLT.Setting.scaled_sq_Y_lt_half_tendsto_zero, SYK.CLT.Setting.scaled_integral_logLinearError_tendsto_zero, SYK.CLT.Setting.scaled_centered_logLinearError_l1_tendsto_zero")
 Write $`W_N=\log Y_N` and $`a=q/2-1`. The active manuscript proof combines
 $`\mathbb E(Y_N-1)^2=O(N^{-2a})` with
 $`\mathbb P(Y_N<1/2)=O(N^{-3a})`. On the small event,
