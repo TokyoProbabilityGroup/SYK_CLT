@@ -6,6 +6,7 @@ This directory contains the manuscript and Lean formalization work for the centr
 
 - `FiniteModel.lean`: abstract finite Majorana partition functions, trace bounds, and Gaussian moment and logarithm estimates, with inputs `Params` and `MajoranaSystem`.
 - `Basic.lean`: the asymptotic family API `Setting q` and the assumed annealed input `AnnealedInput q S`. `Main.lean` states the conditional CLTs.
+- `StandardModel.lean`: the standard family of sizes `q + 2 * n`, its trace normalization, and the three conditional CLTs.
 - `Normalization.lean`: the finite standard-representation check `partitionFunction_standard`; this module is not imported by the abstract CLT proofs.
 - `refs/CLT_SYK.tex`: manuscript root containing the shared preamble, front matter, and references.
 - `refs/sections/`: independently compilable top-level manuscript sections; together with the root file, these are the source of truth for the paper theorem statements.
@@ -42,7 +43,7 @@ The manuscript develops the partition-function CLT through an exact second-chaos
 
 The current manuscript's `thm: input` states the deterministic annealed-pressure limit at every fixed real inverse temperature and differentiability of the limiting function. Its statement contains neither an expected quenched-pressure limit nor an almost-sure assertion. He2026 supplies the positive-temperature input; Gaussian symmetry and the identity at zero extend it to real temperatures. The manuscript's and Lean's relative, standardized, and logarithmic CLTs all exclude zero inverse temperature.
 
-The remaining work is to add the explicit `O(N^(-2a))` logarithmic mean-error bound and apply the conditional CLTs to the standard model family. The proposition remains an explicit assumption. Its proof and the pointwise-to-locally-uniform step in `lem:convex-derivatives` are deferred. See [the editing plan](EDITING_PLAN.md) for specifications and acceptance criteria.
+`Setting.integral_log_Y_isBigO` proves the explicit `O(N^(-2a))` logarithmic mean-error bound. `StandardModel.lean` constructs the standard model family and applies all three conditional CLTs; these results are Lean-checked without `sorryAx`. The next planned work is to scope the refactoring. The proposition remains an explicit assumption. Its proof and the pointwise-to-locally-uniform step in `lem:convex-derivatives` are deferred. See [the editing plan](EDITING_PLAN.md) for specifications and acceptance criteria.
 
 For individual proof files and their main declarations, see the [lemma index](ARCHITECTURE.md#補助-lean-ファイルの役割).
 

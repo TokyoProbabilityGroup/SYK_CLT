@@ -270,6 +270,152 @@ theorem Setting.scaled_varianceY_tendsto_zero {q : ℕ}
       _ = _ := by ring
   · simp
 
+/-- The bad event in the proof of `thm:free-energy-clt` has probability
+`O(N^(-3a))`, where `a = q/2 - 1`. The bound uses fourth moments of the
+second chaos and the quantitative higher-chaos remainder bound. -/
+theorem Setting.cubed_scale_Y_lt_half_bounded {q : ℕ}
+    (S : Setting q) (hFE : AnnealedInput q S) :
+    ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →
+      ∃ C : ℝ, 0 ≤ C ∧ ∀ᶠ n in atTop,
+        S.fluctuationScale n ^ 3 *
+          (standardGaussianMeasure (S.N n) q).real
+            {g | S.Y β n g < (1 / 2 : ℝ)} ≤ C := by
+  obtain ⟨r, hr, R, hR⟩ := S.higherChaosRemainderLp_le_power
+  refine ⟨r, hr, ?_⟩
+  intro β hβ
+  let c : ℕ → ℝ := fun n =>
+    β * deriv (fun b => Real.log (S.meanZ b n)) β /
+      Real.sqrt (2 * (Nat.choose (S.N n) q : ℝ))
+  let L := β * deriv hFE.ℓ β * Real.sqrt ((q.factorial : ℝ) / 2)
+  have hc : Tendsto (fun n => S.fluctuationScale n * c n) atTop (𝓝 L) :=
+    S.secondChaosScaledCoefficient_tendsto hFE β
+  have hc4 := (hc.pow 4).eventually_lt_const (lt_add_one (L ^ 4))
+  have ha : ((q / 2 - 1 : ℕ) : ℝ) = (q : ℝ) / 2 - 1 := by
+    have hq := S.q_ge_four
+    have he : q / 2 * 2 = q := Nat.div_mul_cancel (even_iff_two_dvd.mp S.q_even)
+    have he' : (q / 2 : ℕ) * (2 : ℝ) = (q : ℝ) := by exact_mod_cast he
+    rw [Nat.cast_sub (by omega : 1 ≤ q / 2), Nat.cast_one]
+    linarith
+  refine ⟨3840 * (L ^ 4 + 1) + 16 * |R|, by positivity, ?_⟩
+  filter_upwards [hc4] with n hn
+  have hN : (0 : ℝ) < S.N n := by
+    exact_mod_cast lt_of_lt_of_le (by decide : 0 < 4)
+      (S.q_ge_four.trans (S.q_le_N n))
+  have hs : 1 ≤ S.fluctuationScale n :=
+    (show (1 : ℝ) ≤ S.N n by exact_mod_cast
+      (show 1 ≤ S.N n by have := S.q_le_N n; have := S.q_ge_four; omega)).trans
+        (S.N_le_fluctuationScale n)
+  have hpower : S.fluctuationScale n ^ 3 *
+      (S.N n : ℝ) ^ (-3 * ((q : ℝ) / 2 - 1)) = 1 := by
+    have hscale : S.fluctuationScale n =
+        (S.N n : ℝ) ^ ((q : ℝ) / 2 - 1) := by
+      rw [Setting.fluctuationScale, ← Real.rpow_natCast, ha]
+    rw [hscale]
+    calc
+      _ = (S.N n : ℝ) ^ (((q : ℝ) / 2 - 1) * 3) *
+          (S.N n : ℝ) ^ (-3 * ((q : ℝ) / 2 - 1)) := by
+        rw [Real.rpow_mul hN.le ((q : ℝ) / 2 - 1) (3 : ℝ), Real.rpow_ofNat]
+      _ = (S.N n : ℝ) ^
+          (((q : ℝ) / 2 - 1) * 3 + -3 * ((q : ℝ) / 2 - 1)) :=
+        (Real.rpow_add hN _ _).symm
+      _ = 1 := by ring_nf; simp
+  have hrem : S.fluctuationScale n ^ 3 *
+      ‖S.higherChaosRemainderLp β n‖ ^ 2 ≤ |R| := by
+    calc
+      _ ≤ S.fluctuationScale n ^ 3 *
+          (R * (S.N n : ℝ) ^ (-3 * ((q : ℝ) / 2 - 1))) :=
+        mul_le_mul_of_nonneg_left (hR β hβ n) (by positivity)
+      _ = R := by rw [mul_left_comm, hpower, mul_one]
+      _ ≤ |R| := le_abs_self _
+  have hlead : S.fluctuationScale n ^ 3 * c n ^ 4 ≤ L ^ 4 + 1 := by
+    calc
+      _ ≤ (S.fluctuationScale n * c n) ^ 4 := by
+        nlinarith [mul_nonneg (sub_nonneg.mpr hs)
+          (show 0 ≤ S.fluctuationScale n ^ 3 * c n ^ 4 by positivity)]
+      _ ≤ L ^ 4 + 1 := hn.le
+  have htail := mul_le_mul_of_nonneg_left (S.Y_lt_half_le_moments β n)
+    (show 0 ≤ S.fluctuationScale n ^ 3 by positivity)
+  change S.fluctuationScale n ^ 3 * _ ≤
+    S.fluctuationScale n ^ 3 *
+      (3840 * c n ^ 4 + 16 * ‖S.higherChaosRemainderLp β n‖ ^ 2) at htail
+  nlinarith
+
+/-- The explicit expected-logarithm error in `thm:free-energy-clt`.
+For each fixed nonzero high-temperature real `β`,
+`E[log Y_N] = O(N^(-2a))`, with `a = q/2 - 1`.
+The annealed proposition is an explicit input; the constant need not be
+uniform in `β`. -/
+theorem Setting.integral_log_Y_isBigO {q : ℕ}
+    (S : Setting q) (hFE : AnnealedInput q S) :
+    ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq → β ≠ 0 →
+      (fun n => ∫ g, Real.log (S.Y β n g)
+        ∂standardGaussianMeasure (S.N n) q) =O[atTop]
+        (fun n => ((S.N n : ℝ) ^ (2 * (q / 2 - 1)))⁻¹) := by
+  obtain ⟨rv, hrv, hv⟩ := S.scaled_varianceY_tendsto hFE
+  obtain ⟨rt, hrt, ht⟩ := S.cubed_scale_Y_lt_half_bounded hFE
+  refine ⟨min rv rt, lt_min hrv hrt, ?_⟩
+  intro β hβ _hβ0
+  have hβv := lt_of_lt_of_le hβ (min_le_left rv rt)
+  have hβt := lt_of_lt_of_le hβ (min_le_right rv rt)
+  obtain ⟨T, hT, htail⟩ := ht β hβt
+  obtain ⟨A, hA, hlog⟩ := S.log_meanZ_le_linear_eventually hFE β
+  let V : ℝ := (limitVariance q hFE.ℓ β : ℝ) + 1
+  have hvar := (hv β hβv).eventually_lt_const
+    (lt_add_one (limitVariance q hFE.ℓ β : ℝ))
+  apply Asymptotics.IsBigO.of_bound (2 * V + A * T)
+  filter_upwards [htail, hlog, hvar] with n hnT hnA hnV
+  have hs : 0 < S.fluctuationScale n := by
+    have hN : (0 : ℝ) < S.N n := by
+      exact_mod_cast lt_of_lt_of_le (by decide : 0 < 4)
+        (S.q_ge_four.trans (S.q_le_N n))
+    exact pow_pos hN _
+  have hAn : Real.log (S.meanZ β n) ≤ A * S.fluctuationScale n :=
+    hnA.trans (mul_le_mul_of_nonneg_left (S.N_le_fluctuationScale n) hA)
+  have htailbound : S.fluctuationScale n ^ 2 * Real.log (S.meanZ β n) *
+      (standardGaussianMeasure (S.N n) q).real
+        {g | S.Y β n g < (1 / 2 : ℝ)} ≤ A * T := by
+    calc
+      _ ≤ S.fluctuationScale n ^ 2 * (A * S.fluctuationScale n) *
+          (standardGaussianMeasure (S.N n) q).real
+            {g | S.Y β n g < (1 / 2 : ℝ)} :=
+        mul_le_mul_of_nonneg_right
+          (mul_le_mul_of_nonneg_left hAn (sq_nonneg _)) measureReal_nonneg
+      _ = A * (S.fluctuationScale n ^ 3 *
+          (standardGaussianMeasure (S.N n) q).real
+            {g | S.Y β n g < (1 / 2 : ℝ)}) := by ring
+      _ ≤ A * T := mul_le_mul_of_nonneg_left hnT hA
+  have hbound := mul_le_mul_of_nonneg_left
+    (S.integral_logLinearError_le_variance_tail β n)
+    (sq_nonneg (S.fluctuationScale n))
+  have herr : S.fluctuationScale n ^ 2 *
+      (∫ g, S.logLinearError β n g ∂standardGaussianMeasure (S.N n) q) ≤
+      2 * V + A * T := by
+    calc
+      _ ≤ S.fluctuationScale n ^ 2 *
+          (2 * variance (S.Y β n) (standardGaussianMeasure (S.N n) q) +
+            Real.log (S.meanZ β n) *
+              (standardGaussianMeasure (S.N n) q).real
+                {g | S.Y β n g < (1 / 2 : ℝ)}) := hbound
+      _ = 2 * (S.fluctuationScale n ^ 2 *
+          variance (S.Y β n) (standardGaussianMeasure (S.N n) q)) +
+            S.fluctuationScale n ^ 2 * Real.log (S.meanZ β n) *
+              (standardGaussianMeasure (S.N n) q).real
+                {g | S.Y β n g < (1 / 2 : ℝ)} := by ring
+      _ ≤ 2 * V + A * T :=
+        add_le_add (mul_le_mul_of_nonneg_left hnV.le (by norm_num)) htailbound
+  have hnorm : ‖∫ g, Real.log (S.Y β n g)
+      ∂standardGaussianMeasure (S.N n) q‖ =
+      ∫ g, S.logLinearError β n g ∂standardGaussianMeasure (S.N n) q := by
+    rw [← norm_neg, ← S.integral_logLinearError, Real.norm_eq_abs,
+      abs_of_nonneg (integral_nonneg (S.logLinearError_nonneg β n))]
+  have hpow : (S.N n : ℝ) ^ (2 * (q / 2 - 1)) =
+      S.fluctuationScale n ^ 2 := by
+    rw [Nat.mul_comm 2, pow_mul]
+    rfl
+  rw [hnorm, hpow, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr (sq_pos_of_pos hs))]
+  rw [← div_eq_mul_inv, le_div_iff₀ (sq_pos_of_pos hs)]
+  simpa only [mul_comm] using herr
+
 /-- At high temperature the mean logarithmic Taylor error vanishes on the
 scale of the central limit theorem. -/
 theorem Setting.scaled_integral_logLinearError_tendsto_zero {q : ℕ}

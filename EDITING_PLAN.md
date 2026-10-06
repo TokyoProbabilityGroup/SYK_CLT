@@ -32,8 +32,8 @@ W01–W06、R01–R05、F01–F08、Z01 は、それぞれの履歴に記録し�
 | --- | --- | --- | --- | --- |
 | `CLT-AUDIT` | 原稿全体と Lean の対応の照合 | 完了 | Codex（単独・統合） | 着手時の原稿と実装 |
 | `CLT-INPUT` | アニール入力の整理と条件付き CLT の再検証 | 完了 | Kamijima（担当・統合） | `CLT-AUDIT` |
-| `CLT-LOG` | 対数の期待誤差の明示的評価 | 割当可能 | 未割当 | `CLT-INPUT` |
-| `CLT-APPLY` | `prop:annealed-free-energy` を仮定した標準模型族への適用 | 仕様未確定 | 未割当 | `CLT-INPUT` |
+| `CLT-LOG` | 対数の期待誤差の明示的評価 | 完了 | Noda（担当・統合） | `CLT-INPUT` |
+| `CLT-APPLY` | `prop:annealed-free-energy` を仮定した標準模型族への適用 | 完了 | Noda（担当・統合） | `CLT-INPUT` |
 | `CLT-REFACTOR` | CLT・共有層・利用側のリファクタリング | 仕様未確定 | 未割当 | `CLT-LOG`・`CLT-APPLY` と数学的実装範囲の確定 |
 
 ```mermaid
@@ -47,9 +47,9 @@ flowchart TD
 
 完了した `CLT-AUDIT` の結果と検証は [監査記録](WORK_HISTORY.md#clt-audit-2026-10-04) を参照する。
 
-完了した `CLT-INPUT` の開始点、参照原稿、成果と検証は [入力整理の記録](WORK_HISTORY.md#clt-input-2026-10-04) を参照する。`CLT-LOG` の先行成果は統合済みである。`CLT-APPLY` は公開定理と編集範囲の確定が引き続き必要である。
+完了した `CLT-INPUT` の開始点、参照原稿、成果と検証は [入力整理の記録](WORK_HISTORY.md#clt-input-2026-10-04) を参照する。`CLT-LOG`・`CLT-APPLY` は Noda（担当・統合）が実装・Lean 検証・原稿照合・文書と Blueprint の統合を完了した。開始点と成果・検証は [完了記録](WORK_HISTORY.md#clt-log-apply-completion-2026-10-05) を参照する。
 
-LOG と、仕様確定後の APPLY は別担当で並行できる。図は現在進める作業間の依存関係を表し、同じファイルの同時編集を認めるものではない。
+次の課題は `CLT-REFACTOR` の範囲・担当・検証条件の確定である。LOG・APPLY の先行成果は統合済みだが、リファクタリング自体は未着手である。アニール命題の証明などの保留課題は別に残る。
 
 リファクタリングは現在の数学的実装を終えてから行う。保留した命題の証明を再開する場合は、それも含めた数学的実装を終えてからリファクタリングする。実装中に循環依存などの解消が必要な場合だけ、必要最小限の構造変更を先行させる。
 

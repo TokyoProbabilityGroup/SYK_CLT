@@ -32,6 +32,14 @@
 
 共有の `SYK.partitionFunction` は通常のトレースを使う。CLT の局所定義は既に存在し、通常トレースの分配関数を次元で割ったものとの一致も証明項を持つ。複素解析の API は共有側を使い、零点のない領域や対数の枝は仮定しない。現行の条件付き CLT は複素対数を入力に使わない。
 
+## 標準模型族への適用設計
+
+`StandardModel.lean` の `standardSetting` は `N n = q + 2 * n` の標準表現族を構成する。`CLT-APPLY` で実装・Lean 検証を完了した。偶数 `q ≥ 4` に対してこの列は `N ≥ q` の偶数をすべて一度ずつ通り、無限大へ発散する。従って原稿の偶数サイズの極限を表せる。有限個の `N < q` を除くことは極限を変えず、有限サイズの規格化では必要な `q ≤ N` を明示できる。スケーリングは列の添字ではなく実際のサイズ `N` のべきとする。
+
+新規 `CLT/StandardModel.lean` は模型族の構成・偶数サイズの対応・規格化の橋渡しと具体的適用を担い、`Main.lean` と `Normalization.lean` の利用側に置く。これにより標準表現の import を抽象 CLT の証明依存へ入れずに、原稿の `2^(-N/2) Tr` と共有の標準模型を接続する。公開定理の名前・型の仕様と検証条件は [詳細計画](EDITING_PLAN.md#命題を仮定した具体模型への適用) に置く。`standardSetting_size_iff` が全偶数サイズの列挙を、`standardSetting_Z` が規格化を照合する。`standard_partition_and_log_partition_clt` と2つの個別定理は、この族に対する `AnnealedInput` の下で検証済みである。検証記録は [作業履歴](../WORK_HISTORY.md#clt-log-apply-completion-2026-10-05) を参照する。
+
+入力は構成した標準模型族そのものに対する `AnnealedInput` とする。表現独立性を経由せずにこの族へ条件付き定理を適用するため、表現独立性の証明は不要である。アニール命題の証明・入力の構築は引き続き保留する。共同定理から同じ高温半径で相対・標準化・対数の CLT を得る。LOG の新しい期待誤差評価は APPLY の先行入力に含めない。
+
 ## 補助 Lean ファイルの役割
 
 補題を利用するときは、以下の用途と宣言名から対象を選び、ソースで定理文と必要な定義を確認する。名前空間、節の変数、型クラス、局所記法も確認し、証明の詳細は必要になった箇所を読む。この参照方法は通常の文書・Lean ソースを対象とし、適用される `AGENTS.md` の確認範囲を限定しない。以下の説明は索引であり、正確な仮定と型は Lean 宣言を参照する。
@@ -71,7 +79,7 @@
 | --- | --- | --- |
 | `thm: input` | — | 各固定実逆温度でのアニール圧力の極限と、極限関数の全実軸での微分可能性を述べる外部入力。期待クエンチ圧力の極限や標本ごとの概収束は定理文に含まない |
 | `lem:convex-derivatives` | `convex_convergence_deriv_tendstoUniformlyOn` | 原稿は各点収束から関数・導関数の局所一様収束を全実軸上で結論し、Rockafellar を引用して証明を省略する。Lean は関数の局所一様収束を仮定しており、補題全体は未形式化。既存の開集合上の定理は維持する |
-| `subsec:SYK-model`、`eq:Y_N` | `realPartitionFunction`、`Setting.Y`、`partitionFunction_standard` | 有限模型と標準表現の規格化照合は実装済み。標準模型族への漸近適用は `CLT-APPLY` |
+| `subsec:SYK-model`、`eq:Y_N` | `realPartitionFunction`、`Setting.Y`、`partitionFunction_standard` | 有限模型と標準表現の規格化照合は実装済み。標準模型族への条件付き適用も `StandardModel.lean` で検証済み |
 | `eq: chaos` | `hasSum_hermiteCoefficients_unconditional`、`hasSum_hermiteDegreeProjection_unconditional` | ガウス `L²` の展開・完全性は実装済み |
 | `lem: parity rule lemma` | `Setting.Z_sign_gauge`、`Setting.Z_swap`、`Setting.integral_Z_mul_hermite_eq_zero` | CLT に使う対称性と係数消滅は実装済み。原稿の一般反射・任意の符号付き置換の統一形は一部のみ対応 |
 | `lem:Gaussian-Hermite-IBP`、`eq:Gaussian-Hermite-IBP` | `hermite_coefficient_ibp`、`Setting.hermite_coefficient_Z_eq_integral_partialMulti` | 一般部分と分配関数への特殊化は実装済み。成分ごとの `η≤α` の成長条件を保持 |
@@ -81,7 +89,7 @@
 | `prop:higher-chaos-closure` | `Setting.tsum_higherChaosProjection_le_power`、`Setting.higherChaosProjection_isLittleO` | 高温でのべき評価と little-o は実装済み |
 | `prop:annealed-free-energy` | `AnnealedInput` | 命題文の内容を明示的な仮定として受け取る。命題自体と入力の構築は未形式化 |
 | `eq:intro-A_N-limit`、`eq:Y-decomposition-final` | `secondChaosCoefficient_tendsto`、`Setting.secondChaosScaledCoefficient_tendsto`、`Setting.Y_decomposition` | 分解は実装済み、係数の各点での極限は条件付きで実装済み。係数の局所一様収束の独立した定理は未追加 |
-| `thm:partition-clt`、`thm:free-energy-clt` | `partition_clt`、`log_partition_clt`、`partition_and_log_partition_clt` | `0<\|β\|<β_q` で現行の `AnnealedInput` を仮定して実装済み。対数期待誤差の明示的な次数評価は `CLT-LOG` |
+| `thm:partition-clt`、`thm:free-energy-clt` | `partition_clt`、`log_partition_clt`、`partition_and_log_partition_clt` | `0<\|β\|<β_q` で現行の `AnnealedInput` を仮定して実装済み。対数期待誤差の明示的な次数評価も `Setting.integral_log_Y_isBigO` で検証済み |
 
 相対量・スケール・極限分散は
 ```text
@@ -126,7 +134,7 @@ N^a(log Z_N-E log Z_N)
 | `c_N=O(N^(-a))`、アニール入力から `log E Z_N=O(N)` | `Basic.lean`、CLT の漸近補題 |
 | `sup_N E U_N^4<∞`、`P(Y_N<1/2)=O(N^(-3a))`、期待値の誤差 | `Lemmas/GaussianFourthMoment.lean`、`Lemmas/LogEventBound.lean`、`Lemmas/LogAsymptotics.lean` |
 
-期待誤差は `Y_N≥1/2` と `Y_N<1/2` に分け、表のモーメント評価と分配関数の下界から制御する。分布収束だけからモーメント評価は推論しない。`LogAsymptotics.lean` は CLT に必要な `N^a E[log Y_N] → 0` を証明している。原稿の明示的な `E[log Y_N]=O(N^(-2a))` 評価は独立した Lean 定理にしておらず、[CLT-LOG](EDITING_PLAN.md#対数の期待誤差の明示的評価) で追加する。数学的な導出は `main-results.tex` の `thm:free-energy-clt` の証明を参照する。
+期待誤差は `Y_N≥1/2` と `Y_N<1/2` に分け、表のモーメント評価と分配関数の下界から制御する。分布収束だけからモーメント評価は推論しない。`LogAsymptotics.lean` は CLT に必要な `N^a E[log Y_N] → 0` を証明している。`Setting.cubed_scale_Y_lt_half_bounded` は `N^(3a) P(Y_N<1/2)` の終局的有界性を証明する。`Setting.integral_log_Y_isBigO` は非零の小さい実逆温度で、原稿の明示的な `E[log Y_N]=O(N^(-2a))` を証明する。右辺は自然数べきの逆数 `((N : ℝ)^(2*(q/2-1)))⁻¹` で表し、偶数 `q≥4` では原稿の指数と一致する。定数は固定した逆温度に依存してよい。数学的な導出は `main-results.tex` の `thm:free-energy-clt` の証明を参照する。
 
 ## 仮定する命題と保留した証明
 
