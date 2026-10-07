@@ -5,9 +5,8 @@
 
 \section{Direct Rademacher control of all higher chaoses} \label{sec:Rademacher-remainder}
 
-Following the expressions of the first and second terms in in the polynomial chaos expansion \eqref{eq: chaos} of $Z_N(\beta)$,
-we estimate the higher-order terms in this section.
-Recall definition of $Y_N(\beta)$ in \eqref{eq:Y_N} and the orthogonal projection $P_k$ defined in Section~\ref{sec:chaos-decomposition}.
+Following the expressions of the first and second terms in the polynomial chaos expansion \eqref{eq: chaos} of $Z_N(\beta)$,
+we estimate the higher-order terms in this section. Recall the definition of $Y_N(\beta)$ in \eqref{eq:Y_N} and the orthogonal projection $P_k$ defined in Section~\ref{sec:chaos-decomposition}.
 
 \begin{proposition} \label{prop:higher-chaos-closure}
   There exists $\beta_{\mathrm{r}}=\beta_{\mathrm{r}}(q)>0$ such that, for every fixed real $\beta$ with $|\beta|<\beta_{\mathrm{r}}$,
@@ -33,7 +32,7 @@ To prove this proposition, we use the following two lemmas.
 
 \begin{proof}
   Let $k = |\alpha|$.
-  The case that $k=0$ is trivial, hence assume that $k \geq 1$ in the following.
+  The case that $k=0$ is immediate, so assume that $k \geq 1$ in the following. 
   We claim that, for any $(I_i)_{i=1}^{k} \subset \mathcal I_N$,
   \begin{multline}
     \partial_{g_{I_k}}\cdots\partial_{g_{I_1}}Z_N(\beta;G) \\
@@ -114,15 +113,15 @@ To prove this proposition, we use the following two lemmas.
     \mright)
     \odif{t_1} \cdots \odif{t_k},
   \end{align*}
-  where
+  where $\tilde\pi_j\in\mathfrak{S}_k$ is defined by
   \[
-    \tilde{\pi}_{j}(k)
+    \tilde{\pi}_{j}(r)
     =
     \begin{cases}
-      \pi(k),   & k<j, \\
-      k,        & k=j, \\
-      \pi(k-1), & k>j.
-    \end{cases}
+      \pi(r),   & r<j, \\
+      k,        & r=j, \\
+      \pi(r-1), & r>j,
+    \end{cases}\qquad r\in[k].
   \]
   Since $(\pi, j) \mapsto \tilde{\pi}_{j}$ is a bijection from
   $\mathfrak{S}_{k-1}\times\{1,\ldots,k\}$ onto $\mathfrak{S}_k$, summing the terms produced by the Leibniz rule in
@@ -134,7 +133,7 @@ To prove this proposition, we use the following two lemmas.
     \norm{A}_p \coloneqq \left(\tr\mleft(\sqrt{A^* A}^p\mright)\right)^{1/p}.
   \]
   Note that the case that $p=\infty$ corresponds to the operator norm $\norm{A}_\infty$.
-  Let $t_0, \ldots, t_k \in \interval{0}{1}$ satisfying $\sum_{j=0}^k t_j = 1$.
+  Let $t_0, \ldots, t_k \in \interval{0}{1}$ satisfying $\sum_{j=0}^k t_j = 1$. 
   Iterating H\"older's inequality~\cite[Theorem~6.20]{HiaiPetz2014} for any matrices $A_0, \ldots, A_k$ and $B_1, \ldots, B_k$ with the finiteness of the Schatten norm provides
   \begin{align*}
     \left|\tr(A_0 B_1 A_1 \cdots B_k A_k)\right|
@@ -273,7 +272,7 @@ Set
     \varepsilon_x^{\sum_{I: x\in I}\alpha_I}.
   \end{equation*}
   By independence of the Rademacher variables and the definition of an even
-  multi-index in \eqref{eq:even-multi-index}, its expectation is one if
+  multi-index in Section~\ref{sec:chaos-decomposition}, its expectation is one if
   $\alpha$ is even and zero otherwise.  Substituting this into
   \eqref{eq:Rademacher-multinomial-expansion} proves
   \eqref{eq:even-sum-Rademacher-moment}.
