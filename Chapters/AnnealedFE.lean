@@ -73,7 +73,7 @@ $$`
 \frac{1}{N}\log\mathbb E Z_{N,q}(\beta)
 \longrightarrow
 \mathcal F^{\mathrm{tot}}_\beta(t_*)-1-\log t_*.
-`$$
+`
 
 Here $`\mathcal F^{\mathrm{tot}}_\beta` is the preprint's
 $`\mathcal F_\beta` for $`\beta\ne0` and equals $`z` at $`\beta=0`.

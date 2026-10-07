@@ -39,7 +39,7 @@ $$`
 H_N(g)=\sigma_N\sum_{|I|=q}g_I\Psi_I,
 \qquad \sigma_N^2=\frac{(q-1)!}{N^{q-1}},
 \qquad Z_N(z;g)=\frac{1}{d_N}\operatorname{Tr}\exp(-zH_N(g)).
-`$$
+`
 
 For real $`\beta`, Lean uses the real part of $`Z_N(\beta;g)` to define
 $`Y_N=Z_N/\mathbb E Z_N` and its fluctuations. `Setting q` allows any
@@ -115,7 +115,7 @@ Then both expectations below are integrable and
 $$`
 \mathbb E\left[\left(\prod_{i\in\iota}\operatorname{He}_{\alpha_i}(G_i)\right)
 f(G)\right]=\mathbb E[\partial_G^\alpha f(G)].
-`$$
+`
 
 The Hermite polynomials have the probabilists' normalization. The proof
 uses the shared selected-coordinate Gaussian Stein identity, exponential
@@ -165,7 +165,7 @@ Hermite products satisfy
 $$`
 \mathbb E[H_\alpha(G)H_\eta(G)]
 =\mathbf1_{\{\alpha=\eta\}}\prod_i\alpha_i!.
-`$$
+`
 
 For any finite set $`S` of multi-indices and real $`f\in L^2(\gamma)`, the
 orthogonal projection onto $`\operatorname{span}\{H_\alpha:\alpha\in S\}`
@@ -174,7 +174,7 @@ is the finite coefficient sum
 $$`
 \sum_{\alpha\in S}
 \frac{\langle H_\alpha,f\rangle}{\prod_i\alpha_i!}H_\alpha.
-`$$
+`
 
 The set $`\{\alpha:|\alpha|=r\}` is finite, so this applies to each
 homogeneous degree. Normalizing each Hermite product by its $`L^2` norm
@@ -239,7 +239,7 @@ function satisfies the bound in `eq:Z-derivative-bound`:
 $$`
 |\partial_G^\alpha Z_N(\beta;G)|
 \le (|\beta|\sigma_N)^{|\alpha|}Z_N(\beta;G).
-`$$
+`
 
 Here $`\sigma_N` is the coupling scale of the shared model. The proof
 pulls the checked iterated trace-exponential derivative estimate through
@@ -259,7 +259,7 @@ independent Rademacher signs, Lean proves `eq:even-sum-Rademacher-moment`:
 $$`
 \sum_{|\alpha|=r,\ \alpha\ \mathrm{even}}\frac1{\alpha!}
 =\frac1{r!}\mathbb E_\varepsilon[S_{N,q}^r].
-`$$
+`
 
 For even $`q\ge4`, it also proves `eq:Rademacher-exponential-moment` with
 constants depending only on $`q` and the stated range
@@ -275,7 +275,7 @@ $$`
 \|P_rY_N(\beta)\|_2^2
 \le \frac{(\beta^2\sigma_N^2)^r}{r!}
 \mathbb E_\varepsilon[S_{N,q}^r].
-`$$
+`
 
 The result uses the exact factorial norm of each Hermite product, parity
 of the coefficients, the all-order derivative bound, and the finite
@@ -290,7 +290,7 @@ $$`
 \sum_{r\ge3}\|P_rY_N(\beta)\|_2^2
 \le \frac{t_N^3}{6}\mathbb E_\varepsilon
 \left[|S_{N,q}|^3e^{t_N|S_{N,q}|}\right].
-`$$
+`
 
 The proof first bounds finite partial sums using the factorial-weighted
 Rademacher identity and the exponential-series tail inequality, then
@@ -299,12 +299,12 @@ high-temperature radius and the resulting power of $`N`.
 :::
 
 :::theorem "clt_higher_chaos_closure" (parent := "central_limit_theorem") (uses := "clt_higher_chaos_moment_sum, clt_rademacher_encoding") (lean := "SYK.CLT.Setting.tsum_higherChaosProjection_le_power, SYK.CLT.Setting.higherChaosProjection_isLittleO")
-For some $`\beta_{\rm r}>0` and all $`|\beta|<\beta_{\rm r}`,
+For some $`\beta_{\mathrm{r}}>0` and all $`|\beta|<\beta_{\mathrm{r}}`,
 
 $$`
 \sum_{r\ge3}\|P_rY_N(\beta)\|_2^2
 =O\bigl(N^{-3(q/2-1)}\bigr)=o(N^{2-q}).
-`$$
+`
 
 Both the uniform pointwise power bound and the little-o statement are
 checked in Lean. The radius comes from the Rademacher exponential-moment
@@ -335,7 +335,7 @@ With $`M_N=\binom Nq`, the centered quadratic Gaussian sum
 
 $$`
 \frac{1}{\sqrt{2M_N}}\sum_{I\in\mathcal I_N}(g_I^2-1)
-`$$
+`
 
 converges in distribution to $`\mathcal N(0,1)` under the shared Gaussian
 coupling measure. The checked proof uses the finite product characteristic
@@ -362,7 +362,7 @@ $`\frac12\mathbb E[Y_N(G)(g_I^2-1)](g_I^2-1)` in Gaussian $`L^2`.
 The common coefficient is identified by the checked exact second-chaos
 theorem above. All-order derivatives, Rademacher moments, and the
 infinite-series bound, high-temperature radius, and the
-$`N^{-3(q/2-1)}=o(N^{2-q})` estimate are now checked. The actual $`L^2`$
+$`N^{-3(q/2-1)}=o(N^{2-q})` estimate are now checked. The actual $`L^2`
 remainder is identified by `SYK.CLT.Setting.higherChaosRemainderLp_norm_sq`,
 and its scaled norm tends to zero by
 `SYK.CLT.Setting.scaled_higherChaosRemainderLp_norm_tendsto_zero`.
@@ -400,7 +400,7 @@ $$`
 N^{q/2-1}(Y_N(\beta)-1)
 \Longrightarrow
 \mathcal N\!\left(0,\frac{q!}{2}\beta^2\ell'(\beta)^2\right).
-`$$
+`
 
 The statements also require positive limiting variance,
 positive variance at every finite size, and a standardized CLT. At
@@ -430,7 +430,7 @@ $$`
 \log Y_N=\log Z_N-\log\mathbb E Z_N,
 \qquad
 \log Y_N-\mathbb E\log Y_N=\log Z_N-\mathbb E\log Z_N.
-`$$
+`
 
 Moreover, $`\log Z_N\ge0`, $`\log\mathbb E Z_N\ge0`, and
 $`-\log Y_N\le\log\mathbb E Z_N`. These finite-model inputs to
@@ -467,7 +467,7 @@ $$`
 N^{q/2-1}\bigl(\log Z_N(\beta)-\mathbb E\log Z_N(\beta)\bigr)
 \Longrightarrow
 \mathcal N\!\left(0,\frac{q!}{2}\beta^2\ell'(\beta)^2\right).
-`$$
+`
 
 The current manuscript uses the relative CLT, local linearization of
 $`\log`, and the preceding centering estimate. Lean verifies the

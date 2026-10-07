@@ -12,11 +12,10 @@ weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
 experimental.module = true
 
-# Verso is temporarily disabled to reduce CI work. Preserve for restoration.
-# [[require]]
-# name = "VersoBlueprint"
-# git = "https://github.com/leanprover/verso-blueprint"
-# rev = "v4.32.0"
+[[require]]
+name = "VersoBlueprint"
+git = "https://github.com/leanprover/verso-blueprint"
+rev = "v4.32.0"
 
 [[require]]
 name = "mathlib"
@@ -25,9 +24,8 @@ rev = "v4.32.2"
 
 [[lean_lib]]
 name = "SYK"
-# Shared foundations; Blueprint sources are preserved but temporarily excluded.
-globs = ["SYK.Probability.GaussianConcentration.+"]
-# globs = ["SYK.Probability.GaussianConcentration.+", "SYK.Blueprint", "SYK.Chapters.+"]
+# Shared foundations and the formalization Blueprint.
+globs = ["SYK.Probability.GaussianConcentration.+", "SYK.Blueprint", "SYK.Chapters.+"]
 
 [[lean_lib]]
 name = "Annealed_FE"

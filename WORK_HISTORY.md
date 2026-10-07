@@ -2,6 +2,37 @@
 
 完了済み作業の検証結果と旧計画を保存する。現行の残件は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
 
+<a id="verso-restore-2026-10-07"></a>
+
+## VERSO-RESTORE の第1巡実装・検証（2026-10-07）
+
+担当・統合担当は Kamijima。実作業は Sol、監査は Astra を用いた。開始 HEAD は `d8aadfbc133c89942081ca6ba9f331de375a9362`、開始時の差分はない。ユーザーの依頼に基づき、Verso Blueprint の依存・章ビルド・生成・参照検査を復帰した。作業・監査は最大3巡とし、以下は第1巡の監査前提出記録であり、監査と統合の完了は本節末尾に記す。
+
+- ルートと配布用の `lakefile.toml`・`lake-manifest.json` を揃え、Verso Blueprint `v4.32.0` と Probability・Blueprint・Chapters のグロブを有効にした。保存済み full manifest の15依存を復帰し、現行と共通する9依存の全項目・既存15 checkout のリビジョンを保持した。mathlib は `v4.32.2` のままで、`lake update`・依存の全再取得・キャッシュのソース編集は行っていない。
+- CI の HTML 生成と `vbp check` を有効にし、Lean ソースに加え、配布用設定・CI 自身・関連する設定文書の変更でも発火するようにした。`defaultTargets` と他ライブラリの登録は保持した。
+- 現行の規則・全体/CLT/章の計画・配布用案内と README の関連節を復帰後の検証範囲へ更新した。過去の休止中の未実施記録は、当時の事実として保持した。
+- 任意 PDF の検査で、既存の表示数式終端に残る `$$`、旧 `\rm` 記法、inline 数式の余分な `$` が生成 TeX のエラーとなった。`Chapters/AnnealedFE.lean` の終端1箇所、`Chapters/CLT.lean` の終端13箇所・`\mathrm{r}` への置換2箇所・inline 終端1箇所だけを修正した。数式内容・宣言参照・証明状態は変えていない。
+
+### 検証結果と残る境界
+
+共有ワークスペースのルートから、Lean 4.32.2 で次を実行した。
+
+- `lake build +SYK.Blueprint:olean` による必要依存のビルドは3686 jobs、最終 `lake build` は3691 jobsで成功した。復帰対象外の `Annealed_FE`・`Universality` は引き続き `defaultTargets` に含めていないが、`Chapters.AnnealedFE` が import する `Annealed_FE.main_result` とその依存は既定ビルドで検査される。
+- `lake env lean` で全5章（Model・GaussianConcentration・SuperConcentration・AnnealedFE・CLT）と `Blueprint.lean`・`BlueprintMain.lean` の計7ファイルを検査した。表示構文修正後の対象章と両入口も成功した。
+- `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site` で HTML を生成し、`lake exe vbp check --site SYK/_out/site` は manifest・HTML cache とも251件、`errors=[]`・`ok=true` だった。修正後も同じ結果を確認した。
+- renderer に `--pdf` を追加し、利用可能な LuaLaTeX で31ページの `SYK/_out/site/pdf/main.pdf` を生成した。最終 TeX ログには overfull hbox 89件と依存側のフォントパッケージ改名警告2件が残る。未定義参照・欠落文字・LaTeX Font Warning・致命的エラーはない。PDF は任意検査であり、CI の必須条件にはしていない。
+- 最終ビルドの警告712件は、変更前の復帰直後のビルドと同じ内訳だった。前回 CLT 検査の540件に、Lipschitz 75、Blueprint の章書式85（Model 8・AnnealedFE 17・CLT 60）、VersoBlueprint の universe 2、Annealed_FE の既存 `sorry` 10が加わった。新たな未完成証明や警告は導入していない。
+- 前回の主要25宣言の `#print` と `#print axioms` を再実行し、型・定義・公理出力は前回と完全一致した。抽象・標準模型の CLT は `[propext, Classical.choice, Quot.sound]` のみだが、`hFE : AnnealedInput` は明示的な前提として残る。章が参照する `AnnealedFE.annealed_freeEnergy_density_limit` と `AnnealedFE.main_result` は既存の `sorryAx` に依存する。章の Lean 検査・HTML/PDF 生成・参照検査の成功は、これらの数学的証明の完成を意味しない。
+- 開始時に固定した Lean ソースと CLT 原稿など計66ファイルの SHA-256 を比較し、上記2章の表示構文以外の64ファイルは不変だった。ルートと配布設定・保存 manifest の一致、全依存版の保持、CI と文書コマンド、関係リンク、環境依存の絶対パスがないことを照合し、`git diff --check` は成功した。
+
+実行ログ・開始版のハッシュ・比較記録は検証環境の一時ディレクトリに保存した。第1巡の実装と検証を終え、その時点では監査未了の統合待ちとした。コミットは作成していない。
+
+### 第1巡監査と統合完了
+
+完成成果の読み取り監査で、必須修正0件、任意提案0件、今回の範囲の未解決事項0件を確認した。依存版・ルートと配布設定・全章と入口・既定ビルド・生成物・公理依存・数学内容の保持・警告と文書の整合を確認し、追加の実装・Lean 検証要求はなかった。GitHub 上での更新後の CI 実行は未確認であり、今回確認したのは CI 設定と対応するローカルコマンドの実動作である。
+
+担当・統合担当の Kamijima が完了状態と監査結果を記録した。最終変更は文書のみで、監査時の設定・Lean ソースを保持し、Lean の再実行や第2巡監査は行っていない。関係差分・リンク・状態、環境依存パスと現行の休止指示がないこと、`git diff --check` を確認した。実際の作業・監査は第1巡で完了した。コミットは作成していない。
+
 <a id="clt-cleanup-2026-10-06"></a>
 
 ## CLT-CLEANUP の第1巡実装・検証（2026-10-06–07）
