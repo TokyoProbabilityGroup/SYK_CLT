@@ -5,9 +5,8 @@
 
 \section{Direct Rademacher control of all higher chaoses} \label{sec:Rademacher-remainder}
 
-Following the expressions of the first and second terms in in the polynomial chaos expansion \eqref{eq: chaos} of $Z_N(\beta)$,
-we estimate the higher-order terms in this section.
-Recall definition of $Y_N(\beta)$ in \eqref{eq:Y_N} and the orthogonal projection $P_k$ defined in Section~\ref{sec:chaos-decomposition}.
+Following the expressions of the first and second terms in the polynomial chaos expansion \eqref{eq: chaos} of $Z_N(\beta)$,
+we estimate the higher-order terms in this section. Recall the definition of $Y_N(\beta)$ in \eqref{eq:Y_N} and the orthogonal projection $P_k$ defined in Section~\ref{sec:chaos-decomposition}.
 
 \begin{proposition} \label{prop:higher-chaos-closure}
   There exists $\beta_{\mathrm{r}}=\beta_{\mathrm{r}}(q)>0$ such that, for every fixed real $\beta$ with $|\beta|<\beta_{\mathrm{r}}$,
@@ -33,7 +32,7 @@ To prove this proposition, we use the following two lemmas.
 
 \begin{proof}
   Let $k = |\alpha|$.
-  The case that $k=0$ is trivial, hence assume that $k \geq 1$ in the following.
+  The case that $k=0$ is immediate, so assume that $k \geq 1$ in the following. 
   We claim that, for any $(I_i)_{i=1}^{k} \subset \mathcal I_N$,
   \begin{multline}
     \partial_{g_{I_k}}\cdots\partial_{g_{I_1}}Z_N(\beta;G) \\
@@ -125,7 +124,7 @@ To prove this proposition, we use the following two lemmas.
     \end{cases}
   \]
   Since $(\pi, j) \mapsto \tilde{\pi}_{j}$ is a bijection from
-  $\mathfrak{S}_{k-1}\times\{1,\ldots,k\}$ onto $\mathfrak{S}_k$, summing the terms produced by the Leibniz rule in
+  $\mathfrak{S}_{k-1}\times\{1,\ldots,k\}$ onto $\mathfrak{S}_k$\footnote{\color{red}\hypersetup{linkcolor=red,urlcolor=red,citecolor=red} Review: In the preceding definition, $k$ is the fixed derivative order, so the display gives only the value at $k$. Use a separate argument $r\in\{1,\ldots,k\}$: $\widetilde\pi_j(r)=\pi(r)$ for $r<j$, $\widetilde\pi_j(j)=k$, and $\widetilde\pi_j(r)=\pi(r-1)$ for $r>j$. This defines the insertion permutation needed for the claimed bijection.}, summing the terms produced by the Leibniz rule in
   \eqref{eq:iterated-Duhamel-formula-induction} proves
   \eqref{eq:iterated-Duhamel-formula}.
 
@@ -134,7 +133,7 @@ To prove this proposition, we use the following two lemmas.
     \norm{A}_p \coloneqq \left(\tr\mleft(\sqrt{A^* A}^p\mright)\right)^{1/p}.
   \]
   Note that the case that $p=\infty$ corresponds to the operator norm $\norm{A}_\infty$.
-  Let $t_0, \ldots, t_k \in \interval{0}{1}$ satisfying $\sum_{j=0}^k t_j = 1$.
+  Let $t_0, \ldots, t_k \in \interval{0}{1}$ satisfying $\sum_{j=0}^k t_j = 1$. 
   Iterating H\"older's inequality~\cite[Theorem~6.20]{HiaiPetz2014} for any matrices $A_0, \ldots, A_k$ and $B_1, \ldots, B_k$ with the finiteness of the Schatten norm provides
   \begin{align*}
     \left|\tr(A_0 B_1 A_1 \cdots B_k A_k)\right|
@@ -273,7 +272,7 @@ Set
     \varepsilon_x^{\sum_{I: x\in I}\alpha_I}.
   \end{equation*}
   By independence of the Rademacher variables and the definition of an even
-  multi-index in \eqref{eq:even-multi-index}, its expectation is one if
+  multi-index in \eqref{eq:even-multi-index}\footnote{\color{red}\hypersetup{linkcolor=red,urlcolor=red,citecolor=red} Review: The referenced label \texttt{eq:even-multi-index} is undefined. The definition of an even multi-index is currently an unlabelled sentence in Section~\ref{sec:chaos-decomposition}; add a label or refer to that definition directly in a later revision.}, its expectation is one if
   $\alpha$ is even and zero otherwise.  Substituting this into
   \eqref{eq:Rademacher-multinomial-expansion} proves
   \eqref{eq:even-sum-Rademacher-moment}.

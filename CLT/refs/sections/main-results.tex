@@ -9,9 +9,9 @@
 To identify the deterministic coefficient $A_N(\beta)$ in
 \eqref{eq:finite-N-FTW-coefficient}, we use the annealed free energy limit
 from \cite{He2026}, which holds at every fixed non-negative $\beta$. 
-The symmetry of gaussian distributions extends the claim to negative \(\beta\).
+The symmetry of Gaussian distributions extends the claim to negative \(\beta\).
 
-The following is a standard convergence theorem for convex functions, \textcolor{red}{so we omit its proof}; see
+The following is a standard convergence theorem for convex functions, {so we omit its proof}; see
 \cite[Theorems~10.8 and~25.7]{Rockafellar1970}.
 
 \begin{lemma} \label{lem:convex-derivatives}
@@ -24,7 +24,7 @@ Let $h\in C^1(\mathbb R )$. Suppose that $h_N:\mathbb R \to\mathbb R$ are
 \]
 
 \end{lemma}
-\textcolor{red}{The next proposition establishes convergence of the annealed free energy and its derivative.}
+{The next proposition establishes convergence of the annealed free energy and its derivative.}
 \begin{proposition} \label{prop:annealed-free-energy}
     There exists an even convex function $\ell_q\in C^1(\mathbb R)$ such that,
     locally uniformly for $\beta\in\mathbb R$,
@@ -44,7 +44,7 @@ Let $h\in C^1(\mathbb R )$. Suppose that $h_N:\mathbb R \to\mathbb R$ are
     \begin{equation*}
         \widetilde{H}_N:=2^{-q/2}H_N,
         \qquad
-       \textcolor{red}{\widetilde{p}_{N,q}(s)}:=\frac1N\log\E[\tr e^{s\widetilde{H}_N}].
+       {\widetilde{p}_{N,q}(s)}:=\frac1N\log\E[\tr e^{s\widetilde{H}_N}].
     \end{equation*}
     Since $G$ and $-G$ have the
     same law and $H_N(-G)=-H_N(G)$, for every $\beta\in\mathbb R$,
@@ -115,7 +115,7 @@ Let $h\in C^1(\mathbb R )$. Suppose that $h_N:\mathbb R \to\mathbb R$ are
         \qquad \beta>0.
     \end{equation*}
     Integrating over $[0,\beta]$ with $\ell_q(0)=0$ 
-    \textcolor{red}{gives} $0\leq\ell_q(\beta)\leq\beta^2/(2q)$ for $\beta>0$.
+    {gives} $0\leq\ell_q(\beta)\leq\beta^2/(2q)$ for $\beta>0$.
     Since $\ell_q$ is even, this bound holds for every $\beta\in\mathbb R$, thus 
     \begin{equation*}
         \ell_q'(0)= \lim_{\beta\to0}
@@ -175,16 +175,17 @@ $\beta\in\mathbb R$,
   \frac{A_N(\beta)}N\longrightarrow
   \frac\beta2\ell_q'(\beta).
 \end{equation*}
-\textcolor{red}{We are now in a position to prove Theorems~\ref{thm:partition-clt} and~\ref{thm:free-energy-clt}.}
+
+We are now in a position to prove Theorems~\ref{thm:partition-clt} and~\ref{thm:free-energy-clt}.
 
 \begin{proof}[Proof of Theorem~\ref{thm:partition-clt}]
-Note that $\beta\ell_q'(\beta)>0$ from Proposition~\ref{prop:annealed-free-energy}. Let
+Note that $\beta\ell_q'(\beta)>0$ from Proposition~\ref{prop:annealed-free-energy}. We take $\beta_q=\beta_{\mathrm r}$ from Proposition~\ref{prop:higher-chaos-closure} and fix $0<|\beta|<\beta_q$. Let
 \[
   U_N:=\frac1{\sqrt{2|\mathcal I_N|}}\sum_{I\in\calI_N}(g_I^2-1).
 \]
 The classical i.i.d.\ central limit theorem gives
 $U_N\Rightarrow\N(0,1)$.
-By \textcolor{red}{Proposition~\ref{prop:exact-second-chaos}} \textcolor{blue}{Lemma~\ref{lem:exact-second-chaos}},
+By {Proposition~\ref{prop:exact-second-chaos}},
 \begin{equation}\label{eq:Y-decomposition-final}
   Y_N(\beta)-1
   =c_N(\beta)U_N+\mathcal R_N(\beta),
@@ -206,12 +207,13 @@ $N^{q/2-1}\mathcal R_N\to0$ in $L^2$.  This proves
 \[
   \Var(Y_N)=c_N(\beta)^2+\norm{\mathcal R_N(\beta)}_2^2.
 \]
-Finally, using the identity 
-$\Var(Y_N)=\Var(Z_N)/(\E[Z_N])^2$, this  
- gives \eqref{eq:standardized-clt}.
+Thus $N^{q-2}\Var(Y_N)\longrightarrow(q!/2)\beta^2(\ell_q'(\beta))^2>0$.
+Together with \eqref{eq:scaled-relative-clt} and the identity
+$\Var(Y_N)=\Var(Z_N)/(\E[Z_N])^2$, Slutsky's theorem gives
+\eqref{eq:standardized-clt}.
 \end{proof}
 
-\begin{proof}[Proof of \textcolor{red}{Theorem~\ref{thm:free-energy-clt}}]
+\begin{proof}[Proof of {Theorem~\ref{thm:free-energy-clt}}]
 Assume $\beta\neq0$.  Set
 \[
 a:=\frac q2-1,
@@ -296,7 +298,7 @@ We claim that
 Z_N(\beta;G)\ge1.
 \]
 To this end, fix \(I\in\mathcal I_N\) and choose \(x\in I\). 
-The unitary $U_x$ \textcolor{red}{constructed in the proof of} \textcolor{blue}{from} Lemma~\ref{lem: parity rule lemma} satisfies
+The unitary $U_x$ {constructed in the proof of}  Lemma~\ref{lem: parity rule lemma} satisfies
 \[
 U_x\psi_IU_x^*=-\psi_I,
 \]
@@ -372,7 +374,7 @@ O(N^{-2a})
 =o(N^{-a}).
 \]
 
-Combining the three terms above and applying \textcolor{red}{Slutsky's lemma
+Combining the three terms above and applying {Slutsky's lemma
 \cite[Theorem~3.1]{Billingsley1999}} yields
 \[
 N^{q/2-1}
