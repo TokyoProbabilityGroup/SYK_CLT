@@ -113,18 +113,18 @@ To prove this proposition, we use the following two lemmas.
     \mright)
     \odif{t_1} \cdots \odif{t_k},
   \end{align*}
-  where
+  where $\tilde\pi_j\in\mathfrak{S}_k$ is defined by
   \[
-    \tilde{\pi}_{j}(k)
+    \tilde{\pi}_{j}(r)
     =
     \begin{cases}
-      \pi(k),   & k<j, \\
-      k,        & k=j, \\
-      \pi(k-1), & k>j.
-    \end{cases}
+      \pi(r),   & r<j, \\
+      k,        & r=j, \\
+      \pi(r-1), & r>j,
+    \end{cases}\qquad r\in[k].
   \]
   Since $(\pi, j) \mapsto \tilde{\pi}_{j}$ is a bijection from
-  $\mathfrak{S}_{k-1}\times\{1,\ldots,k\}$ onto $\mathfrak{S}_k$\footnote{\color{red}\hypersetup{linkcolor=red,urlcolor=red,citecolor=red} Review: In the preceding definition, $k$ is the fixed derivative order, so the display gives only the value at $k$. Use a separate argument $r\in\{1,\ldots,k\}$: $\widetilde\pi_j(r)=\pi(r)$ for $r<j$, $\widetilde\pi_j(j)=k$, and $\widetilde\pi_j(r)=\pi(r-1)$ for $r>j$. This defines the insertion permutation needed for the claimed bijection.}, summing the terms produced by the Leibniz rule in
+  $\mathfrak{S}_{k-1}\times\{1,\ldots,k\}$ onto $\mathfrak{S}_k$, summing the terms produced by the Leibniz rule in
   \eqref{eq:iterated-Duhamel-formula-induction} proves
   \eqref{eq:iterated-Duhamel-formula}.
 
@@ -272,7 +272,7 @@ Set
     \varepsilon_x^{\sum_{I: x\in I}\alpha_I}.
   \end{equation*}
   By independence of the Rademacher variables and the definition of an even
-  multi-index in \eqref{eq:even-multi-index}\footnote{\color{red}\hypersetup{linkcolor=red,urlcolor=red,citecolor=red} Review: The referenced label \texttt{eq:even-multi-index} is undefined. The definition of an even multi-index is currently an unlabelled sentence in Section~\ref{sec:chaos-decomposition}; add a label or refer to that definition directly in a later revision.}, its expectation is one if
+  multi-index in Section~\ref{sec:chaos-decomposition}, its expectation is one if
   $\alpha$ is even and zero otherwise.  Substituting this into
   \eqref{eq:Rademacher-multinomial-expansion} proves
   \eqref{eq:even-sum-Rademacher-moment}.
