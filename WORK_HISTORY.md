@@ -2,6 +2,28 @@
 
 完了済み作業の検証結果と旧計画を保存する。現行の残件は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
 
+<a id="repo-layout-2026-10-07"></a>
+
+## REPO-LAYOUT の構成変更と検証（2026-10-07）
+
+担当・統合担当は Kamijima。ユーザーが承認した最終計画を単発で適用し、実作業に Sol を用いた。監査は保留し、反復巡回は行っていない。開始 HEAD は `baf3d747280c50b228038c42749c8255af3754e7`、開始時の差分はない。以下の検査と文書更新を終えて作業を完了した。コミットは作成していない。
+
+- リポジトリの数学コードを `SYK/{Analysis,Probability,Model,SuperConcentration,CLT}/` へ集約した。旧 `CLT/Lemmas/` の実数は37ファイルであり、合意した分類で36ファイルを移設し、空の GaussianConcentration を削除した。Preliminaries は PartitionSymmetry へ改名した。公開宣言名・型・仮定・規格化・属性は保持し、互換モジュールや別名は追加していない。
+- 論文を `Paper/`、講義ノートを `Notes/`、Blueprint を平坦な `Blueprint/{Main,Build,Model,CLT,GaussianConcentration,SuperConcentration}.lean` に移した。Main は本文、Build は生成入口である。独立した `Annealed_FE` と対応章、旧テキスト設計資料3件を削除し、Gaussian `AnnealedInput` の説明を CLT 章へ移した。入力ノードの本文と宣言参照は保持し、Blueprint 上の親だけ変更した。
+- 子パッケージは名前 `SYK` と数学名前空間を維持し、mathlib だけを宣言する。親は `ResearchWorkspace` とし、ローカル SYK と固定 Verso Blueprint に依存する。親の既定 Blueprint は `needs = ["SYK/SYK:leanArts"]` で数学全体も検査する。親・配布用設定と子の toolchain を揃え、外部15依存の全リビジョンと子の9依存のリビジョンを保持した。旧配布用 Verso 保存 manifest は削除した。依存更新・キャッシュの全再取得・キャッシュのソース編集は行っていない。
+- CI の変更は renderer と論文のパスだけに限定した。新数学コードを除外していた ignore 行を除き、既存の論文 PDF 除外パスを更新した。開始時にローカルにあった旧 refs の生成物は Paper へ移して保持した。公開案内・規則・構造文書・計画と履歴のリンクを新配置へ合わせ、過去の検証コマンドと証明状態は当時の事実として保持した。
+
+### 検証結果と残る境界
+
+- `lake build SYK` は3325 jobs、親の最終 `lake build` は3687 jobsで成功した。移設した数学52ファイル、平坦な Blueprint の4章・本文・生成入口の計6ファイルを `lake env lean` で個別に検査し、すべて成功した。最終参照コメントを変えた ConvexDerivatives も再検査した。
+- 開始前後の主要25宣言の `#print`・`#print axioms` は完全一致し、`[propext, Classical.choice, Quot.sound]` のみで `sorryAx` はない。52数学ファイルの全文を、承認した import と参照コメントの置換だけを除いて比較し、数学的本文に変更がないことを確認した。論文5 TeX と Notes の TeX・追跡 PDF の計7ファイルは開始版とバイト一致した。
+- `lake lean SYK/Blueprint/Build.lean -- --run SYK/Blueprint/Build.lean --output SYK/_out/site --pdf` は HTML と29ページの PDF を生成した。`lake exe vbp check --site SYK/_out/site` は manifest・HTML cache とも232件、`errors=[]`・`ok=true` だった。PDF は任意検査であり、overfull hbox 82件と依存側フォントパッケージの改名警告2件が残る。
+- 論文全体・4つの単独節・Notes の計6ファイルを、一時出力先を指定した `latexmk -pdf -silent -interaction=nonstopmode -halt-on-error` で検査し、すべて成功した。論文全体は警告なし。単独節には他節で定義する参照・引用の未解決警告、Notes には overfull hbox 4件が残る。配布用の Notes PDF は検査出力で上書きしていない。
+- 数学ビルドの既存警告は615件、親の既定ビルドは693件で、数学615・依存側 universe 2・Blueprint 書式76（Model 8・CLT 68）である。CLT 章には移した入力ノードの既存書式警告も含まれる。削除した独立 Annealed_FE の未完成証明は現行ビルドへ含まれず、`sorry` の警告は0件だった。ただし Gaussian CLT の `hFE : AnnealedInput` と命題自体の証明・入力構築の保留状態は変えていない。生成・参照検査の成功は数学的主張と原稿の完全な一致を保証しない。
+- 親子設定と配布用設定・toolchain・固定依存・実 import、現行ファイル/アンカーのリンク、新数学ディレクトリが ignore されないこと、共有文書に環境依存の絶対パスがないことを照合し、`git diff --check` は成功した。GitHub 上の更新後 CI は未実行であり、設定と対応するローカルコマンドを確認した。
+
+実行ログ・開始版のハッシュ・移設表・前後の型/本文比較は検証環境の一時ディレクトリに保存した。監査を実施したという記録は追加していない。
+
 <a id="verso-restore-2026-10-07"></a>
 
 ## VERSO-RESTORE の第1巡実装・検証（2026-10-07）
@@ -366,7 +388,7 @@ R05 では `a=q/2-1≥1` とし、`E(g²-1)²=2`、`E(g²-1)⁴=60` から `E S_
 
 `CLT/Main.lean` は `Annealed_FE/main_result.lean` を直接 import するため、同ライブラリの既定対象からの除外だけでは依存先としての構築を除けない。既存の `Annealed_FE` の10箇所と共同 CLT の `sorry` は対象外として報告し、ビルド成功を最終結果の証明完了と呼ばない。対象外のエラーが検査を妨げる場合は根拠を記録し、無断で対象外へ修正を広げない。
 
-W06 の完了は、上記の有限模型の成果・原稿との対応・[Chapters の計画](Chapters/EDITING_PLAN.md)の更新・差分確認までとする。Verso の生成・参照検査は休止中につき行わない。今回の再計画ではこれらの証明・ビルドを実施しておらず、W06 完了ではない。
+W06 の完了は、上記の有限模型の成果・原稿との対応・[Chapters の計画](Blueprint/EDITING_PLAN.md)の更新・差分確認までとする。Verso の生成・参照検査は休止中につき行わない。今回の再計画ではこれらの証明・ビルドを実施しておらず、W06 完了ではない。
 
 ### 引き継ぎ・有限模型の検証（2026-09-26）
 
@@ -572,7 +594,7 @@ error: import SYK.CLT.Lemmas.CliffordSignParity failed, environment already cont
 - [x] `FiniteDimensionalGibbs.lean` を個別に検査し、`lake build Model SuperConcentration` と追加した主要定理の `#print axioms` を確認した。
 - [x] 差分、警告、既知の失敗と今回の検証範囲を記録し、構造文書と Blueprint の現在の状態を更新した。
 
-担当部分の完了条件：追加の解析 API と Model 内の対応文書が一致し、上記の検証結果が記録されている。W01 全体では [Chapters の計画](Chapters/EDITING_PLAN.md) に記す章の更新と宣言参照の照合も含む。Verso の機械的検証は休止中は要求しない。CLT の局所定義や零点のない領域の証明は含めない。
+担当部分の完了条件：追加の解析 API と Model 内の対応文書が一致し、上記の検証結果が記録されている。W01 全体では [Chapters の計画](Blueprint/EDITING_PLAN.md) に記す章の更新と宣言参照の照合も含む。Verso の機械的検証は休止中は要求しない。CLT の局所定義や零点のない領域の証明は含めない。
 
 ### 検証記録（2026-09-08）
 
@@ -662,7 +684,7 @@ Blueprint の章は W01 の3項目を追加して `lake env lean SYK/Chapters/Mo
 - `majorana_sq`、語の並べ替え・随伴との積、相互作用の二乗の既存証明を `SuperConcentration.Core` から `Model.Majorana` へ移設した。生成子が添字集合に含まれる場合・含まれない場合の交換則を共有層に追加し、逆向きの import は作っていない。
 - `lake env lean SYK/Model/Majorana.lean`、`lake env lean SYK/Model/StandardRepresentation.lean`、`lake env lean SYK/SuperConcentration/Core.lean` は warning なしで成功した。`lake build +SYK.Model.Majorana:olean` と `lake build Model SuperConcentration`（3195 jobs）も成功した。関連ビルドには既存のガウス基盤・密度行列の linter warning が残る。
 - 基底の次元、生成子の二乗・自己共役性・反交換関係、二つの系の構成、トレース直交性、移設・追加した共有補題、および既存の二乗和・両側集中評価に対する `#print axioms` は、すべて `propext`・`Classical.choice`・`Quot.sound` のみだった。仮置きの証明や新たな公理はない。
-- 全体ビルドと Blueprint の生成・参照検査は [Chapters の W04 記録](Chapters/EDITING_PLAN.md) に記録する。`Annealed_FE` と `Universality` は既定対象から除外されたままで、今回も検証していない。
+- 全体ビルドと Blueprint の生成・参照検査は [Chapters の W04 記録](Blueprint/EDITING_PLAN.md) に記録する。`Annealed_FE` と `Universality` は既定対象から除外されたままで、今回も検証していない。
 
 <a id="model-legacy"></a>
 
@@ -899,7 +921,7 @@ W06 を未完了として扱う Model 側の現況説明と、CLT の指示フ�
 
 ## 既定ビルドと未完成証明の確認（2026-09）
 
-2026-09-24 のソース確認では `CLT/Main.lean` が `Annealed_FE/main_result.lean` を直接 import している。従って既定対象からの除外は、そのファイルが依存先として構築されないことを意味しない。旧 API によるエラーは過去の検証結果であり、同日の [CLT の個別検査記録](CLT/EDITING_PLAN.md) では再現しなかった。確認時のソースには CLT の2箇所と Annealed_FE の10箇所の `sorry` がある。W06 では有限模型の `partition_moments` を解消し、共同 CLT と Annealed_FE の未完成箇所は別課題として報告する。この記録は新しい `sorry` の許可ではない。
+2026-09-24 のソース確認では `CLT/Main.lean` が `Annealed_FE/main_result.lean` を直接 import している。従って既定対象からの除外は、そのファイルが依存先として構築されないことを意味しない。旧 API によるエラーは過去の検証結果であり、同日の [CLT の個別検査記録](SYK/CLT/EDITING_PLAN.md) では再現しなかった。確認時のソースには CLT の2箇所と Annealed_FE の10箇所の `sorry` がある。W06 では有限模型の `partition_moments` を解消し、共同 CLT と Annealed_FE の未完成箇所は別課題として報告する。この記録は新しい `sorry` の許可ではない。
 
 2026-09-08 に両ライブラリを一時除外し、`lake env lean SYK.lean`、`lake build Model SuperConcentration CLT`、`lake build`、`lake exe vbp build`、`lake exe vbp check` が成功した。Blueprint の manifest と HTML cache は各50件で整合した。Model・SuperConcentration・Chapters と VersoBlueprint には既存の linter warning が残るが、エラー、未解決の証明目標、および既定範囲の `sorry`・`admit`・`axiom` は検出されなかった。
 

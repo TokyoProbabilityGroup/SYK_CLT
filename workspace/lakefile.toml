@@ -1,9 +1,6 @@
-name = "SYK"
+name = "ResearchWorkspace"
 version = "0.1.0"
-keywords = ["math"]
-# Restore Annealed_FE and Universality when their individual builds are ready.
-defaultTargets = ["Model", "SuperConcentration", "CLT", "SYK"]
-# defaultTargets = ["Model", "SuperConcentration", "CLT", "SYK", "Annealed_FE", "Universality"]
+defaultTargets = ["Blueprint"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -13,36 +10,18 @@ maxSynthPendingDepth = 3
 experimental.module = true
 
 [[require]]
+name = "SYK"
+path = "SYK"
+
+[[require]]
 name = "VersoBlueprint"
 git = "https://github.com/leanprover/verso-blueprint"
 rev = "v4.32.0"
 
-[[require]]
-name = "mathlib"
-scope = "leanprover-community"
-rev = "v4.32.2"
-
 [[lean_lib]]
-name = "SYK"
-# Shared foundations and the formalization Blueprint.
-globs = ["SYK.Probability.GaussianConcentration.+", "SYK.Blueprint", "SYK.Chapters.+"]
-
-[[lean_lib]]
-name = "Annealed_FE"
-globs = ["SYK.Annealed_FE.+"]
-
-[[lean_lib]]
-name = "CLT"
-globs = ["SYK.CLT.+"]
-
-[[lean_lib]]
-name = "SuperConcentration"
-globs = ["SYK.SuperConcentration.+"]
-
-[[lean_lib]]
-name = "Model"
-globs = ["SYK.Model.+"]
-
-[[lean_lib]]
-name = "Universality"
-globs = ["SYK.Universality.+"]
+name = "Blueprint"
+srcDir = "SYK"
+roots = ["Blueprint.Main"]
+globs = ["Blueprint.+"]
+# Check the complete mathematical library before building its documentation.
+needs = ["SYK/SYK:leanArts"]

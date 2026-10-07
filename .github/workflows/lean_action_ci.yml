@@ -35,7 +35,7 @@ jobs:
           use-github-cache: false
 
       - name: Build Blueprint site
-        run: lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site
+        run: lake lean SYK/Blueprint/Build.lean -- --run SYK/Blueprint/Build.lean --output SYK/_out/site
 
       - name: Check Blueprint output
         run: lake exe vbp check --site SYK/_out/site

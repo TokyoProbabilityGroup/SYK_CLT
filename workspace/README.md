@@ -1,47 +1,41 @@
 # Shared Lean Workspace Template
 
-This directory contains the files to copy to the parent directory of the cloned `SYK` repository. That parent directory serves as a shared Lean workspace for multiple mathematical research libraries.
+This directory supplies the parent `ResearchWorkspace` configuration for the local mathematical package `SYK`. The mathematical package's name and declaration namespaces remain unchanged.
 
 ## Intended layout
 
 ```text
 <workspace-root>/
 ├── AGENTS.md
-├── lakefile.toml
-├── lake-manifest.json
+├── lakefile.toml            # ResearchWorkspace
+├── lake-manifest.json       # local SYK and pinned external dependencies
 ├── lean-toolchain
-├── .lake/                  # generated locally by Lake
-└── SYK/                    # cloned repository
-    ├── AGENTS.md
-    ├── Annealed_FE/
-    ├── Blueprint.lean
-    ├── BlueprintMain.lean  # Blueprint renderer entry point
-    ├── Chapters/
-    ├── CLT/
-    ├── Model/
-    ├── SuperConcentration/
+├── .lake/packages/          # shared dependency checkouts
+└── SYK/                     # cloned repository
+    ├── lakefile.toml        # mathematical SYK package, mathlib only
+    ├── lake-manifest.json   # mathematical dependency lock
+    ├── lean-toolchain      # same Lean version as the parent
+    ├── SYK/                # Analysis, Probability, Model, SuperConcentration, CLT
+    ├── Blueprint/          # Main.lean, Build.lean, and four chapters
+    ├── Paper/
+    ├── Notes/
     └── workspace/
 ```
 
-The projects share one Lean toolchain, one Lake dependency manifest, and one downloaded mathlib cache. Sharing the workspace is an implementation and cache-management choice; it does not imply a mathematical dependency between the projects.
+One parent dependency cache serves the mathematical package and the documentation. Lake may place package build artifacts under each package's `.lake/build/`; these are local artifacts, not another dependency checkout or a separately installed mathlib. Sharing the workspace does not introduce mathematical dependencies between topics.
 
-## Why use a shared workspace?
+## Template files and targets
 
-A separate Lake project normally maintains its own `.lake` directory and dependency checkout. Creating one for every research topic can duplicate large mathlib installations. This template instead provides one root toolchain, Lake configuration, dependency manifest, and cache for multiple mathematically independent libraries.
+- `lakefile.toml` defines `ResearchWorkspace`, the local path dependency `SYK`, pinned Verso Blueprint, and the documentation library `Blueprint` with source directory `SYK/`. Its `needs` includes `SYK/SYK:leanArts`, so the default documentation build checks every mathematical module.
+- `lake-manifest.json` locks the local package and the external dependency revisions. The repository's own manifest locks its mathlib-only dependency closure; keep shared revisions consistent.
+- `lean-toolchain` fixes Lean for the parent and dependent package.
+- `AGENTS.md` supplies project-independent rules; repository and topic rules also apply.
 
-## Template files
-
-- `lakefile.toml` defines the workspace package, the pinned mathlib and Verso Blueprint dependencies, common Lean options, and Lean libraries under `SYK/`. A compatible new project should normally be added as another `lean_lib`, not as a nested Lake project.
-- `lake-manifest.json` records exact resolved dependency revisions. It should normally be updated through Lake rather than edited manually.
-- `lean-toolchain` fixes the Lean version shared by all libraries.
-- `AGENTS.md` provides project-independent Codex instructions. At the workspace root, it is supplemented by files such as `SYK/AGENTS.md` and `SYK/CLT/AGENTS.md`.
-- `README.md` documents this template and remains in `SYK/workspace/`.
-
-`defaultTargets` selects the individual mathematical libraries and the `SYK` target for shared foundations, Blueprint, and chapters. No aggregate Lean import file is needed. The renderer `SYK/BlueprintMain.lean` stays in the repository; no project-specific Lean file needs to be copied to the workspace root.
+`lake build` and `lake build Blueprint` check the complete mathematics and documentation. `lake build SYK` checks the mathematical package only. No aggregate mathematical import file is required. The parent renderer is `SYK/Blueprint/Build.lean`.
 
 ## Initial setup
 
-From the directory that will become the workspace root, run:
+From the intended parent directory:
 
 ```bash
 git clone git@github.com:TokyoProbabilityGroup/SYK.git
@@ -51,40 +45,32 @@ cp SYK/workspace/lean-toolchain .
 cp SYK/workspace/AGENTS.md .
 lake exe cache get
 lake build
-lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site
+lake lean SYK/Blueprint/Build.lean -- --run SYK/Blueprint/Build.lean --output SYK/_out/site
 lake exe vbp check --site SYK/_out/site
 ```
 
-Review existing root files before overwriting them. Lake creates `.lake/` locally; do not copy it into this template.
+Review existing parent files before copying. Keep other projects and their dependency constraints. Run Lake from the parent workspace so it uses the shared dependency cache. Generated output remains under `SYK/_out/site/` and is ignored by Git. Append `--pdf` to the renderer for an optional PDF when a compatible LuaLaTeX environment is available.
 
 <a id="collaborator-setup"></a>
 
 ## Collaborator setup for an assigned task
 
-The task owner should provide the full `SYK` Git commit ID and every uncommitted change needed for the assignment, including untracked files. A clone at the commit alone will not include those changes. From the workspace root, the owner can prepare a patch of tracked changes and list the files that must be transferred separately:
-
-```bash
-git -C SYK rev-parse HEAD
-git -C SYK diff --binary HEAD > syk-worktree.patch
-git -C SYK ls-files --others --exclude-standard
-```
-
-The recipient checks out that commit, applies the supplied patch with `git -C SYK apply ../syk-worktree.patch`, copies any listed untracked files, and confirms the received source before editing:
+Provide the complete repository revision and every required tracked or untracked change. From the parent directory, identify the source and prepare tracked changes:
 
 ```bash
 git -C SYK rev-parse HEAD
 git -C SYK status --short
+git -C SYK diff --binary HEAD > syk-worktree.patch
+git -C SYK ls-files --others --exclude-standard
 ```
 
-Use the layout above in a dedicated workspace, or compare the four root configuration files with this template when joining an existing shared workspace. Read the root `AGENTS.md`, `SYK/AGENTS.md`, and every `AGENTS.md` on the path to the assigned files. Keep the repository's `.lake/` out of the handoff; Lake creates a local cache at the workspace root. If the existing root configuration has different Lean, mathlib, or other project dependencies, resolve that difference with the workspace owner before building or replacing root files. A matching Git commit does not imply matching Lake dependencies.
+A clone at the commit alone omits uncommitted changes. Transfer untracked sources separately, apply the patch with `git -C SYK apply ../syk-worktree.patch`, and verify the received files before editing. Read parent, repository, and applicable topic `AGENTS.md` files. Assignment scope and handoff requirements are in [the project plan](../EDITING_PLAN.md#別環境への引き継ぎ).
 
-Run commands from the workspace root. For a Lean edit, start with `lake env lean SYK/path/to/ModifiedFile.lean`, then build the smallest affected target. Use `lake build` for the final integration check. If an existing `lakefile.lean` takes precedence over the intended TOML configuration, select the reviewed TOML explicitly with `lake -f lakefile.toml ...`; do not silently replace the existing workspace configuration. For changes to Blueprint sources or referenced declarations, check the affected chapters and renderer with Lean, generate HTML, and run the reference checker using the commands above. PDF generation is optional when a compatible TeX environment is available. A successful build can still contain existing proof placeholders; check the statement and `#print axioms` of each assigned result separately.
-
-The integration owner collects the changed files, exact validation commands and results, remaining assumptions and warnings, and any mismatch with the manuscript. The task-specific scope and handoff prompt are in [`SYK/EDITING_PLAN.md`](../EDITING_PLAN.md#別環境への引き継ぎ).
+Check an edited mathematical file with `lake env lean SYK/SYK/path/to/File.lean`, then the affected build target, and finally `lake build`. For documentation or referenced declarations, also check the affected chapter and `Blueprint/Main.lean` and `Blueprint/Build.lean`, generate HTML, and run `vbp check`. Inspect theorem statements, assumptions, and `#print axioms` separately; successful generation does not complete an assumed mathematical input.
 
 ## Updating an existing workspace
 
-The root copies are active; the files here are versioned templates. Compare them before applying changes:
+Compare parent copies with the versioned template before applying changes:
 
 ```bash
 diff -u lakefile.toml SYK/workspace/lakefile.toml
@@ -93,26 +79,18 @@ diff -u lean-toolchain SYK/workspace/lean-toolchain
 diff -u AGENTS.md SYK/workspace/AGENTS.md
 ```
 
-Do not blindly overwrite root files when the workspace contains other projects. Merge relevant changes while preserving their libraries and instructions. A template change does not automatically update an existing workspace, and a local root change should be copied back only when it is appropriate for future users.
+The template is not automatically applied to an existing parent workspace. Reconcile its local packages and dependency revisions without discarding unrelated projects. If a parent `lakefile.lean` takes precedence, select the reviewed configuration with `lake -f lakefile.toml ...`.
 
-When migrating from the old layout, review the imports in the root `SYK.lean` and cover the required modules with Lake targets. Compare `SYKMain.lean` with `SYK/BlueprintMain.lean` and preserve local renderer changes. Update the root Lake configuration, then remove the two obsolete root files. Their template copies are no longer distributed. Existing output under the root `_out/site/` is from the old layout and is not used by the new commands.
+A compatible new mathematics project can be a local dependency package or another library in the parent workspace. Keep one shared dependency cache and avoid copying mathlib into the repository. Incompatible Lean or dependency versions may require another workspace.
 
-Run `lake build` for the targets listed in `defaultTargets`. Individual targets such as `lake build Model SuperConcentration CLT` are unchanged. `lake build SYK` checks the shared foundations under `SYK/Probability/`, Blueprint, the chapters, and their dependencies; it does not replace the individual mathematical library targets. CI uses the same `defaultTargets` rather than maintaining a separate list. `Annealed_FE` and `Universality` remain registered but are temporarily excluded as targets; `Universality` currently has no source directory. `CLT.Main` does not import `Annealed_FE.main_result`, but `Chapters.AnnealedFE` does. The default build therefore checks that module and its transitive dependencies, including existing proof placeholders. Success does not establish completion of `Annealed_FE` or validate `Universality`. The main CLTs are Lean-checked conditional on `AnnealedInput`; construction of that input remains separate. A successful build alone does not establish that the formal statements match every claim in the manuscript.
+<a id="restoring-verso"></a>
 
-Use the `lake lean` renderer command shown above, followed by `lake exe vbp check --site SYK/_out/site`. Lake builds the renderer's imports automatically. This explicitly selects the repository's renderer because the installed `vbp build` only discovers root-level entry points. Generated output stays under `SYK/_out/site/` and is ignored by Git. Append `--pdf` to the renderer command for an optional PDF. See the project README for local serving instructions and the reason for invoking the server separately.
+## Blueprint dependencies
 
-## Adding another project
+Verso Blueprint is enabled in the parent only; the child `SYK` package depends on mathlib. Active parent and child manifests preserve the previously pinned external revisions. The obsolete saved Verso lock is no longer distributed; do not overwrite the active parent manifest with a historical lock.
 
-A project compatible with the current Lean and mathlib versions should normally be added as another directory and `lean_lib` in the root `lakefile.toml`. It should keep its mathematical instructions in its own `AGENTS.md`. If it requires incompatible versions, it may need a separate workspace.
+When updating an older workspace, apply the parent package configuration and the repository's mathematical package together, reconcile the lock files, then run the complete build and documentation commands above. Existing CI materializes this parent template and uses the same renderer/check commands. PDF compilation is optional and is not required by CI.
 
 ## Files excluded from this template
 
-Do not place `.lake/`, copied mathlib sources, compiled artifacts, editor or machine state, absolute local paths, secrets, LaTeX products, or project-specific proof plans here. Project-specific architecture and progress documents belong in the corresponding project directory, such as `SYK/CLT/`.
-
-## Restoring Verso
-
-Verso Blueprint is enabled in the dependency configuration, the `SYK` build globs, and the Blueprint CI steps. `lake-manifest.json` contains the full pinned dependency set; `lake-manifest.verso.json` preserves the pre-pause lock file. The restoration retained every existing dependency revision and did not require `lake update`.
-
-For a workspace still using the paused configuration, compare its dependencies with the template before applying the active Verso requirement, `SYK` globs, and full manifest. Preserve revisions and other projects added locally; use `lake update` only if reconciliation requires it. Apply the root and template changes consistently, then run `lake build`, check all chapters and both Blueprint entry modules with Lean, generate HTML, and run `vbp check`. This initial check includes chapters edited during the pause. Optional PDF generation requires a compatible TeX environment; it is not a CI requirement.
-
-Existing workspaces must apply the same configuration changes separately. This repository's CI uses the versioned template; a parent workspace with other projects is not changed automatically.
+Do not distribute `.lake/`, compiled artifacts, mathlib copies, editor state, absolute local paths, secrets, or generated LaTeX and Blueprint products. Topic-specific plans and architecture belong with their mathematical sources.

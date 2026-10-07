@@ -1,7 +1,18 @@
-{"version": "1.2.0",
+{
+ "version": "1.2.0",
  "packagesDir": ".lake/packages",
- "packages":
- [{"url": "https://github.com/leanprover-community/mathlib4",
+ "packages": [
+  {
+   "type": "path",
+   "scope": "",
+   "name": "SYK",
+   "manifestFile": "lake-manifest.json",
+   "inherited": false,
+   "dir": "SYK",
+   "configFile": "lakefile.toml"
+  },
+  {
+   "url": "https://github.com/leanprover-community/mathlib4",
    "type": "git",
    "subDir": null,
    "scope": "leanprover-community",
@@ -9,9 +20,11 @@
    "name": "mathlib",
    "manifestFile": "lake-manifest.json",
    "inputRev": "v4.32.2",
-   "inherited": false,
-   "configFile": "lakefile.lean"},
-  {"url": "https://github.com/leanprover/verso-blueprint",
+   "inherited": true,
+   "configFile": "lakefile.lean"
+  },
+  {
+   "url": "https://github.com/leanprover/verso-blueprint",
    "type": "git",
    "subDir": null,
    "scope": "",
@@ -20,8 +33,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "v4.32.0",
    "inherited": false,
-   "configFile": "lakefile.lean"},
-  {"url": "https://github.com/leanprover-community/plausible",
+   "configFile": "lakefile.lean"
+  },
+  {
+   "url": "https://github.com/leanprover-community/plausible",
    "type": "git",
    "subDir": null,
    "scope": "leanprover-community",
@@ -30,8 +45,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",
    "inherited": true,
-   "configFile": "lakefile.toml"},
-  {"url": "https://github.com/leanprover-community/LeanSearchClient",
+   "configFile": "lakefile.toml"
+  },
+  {
+   "url": "https://github.com/leanprover-community/LeanSearchClient",
    "type": "git",
    "subDir": null,
    "scope": "leanprover-community",
@@ -40,8 +57,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",
    "inherited": true,
-   "configFile": "lakefile.toml"},
-  {"url": "https://github.com/leanprover-community/import-graph",
+   "configFile": "lakefile.toml"
+  },
+  {
+   "url": "https://github.com/leanprover-community/import-graph",
    "type": "git",
    "subDir": null,
    "scope": "leanprover-community",
@@ -50,8 +69,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",
    "inherited": true,
-   "configFile": "lakefile.toml"},
-  {"url": "https://github.com/leanprover-community/ProofWidgets4",
+   "configFile": "lakefile.toml"
+  },
+  {
+   "url": "https://github.com/leanprover-community/ProofWidgets4",
    "type": "git",
    "subDir": null,
    "scope": "leanprover-community",
@@ -60,8 +81,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",
    "inherited": true,
-   "configFile": "lakefile.lean"},
-  {"url": "https://github.com/leanprover-community/aesop",
+   "configFile": "lakefile.lean"
+  },
+  {
+   "url": "https://github.com/leanprover-community/aesop",
    "type": "git",
    "subDir": null,
    "scope": "leanprover-community",
@@ -70,8 +93,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "master",
    "inherited": true,
-   "configFile": "lakefile.toml"},
-  {"url": "https://github.com/leanprover-community/quote4",
+   "configFile": "lakefile.toml"
+  },
+  {
+   "url": "https://github.com/leanprover-community/quote4",
    "type": "git",
    "subDir": null,
    "scope": "leanprover-community",
@@ -80,8 +105,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "master",
    "inherited": true,
-   "configFile": "lakefile.toml"},
-  {"url": "https://github.com/leanprover-community/batteries",
+   "configFile": "lakefile.toml"
+  },
+  {
+   "url": "https://github.com/leanprover-community/batteries",
    "type": "git",
    "subDir": null,
    "scope": "leanprover-community",
@@ -90,8 +117,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",
    "inherited": true,
-   "configFile": "lakefile.toml"},
-  {"url": "https://github.com/leanprover/verso-slides",
+   "configFile": "lakefile.toml"
+  },
+  {
+   "url": "https://github.com/leanprover/verso-slides",
    "type": "git",
    "subDir": null,
    "scope": "",
@@ -100,8 +129,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "v4.32.0",
    "inherited": true,
-   "configFile": "lakefile.lean"},
-  {"url": "https://github.com/leanprover/verso",
+   "configFile": "lakefile.lean"
+  },
+  {
+   "url": "https://github.com/leanprover/verso",
    "type": "git",
    "subDir": null,
    "scope": "",
@@ -110,8 +141,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "v4.32.0",
    "inherited": true,
-   "configFile": "lakefile.lean"},
-  {"url": "https://github.com/leanprover/lean4-cli",
+   "configFile": "lakefile.lean"
+  },
+  {
+   "url": "https://github.com/leanprover/lean4-cli",
    "type": "git",
    "subDir": null,
    "scope": "leanprover",
@@ -120,8 +153,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "v4.32.0",
    "inherited": true,
-   "configFile": "lakefile.toml"},
-  {"url": "https://github.com/leanprover/illuminate",
+   "configFile": "lakefile.toml"
+  },
+  {
+   "url": "https://github.com/leanprover/illuminate",
    "type": "git",
    "subDir": null,
    "scope": "",
@@ -130,8 +165,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",
    "inherited": true,
-   "configFile": "lakefile.lean"},
-  {"url": "https://github.com/acmepjz/md4lean",
+   "configFile": "lakefile.lean"
+  },
+  {
+   "url": "https://github.com/acmepjz/md4lean",
    "type": "git",
    "subDir": null,
    "scope": "",
@@ -140,8 +177,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",
    "inherited": true,
-   "configFile": "lakefile.lean"},
-  {"url": "https://github.com/leanprover/subverso",
+   "configFile": "lakefile.lean"
+  },
+  {
+   "url": "https://github.com/leanprover/subverso",
    "type": "git",
    "subDir": null,
    "scope": "",
@@ -150,7 +189,10 @@
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",
    "inherited": true,
-   "configFile": "lakefile.lean"}],
- "name": "SYK",
+   "configFile": "lakefile.lean"
+  }
+ ],
+ "name": "ResearchWorkspace",
  "lakeDir": ".lake",
- "fixedToolchain": false}
+ "fixedToolchain": false
+}
