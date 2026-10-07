@@ -35,6 +35,7 @@ W01–W06、R01–R05、F01–F08、Z01 は、それぞれの履歴に記録し�
 | `CLT-LOG` | 対数の期待誤差の明示的評価 | 完了 | Noda（担当・統合） | `CLT-INPUT` |
 | `CLT-APPLY` | `prop:annealed-free-energy` を仮定した標準模型族への適用 | 完了 | Noda（担当・統合） | `CLT-INPUT` |
 | `CLT-REFACTOR` | CLT・共有層・利用側のリファクタリング | 完了 | Kamijima（担当・統合） | `CLT-LOG`・`CLT-APPLY` と現行数学的実装 |
+| `CLT-CLEANUP` | 品質調査で確認した重複証明・定義と読解案内の整理 | 完了 | Kamijima（担当・統合） | `CLT-REFACTOR` と改善案の適用依頼 |
 
 ```mermaid
 flowchart TD
@@ -43,9 +44,12 @@ flowchart TD
     input --> application["CLT-APPLY"]
     log --> refactor["CLT-REFACTOR"]
     application --> refactor
+    refactor --> cleanup["CLT-CLEANUP"]
 ```
 
 完了した `CLT-AUDIT` の結果と検証は [監査記録](WORK_HISTORY.md#clt-audit-2026-10-04) を参照する。
+
+`CLT-CLEANUP` は品質調査の改善案を適用する別作業とする。開始 HEAD は `f321eb570b5067f67b5127a4639335500c4d3f12`、開始時の差分はない。第1巡の実装・15個別検査・CLT ビルド・型と公理確認・文書更新と監査を終え、統合を完了した。監査の必須修正・任意提案・未解決事項はすべて0件で、追加の実装・Lean 検証・監査巡回は不要だった。公開定理の型・前提・規格化を保持し、作業・監査は最大3巡とする。成果は [第1巡の記録](WORK_HISTORY.md#clt-cleanup-2026-10-06)、対象と完了条件は [CLT の計画](CLT/EDITING_PLAN.md#重複証明定義と読解案内の整理) に記す。
 
 完了した `CLT-INPUT` の開始点、参照原稿、成果と検証は [入力整理の記録](WORK_HISTORY.md#clt-input-2026-10-04) を参照する。`CLT-LOG`・`CLT-APPLY` は Noda（担当・統合）が実装・Lean 検証・原稿照合・文書と Blueprint の統合を完了した。開始点と成果・検証は [完了記録](WORK_HISTORY.md#clt-log-apply-completion-2026-10-05) を参照する。
 

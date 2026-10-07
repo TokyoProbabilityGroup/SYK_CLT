@@ -2,6 +2,43 @@
 
 完了済み作業の検証結果と旧計画を保存する。現行の残件は [全体計画](EDITING_PLAN.md) と各詳細計画で確認する。履歴内の「現在」「未解決」は記録当時を指す。通常の作業再開時に全体を読む必要はない。
 
+<a id="clt-cleanup-2026-10-06"></a>
+
+## CLT-CLEANUP の第1巡実装・検証（2026-10-06–07）
+
+担当・統合担当は Kamijima。品質調査で提示した改善案の適用依頼を受け、完了した `CLT-REFACTOR` とは別作業として開始した。実作業は Sol、監査は Astra。作業・監査は最大3巡とする。開始 HEAD は `f321eb570b5067f67b5127a4639335500c4d3f12`、開始時の差分・未追跡ファイルはなかった。2026-10-06 の第1巡実装中に使用量限度で停止し、2026-10-07 の再開依頼により同じ成果とログを保持して続きを行った。この停止は監査巡回に数えない。以下は第1巡提出時の実装・検証記録であり、その時点では監査待ちの統合待ちとした。監査と統合の完了は本節末尾に記す。
+
+編集前に既存の全体計画と CLT 計画へ範囲・担当・完了条件を記録した。参照原稿は開始 HEAD の `CLT/refs/CLT_SYK.tex` と `CLT/refs/sections/` の全4節（`introduction.tex`、`gaussian-chaos.tex`、`higher-chaoses.tex`、`main-results.tex`）。終了時に開始版とバイト比較し、SHA-256 も一致した。原稿本文・`SYK/README.md`・共有 Model・ガウス基盤・依存設定は変更していない。保留中の凸収束補題・外部入力調査・アニール命題の証明は再開していない。
+
+### 適用した改善案
+
+- `SingularAux.sv_sq` と `sv_antitone` の証明を mathlib の `sq_singularValues_of_lt` と `singularValues_antitone` の適用にした。有限和 Hölder は `NNReal.Lr_rpow_le_Lp_mul_Lq` と、正の `1/r` 乗・実数への射影による13行の証明に整理した。非負列に零を許す条件と元の明示的な `0<r` の仮定を保つ。
+- `Main` は `partition_clt` を先に証明し、`partition_and_log_partition_clt` がその結論と下位の `Setting.logFluctuation_clt` を共通の小さい正半径で結合する。`log_partition_clt` は結合定理から射影する。全結論・仮定・量化と温度条件を保ち、循環依存を作らない。
+- `GaussianQuadraticObservable` の2個の可測性補題を公開し `fun_prop` 属性を付けた。`normalizedQuadraticSum_measurable` は法則対応・二次 CLT・四次モーメントの3箇所で共有する。中心化した Gaussian square の可測性も直接利用し、繰り返した局所展開を除いた。参照のない private の `normalizedQuadraticSum_raw_measurable` は削除した。
+- `TraceExpDerivatives` は `DerivAux.tE` を削除し、既存の `MatrixAnalysis.Matrix.traceExp` に定義を一本化した。`DerivAux.contDiff_tE` と `iteratedFDeriv_tE_bound_hermitian` の公開名は保持し、対象を同じ定義へ置き換えた。互換別名は残していない。
+- 次数2の Hermite 評価式を `GaussianHermiteBasic` の `SYK.hermite_two_eval` として共有し、平均計算と四次展開で利用する。四次モーメントは六つの Hermite 項の可積分性を列挙して `integral_finsetSum` を一度適用する証明にした。生成作用素による Hermite と積による Hermite の2構成は保持した。
+- `MatrixTraceExponential` の Duhamel・Schatten・語のトレース・Taylor 係数の役割を説明した。案内と構造文書には、共有 `Smooth` が現行の部分積分経路であり、旧 `GaussianIBP` は `Main` の再帰 import 外だが CLT グロブと章参照に残ることを明記した。ファイルの大規模分割や旧経路の削除は行っていない。
+- Blueprint は分配 CLT の節を個別定理の参照とし、対数 CLT の節で結合定理の共同半径と射影を説明した。`Setting`・`AnnealedInput`、List に沿う微分、規格化トレース2種、抽象模型と標準模型の境界は保持した。
+
+### 検証結果と残る境界
+
+Lean 4.32.2、Lake 5.0.0（commit `f3b06c7`）で、共有ワークスペースのルートから、elan が管理する Lake の実行ファイルを指定して検査した。
+
+- 最終 `lake env lean` は、変更した `GaussianHermiteBasic`、`GaussianQuadraticObservable`、`GaussianFourthMoment`、`IndependentFourthMoment`、`GaussianQuadraticCLT`、`SingularValues`、`MatrixTraceExponential`、`TraceExpDerivatives`、`Main` と、直接利用側の `GaussianChaos`、`CliffordSignParity`、`PartitionDerivatives`、`QuadraticBridge`、`LogEventBound`、`StandardModel` の計15ファイルですべて成功した。必要な `olean` は依存順に生成した。
+- 最終 `lake build CLT` は3256 jobsで成功した。エラー0件、警告540件で、前回と同じ既存警告と内訳である。`StandardGaussian` 264、`Smooth` 183、`GaussianIBP` 74、`SingularValues` 2、`MatrixTraceExponential` 6、`TraceExpDerivatives` 2、`PartitionDerivatives` 5、`Preliminaries` 2、`Rademacher` 1、`FiniteDimensionalGibbs` 1。関連する警告は既存の長い行、非推奨の線形写像補題、`show`・柔軟な `simp` の使用、未使用の型クラス仮定である。新しい警告はない。共有層を変更していないため既定ビルドは本単位の検証対象に含めず、既定対象外のライブラリも検査していない。
+- 開始時の22主要宣言と終了時の `#print` を比較した。20宣言は型・定義・公理表示が完全一致し、上記の行列微分2補題は承認済みの `tE` から `traceExp` への置換後に一致した。両定義の展開式は同じ `normalizedTrace (exp A)` であり、保持した定義に対する `rfl` の Lean 検査も成功した。関係20宣言のソースヘッダーは、この2置換を除きそのまま保持した。
+- 共有した Hermite 評価式と可測性2補題を加えた25宣言の `#print axioms` はすべて `[propext, Classical.choice, Quot.sound]` のみで、`sorryAx`・新規公理はない。対象は変更した特異値・Hölder・行列微分、Gaussian モーメント・二次和 CLT、抽象3 CLT、標準模型3 CLT と共有補題である。
+- 原稿 `thm:partition-clt`・`thm:free-energy-clt`・`eq:Z-derivative-bound` と、入力・型・規格化・結論を再照合した。主定理は `hFE : AnnealedInput`、実逆温度 `0<|β|<βq`、尺度 `N^(q/2-1)`、極限分散 `(q!/2)β²(ℓ_q'(β))²`、標準化分散1を保持する。アニール命題と入力の構築は未証明のまま明示的に仮定する。
+- Blueprint の変更した宣言名・証明依存をソース上で照合し、CLT 章の42個の依存参照を他章も含めた識別子と比較して未解決参照0件を確認した。Verso の章・生成入口の Lean 検査、生成、`vbp check` は休止中のため実施していない。関係差分・リンクを確認し、`git diff --check` は成功した。
+
+途中の局所検査では、非負実数の記法スコープと射影の型変換、有限和の括弧順序のエラーを修正した。Hölder の最初の短縮案では元の `0<r` が未使用となったため、仮定を隠す参照を加えず、`r` 乗不等式から正の `1/r` 乗を取る自然な証明に改めた。最終検証にエラー・未完成証明・未解決目標はない。実行ログと比較記録は検証環境の一時ディレクトリに保存した。コミットは作成していない。第1巡監査はこれから行う。
+
+### 第1巡監査と統合完了
+
+第1巡の完成成果を読み取り監査し、必須修正0件、任意提案0件、未解決事項0件を確認した。型・前提・規格化と零・空集合の場合、証明依存と共有補題の実利用、定義の一本化、四次モーメントの有限和、15個別検査・3256 jobsのビルド・25宣言の公理依存、原稿・文書・Blueprint の境界を確認した。追加の実装・Lean 検証要求はなかった。
+
+指摘なしの結論を受け、担当・統合担当の Kamijima が計画と本履歴を完了へ更新した。最終更新は状態と監査記録のみで、数学的ソースを追加変更せず Lean 検証も繰り返していない。関係差分・リンク・状態と `git diff --check` を確認した。実際の作業・監査は第1巡のみで完了し、使用量限度による実装途中の停止はこの巡回と区別する。`hFE : AnnealedInput` は明示的な前提として残り、Verso の機械的検査は休止中である。コミットは作成していない。
+
 <a id="clt-refactor-2026-10-06"></a>
 
 ## CLT-REFACTOR の第1巡実装・検証（2026-10-06）
@@ -16,7 +53,7 @@
 
 移設した12公開宣言と4 private 補助の元ソースブロックが、移設先にそのまま含まれることを確認した。private の `centeredGaussianSquare_measurable` は `@[fun_prop]` と証明項を保って観測量ファイルへ移した。二次 CLT 内でこの private 名を直接使っていた箇所は、同じ可測性の局所証明に接続した。元ソースから再検査した一時入力と移設後の `#print` を比較し、12公開宣言の型・定義が一致した。公開名・名前空間・仮定・量化・属性・規格化を変更せず、互換用別名・旧パスは追加していない。
 
-Lean 4.32.2、Lake 5.0.0（commit `f3b06c7`）で、共有ワークスペースのルートから以下を検証した。環境の PATH に Lake がなかったため、既存の `/home/yoshi/.elan/bin/lake` を明示して実行した。
+Lean 4.32.2、Lake 5.0.0（commit `f3b06c7`）で、共有ワークスペースのルートから以下を検証した。環境の PATH に Lake がなかったため、elan が管理する Lake の実行ファイルを明示して実行した。
 
 - `lake env lean SYK/CLT/Lemmas/<名前>.lean` は、新規2ファイルと `CliffordSignParity`、`GaussianChaos`、`GaussianQuadraticCLT`、`GaussianFourthMoment`、`IndependentFourthMoment`、`Rademacher`、直接利用側の `GaussianHermiteOrthogonality`、`Preliminaries`、`QuadraticBridge`、`LogEventBound`、`HigherChaosProjection` の計13ファイルですべて成功した。必要な `olean` は `lake build +<module>:olean` で依存順に生成した。
 - 最終 `lake build CLT` は3256 jobsで成功した。エラー0件、既存の linter・非推奨警告540件（直前の LOG・APPLY 記録と同数）。内訳は `StandardGaussian` 264、`Smooth` 183、`GaussianIBP` 74、`SingularValues` 2、`MatrixTraceExponential` 6、`TraceExpDerivatives` 2、`PartitionDerivatives` 5、`Preliminaries` 2、`Rademacher` 1、`FiniteDimensionalGibbs` 1。関連する警告は既存の長い行、非推奨の線形写像補題、`show`・柔軟な `simp` の使用、未使用の型クラス仮定である。新規2ファイルと移設元に新しい警告はない。共有層・設定を変更していないため既定ビルドは本単位の検証対象に含めず、既定対象外の `Annealed_FE`・`Universality` も検査していない。
@@ -179,7 +216,7 @@ R04-A は方針(i)を採用し、`thm: input` を `N^{-1}E[log Z_N(β)]` と `N^
 
 F08 は R04-A の決定で概収束の形式化対象がなくなったことを確認し、新規 Lean 宣言を追加せず仕様確定で完了した。`AnnealedInput q S` は期待クエンチ圧力も概収束も要求せず、条件付きの相対・標準化・対数 CLT の入力を維持する。F01–F07 の既存実装・検証記録と合わせて F01–F08 を完了とした。これらの完了は `AnnealedInput` 自体の構築、He2026 の Lean 証明、概収束の Lean 証明を意味しない。
 
-`latexmk -pdf -silent -interaction=nonstopmode -halt-on-error -outdir=/private/tmp/syk-r08-tex.jkAZxk CLT_SYK.tex` は17ページの PDF を一時ディレクトリに生成して成功し、最終ログに未解決引用・参照や組版警告はない。ワークスペースのルートから `lake -f SYK/workspace/lakefile.toml build CLT` は3253 jobs で成功した。既存 Lean ファイルの linter 警告は再表示された。Blueprint の数学的主張と参照はソース上で照合し、休止中の Verso 生成・参照検査は行っていない。変更は未コミット。
+一時ディレクトリを `-outdir` で出力先に指定し、`latexmk` を `-pdf -silent -interaction=nonstopmode -halt-on-error` の各オプションで `CLT_SYK.tex` に対して実行した。17ページの PDF を生成して成功し、最終ログに未解決引用・参照や組版警告はない。ワークスペースのルートから `lake -f SYK/workspace/lakefile.toml build CLT` は3253 jobs で成功した。既存 Lean ファイルの linter 警告は再表示された。Blueprint の数学的主張と参照はソース上で照合し、休止中の Verso 生成・参照検査は行っていない。変更は未コミット。
 
 <a id="clt-abstract-input-2026-09-27"></a>
 

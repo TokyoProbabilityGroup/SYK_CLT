@@ -44,7 +44,7 @@
 
 補題を利用するときは、以下の用途と宣言名から対象を選び、ソースで定理文と必要な定義を確認する。名前空間、節の変数、型クラス、局所記法も確認し、証明の詳細は必要になった箇所を読む。この参照方法は通常の文書・Lean ソースを対象とし、適用される `AGENTS.md` の確認範囲を限定しない。以下の説明は索引であり、正確な仮定と型は Lean 宣言を参照する。
 
-- `Lemmas/GaussianIBP.lean` は、指数傾斜によるシフト恒等式、差商の一様評価、支配収束を用いて、実ガウス分布の Stein 型部分積分を構成する。共有 `Probability/GaussianConcentration/Smooth.lean` は、独立標準ガウスと probabilists' Hermite 多項式に対し、`C^{|α|}` の正則性と `η ≤ α` の各偏導関数に対する指数増大から、多重指数部分積分 `hermiteMulti_ibp_of_expGrowth` と両辺の可積分性を与える。これは `lem:Gaussian-Hermite-IBP` の一般部分に対応するが、`Setting.Z` の各偏導関数の評価を供給したり、この公式を `Z_N` に適用したりするものではない。
+- `Lemmas/GaussianIBP.lean` は、指数傾斜によるシフト恒等式、差商の一様評価、支配収束を用いて、実ガウス分布の Stein 型部分積分を構成する旧経路である。`Main` の再帰 import に含まれず、`Chapters/CLT.lean` の参照と `CLT` ライブラリのグロブによる別途ビルドを残す。現行の CLT の部分積分は共有 `Probability/GaussianConcentration/Smooth.lean` を使う。同基盤は、独立標準ガウスと probabilists' Hermite 多項式に対し、`C^{|α|}` の正則性と `η ≤ α` の各偏導関数に対する指数増大から、多重指数部分積分 `hermiteMulti_ibp_of_expGrowth` と両辺の可積分性を与える。これは `lem:Gaussian-Hermite-IBP` の一般部分に対応するが、`Setting.Z` の各偏導関数の評価を供給したり、この公式を `Z_N` に適用したりするものではない。
 - [GaussianHermiteBasic.lean](Lemmas/GaussianHermiteBasic.lean)：任意の有限型に対する `SYK.hermiteMulti`、`gaussianCouplings` と符号反転・置換による期待値の不変性を置く。模型や CLT を import しない。これらを使うマヨラナ系の符号ゲージ・頂点偶奇則は `CliffordSignParity.lean` に置く。
 - [GaussianChaos.lean](Lemmas/GaussianChaos.lean)：`SYK.CLT.hermite_coefficient_ibp` と `hermite_coefficient_integrable` が係数の部分積分と両辺の可積分性の入口である。`SYK.GaussianConcentration.hermiteMulti` と `GaussianHermiteBasic.lean` の `SYK.hermiteMulti`、二つの標準ガウス測度の定義を照合し、原稿の成長条件で後者の記法へ移す。正次数の平均零と Hermite 関数の積の可積分性も証明する。模型固有の符号ゲージを import しない。
 - [GaussianHermiteOrthogonality.lean](Lemmas/GaussianHermiteOrthogonality.lean)：`SYK.CLT.hermiteMulti_orthogonality`、`inner_hermiteLp`、`hermiteFiniteProjection_eq_starProjection` が、原稿の Hermite 内積・階乗ノルムと任意の有限添字集合への直交射影公式の入口である。このファイルの `hasSum_hermiteCoefficients` と `hasSum_hermiteDegreeProjection` は $L^2$ 完全性を仮定する。完全性を別途渡さずに使う結果は、次の `GaussianPolynomialDensity.lean` を参照する。
@@ -84,6 +84,26 @@ flowchart TD
 汎用 Hermite 補題の実利用側はこの CLT 内の展開と符号対称性であるため、共有ガウス基盤へ CLT の記法を追加しない。四次モーメントの経路から二次 CLT と `SecondChaosAsymptotic` を外すことで、有限モーメント評価の数学的前提が直接読める。
 
 有限行列解析の `SingularValues → MatrixTraceExponential → TraceExpDerivatives` は現行配置を維持する。実際の外部利用側は `PartitionDerivatives` だけで、Model はこれを import しない。`SYK.normalizedTrace` は複素行列と非空型、`MatrixAnalysis.Matrix.normalizedTrace` は一般の `RCLike` と空型も対象にするため、型を保った整理で両定義を統合しない。CLT への規格化の接続は `Setting.Z_eq_traceExp` と `Setting.norm_traceExp_disorder` に残る。採否と検証条件は [詳細計画](EDITING_PLAN.md#調査から確定した編集範囲) を参照する。
+
+## 重複証明と定義の整理
+
+`CLT-CLEANUP` は既存の型・仮定・規格化を保って証明を共有する。`SingularValues` の平方・単調性は mathlib の API、有限和 Hölder は非負実数の有限和不等式を使う。零を許す列を正値に強めない。二次観測量の可測性は `GaussianQuadraticObservable` から法則対応・二次 CLT・四次モーメントへ供給し、Hermite2 の評価式は `GaussianHermiteBasic` で共有する。四次モーメントの六つの項は可積分性を個別に確認して有限和を積分する。
+
+行列トレース指数は `MatrixAnalysis.Matrix.traceExp` に一本化した。`DerivAux.contDiff_tE` と `iteratedFDeriv_tE_bound_hermitian` の公開名は保ち、対象を同じ定義へ接続する。List に沿う微分と mathlib の反復 Fréchet 微分の滑らかさによる接続、および二つの規格化トレースの型は保持する。`MatrixTraceExponential` の Duhamel は一次微分、Schatten・語の評価と Taylor 係数は高階微分の解析的証明を担う。
+
+`Main` は分配 CLT を先に証明し、結合定理が下位の対数 CLT と組み合わせて共通半径を取る。個別の対数 CLT は結合定理から射影する。矢印は証明結果から利用側へ向かい、公開定理の全結論と入力 `hFE` は変えない。
+
+```mermaid
+flowchart TD
+    relative["相対 CLT"] --> partition["partition_clt"]
+    standardized["標準化 CLT・分散正値性"] --> partition
+    partition --> joint["partition_and_log_partition_clt"]
+    lowerlog["Setting.logFluctuation_clt"] --> joint
+    joint --> log["log_partition_clt"]
+    joint --> standard["標準模型への適用"]
+```
+
+検証と監査の状態は [詳細計画](EDITING_PLAN.md#重複証明定義と読解案内の整理)、開始点と結果は [作業履歴](../WORK_HISTORY.md#clt-cleanup-2026-10-06) を参照する。
 
 ## アニール入力
 

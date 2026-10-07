@@ -18,16 +18,11 @@ namespace SYK.CLT
 noncomputable def centeredGaussianSquare (x : ℝ) : ℝ :=
   (x ^ 2 - 1) / Real.sqrt 2
 
-@[fun_prop] private theorem centeredGaussianSquare_measurable :
+/-- Measurability of the centered variance-one Gaussian square. -/
+@[fun_prop] theorem centeredGaussianSquare_measurable :
     Measurable centeredGaussianSquare := by
   unfold centeredGaussianSquare
   fun_prop
-
-private theorem hermite_two_eval (x : ℝ) :
-    Polynomial.aeval x (Polynomial.hermite 2) = x ^ 2 - 1 := by
-  rw [show 2 = 1 + 1 by decide, Polynomial.hermite_succ, Polynomial.hermite_one]
-  simp
-  ring
 
 theorem centeredGaussianSquare_mean :
     (∫ x, centeredGaussianSquare x ∂gaussianReal 0 1) = 0 := by
@@ -58,16 +53,10 @@ noncomputable def normalizedQuadraticSum (N q : ℕ) (g : CouplingSpace N q) : �
   (Real.sqrt (Fintype.card (InteractionIndex N q) : ℝ))⁻¹ *
     ∑ i : InteractionIndex N q, centeredGaussianSquare (g i)
 
-private theorem normalizedQuadraticSum_measurable (N q : ℕ) :
+/-- Measurability of the finite quadratic fluctuation on the coupling space. -/
+@[fun_prop] theorem normalizedQuadraticSum_measurable (N q : ℕ) :
     Measurable (normalizedQuadraticSum N q) := by
-  unfold normalizedQuadraticSum centeredGaussianSquare
-  fun_prop
-
-private theorem normalizedQuadraticSum_raw_measurable (N q : ℕ) :
-    Measurable (fun g : InteractionIndex N q → ℝ =>
-      (Real.sqrt (Fintype.card (InteractionIndex N q) : ℝ))⁻¹ *
-        ∑ i : InteractionIndex N q, centeredGaussianSquare (g i)) := by
-  unfold centeredGaussianSquare
+  unfold normalizedQuadraticSum
   fun_prop
 
 theorem normalizedQuadraticSum_law (N q : ℕ) :

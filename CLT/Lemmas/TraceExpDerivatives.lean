@@ -56,6 +56,16 @@ theorem iterDirectionalFDeriv_eq_iteratedFDeriv (f : E → F) (hf : ContDiff ℝ
 
 end DirectionalDerivative
 
+namespace Matrix
+
+variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
+
+/-- Normalized trace exponential, shared by the smoothness and derivative estimates. -/
+noncomputable def traceExp (A : Matrix n n 𝕜) : 𝕜 :=
+  normalizedTrace (NormedSpace.exp A)
+
+end Matrix
+
 namespace DerivAux
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
@@ -77,12 +87,8 @@ local instance : IsScalarTower ℝ 𝕜 (Matrix n n 𝕜) :=
     rw [RCLike.real_smul_eq_coe_mul]
     ring⟩
 
-/-- Normalized trace of the matrix exponential. -/
-noncomputable def tE (A : Matrix n n 𝕜) : 𝕜 :=
-  Matrix.normalizedTrace (NormedSpace.exp A)
-
 /-- Smoothness of the normalized trace exponential as a real map. -/
-theorem contDiff_tE : ContDiff ℝ ⊤ (tE : Matrix n n 𝕜 → 𝕜) := by
+theorem contDiff_tE : ContDiff ℝ ⊤ (Matrix.traceExp : Matrix n n 𝕜 → 𝕜) := by
   have hexp : ContDiff ℝ ⊤ (NormedSpace.exp : Matrix n n 𝕜 → Matrix n n 𝕜) := by
     rw [contDiff_iff_contDiffAt]
     intro x
@@ -97,7 +103,7 @@ theorem contDiff_tE : ContDiff ℝ ⊤ (tE : Matrix n n 𝕜 → 𝕜) := by
     ext a b
     rfl
   have hsmooth : @ContDiff ℝ _ (Matrix n n 𝕜) _ _ 𝕜 _
-      (NormedAlgebra.toNormedSpace 𝕜) ⊤ tE := by
+      (NormedAlgebra.toNormedSpace 𝕜) ⊤ Matrix.traceExp := by
     change @ContDiff ℝ _ (Matrix n n 𝕜) _ _ 𝕜 _
       (NormedAlgebra.toNormedSpace 𝕜) ⊤ (fun A : Matrix n n 𝕜 =>
         (Fintype.card n : 𝕜)⁻¹ * Matrix.trace (NormedSpace.exp A))
@@ -109,7 +115,7 @@ open scoped Nat in
 point: each direction contributes its operator norm. -/
 theorem iteratedFDeriv_tE_bound_hermitian [Nonempty n] (A : Matrix n n 𝕜) (hA : A.IsHermitian)
     (k : ℕ) (v : Fin k → Matrix n n 𝕜) :
-    ‖iteratedFDeriv ℝ k tE A v‖ ≤ (∏ i, ‖v i‖) * ‖tE A‖ := by
+    ‖iteratedFDeriv ℝ k Matrix.traceExp A v‖ ≤ (∏ i, ‖v i‖) * ‖Matrix.traceExp A‖ := by
   set c0 := ‖A‖ with hc0
   set ν : n → ℝ := fun j => hA.eigenvalues j + c0 with hν_def
   have hν : ∀ j, 0 ≤ ν j := fun j => by
@@ -125,11 +131,11 @@ theorem iteratedFDeriv_tE_bound_hermitian [Nonempty n] (A : Matrix n n 𝕜) (hA
   have hDs : ∀ l : ℕ, 1 ≤ l →
       Matrix.normalizedSchattenNorm l D ^ l = ‖Matrix.normalizedTrace (D ^ l)‖ := fun l hl => by
     rw [hDtr, Matrix.normalizedSchattenNorm_conjDiag_pow A hA ν hν l hl]
-  have htE : ‖tE A‖ = (∑ j, Real.exp (hA.eigenvalues j)) / Fintype.card n := by
+  have htE : ‖Matrix.traceExp A‖ = (∑ j, Real.exp (hA.eigenvalues j)) / Fintype.card n := by
     have h := ExpAux.trace_exp A hA 1
     rw [one_smul] at h
     simp only [one_mul] at h
-    rw [tE, Matrix.normalizedTrace, h, ← RCLike.ofReal_sum, ← RCLike.ofReal_natCast,
+    rw [Matrix.traceExp, Matrix.normalizedTrace, h, ← RCLike.ofReal_sum, ← RCLike.ofReal_natCast,
       ← RCLike.ofReal_inv, ← RCLike.ofReal_mul, RCLike.norm_ofReal, abs_of_nonneg (by positivity),
       inv_mul_eq_div]
   set S := (∑ j, Real.exp (ν j)) / Fintype.card n with hS_def
@@ -146,7 +152,7 @@ theorem iteratedFDeriv_tE_bound_hermitian [Nonempty n] (A : Matrix n n 𝕜) (hA
       ring
     rw [hterms, hS_def]
     exact h2
-  have hSeq : Real.exp (-c0) * S = ‖tE A‖ := by
+  have hSeq : Real.exp (-c0) * S = ‖Matrix.traceExp A‖ := by
     rw [htE, hS_def, mul_div_assoc', Finset.mul_sum]
     congr 1
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -163,29 +169,30 @@ theorem iteratedFDeriv_tE_bound_hermitian [Nonempty n] (A : Matrix n n 𝕜) (hA
     have := hfps.changeOrigin (y := D) (by simp)
     simpa using this
   have hfpsR := hfpsD.restrictScalars (𝕜 := ℝ)
-  have hshift : (tE : Matrix n n 𝕜 → 𝕜) =
+  have hshift : (Matrix.traceExp : Matrix n n 𝕜 → 𝕜) =
       fun X => (L ∘ NormedSpace.exp) (X + ((c0 : ℝ) : 𝕜) • (1 : Matrix n n 𝕜)) := by
     funext X
     simp only [Function.comp_apply, Matrix.exp_add_smul_one, hL, ha,
       ContinuousLinearMap.smul_apply, Matrix.normalizedTraceCLM_apply,
-      Matrix.normalizedTrace_smul, smul_eq_mul, tE]
+      Matrix.normalizedTrace_smul, smul_eq_mul, Matrix.traceExp]
     rw [← mul_assoc, ← RCLike.ofReal_mul, ← Real.exp_add, neg_add_cancel, Real.exp_zero,
       RCLike.ofReal_one, one_mul]
-  have hiter : iteratedFDeriv ℝ k tE A = iteratedFDeriv ℝ k (L ∘ NormedSpace.exp) D := by
+  have hiter : iteratedFDeriv ℝ k Matrix.traceExp A =
+      iteratedFDeriv ℝ k (L ∘ NormedSpace.exp) D := by
     rw [hshift, iteratedFDeriv_comp_add_right']
     simp only
     rw [← hDeq]
   rw [hiter, hfpsR.iteratedFDeriv_eq_sum_of_completeSpace]
   have hcoef : ∀ σ : Equiv.Perm (Fin k),
       ‖(P.changeOrigin D).restrictScalars ℝ k (fun i => v (σ i))‖ ≤
-        (∏ i, ‖v i‖) / (k ! : ℝ) * ‖tE A‖ := by
+        (∏ i, ‖v i‖) / (k ! : ℝ) * ‖Matrix.traceExp A‖ := by
     intro σ
     have h := Matrix.changeOrigin_coef_bound D hDs a S hS k (fun i => v (σ i))
     rw [Equiv.prod_comp σ (fun i => ‖v i‖)] at h
     calc ‖(P.changeOrigin D).restrictScalars ℝ k (fun i => v (σ i))‖
         = ‖(P.changeOrigin D k) (fun i => v (σ i))‖ := rfl
       _ ≤ ‖a‖ * (∏ i, ‖v i‖) / (k ! : ℝ) * S := h
-      _ = (∏ i, ‖v i‖) / (k ! : ℝ) * ‖tE A‖ := by
+      _ = (∏ i, ‖v i‖) / (k ! : ℝ) * ‖Matrix.traceExp A‖ := by
           rw [← hSeq, ha, RCLike.norm_ofReal, abs_of_pos (Real.exp_pos _)]
           ring
   refine (norm_sum_le _ _).trans ((Finset.sum_le_sum fun σ _ => hcoef σ).trans (le_of_eq ?_))
@@ -201,10 +208,6 @@ variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 noncomputable local instance : NormedSpace ℝ (Matrix n n 𝕜) :=
   NormedSpace.restrictScalars ℝ 𝕜 (Matrix n n 𝕜)
 
-/-- Normalized trace exponential. -/
-noncomputable def traceExp (A : Matrix n n 𝕜) : 𝕜 :=
-  normalizedTrace (NormedSpace.exp A)
-
 /--
 General higher-derivative estimate for a Hermitian base point.
 
@@ -219,9 +222,8 @@ theorem iterDirectionalFDeriv_traceExp_bound
     (dirs : List (Matrix n n 𝕜)) :
     ‖DirectionalDerivative.iterDirectionalFDeriv traceExp dirs A‖ ≤
       (dirs.map (fun B => ‖B‖)).prod * ‖traceExp A‖ := by
-  have htE : (traceExp : Matrix n n 𝕜 → 𝕜) = DerivAux.tE := rfl
   rw [DirectionalDerivative.iterDirectionalFDeriv_eq_iteratedFDeriv traceExp
-    (htE ▸ DerivAux.contDiff_tE) dirs A, htE, ← Fin.prod_univ_fun_getElem dirs norm]
+    DerivAux.contDiff_tE dirs A, ← Fin.prod_univ_fun_getElem dirs norm]
   exact DerivAux.iteratedFDeriv_tE_bound_hermitian A hA _ _
 
 /-- Unit-ball specialization of the higher derivative bound. -/

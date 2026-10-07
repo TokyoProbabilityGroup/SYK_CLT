@@ -17,9 +17,9 @@ private theorem charFun_centeredGaussianSquares {ι : Type*} [Fintype ι]
   let μ : ι → Measure ℝ := fun _ => gaussianReal 0 1
   have hindep : iIndepFun (fun i (g : ι → ℝ) => centeredGaussianSquare (g i))
       (Measure.pi μ) :=
-    iIndepFun_pi (fun _ => (by fun_prop : Measurable centeredGaussianSquare).aemeasurable)
+    iIndepFun_pi (fun _ => centeredGaussianSquare_measurable.aemeasurable)
   have hmeas (i : ι) : Measurable (fun g : ι → ℝ => centeredGaussianSquare (g i)) :=
-    (by fun_prop : Measurable centeredGaussianSquare).comp (by fun_prop)
+    centeredGaussianSquare_measurable.comp (by fun_prop)
   have hsum : Measurable (fun g : ι → ℝ => ∑ i, centeredGaussianSquare (g i)) :=
     Finset.measurable_fun_sum _ (fun i _ => hmeas i)
   have hchar := hindep.charFun_map_fun_sum_eq_prod (fun i => (hmeas i).aemeasurable)
@@ -32,7 +32,7 @@ private theorem charFun_centeredGaussianSquares {ι : Type*} [Fintype ι]
       (Measure.pi μ).map (fun g => centeredGaussianSquare (g i)) =
         (gaussianReal 0 1).map centeredGaussianSquare := by
     change (Measure.pi μ).map (centeredGaussianSquare ∘ fun g => g i) = _
-    rw [← Measure.map_map (by fun_prop : Measurable centeredGaussianSquare) (by fun_prop)]
+    rw [← Measure.map_map centeredGaussianSquare_measurable (by fun_prop)]
     rw [(measurePreserving_eval μ i).map_eq]
   simp_rw [hmap]
   simp
@@ -48,7 +48,7 @@ theorem Setting.centeredGaussianSquares_charFun_tendsto (t : ℝ) :
           ∑ i : InteractionIndex (S.N n) q, centeredGaussianSquare (g i))) t) atTop
       (𝓝 (charFun (gaussianReal 0 1) t)) := by
   have ht := (tendsto_charFun_inv_sqrt_mul_pow
-    (by fun_prop : Measurable centeredGaussianSquare).aemeasurable
+    centeredGaussianSquare_measurable.aemeasurable
     centeredGaussianSquare_mean centeredGaussianSquare_second_moment t).comp
       S.interactionCard_tendsto
   simp_rw [charFun_centeredGaussianSquares]
@@ -64,10 +64,7 @@ theorem Setting.normalizedQuadraticSum_clt {q : ℕ} (S : Setting q) :
       (fun n => normalizedQuadraticSum (S.N n) q) atTop (fun x : ℝ => x)
       (fun n => standardGaussianMeasure (S.N n) q) (gaussianReal 0 1) where
   forall_aemeasurable n := by
-    have hm : Measurable (normalizedQuadraticSum (S.N n) q) := by
-      unfold normalizedQuadraticSum centeredGaussianSquare
-      fun_prop
-    exact hm.aemeasurable
+    exact (normalizedQuadraticSum_measurable (S.N n) q).aemeasurable
   tendsto := by
     refine ProbabilityMeasure.tendsto_iff_tendsto_charFun.2 fun t => ?_
     have h := S.centeredGaussianSquares_charFun_tendsto t

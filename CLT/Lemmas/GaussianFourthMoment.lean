@@ -12,13 +12,6 @@ private theorem hermite_four_eval (x : ℝ) :
   rw [map_ofNat]
   ring
 
-private theorem hermite_two_eval_fourth (x : ℝ) :
-    Polynomial.aeval x (Polynomial.hermite 2) = x ^ 2 - 1 := by
-  rw [show 2 = 1 + 1 by decide, Polynomial.hermite_succ,
-    Polynomial.hermite_one]
-  simp
-  ring
-
 private theorem integrable_hermite_pair_real (n m : ℕ) :
     Integrable (fun x : ℝ =>
       Polynomial.aeval x (Polynomial.hermite n) *
@@ -38,7 +31,7 @@ private theorem centeredGaussianSquare_pow_four_pointwise (x : ℝ) :
         4 * Polynomial.aeval x (Polynomial.hermite 4) +
         16 * (Polynomial.aeval x (Polynomial.hermite 2)) ^ 2 +
         16 * Polynomial.aeval x (Polynomial.hermite 2) + 4) / 4 := by
-  rw [hermite_four_eval, hermite_two_eval_fourth]
+  rw [hermite_four_eval, hermite_two_eval]
   unfold centeredGaussianSquare
   rw [div_pow]
   have hsqrt : Real.sqrt 2 ^ 4 = (4 : ℝ) := by
@@ -73,64 +66,33 @@ theorem centeredGaussianSquare_fourth_moment :
     simpa [H₄, Polynomial.hermite_zero] using hermite_pair_integral_real 4 0
   have e2 : (∫ x, H₂ x ∂gaussianReal 0 1) = 0 := by
     simpa [H₂, Polynomial.hermite_zero] using hermite_pair_integral_real 2 0
+  -- Integrate the six terms of the Hermite expansion once; orthogonality kills the mixed terms.
+  let terms : Fin 6 → ℝ → ℝ :=
+    ![fun x => H₄ x ^ 2, fun x => 8 * (H₄ x * H₂ x), fun x => 4 * H₄ x,
+      fun x => 16 * H₂ x ^ 2, fun x => 16 * H₂ x, fun _ => 4]
+  have hterms : ∀ i, Integrable (terms i) (gaussianReal 0 1) := by
+    intro i
+    fin_cases i
+    · exact h44
+    · exact h42.const_mul 8
+    · exact h4.const_mul 4
+    · exact h22.const_mul 16
+    · exact h2.const_mul 16
+    · exact integrable_const 4
+  have hexpansion (x : ℝ) : centeredGaussianSquare x ^ 4 = (∑ i, terms i x) / 4 := by
+    rw [centeredGaussianSquare_pow_four_pointwise]
+    change (H₄ x ^ 2 + 8 * H₄ x * H₂ x + 4 * H₄ x +
+      16 * H₂ x ^ 2 + 16 * H₂ x + 4) / 4 = _
+    simp [terms, Fin.sum_univ_succ, mul_assoc, add_assoc]
   calc
     (∫ x, centeredGaussianSquare x ^ 4 ∂gaussianReal 0 1) =
-        ∫ x, (H₄ x ^ 2 + 8 * H₄ x * H₂ x + 4 * H₄ x +
-          16 * H₂ x ^ 2 + 16 * H₂ x + 4) / 4 ∂gaussianReal 0 1 := by
-          congr 1
-          funext x
-          simpa [H₂, H₄] using centeredGaussianSquare_pow_four_pointwise x
-    _ = 15 := by
+        (∫ x, ∑ i, terms i x ∂gaussianReal 0 1) / 4 := by
+      simp_rw [hexpansion]
       rw [integral_div]
-      have hB : Integrable (fun x => 8 * (H₄ x * H₂ x)) (gaussianReal 0 1) :=
-        h42.const_mul 8
-      have hC : Integrable (fun x => 4 * H₄ x) (gaussianReal 0 1) :=
-        h4.const_mul 4
-      have hD : Integrable (fun x => 16 * H₂ x ^ 2) (gaussianReal 0 1) :=
-        h22.const_mul 16
-      have hE : Integrable (fun x => 16 * H₂ x) (gaussianReal 0 1) :=
-        h2.const_mul 16
-      have hAB := h44.add hB
-      have hABC := hAB.add hC
-      have hABCD := hABC.add hD
-      have hABCDE := hABCD.add hE
-      simp only [mul_assoc]
-      have eABCDE :
-          (∫ x, H₄ x ^ 2 + 8 * (H₄ x * H₂ x) + 4 * H₄ x +
-            16 * H₂ x ^ 2 + 16 * H₂ x + 4 ∂gaussianReal 0 1) =
-          (∫ x, H₄ x ^ 2 + 8 * (H₄ x * H₂ x) + 4 * H₄ x +
-            16 * H₂ x ^ 2 + 16 * H₂ x ∂gaussianReal 0 1) + 4 := by
-        simpa only [Pi.add_apply, integral_const, probReal_univ, one_smul] using
-          (integral_add hABCDE (integrable_const 4))
-      have eABCD :
-          (∫ x, H₄ x ^ 2 + 8 * (H₄ x * H₂ x) + 4 * H₄ x +
-            16 * H₂ x ^ 2 + 16 * H₂ x ∂gaussianReal 0 1) =
-          (∫ x, H₄ x ^ 2 + 8 * (H₄ x * H₂ x) + 4 * H₄ x +
-            16 * H₂ x ^ 2 ∂gaussianReal 0 1) +
-          (∫ x, 16 * H₂ x ∂gaussianReal 0 1) := by
-        simpa only [Pi.add_apply] using integral_add hABCD hE
-      have eABC :
-          (∫ x, H₄ x ^ 2 + 8 * (H₄ x * H₂ x) + 4 * H₄ x +
-            16 * H₂ x ^ 2 ∂gaussianReal 0 1) =
-          (∫ x, H₄ x ^ 2 + 8 * (H₄ x * H₂ x) + 4 * H₄ x
-            ∂gaussianReal 0 1) +
-          (∫ x, 16 * H₂ x ^ 2 ∂gaussianReal 0 1) := by
-        simpa only [Pi.add_apply] using integral_add hABC hD
-      have eAB :
-          (∫ x, H₄ x ^ 2 + 8 * (H₄ x * H₂ x) + 4 * H₄ x
-            ∂gaussianReal 0 1) =
-          (∫ x, H₄ x ^ 2 + 8 * (H₄ x * H₂ x)
-            ∂gaussianReal 0 1) +
-          (∫ x, 4 * H₄ x ∂gaussianReal 0 1) := by
-        simpa only [Pi.add_apply] using integral_add hAB hC
-      have eA :
-          (∫ x, H₄ x ^ 2 + 8 * (H₄ x * H₂ x)
-            ∂gaussianReal 0 1) =
-          (∫ x, H₄ x ^ 2 ∂gaussianReal 0 1) +
-          (∫ x, 8 * (H₄ x * H₂ x) ∂gaussianReal 0 1) := by
-        simpa only [Pi.add_apply] using integral_add h44 hB
-      rw [eABCDE, eABCD, eABC, eAB, eA]
-      norm_num [integral_const_mul, e44, e42, e4, e22, e2]
+    _ = (∑ i, ∫ x, terms i x ∂gaussianReal 0 1) / 4 := by
+      rw [integral_finsetSum Finset.univ (fun i _ => hterms i)]
+    _ = 15 := by
+      norm_num [terms, Fin.sum_univ_succ, integral_const_mul, e44, e42, e4, e22, e2]
 
 /-- The fourth-moment calculation also supplies the `L⁴` input for finite sums. -/
 theorem centeredGaussianSquare_memLp_four :

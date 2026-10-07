@@ -283,7 +283,8 @@ The main reusable pieces are:
 * Schatten Hölder and operator-norm multiplication bounds;
 * the exact Schatten norm of an exponential of a Hermitian matrix;
 * positive-trace and word bounds, followed by change-of-origin Taylor-coefficient estimates;
-* an iterated directional derivative bound for the normalized trace exponential.
+The higher-derivative bound itself is in `TraceExpDerivatives`: it uses the word and
+Taylor-coefficient bounds here after shifting the Hermitian base point to a positive matrix.
 -/
 
 namespace MatrixAnalysis
@@ -312,7 +313,12 @@ theorem hasFDerivAt_radial
 
 end Radial
 
-/-! ## Duhamel formula -/
+/-! ## Duhamel formula
+
+The integral kernel represents the first derivative of the exponential without assuming
+commutativity. Cyclicity of the trace later removes the position of the inserted direction.
+Higher derivatives in `TraceExpDerivatives` use the analytic power-series bounds instead.
+-/
 
 namespace Duhamel
 
@@ -423,7 +429,12 @@ theorem fderiv_exp_apply (X V : 𝔸) :
 
 end Duhamel
 
-/-! ## Normalized Schatten norms -/
+/-! ## Normalized Schatten norms
+
+Finite-dimensional Hölder bounds control products of matrices. Dividing the trace by the
+dimension gives the normalization used for partition functions; operator-norm factors handle
+directions that need no finite Schatten exponent.
+-/
 
 namespace Schatten
 
@@ -894,7 +905,13 @@ theorem normalizedSchattenNorm_exp_hermitian
   field_simp
 
 
-/-! ### Trace bounds for words and the Taylor coefficients of `τ ∘ exp` -/
+/-! ### Trace bounds for words and the Taylor coefficients of `τ ∘ exp`
+
+`word_schatten_bound` counts the copies of one base matrix in a noncommutative word.
+`word_trace_bound` then controls its trace, with an operator norm for each inserted direction.
+`changeOrigin_coef_bound` sums these words to estimate each Taylor coefficient at the base point.
+These are the inputs to the Hermitian higher-derivative estimate in `TraceExpDerivatives`.
+-/
 
 section WordBounds
 

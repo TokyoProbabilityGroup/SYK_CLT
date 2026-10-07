@@ -192,17 +192,10 @@ theorem eig_nonneg (T : E →ₗ[𝕜] E) {n : ℕ} (hn : Module.finrank 𝕜 E 
 
 theorem sv_sq (T : E →ₗ[𝕜] E) {i : ℕ} (hi : i < Module.finrank 𝕜 E) :
     T.singularValues i ^ 2 = T.isSymmetric_adjoint_comp_self.eigenvalues rfl ⟨i, hi⟩ := by
-  rw [T.singularValues_of_lt rfl hi, Real.sq_sqrt (eig_nonneg T rfl _)]
+  exact T.sq_singularValues_of_lt rfl hi
 
 theorem sv_antitone (T : E →ₗ[𝕜] E) : Antitone (fun i => T.singularValues i) := by
-  intro i j hij
-  simp only
-  by_cases hj : j < Module.finrank 𝕜 E
-  · rw [T.singularValues_of_lt rfl hj, T.singularValues_of_lt rfl (by omega)]
-    exact Real.sqrt_le_sqrt (T.isSymmetric_adjoint_comp_self.eigenvalues_antitone rfl
-      (show (⟨i, by omega⟩ : Fin _) ≤ ⟨j, hj⟩ from hij))
-  · rw [T.singularValues_of_finrank_le (by omega)]
-    exact T.singularValues_nonneg i
+  exact T.singularValues_antitone
 
 /-- The `i`-th singular value is bounded by any constant controlling the Rayleigh quotient of
 `T†T` off at most `i` vectors. -/
@@ -516,39 +509,19 @@ theorem sum_mul_rpow_le (s : Finset ℕ) (a b : ℕ → ℝ) (ha : ∀ i, 0 ≤ 
     {p q r : ℝ} (hp : 0 < p) (hq : 0 < q) (hr : 0 < r) (hrecip : 1 / r = 1 / p + 1 / q) :
     (∑ i ∈ s, (a i * b i) ^ r) ^ (1 / r) ≤
       (∑ i ∈ s, a i ^ p) ^ (1 / p) * (∑ i ∈ s, b i ^ q) ^ (1 / q) := by
-  have hP : 1 < p / r := by
-    rw [lt_div_iff₀ hr, one_mul]
-    have : 1 / p < 1 / r := by rw [hrecip]; linarith [one_div_pos.mpr hq]
-    exact (one_div_lt_one_div hp hr).mp this
-  have hQ : 1 < q / r := by
-    rw [lt_div_iff₀ hr, one_mul]
-    have : 1 / q < 1 / r := by rw [hrecip]; linarith [one_div_pos.mpr hp]
-    exact (one_div_lt_one_div hq hr).mp this
-  have hconj : (p / r).HolderConjugate (q / r) := by
-    rw [Real.holderConjugate_iff]
-    refine ⟨hP, ?_⟩
-    rw [inv_div, inv_div]
-    field_simp at hrecip ⊢
-    linarith
-  have hH := Real.inner_le_Lp_mul_Lq_of_nonneg s hconj (f := fun i => a i ^ r)
-    (g := fun i => b i ^ r) (fun i _ => Real.rpow_nonneg (ha i) _)
-    (fun i _ => Real.rpow_nonneg (hb i) _)
-  have e1 : ∀ i, (a i ^ r) ^ (p / r) = a i ^ p := fun i => by
-    rw [← Real.rpow_mul (ha i), mul_div_cancel₀ _ hr.ne']
-  have e2 : ∀ i, (b i ^ r) ^ (q / r) = b i ^ q := fun i => by
-    rw [← Real.rpow_mul (hb i), mul_div_cancel₀ _ hr.ne']
-  simp only [e1, e2, ← Real.mul_rpow (ha _) (hb _)] at hH
-  have hA : 0 ≤ ∑ i ∈ s, a i ^ p := sum_nonneg fun i _ => Real.rpow_nonneg (ha i) _
-  have hB : 0 ≤ ∑ i ∈ s, b i ^ q := sum_nonneg fun i _ => Real.rpow_nonneg (hb i) _
-  have hS : 0 ≤ ∑ i ∈ s, (a i * b i) ^ r :=
-    sum_nonneg fun i _ => Real.rpow_nonneg (mul_nonneg (ha i) (hb i)) _
-  calc (∑ i ∈ s, (a i * b i) ^ r) ^ (1 / r)
-      ≤ ((∑ i ∈ s, a i ^ p) ^ (1 / (p / r)) * (∑ i ∈ s, b i ^ q) ^ (1 / (q / r))) ^ (1 / r) :=
-        Real.rpow_le_rpow hS hH (by positivity)
-    _ = (∑ i ∈ s, a i ^ p) ^ (1 / p) * (∑ i ∈ s, b i ^ q) ^ (1 / q) := by
-        rw [Real.mul_rpow (Real.rpow_nonneg hA _) (Real.rpow_nonneg hB _),
-          ← Real.rpow_mul hA, ← Real.rpow_mul hB]
-        congr 2 <;> field_simp
+  have hpqr : p.HolderTriple q r :=
+    ⟨by simpa only [one_div] using hrecip.symm, hp, hq⟩
+  lift a to (ℕ → NNReal) using ha
+  lift b to (ℕ → NNReal) using hb
+  have h := NNReal.Lr_rpow_le_Lp_mul_Lq s a b hpqr
+  -- Taking the positive 1/r power gives the norm inequality, including zero-valued sums.
+  have hroot := NNReal.rpow_le_rpow h (one_div_pos.mpr hr).le
+  have hcancel (t : ℝ) : (r / t) * (1 / r) = 1 / t := by
+    rw [div_mul_eq_mul_div, one_div, mul_inv_cancel₀ hr.ne']
+  conv_rhs at hroot =>
+    rw [NNReal.mul_rpow, ← NNReal.rpow_mul, ← NNReal.rpow_mul, hcancel, hcancel]
+  have hreal := NNReal.coe_le_coe.mpr hroot
+  simpa only [NNReal.coe_rpow, NNReal.coe_sum, NNReal.coe_mul] using hreal
 
 end SingularAux
 

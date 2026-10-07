@@ -391,7 +391,7 @@ Gaussian limit. The partition-function theorem is checked independently
 of the logarithmic transfer.
 :::
 
-:::theorem "partition_function_clt" (parent := "central_limit_theorem") (uses := "clt_second_chaos_and_remainder, clt_gaussian_quadratic_sum, clt_conditional_nondegeneracy") (lean := "SYK.CLT.partition_clt, SYK.CLT.partition_and_log_partition_clt")
+:::theorem "partition_function_clt" (parent := "central_limit_theorem") (uses := "clt_second_chaos_and_remainder, clt_gaussian_quadratic_sum, clt_conditional_nondegeneracy") (lean := "SYK.CLT.partition_clt")
 Assume `S : Setting q` and `hFE : AnnealedInput q S`. The Lean statements
 choose $`0<\beta_q` so that, for real
 $`0<|\beta|<\beta_q`, the annealed pressure converges to $`\ell(\beta)` and
@@ -472,7 +472,9 @@ N^{q/2-1}\bigl(\log Z_N(\beta)-\mathbb E\log Z_N(\beta)\bigr)
 The current manuscript uses the relative CLT, local linearization of
 $`\log`, and the preceding centering estimate. Lean verifies the
 logarithmic CLT and the joint theorem without `sorryAx`, conditional on
-`hFE`.
+`hFE`. The joint theorem combines the independently proved partition theorem
+with the lower-level logarithmic CLT, taking a common smaller positive radius.
+The individual logarithmic theorem projects this joint conclusion.
 :::
 
 :::theorem "clt_standard_model_application" (parent := "central_limit_theorem") (uses := "partition_function_clt, log_partition_clt") (lean := "SYK.CLT.standardSetting, SYK.CLT.standardSetting_size_iff, SYK.CLT.standardSetting_Z, SYK.CLT.standard_partition_and_log_partition_clt, SYK.CLT.standard_partition_clt, SYK.CLT.standard_log_partition_clt")

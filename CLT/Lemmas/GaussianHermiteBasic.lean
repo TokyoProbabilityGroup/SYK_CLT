@@ -17,6 +17,13 @@ open MeasureTheory ProbabilityTheory
 
 namespace SYK
 
+/-- The degree-two probabilists' Hermite polynomial evaluated on the real line. -/
+theorem hermite_two_eval (x : ℝ) :
+    Polynomial.aeval x (Polynomial.hermite 2) = x ^ 2 - 1 := by
+  rw [show 2 = 1 + 1 by decide, Polynomial.hermite_succ, Polynomial.hermite_one]
+  simp
+  ring
+
 /-- The multivariate (probabilists') Hermite polynomial `H_α(g) = ∏_I He_{α_I}(g_I)`. -/
 noncomputable def hermiteMulti {ι : Type*} [Fintype ι] (α : ι → ℕ) (g : ι → ℝ) : ℝ :=
   ∏ I, Polynomial.aeval (g I) (Polynomial.hermite (α I))

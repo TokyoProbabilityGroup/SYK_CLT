@@ -237,7 +237,7 @@ private theorem centeredSquareSum_indep (s : Finset ι) {i : ι} (hi : i ∉ s) 
   let X : ι → (ι → ℝ) → ℝ := fun j g => centeredGaussianSquare (g j)
   have hindep : iIndepFun X (gaussianCouplings ι) := by
     change iIndepFun X (Measure.pi fun _ : ι => gaussianReal 0 1)
-    exact iIndepFun_pi (fun _ => (by fun_prop : Measurable centeredGaussianSquare).aemeasurable)
+    exact iIndepFun_pi (fun _ => centeredGaussianSquare_measurable.aemeasurable)
   have hmeas (j : ι) : Measurable (X j) := by
     dsimp [X]
     fun_prop
@@ -364,9 +364,7 @@ theorem normalizedQuadraticSum_fourth_moment_le (N q : ℕ)
     (hcard : 0 < Fintype.card (InteractionIndex N q)) :
     (∫ g, normalizedQuadraticSum N q g ^ 4
       ∂standardGaussianMeasure N q) ≤ 15 := by
-  have hm : Measurable (normalizedQuadraticSum N q) := by
-    unfold normalizedQuadraticSum centeredGaussianSquare
-    fun_prop
+  have hm := normalizedQuadraticSum_measurable N q
   have hraw : Measurable (fun g : InteractionIndex N q → ℝ =>
       (Real.sqrt (Fintype.card (InteractionIndex N q) : ℝ))⁻¹ *
         ∑ i : InteractionIndex N q, centeredGaussianSquare (g i)) := by
