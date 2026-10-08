@@ -1,6 +1,6 @@
 import SYK.CLT.Basic
 import SYK.CLT.Chaos.CliffordSignParity
-import SYK.Probability.GaussianChaos.GaussianHermiteOrthogonality
+import SYK.Probability.GaussianChaos.Orthogonality
 import Mathlib.Logic.Equiv.Fintype
 import Mathlib.GroupTheory.Perm.Sign
 
@@ -16,6 +16,8 @@ Entry points: `Setting.Z_sign_gauge`, `Setting.Z_firstChaos_eq_zero`,
 
 open MeasureTheory
 open scoped InnerProductSpace
+
+open SYK.GaussianChaos
 
 namespace SYK.CLT
 

@@ -5,6 +5,8 @@ open scoped Topology NNReal
 
 /-!`AnnealedInput` gives the standardized partition-function CLT at nonzero small temperatures. -/
 
+open SYK.Probability
+
 namespace SYK.CLT
 
 local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by

@@ -10,11 +10,13 @@ an exact L² remainder whose norm squared is the sum bounded in F05.
 open MeasureTheory Filter Asymptotics
 open scoped Topology InnerProductSpace
 
+open SYK.GaussianChaos
+
 namespace SYK.CLT
 /-- Distinct homogeneous Hermite chaoses are orthogonal in Gaussian L². -/
 theorem inner_hermiteDegreeProjection_eq_zero {ι : Type*} [Fintype ι]
     (r s : ℕ) (hrs : r ≠ s)
-    (f g : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
+    (f g : Lp ℝ 2 (gaussianCouplings ι)) :
     ⟪hermiteDegreeProjection r f, hermiteDegreeProjection s g⟫_ℝ = 0 := by
   classical
   simp only [hermiteDegreeProjection, hermiteFiniteProjection,
@@ -70,7 +72,7 @@ private theorem norm_sq_eq_tsum_of_pairwise_orthogonal
 /-- The Gaussian L² sum of Hermite chaoses of degree at least three. -/
 noncomputable def Setting.higherChaosRemainderLp {q : ℕ}
     (S : Setting q) (β : ℝ) (n : ℕ) :
-    Lp ℝ 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) :=
+    Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q)) :=
   S.YGaussianLp β n -
     ∑ r ∈ Finset.range 3, hermiteDegreeProjection r (S.YGaussianLp β n)
 
@@ -81,7 +83,7 @@ theorem Setting.higherChaosRemainderLp_norm_sq {q : ℕ}
       ∑' k : ℕ,
         ‖hermiteDegreeProjection (k + 3) (S.YGaussianLp β n)‖ ^ 2 := by
   let f := S.YGaussianLp β n
-  let v : ℕ → Lp ℝ 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) :=
+  let v : ℕ → Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q)) :=
     fun k => hermiteDegreeProjection (k + 3) f
   have horth : ∀ i j, i ≠ j → ⟪v i, v j⟫_ℝ = 0 := by
     intro i j hij

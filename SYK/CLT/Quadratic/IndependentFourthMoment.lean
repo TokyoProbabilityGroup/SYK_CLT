@@ -5,6 +5,8 @@ import SYK.CLT.Basic
 
 open MeasureTheory ProbabilityTheory
 
+open SYK.GaussianChaos
+
 namespace SYK.CLT
 
 private theorem integrable_pow_le_four {Ω : Type*} [MeasurableSpace Ω]

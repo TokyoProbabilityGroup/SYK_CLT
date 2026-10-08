@@ -1,4 +1,4 @@
-import SYK.Probability.GaussianChaos.GaussianChaos
+import SYK.Probability.GaussianChaos.CoefficientIBP
 import Mathlib.MeasureTheory.Integral.Pi
 import Mathlib.MeasureTheory.Function.L2Space
 import Mathlib.Analysis.InnerProductSpace.l2Space
@@ -18,7 +18,7 @@ Entry points: `hermiteMulti_orthogonality`, `inner_hermiteLp`,
 open MeasureTheory
 open scoped ComplexConjugate InnerProductSpace
 
-namespace SYK.CLT
+namespace SYK.GaussianChaos
 
 private theorem iterate_derivative_hermite_self (n : ℕ) :
     Polynomial.derivative^[n] (Polynomial.hermite n) =
@@ -125,18 +125,18 @@ theorem hermite_pair_integral_real (n m : ℕ) :
 coordinate type and zero multi-indices. -/
 theorem hermiteMulti_orthogonality {ι : Type*} [Fintype ι]
     (α β : ι → ℕ) :
-    (∫ g, SYK.hermiteMulti α g * SYK.hermiteMulti β g
-      ∂SYK.gaussianCouplings ι) =
+    (∫ g, hermiteMulti α g * hermiteMulti β g
+      ∂gaussianCouplings ι) =
       if α = β then ∏ i : ι, ((α i).factorial : ℝ) else 0 := by
   classical
   calc
-    (∫ g, SYK.hermiteMulti α g * SYK.hermiteMulti β g
-      ∂SYK.gaussianCouplings ι) =
+    (∫ g, hermiteMulti α g * hermiteMulti β g
+      ∂gaussianCouplings ι) =
         ∫ g, ∏ i : ι,
           (Polynomial.aeval (g i) (Polynomial.hermite (α i)) *
             Polynomial.aeval (g i) (Polynomial.hermite (β i)))
           ∂(Measure.pi fun _ : ι => ProbabilityTheory.gaussianReal 0 1) := by
-          simp only [SYK.hermiteMulti, SYK.gaussianCouplings,
+          simp only [hermiteMulti, gaussianCouplings,
             Finset.prod_mul_distrib]
     _ = ∏ i : ι, ∫ x : ℝ,
           Polynomial.aeval x (Polynomial.hermite (α i)) *
@@ -163,12 +163,12 @@ theorem hermiteMulti_orthogonality {ι : Type*} [Fintype ι]
 /-- Each finite-dimensional Hermite product represents an element of Gaussian
 `L²`, as required for the chaos projections in `eq: chaos`. -/
 theorem hermiteMulti_memLp_two {ι : Type*} [Fintype ι] (α : ι → ℕ) :
-    MemLp (SYK.hermiteMulti α) 2 (SYK.gaussianCouplings ι) := by
+    MemLp (hermiteMulti α) 2 (gaussianCouplings ι) := by
   classical
-  have hfun : GaussianConcentration.hermiteMulti α = SYK.hermiteMulti α := by
+  have hfun : GaussianConcentration.hermiteMulti α = hermiteMulti α := by
     funext g
     exact hermiteMulti_eq_signParity α g
-  have hcontinuous : Continuous (SYK.hermiteMulti α) := by
+  have hcontinuous : Continuous (hermiteMulti α) := by
     rw [← hfun]
     exact (GaussianConcentration.contDiff_hermiteList
       (GaussianConcentration.multiIndexList α)).continuous
@@ -177,8 +177,8 @@ theorem hermiteMulti_memLp_two {ι : Type*} [Fintype ι] (α : ι → ℕ) :
 
 /-- The Hermite product as an element of real Gaussian `L²`. -/
 noncomputable def hermiteLp {ι : Type*} [Fintype ι] (α : ι → ℕ) :
-    Lp ℝ 2 (SYK.gaussianCouplings ι) :=
-  (hermiteMulti_memLp_two α).toLp (SYK.hermiteMulti α)
+    Lp ℝ 2 (gaussianCouplings ι) :=
+  (hermiteMulti_memLp_two α).toLp (hermiteMulti α)
 
 /-- The exact Gaussian `L²` Gram matrix of the Hermite products. -/
 theorem inner_hermiteLp {ι : Type*} [Fintype ι] (α β : ι → ℕ) :
@@ -188,14 +188,14 @@ theorem inner_hermiteLp {ι : Type*} [Fintype ι] (α β : ι → ℕ) :
   have ha := (hermiteMulti_memLp_two α).coeFn_toLp
   have hb := (hermiteMulti_memLp_two β).coeFn_toLp
   have h : (∫ a : ι → ℝ, ⟪(hermiteLp α) a, (hermiteLp β) a⟫_ℝ
-      ∂SYK.gaussianCouplings ι) =
-      ∫ a, SYK.hermiteMulti α a * SYK.hermiteMulti β a
-        ∂SYK.gaussianCouplings ι := by
+      ∂gaussianCouplings ι) =
+      ∫ a, hermiteMulti α a * hermiteMulti β a
+        ∂gaussianCouplings ι := by
     apply integral_congr_ae
     filter_upwards [ha, hb] with a ha' hb'
     change (hermiteLp β) a * (hermiteLp α) a = _
-    rw [show (hermiteLp α) a = SYK.hermiteMulti α a from ha',
-      show (hermiteLp β) a = SYK.hermiteMulti β a from hb']
+    rw [show (hermiteLp α) a = hermiteMulti α a from ha',
+      show (hermiteLp β) a = hermiteMulti β a from hb']
     ring
   rw [h, hermiteMulti_orthogonality]
 
@@ -206,15 +206,15 @@ theorem hermiteFactorial_pos {ι : Type*} [Fintype ι] (α : ι → ℕ) :
 
 /-- The Hermite coefficient sum over any finite set of multi-indices. -/
 noncomputable def hermiteFiniteProjection {ι : Type*} [Fintype ι]
-    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
-    Lp ℝ 2 (SYK.gaussianCouplings ι) :=
+    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
+    Lp ℝ 2 (gaussianCouplings ι) :=
   ∑ α ∈ s, (⟪hermiteLp α, f⟫_ℝ /
     ∏ i : ι, ((α i).factorial : ℝ)) • hermiteLp α
 
 /-- On the chosen finite set, the coefficient sum preserves every Hermite
 coefficient. -/
 theorem inner_hermiteFiniteProjection {ι : Type*} [Fintype ι]
-    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (SYK.gaussianCouplings ι))
+    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι))
     (β : ι → ℕ) (hβ : β ∈ s) :
     ⟪hermiteLp β, hermiteFiniteProjection s f⟫_ℝ = ⟪hermiteLp β, f⟫_ℝ := by
   classical
@@ -226,7 +226,7 @@ theorem inner_hermiteFiniteProjection {ι : Type*} [Fintype ι]
 /-- The error of a finite Hermite coefficient sum is orthogonal to every
 Hermite polynomial included in the sum. -/
 theorem inner_hermiteFiniteProjection_error {ι : Type*} [Fintype ι]
-    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (SYK.gaussianCouplings ι))
+    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι))
     (β : ι → ℕ) (hβ : β ∈ s) :
     ⟪hermiteLp β, f - hermiteFiniteProjection s f⟫_ℝ = 0 := by
   rw [inner_sub_right, inner_hermiteFiniteProjection s f β hβ]
@@ -262,13 +262,13 @@ theorem mem_multiIndices_degree {ι : Type*} [Fintype ι]
 
 /-- Coefficient formula for the finite sum at one homogeneous degree. -/
 noncomputable def hermiteDegreeProjection {ι : Type*} [Fintype ι]
-    (r : ℕ) (f : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
-    Lp ℝ 2 (SYK.gaussianCouplings ι) :=
+    (r : ℕ) (f : Lp ℝ 2 (gaussianCouplings ι)) :
+    Lp ℝ 2 (gaussianCouplings ι) :=
   hermiteFiniteProjection (multiIndices_degree r) f
 
 /-- The finite-dimensional subspace spanned by Hermite products in `s`. -/
 noncomputable def hermiteFiniteSpan {ι : Type*} [Fintype ι] (s : Finset (ι → ℕ)) :
-    Submodule ℝ (Lp ℝ 2 (SYK.gaussianCouplings ι)) :=
+    Submodule ℝ (Lp ℝ 2 (gaussianCouplings ι)) :=
   Submodule.span ℝ (hermiteLp '' (s : Set (ι → ℕ)))
 
 noncomputable instance hermiteFiniteSpan_finiteDimensional {ι : Type*} [Fintype ι]
@@ -277,7 +277,7 @@ noncomputable instance hermiteFiniteSpan_finiteDimensional {ι : Type*} [Fintype
   exact FiniteDimensional.span_of_finite ℝ (Set.toFinite _)
 
 theorem hermiteFiniteProjection_mem {ι : Type*} [Fintype ι]
-    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
+    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     hermiteFiniteProjection s f ∈ hermiteFiniteSpan s := by
   classical
   unfold hermiteFiniteProjection
@@ -287,7 +287,7 @@ theorem hermiteFiniteProjection_mem {ι : Type*} [Fintype ι]
   exact Submodule.subset_span ⟨α, hα, rfl⟩
 
 theorem hermiteFiniteProjection_error_orthogonal {ι : Type*} [Fintype ι]
-    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
+    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     f - hermiteFiniteProjection s f ∈ (hermiteFiniteSpan s)ᗮ := by
   classical
   apply (Submodule.mem_orthogonal' _ _).2
@@ -304,7 +304,7 @@ theorem hermiteFiniteProjection_error_orthogonal {ι : Type*} [Fintype ι]
 /-- The coefficient formula is the orthogonal projection onto the finite
 Hermite span. -/
 theorem hermiteFiniteProjection_eq_starProjection {ι : Type*} [Fintype ι]
-    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
+    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     hermiteFiniteProjection s f = (hermiteFiniteSpan s).starProjection f := by
   classical
   exact ((hermiteFiniteSpan s).eq_starProjection_of_mem_orthogonal
@@ -313,7 +313,7 @@ theorem hermiteFiniteProjection_eq_starProjection {ι : Type*} [Fintype ι]
 
 /-- Unit-norm Hermite products in real Gaussian `L²`. -/
 noncomputable def hermiteOrthonormal {ι : Type*} [Fintype ι] (α : ι → ℕ) :
-    Lp ℝ 2 (SYK.gaussianCouplings ι) :=
+    Lp ℝ 2 (gaussianCouplings ι) :=
   ‖hermiteLp α‖⁻¹ • hermiteLp α
 
 theorem hermiteLp_norm_pos {ι : Type*} [Fintype ι] (α : ι → ℕ) :
@@ -340,20 +340,20 @@ Hilbert basis. The density hypothesis is the remaining analytic input. -/
 noncomputable def hermiteHilbertBasis {ι : Type*} [Fintype ι]
     (hdense : (Submodule.span ℝ (Set.range (hermiteOrthonormal (ι := ι)))).topologicalClosure
       = ⊤) :
-    HilbertBasis (ι → ℕ) ℝ (Lp ℝ 2 (SYK.gaussianCouplings ι)) :=
+    HilbertBasis (ι → ℕ) ℝ (Lp ℝ 2 (gaussianCouplings ι)) :=
   HilbertBasis.mk hermiteOrthonormal_orthonormal (by rw [hdense])
 
 theorem hasSum_hermiteOrthonormal {ι : Type*} [Fintype ι]
     (hdense : (Submodule.span ℝ (Set.range (hermiteOrthonormal (ι := ι)))).topologicalClosure
       = ⊤)
-    (f : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
+    (f : Lp ℝ 2 (gaussianCouplings ι)) :
     HasSum (fun α : ι → ℕ => ⟪hermiteOrthonormal α, f⟫_ℝ • hermiteOrthonormal α) f := by
   simpa only [hermiteHilbertBasis, HilbertBasis.coe_mk,
     HilbertBasis.repr_apply_apply] using (hermiteHilbertBasis hdense).hasSum_repr f
 
 /-- A normalized basis coefficient is the manuscript's factorial coefficient. -/
 theorem hermiteOrthonormal_coefficient {ι : Type*} [Fintype ι]
-    (α : ι → ℕ) (f : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
+    (α : ι → ℕ) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     ⟪hermiteOrthonormal α, f⟫_ℝ • hermiteOrthonormal α =
       (⟪hermiteLp α, f⟫_ℝ /
         ∏ i : ι, ((α i).factorial : ℝ)) • hermiteLp α := by
@@ -372,7 +372,7 @@ density of Hermite products in Gaussian `L²`. -/
 theorem hasSum_hermiteCoefficients {ι : Type*} [Fintype ι]
     (hdense : (Submodule.span ℝ (Set.range (hermiteOrthonormal (ι := ι)))).topologicalClosure
       = ⊤)
-    (f : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
+    (f : Lp ℝ 2 (gaussianCouplings ι)) :
     HasSum (fun α : ι → ℕ =>
       (⟪hermiteLp α, f⟫_ℝ /
         ∏ i : ι, ((α i).factorial : ℝ)) • hermiteLp α) f := by
@@ -419,10 +419,10 @@ density is available. -/
 theorem hasSum_hermiteDegreeProjection {ι : Type*} [Fintype ι]
     (hdense : (Submodule.span ℝ (Set.range (hermiteOrthonormal (ι := ι)))).topologicalClosure
       = ⊤)
-    (f : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
+    (f : Lp ℝ 2 (gaussianCouplings ι)) :
     HasSum (fun r : ℕ => hermiteDegreeProjection r f) f := by
   classical
-  let t : (ι → ℕ) → Lp ℝ 2 (SYK.gaussianCouplings ι) :=
+  let t : (ι → ℕ) → Lp ℝ 2 (gaussianCouplings ι) :=
     fun α => (⟪hermiteLp α, f⟫_ℝ /
       ∏ i : ι, ((α i).factorial : ℝ)) • hermiteLp α
   have hall : HasSum t f := hasSum_hermiteCoefficients hdense f
@@ -435,4 +435,4 @@ theorem hasSum_hermiteDegreeProjection {ι : Type*} [Fintype ι]
     ← sum_multiIndices_degree, t] using
     (hasSum_fintype (fun α : {α : ι → ℕ // ∑ i, α i = r} => t α.1))
 
-end SYK.CLT
+end SYK.GaussianChaos

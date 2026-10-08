@@ -1,16 +1,16 @@
-import SYK.CLT.Limit.QuadraticBridge
+import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
 
 /-!
 # Distributional perturbations on varying probability spaces
 
-An ¹ or ² error tending to zero preserves weak convergence even when
+An `L¹` or `L²` error tending to zero preserves weak convergence even when
 the source space and probability measure vary with the index.
 -/
 
 open MeasureTheory ProbabilityTheory Filter
 open scoped Topology
 
-namespace SYK.CLT
+namespace SYK.Probability
 
 theorem varying_l1_perturb_clt
     {Ω : ℕ → Type*} [∀ n, MeasurableSpace (Ω n)]
@@ -121,4 +121,4 @@ theorem varying_l2_perturb_clt
       hErrBound hNorm
   exact varying_l1_perturb_clt μs ν X Y Z hX hY hErrInt hErr
 
-end SYK.CLT
+end SYK.Probability

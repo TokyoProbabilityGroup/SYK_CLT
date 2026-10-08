@@ -1,9 +1,11 @@
-import SYK.CLT.Log.LogTaylor
+import SYK.CLT.Log.Taylor
 import SYK.CLT.Quadratic.IndependentFourthMoment
 
 /-! # Small-event estimates for the logarithmic CLT -/
 
 open MeasureTheory ProbabilityTheory
+
+open SYK.GaussianChaos
 
 namespace SYK.CLT
 

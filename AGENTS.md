@@ -27,6 +27,18 @@ SYK リポジトリ全体に適用する。数学コードは `SYK/`、公開用
 
 利用箇所と型・規格化・依存への影響を調べ、現行ファイルを必要な範囲で改修する。旧 API の併存用モジュール・名前空間・互換別名は作らない。証明整理でも既存の数学的着想と検証根拠を比較し、定理文を再照合する。
 
+宣言はすべて `SYK` の名前空間の下に置き、mathlib など外部の名前空間には追加しない（Lean が自動生成する `congr_simp` 補題は除く）。名前空間はファイルの配置ではなく数学的な話題で決める。現在の対応は次のとおりで、旧 `SYK/Probability/GaussianIBP.lean` だけが例外として残る。
+
+| 話題 | 名前空間 |
+| --- | --- |
+| 行列解析（`SYK/Analysis/Matrix/`） | `SYK.MatrixAnalysis` |
+| 凸関数列（`SYK/Analysis/ConvexDerivatives.lean`） | `SYK.Analysis` |
+| ガウスカオス・Hermite 展開（`SYK/Probability/GaussianChaos/`） | `SYK.GaussianChaos` |
+| ガウス集中（`SYK/Probability/GaussianConcentration/`） | `SYK.GaussianConcentration` |
+| 分布収束・モーメント一意性（`SYK/Probability/` 直下） | `SYK.Probability` |
+| 模型・集中評価 | `SYK` |
+| CLT 固有の結果 | `SYK.CLT` |
+
 ## ビルドと Blueprint
 
 現行の数学ライブラリは `SYK`、親の既定対象は `Blueprint` であり、`needs = ["SYK/SYK:leanArts"]` により数学全体も検査する。コマンドと環境準備は [README](README.md#building-and-testing) と [ワークスペース案内](workspace/README.md) を参照する。配布設定の変更では他プロジェクトを保持し、親との整合を確認する。

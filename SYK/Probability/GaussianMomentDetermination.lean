@@ -12,7 +12,7 @@ polynomial density.
 
 open MeasureTheory ProbabilityTheory
 
-namespace SYK.CLT
+namespace SYK.Probability
 
 /-- Two real measures with all exponential moments have the same moment
 generating function if their polynomial moments agree. -/
@@ -82,4 +82,4 @@ theorem measure_eq_of_moments {μ ν : Measure ℝ}
     exact (eqOn_complexMGF_of_mgf' hmgf hzero) (by simp [hsetμ])
   exact Measure.ext_of_complexMGF_id_eq hcomplex
 
-end SYK.CLT
+end SYK.Probability

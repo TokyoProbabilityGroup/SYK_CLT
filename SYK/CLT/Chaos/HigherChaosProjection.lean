@@ -1,4 +1,4 @@
-import SYK.Probability.GaussianChaos.GaussianPolynomialDensity
+import SYK.Probability.GaussianChaos.PolynomialDensity
 import SYK.CLT.Chaos.PartitionHigherDerivatives
 import SYK.CLT.Chaos.Rademacher
 
@@ -13,6 +13,8 @@ and `Setting.tsum_higherChaosProjection_le_exp_moment`.
 
 open MeasureTheory Filter Asymptotics
 open scoped Topology InnerProductSpace
+
+open SYK.GaussianChaos
 
 namespace SYK.CLT
 
@@ -43,7 +45,7 @@ private theorem exp_tail_range_le (u : ℝ) (hu : 0 ≤ u) (m : ℕ) :
       exact mul_le_mul_of_nonneg_left (Real.sum_le_exp_of_nonneg hu m) (by positivity)
 
 theorem norm_sq_hermiteFiniteProjection {ι : Type*} [Fintype ι]
-    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
+    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     ‖hermiteFiniteProjection s f‖ ^ 2 =
       ∑ α ∈ s, |⟪hermiteLp α, f⟫_ℝ| ^ 2 /
         ∏ i : ι, ((α i).factorial : ℝ) := by
@@ -61,7 +63,7 @@ theorem norm_sq_hermiteFiniteProjection {ι : Type*} [Fintype ι]
   field_simp
 
 theorem norm_sq_hermiteDegreeProjection {ι : Type*} [Fintype ι]
-    (r : ℕ) (f : Lp ℝ 2 (SYK.gaussianCouplings ι)) :
+    (r : ℕ) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     ‖hermiteDegreeProjection r f‖ ^ 2 =
       ∑ α ∈ multiIndices_degree r, |⟪hermiteLp α, f⟫_ℝ| ^ 2 /
         ∏ i : ι, ((α i).factorial : ℝ) := by

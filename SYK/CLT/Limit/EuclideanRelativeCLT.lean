@@ -10,14 +10,16 @@ Euclidean coupling measure, with the exact limitVariance normalization.
 open MeasureTheory ProbabilityTheory Filter
 open scoped Topology
 
+open SYK.GaussianChaos
+
 namespace SYK.CLT
 
 local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
   unfold standardGaussianMeasure
   infer_instance
 
-local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (SYK.gaussianCouplings ι) := by
-  unfold SYK.gaussianCouplings
+local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (gaussianCouplings ι) := by
+  unfold gaussianCouplings
   infer_instance
 
 theorem Setting.relativeFluctuation_memLp {q : ℕ} (S : Setting q)
@@ -30,13 +32,13 @@ theorem Setting.relativeFluctuation_memLp {q : ℕ} (S : Setting q)
 theorem Setting.relativeFluctuation_law {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     (standardGaussianMeasure (S.N n) q).map (S.relativeFluctuation β n) =
-      (SYK.gaussianCouplings (InteractionIndex (S.N n) q)).map
+      (gaussianCouplings (InteractionIndex (S.N n) q)).map
         (fun g => S.relativeFluctuation β n (WithLp.toLp 2 g)) := by
   let ι := InteractionIndex (S.N n) q
   have hrel := (S.relativeFluctuation_memLp β n).aestronglyMeasurable.aemeasurable
   change AEMeasurable (S.relativeFluctuation β n)
-    ((SYK.gaussianCouplings ι).map (MeasurableEquiv.toLp 2 (ι → ℝ))) at hrel
-  change ((SYK.gaussianCouplings ι).map
+    ((gaussianCouplings ι).map (MeasurableEquiv.toLp 2 (ι → ℝ))) at hrel
+  change ((gaussianCouplings ι).map
     (MeasurableEquiv.toLp 2 (ι → ℝ))).map (S.relativeFluctuation β n) = _
   rw [AEMeasurable.map_map_of_aemeasurable hrel
     (MeasurableEquiv.toLp 2 (ι → ℝ)).measurable.aemeasurable]

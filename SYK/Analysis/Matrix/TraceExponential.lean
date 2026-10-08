@@ -34,15 +34,15 @@ noncomputable section
 # Matrix exponential and normalized trace bounds
 
 The spectral estimates used below are in `SingularValues`. Main entry points:
-`MatrixAnalysis.Matrix.normalizedTrace`, `MatrixAnalysis.Matrix.normalizedSchattenNorm`,
-`MatrixAnalysis.Matrix.word_trace_bound`.
+`SYK.MatrixAnalysis.Matrix.normalizedTrace`, `SYK.MatrixAnalysis.Matrix.normalizedSchattenNorm`,
+`SYK.MatrixAnalysis.Matrix.word_trace_bound`.
 -/
 
 open scoped BigOperators InnerProductSpace
 
 noncomputable section
 
-namespace MatrixAnalysis.PositiveTrace
+namespace SYK.MatrixAnalysis.PositiveTrace
 
 variable {𝕜 E : Type*} [RCLike 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E]
@@ -90,7 +90,7 @@ theorem norm_trace_comp_positive_le_norm_trace (P B : E →ₗ[𝕜] E)
   rw [hnorm]
   exact norm_trace_comp_positive_le P B hP
 
-end MatrixAnalysis.PositiveTrace
+end SYK.MatrixAnalysis.PositiveTrace
 
 
 
@@ -98,11 +98,11 @@ open scoped Matrix.Norms.L2Operator
 
 noncomputable section
 
-namespace ExpAux
+namespace SYK.MatrixAnalysis.ExpAux
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 
-theorem exp_smul_spectral (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
+private theorem exp_smul_spectral (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
     NormedSpace.exp (β • H) =
       (↑hH.eigenvectorUnitary : Matrix n n 𝕜) *
         Matrix.diagonal (fun j => (Real.exp (β * hH.eigenvalues j) : 𝕜)) *
@@ -128,13 +128,13 @@ theorem exp_smul_spectral (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) 
         (β * hH.eigenvalues j)).symm
   rw [hdiag]
 
-theorem charpoly_exp_smul (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
+private theorem charpoly_exp_smul (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
     (NormedSpace.exp (β • H)).charpoly =
       ∏ j, (Polynomial.X - Polynomial.C (Real.exp (β * hH.eigenvalues j) : 𝕜)) := by
   rw [exp_smul_spectral H hH β, Matrix.charpoly_mul_comm, ← Matrix.mul_assoc,
     Unitary.coe_star_mul_self, one_mul, Matrix.charpoly_diagonal]
 
-theorem roots_charpoly_exp_smul (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
+private theorem roots_charpoly_exp_smul (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
     (NormedSpace.exp (β • H)).charpoly.roots =
       Multiset.map (fun j => (Real.exp (β * hH.eigenvalues j) : 𝕜)) Finset.univ.val := by
   rw [charpoly_exp_smul H hH β]
@@ -142,7 +142,7 @@ theorem roots_charpoly_exp_smul (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β :
     Polynomial.X_sub_C_ne_zero _))]
   simp only [Polynomial.roots_X_sub_C, Multiset.bind_singleton]
 
-theorem charpoly_toEuclideanLin (A : Matrix n n 𝕜) :
+private theorem charpoly_toEuclideanLin (A : Matrix n n 𝕜) :
     (Matrix.toEuclideanLin A).charpoly = A.charpoly := by
   rw [← LinearMap.charpoly_toMatrix (Matrix.toEuclideanLin A)
     (EuclideanSpace.basisFun n 𝕜).toBasis,
@@ -151,7 +151,7 @@ theorem charpoly_toEuclideanLin (A : Matrix n n 𝕜) :
 section
 open scoped ComplexOrder
 
-theorem exp_smul_posSemidef (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
+private theorem exp_smul_posSemidef (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
     (NormedSpace.exp (β • H)).PosSemidef := by
   rw [exp_smul_spectral H hH β]
   have hU : IsUnit (↑hH.eigenvectorUnitary : Matrix n n 𝕜) := Unitary.isUnit_coe
@@ -159,7 +159,7 @@ theorem exp_smul_posSemidef (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ
   rw [Matrix.posSemidef_diagonal_iff]
   exact fun i => RCLike.ofReal_nonneg.mpr (Real.exp_pos _).le
 
-theorem exp_smul_posDef (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
+private theorem exp_smul_posDef (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
     (NormedSpace.exp (β • H)).PosDef := by
   rw [exp_smul_spectral H hH β]
   have hU : IsUnit (↑hH.eigenvectorUnitary : Matrix n n 𝕜) := Unitary.isUnit_coe
@@ -169,7 +169,7 @@ theorem exp_smul_posDef (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
 
 end
 
-theorem sum_eigenvalues_exp_smul (H : Matrix n n 𝕜) (hH : H.IsHermitian)
+private theorem sum_eigenvalues_exp_smul (H : Matrix n n 𝕜) (hH : H.IsHermitian)
     (β : ℝ) (f : ℝ → ℝ)
     (hT : (Matrix.toEuclideanLin (NormedSpace.exp (β • H))).IsPositive) :
     ∑ i : Fin (Module.finrank 𝕜 (EuclideanSpace 𝕜 n)),
@@ -180,10 +180,10 @@ theorem sum_eigenvalues_exp_smul (H : Matrix n n 𝕜) (hH : H.IsHermitian)
       rw [exp_smul_spectral H hH β]
       exact SingularAux.toEuclideanLin_conj_diagonal_apply H hH _ j) f
 
-end ExpAux
+end SYK.MatrixAnalysis.ExpAux
 
 
-namespace SVDAux
+namespace SYK.MatrixAnalysis.SVDAux
 
 variable {𝕜 E : Type*} [RCLike 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E]
@@ -193,10 +193,10 @@ open Polynomial
 noncomputable def sv (T : E →ₗ[𝕜] E) (i : Fin (Module.finrank 𝕜 E)) : ℝ :=
   T.singularValues i
 
-theorem sv_nonneg (T : E →ₗ[𝕜] E) (i : Fin (Module.finrank 𝕜 E)) :
+private theorem sv_nonneg (T : E →ₗ[𝕜] E) (i : Fin (Module.finrank 𝕜 E)) :
     0 ≤ sv T i := T.singularValues_nonneg i
 
-theorem singularValues_sum_rpow (T : E →ₗ[𝕜] E) {p : ℝ} (hp : 0 < p) :
+private theorem singularValues_sum_rpow (T : E →ₗ[𝕜] E) {p : ℝ} (hp : 0 < p) :
     T.singularValues.sum (fun _ s => s ^ p) =
       ∑ i : Fin (Module.finrank 𝕜 E), sv T i ^ p := by
   unfold sv
@@ -216,7 +216,7 @@ theorem singularValues_sum_rpow (T : E →ₗ[𝕜] E) {p : ℝ} (hp : 0 < p) :
   · intro i hi
     simp [Real.zero_rpow hp.ne']
 
-theorem charpoly_adjoint_comp_self_of_positive (T : E →ₗ[𝕜] E) (hT : T.IsPositive) :
+private theorem charpoly_adjoint_comp_self_of_positive (T : E →ₗ[𝕜] E) (hT : T.IsPositive) :
     (T.adjoint ∘ₗ T).charpoly =
       ∏ i : Fin (Module.finrank 𝕜 E),
         (X - C ((hT.isSymmetric.eigenvalues rfl i ^ 2 : ℝ) : 𝕜)) := by
@@ -235,24 +235,24 @@ theorem charpoly_adjoint_comp_self_of_positive (T : E →ₗ[𝕜] E) (hT : T.Is
     · simp [hij, Ne.symm hij]
   rw [← LinearMap.charpoly_toMatrix (T.adjoint ∘ₗ T) b, hmat, Matrix.charpoly_diagonal]
 
-theorem eigenvalues_adjoint_comp_self_of_positive (T : E →ₗ[𝕜] E)
+private theorem eigenvalues_adjoint_comp_self_of_positive (T : E →ₗ[𝕜] E)
     (hT : T.IsPositive) :
     T.isSymmetric_adjoint_comp_self.eigenvalues rfl =
       fun i => (hT.isSymmetric.eigenvalues rfl i) ^ 2 :=
   SingularAux.eigenvalues_adjoint_comp_self_of_positive' T hT
 
-theorem singularValues_fin_of_positive (T : E →ₗ[𝕜] E) (hT : T.IsPositive)
+private theorem singularValues_fin_of_positive (T : E →ₗ[𝕜] E) (hT : T.IsPositive)
     (i : Fin (Module.finrank 𝕜 E)) :
     T.singularValues i = hT.isSymmetric.eigenvalues rfl i := by
   rw [T.singularValues_fin rfl,
     eigenvalues_adjoint_comp_self_of_positive T hT,
     Real.sqrt_sq_eq_abs, abs_of_nonneg (hT.nonneg_eigenvalues rfl i)]
 
-end SVDAux
+end SYK.MatrixAnalysis.SVDAux
 
-namespace ExpAux
+namespace SYK.MatrixAnalysis.ExpAux
 
-theorem sum_sv_exp {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
+private theorem sum_sv_exp {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
     (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) (f : ℝ → ℝ) :
     ∑ i : Fin (Module.finrank 𝕜 (EuclideanSpace 𝕜 n)),
       f (SVDAux.sv (Matrix.toEuclideanLin (NormedSpace.exp (β • H))) i) =
@@ -263,7 +263,7 @@ theorem sum_sv_exp {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
   simpa only [SVDAux.sv, T, SVDAux.singularValues_fin_of_positive T hT] using
     sum_eigenvalues_exp_smul H hH β f hT
 
-end ExpAux
+end SYK.MatrixAnalysis.ExpAux
 
 
 open scoped BigOperators InnerProductSpace Matrix.Norms.L2Operator
@@ -287,7 +287,7 @@ The higher-derivative bound itself is in `TraceExpDerivatives`: it uses the word
 Taylor-coefficient bounds here after shifting the Hermitian base point to a positive matrix.
 -/
 
-namespace MatrixAnalysis
+namespace SYK.MatrixAnalysis
 
 /-! ## Radial chain rule -/
 
@@ -471,7 +471,7 @@ variable {𝕜 E : Type*} [RCLike 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E]
 
 /-- The absolute trace is bounded by the sum of singular values. -/
-theorem norm_trace_le (T : E →ₗ[𝕜] E) :
+private theorem norm_trace_le (T : E →ₗ[𝕜] E) :
     ‖LinearMap.trace 𝕜 E T‖ ≤
       ∑ i : Fin (Module.finrank 𝕜 E), T.singularValues i := by
   let b := T.isSymmetric_adjoint_comp_self.eigenvectorBasis rfl
@@ -495,13 +495,13 @@ theorem norm_trace_le (T : E →ₗ[𝕜] E) :
       rw [inner_smul_left, inner_self_eq_norm_sq_to_K]
       simp
 
-theorem sum_sv_rpow_eq_sum_range (T : E →ₗ[𝕜] E) (p : ℝ) :
+private theorem sum_sv_rpow_eq_sum_range (T : E →ₗ[𝕜] E) (p : ℝ) :
     ∑ i : Fin (Module.finrank 𝕜 E), SVDAux.sv T i ^ p =
       ∑ i ∈ Finset.range (Module.finrank 𝕜 E), T.singularValues i ^ p :=
   Fin.sum_univ_eq_sum_range (fun i => T.singularValues i ^ p) _
 
 /-- **Schatten–Hölder inequality** for singular value sums. -/
-theorem holder (T S : E →ₗ[𝕜] E) {p q r : ℝ} (hp : 1 ≤ p) (hq : 1 ≤ q) (hr : 1 ≤ r)
+private theorem holder (T S : E →ₗ[𝕜] E) {p q r : ℝ} (hp : 1 ≤ p) (hq : 1 ≤ q) (hr : 1 ≤ r)
     (hrecip : 1 / r = 1 / p + 1 / q) :
     (∑ i : Fin (Module.finrank 𝕜 E), SVDAux.sv (T ∘ₗ S) i ^ r) ^ (1 / r) ≤
       (∑ i : Fin (Module.finrank 𝕜 E), SVDAux.sv T i ^ p) ^ (1 / p) *
@@ -510,7 +510,7 @@ theorem holder (T S : E →ₗ[𝕜] E) {p q r : ℝ} (hp : 1 ≤ p) (hq : 1 ≤
   exact SingularAux.schatten_holder T S hp hq hr hrecip
 
 /-- Right multiplication by a bounded operator in Schatten norm. -/
-theorem mul_opNorm (T S : E →ₗ[𝕜] E) {p : ℝ} (hp : 1 ≤ p) :
+private theorem mul_opNorm (T S : E →ₗ[𝕜] E) {p : ℝ} (hp : 1 ≤ p) :
     (∑ i : Fin (Module.finrank 𝕜 E), SVDAux.sv (T ∘ₗ S) i ^ p) ^ (1 / p) ≤
       (∑ i : Fin (Module.finrank 𝕜 E), SVDAux.sv T i ^ p) ^ (1 / p) *
         ‖S.toContinuousLinearMap‖ := by
@@ -519,7 +519,7 @@ theorem mul_opNorm (T S : E →ₗ[𝕜] E) {p : ℝ} (hp : 1 ≤ p) :
     (fun v => S.toContinuousLinearMap.le_opNorm v) (by linarith)
 
 /-- Left multiplication by a bounded operator in Schatten norm. -/
-theorem opNorm_mul (T S : E →ₗ[𝕜] E) {p : ℝ} (hp : 1 ≤ p) :
+private theorem opNorm_mul (T S : E →ₗ[𝕜] E) {p : ℝ} (hp : 1 ≤ p) :
     (∑ i : Fin (Module.finrank 𝕜 E), SVDAux.sv (T ∘ₗ S) i ^ p) ^ (1 / p) ≤
       ‖T.toContinuousLinearMap‖ *
         (∑ i : Fin (Module.finrank 𝕜 E), SVDAux.sv S i ^ p) ^ (1 / p) := by
@@ -558,7 +558,7 @@ theorem trace_exp (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
       (β * hH.eigenvalues i)).symm
 
 /-- A Hermitian matrix exponential has strictly positive real trace. -/
-theorem trace_exp_re_pos [Nonempty n]
+private theorem trace_exp_re_pos [Nonempty n]
     (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
     0 < RCLike.re (NormedSpace.exp (β • H)).trace := by
   rw [trace_exp H hH β]
@@ -1228,4 +1228,4 @@ end WordBounds
 
 end Matrix
 
-end MatrixAnalysis
+end SYK.MatrixAnalysis

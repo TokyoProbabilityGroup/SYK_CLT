@@ -11,7 +11,7 @@ import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Positivity
 import Mathlib.Tactic.Ring
-import SYK.Probability.GaussianChaos.GaussianHermiteOrthogonality
+import SYK.Probability.GaussianChaos.Orthogonality
 import SYK.CLT.Chaos.CliffordSignParity
 
 /-!
@@ -22,6 +22,8 @@ Finite sign averages and the exponential moment estimate associated with
 -/
 
 open Finset Real
+
+open SYK.GaussianChaos
 
 namespace SYK.CLT.Rademacher
 

@@ -10,10 +10,12 @@ This is the exact finite-size normalization needed for the variance limit.
 open MeasureTheory Filter ProbabilityTheory
 open scoped Topology InnerProductSpace
 
+open SYK.GaussianChaos
+
 namespace SYK.CLT
 
-local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (SYK.gaussianCouplings ι) := by
-  unfold SYK.gaussianCouplings
+local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (gaussianCouplings ι) := by
+  unfold gaussianCouplings
   infer_instance
 
 theorem inner_hermiteLp_single_two {ι : Type*} [Fintype ι]
@@ -36,8 +38,8 @@ theorem quadraticGaussianLp_norm_sq {ι : Type*} [Fintype ι]
   have hcard : 0 < (Fintype.card ι : ℝ) := by
     exact_mod_cast Fintype.card_pos
   have hinner :
-      ⟪(∑ i : ι, hermiteLp (Pi.single i 2) : Lp ℝ 2 (SYK.gaussianCouplings ι)),
-        (∑ i : ι, hermiteLp (Pi.single i 2) : Lp ℝ 2 (SYK.gaussianCouplings ι))⟫_ℝ =
+      ⟪(∑ i : ι, hermiteLp (Pi.single i 2) : Lp ℝ 2 (gaussianCouplings ι)),
+        (∑ i : ι, hermiteLp (Pi.single i 2) : Lp ℝ 2 (gaussianCouplings ι))⟫_ℝ =
         2 * (Fintype.card ι : ℝ) := by
     rw [inner_sum]
     simp_rw [sum_inner, inner_hermiteLp_single_two]
@@ -55,7 +57,7 @@ theorem Setting.inner_secondChaos_higherChaosRemainder_eq_zero {q : ℕ}
     ⟪hermiteDegreeProjection 2 (S.YGaussianLp β n),
       S.higherChaosRemainderLp β n⟫_ℝ = 0 := by
   let f := S.YGaussianLp β n
-  let v : ℕ → Lp ℝ 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) :=
+  let v : ℕ → Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q)) :=
     fun k => hermiteDegreeProjection (k + 3) f
   have hsum : HasSum v (S.higherChaosRemainderLp β n) := by
     exact (hasSum_nat_add_iff' 3).mpr (hasSum_hermiteDegreeProjection_unconditional f)
@@ -73,11 +75,11 @@ theorem Setting.varianceY_pi_eq_norm_sq {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     variance (fun g : InteractionIndex (S.N n) q → ℝ =>
       S.Y β n (WithLp.toLp 2 g))
-      (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) =
+      (gaussianCouplings (InteractionIndex (S.N n) q)) =
       ‖S.YGaussianLp β n -
-        Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ)‖ ^ 2 := by
+        Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ)‖ ^ 2 := by
   let ι := InteractionIndex (S.N n) q
-  let μ := SYK.gaussianCouplings ι
+  let μ := gaussianCouplings ι
   have hY : MemLp (fun g : ι → ℝ => S.Y β n (WithLp.toLp 2 g)) 2 μ := by
     exact (Lp.memLp (S.YGaussianLp β n)).ae_eq (S.YGaussianLp_ae β n)
   rw [variance_eq_integral hY.aemeasurable, integral_Y_pi S β n]
@@ -97,7 +99,7 @@ theorem Setting.varianceY_pi_decomposition {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     variance (fun g : InteractionIndex (S.N n) q → ℝ =>
       S.Y β n (WithLp.toLp 2 g))
-      (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) =
+      (gaussianCouplings (InteractionIndex (S.N n) q)) =
       (β * deriv (fun b => Real.log (S.meanZ b n)) β /
         Real.sqrt (2 * (Nat.choose (S.N n) q : ℝ))) ^ 2 +
       ‖S.higherChaosRemainderLp β n‖ ^ 2 := by
@@ -105,16 +107,16 @@ theorem Setting.varianceY_pi_decomposition {q : ℕ} (S : Setting q)
     simpa [InteractionIndex] using Nat.choose_pos (S.q_le_N n)
   letI : Nonempty (InteractionIndex (S.N n) q) := Fintype.card_pos_iff.mp hcard
   have heq : S.YGaussianLp β n -
-      Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ) =
+      Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ) =
       hermiteDegreeProjection 2 (S.YGaussianLp β n) +
         S.higherChaosRemainderLp β n := by
     calc
-      _ = (Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ) +
+      _ = (Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ) +
           hermiteDegreeProjection 2 (S.YGaussianLp β n) +
           S.higherChaosRemainderLp β n) -
-          Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ) := by
+          Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ) := by
             exact congrArg (fun x => x -
-              Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ))
+              Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ))
               (S.Y_decomposition β n)
       _ = _ := by abel
   rw [S.varianceY_pi_eq_norm_sq, heq]
@@ -132,7 +134,7 @@ theorem Setting.scaled_varianceY_pi_tendsto {q : ℕ} (S : Setting q)
       Tendsto (fun n => S.fluctuationScale n ^ 2 *
         variance (fun g : InteractionIndex (S.N n) q → ℝ =>
           S.Y β n (WithLp.toLp 2 g))
-          (SYK.gaussianCouplings (InteractionIndex (S.N n) q)))
+          (gaussianCouplings (InteractionIndex (S.N n) q)))
         atTop (𝓝 (limitVariance q hFE.ℓ β : ℝ)) := by
   obtain ⟨βq, hβq, hrem⟩ := S.scaled_higherChaosRemainderLp_norm_tendsto_zero
   refine ⟨βq, hβq, ?_⟩
@@ -143,7 +145,7 @@ theorem Setting.scaled_varianceY_pi_tendsto {q : ℕ} (S : Setting q)
   have heq (n : ℕ) : S.fluctuationScale n ^ 2 *
       variance (fun g : InteractionIndex (S.N n) q → ℝ =>
         S.Y β n (WithLp.toLp 2 g))
-        (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) =
+        (gaussianCouplings (InteractionIndex (S.N n) q)) =
       (S.fluctuationScale n *
         (β * deriv (fun b => Real.log (S.meanZ b n)) β /
           Real.sqrt (2 * (Nat.choose (S.N n) q : ℝ)))) ^ 2 +
@@ -162,7 +164,7 @@ theorem Setting.varianceZ_eq_mean_sq_varianceY_pi {q : ℕ}
     S.varianceZ β n = (S.meanZ β n) ^ 2 *
       variance (fun g : InteractionIndex (S.N n) q → ℝ =>
         S.Y β n (WithLp.toLp 2 g))
-        (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) := by
+        (gaussianCouplings (InteractionIndex (S.N n) q)) := by
   have hZ : S.Z β n = fun g => S.meanZ β n * S.Y β n g := by
     funext g
     simp only [Setting.Y]
@@ -170,7 +172,7 @@ theorem Setting.varianceZ_eq_mean_sq_varianceY_pi {q : ℕ}
   rw [Setting.varianceZ, hZ, variance_const_mul]
   change (S.meanZ β n) ^ 2 *
       variance (S.Y β n)
-        ((SYK.gaussianCouplings (InteractionIndex (S.N n) q)).map
+        ((gaussianCouplings (InteractionIndex (S.N n) q)).map
           (MeasurableEquiv.toLp 2 (InteractionIndex (S.N n) q → ℝ))) = _
   rw [variance_map_equiv]
   rfl
@@ -191,7 +193,7 @@ theorem Setting.scaled_varianceZ_over_mean_sq_tendsto {q : ℕ}
       S.fluctuationScale n ^ 2 *
         variance (fun g : InteractionIndex (S.N n) q → ℝ =>
           S.Y β n (WithLp.toLp 2 g))
-          (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) := by
+          (gaussianCouplings (InteractionIndex (S.N n) q)) := by
     rw [S.varianceZ_eq_mean_sq_varianceY_pi]
     field_simp [(ne_of_gt (S.partition_moments β n).2.2)]
   simpa only [heq] using hvar β hβ

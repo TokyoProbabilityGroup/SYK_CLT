@@ -2,16 +2,18 @@
 
 ## 現行の配置
 
-数学コードはリポジトリの `SYK/` に置く。共有環境とビルド対象は [ワークスペース案内](../../workspace/README.md) を参照する。ファイルの配置と宣言の名前空間は別であり、確率基盤の一部の宣言は既存の `SYK.CLT` 名前空間を保持している。
+数学コードはリポジトリの `SYK/` に置く。共有環境とビルド対象は [ワークスペース案内](../../workspace/README.md) を参照する。宣言の名前空間はファイルの配置ではなく数学的な話題で決める。下表の右端の列が各配置の主な名前空間である。
 
-| 配置（リポジトリ内） | 数学的役割 |
-| --- | --- |
-| `SYK/Analysis/Matrix/`・`SYK/Analysis/ConvexDerivatives.lean` | 特異値・トレース指数関数・微分評価と凸関数列の補題 |
-| `SYK/Probability/GaussianChaos/` | Hermite 基本定義・部分積分・直交性・密度・完全性 |
-| `SYK/Probability/` | モーメント一意性・分布移送・旧 GaussianIBP と GaussianConcentration 基盤 |
-| `SYK/CLT/Chaos/` | 模型の符号対称性・分配関数の微分・二次/高次/零次カオス |
-| `SYK/CLT/Quadratic/` | 有限個のガウス変数二乗の観測量・四次モーメント・二次和の CLT |
-| `SYK/CLT/Limit/`・`SYK/CLT/Log/` | 模型への分布移送・分散・相対/標準化 CLT と対数への移送 |
+| 配置（リポジトリ内） | 数学的役割 | 名前空間 |
+| --- | --- | --- |
+| `SYK/Analysis/Matrix/` | 特異値・トレース指数関数・微分評価 | `SYK.MatrixAnalysis` |
+| `SYK/Analysis/ConvexDerivatives.lean` | 凸関数列の導関数の収束 | `SYK.Analysis` |
+| `SYK/Probability/GaussianChaos/` | Hermite 基本定義・部分積分・直交性・密度・完全性 | `SYK.GaussianChaos` |
+| `SYK/Probability/` 直下 | モーメント一意性・分布移送 | `SYK.Probability`（旧 `GaussianIBP.lean` を除く） |
+| `SYK/Probability/GaussianConcentration/` | 共有ガウス基盤 | `SYK.GaussianConcentration` |
+| `SYK/CLT/Chaos/` | 模型の符号対称性・分配関数の微分・二次/高次/零次カオス | `SYK.CLT`（符号ゲージ・頂点偶奇則は `SYK` と `SYK.MajoranaSystem`） |
+| `SYK/CLT/Quadratic/` | 有限個のガウス変数二乗の観測量・四次モーメント・二次和の CLT | `SYK.CLT` |
+| `SYK/CLT/Limit/`・`SYK/CLT/Log/` | 模型への分布移送・分散・相対/標準化 CLT と対数への移送 | `SYK.CLT` |
 
 ## 基準と正式な参照元
 
@@ -70,13 +72,13 @@
 補題を利用するときは、以下の用途と宣言名から対象を選び、ソースで定理文と必要な定義を確認する。名前空間、節の変数、型クラス、局所記法も確認し、証明の詳細は必要になった箇所を読む。この参照方法は通常の文書・Lean ソースを対象とし、適用される `AGENTS.md` の確認範囲を限定しない。以下の説明は索引であり、正確な仮定と型は Lean 宣言を参照する。
 
 - `../Probability/GaussianIBP.lean` は、指数傾斜によるシフト恒等式、差商の一様評価、支配収束を用いて、実ガウス分布の Stein 型部分積分を構成する旧経路である。`Main` の再帰 import に含まれず、`../../Blueprint/CLT.lean` の参照と子 `SYK` ライブラリのグロブによる全量ビルドを残す。現行の CLT の部分積分は共有 `../Probability/GaussianConcentration/Smooth.lean` を使う。同基盤は、独立標準ガウスと probabilists' Hermite 多項式に対し、`C^{|α|}` の正則性と `η ≤ α` の各偏導関数に対する指数増大から、多重指数部分積分 `hermiteMulti_ibp_of_expGrowth` と両辺の可積分性を与える。これは `lem:Gaussian-Hermite-IBP` の一般部分に対応するが、`Setting.Z` の各偏導関数の評価を供給したり、この公式を `Z_N` に適用したりするものではない。
-- [GaussianHermiteBasic.lean](../Probability/GaussianChaos/GaussianHermiteBasic.lean)：任意の有限型に対する `SYK.hermiteMulti`、`gaussianCouplings` と符号反転・置換による期待値の不変性を置く。模型や CLT を import しない。これらを使うマヨラナ系の符号ゲージ・頂点偶奇則は `CliffordSignParity.lean` に置く。
-- [GaussianChaos.lean](../Probability/GaussianChaos/GaussianChaos.lean)：`SYK.CLT.hermite_coefficient_ibp` と `hermite_coefficient_integrable` が係数の部分積分と両辺の可積分性の入口である。`SYK.GaussianConcentration.hermiteMulti` と `GaussianHermiteBasic.lean` の `SYK.hermiteMulti`、二つの標準ガウス測度の定義を照合し、原稿の成長条件で後者の記法へ移す。正次数の平均零と Hermite 関数の積の可積分性も証明する。模型固有の符号ゲージを import しない。
-- [GaussianHermiteOrthogonality.lean](../Probability/GaussianChaos/GaussianHermiteOrthogonality.lean)：`SYK.CLT.hermiteMulti_orthogonality`、`inner_hermiteLp`、`hermiteFiniteProjection_eq_starProjection` が、原稿の Hermite 内積・階乗ノルムと任意の有限添字集合への直交射影公式の入口である。このファイルの `hasSum_hermiteCoefficients` と `hasSum_hermiteDegreeProjection` は $L^2$ 完全性を仮定する。完全性を別途渡さずに使う結果は、次の `GaussianPolynomialDensity.lean` を参照する。
-- [GaussianHermiteDensity.lean](../Probability/GaussianChaos/GaussianHermiteDensity.lean)：一変数実多項式の Hermite 基底、任意の実係数多変数多項式関数の Hermite 有限線形包への包含、$L^2$ クラスへの移送を証明する。多項式クラスがガウス $L^2$ に稠密なら規格化 Hermite 族も稠密であることを証明済み。
+- [GaussianChaos/Basic.lean](../Probability/GaussianChaos/Basic.lean)：任意の有限型に対する `SYK.GaussianChaos.hermiteMulti`、`gaussianCouplings` と符号反転・置換による期待値の不変性を置く。模型や CLT を import しない。これらを使うマヨラナ系の符号ゲージ・頂点偶奇則は `CliffordSignParity.lean` に置く。
+- [GaussianChaos/CoefficientIBP.lean](../Probability/GaussianChaos/CoefficientIBP.lean)：`SYK.GaussianChaos.hermite_coefficient_ibp` と `hermite_coefficient_integrable` が係数の部分積分と両辺の可積分性の入口である。`SYK.GaussianConcentration.hermiteMulti` と `GaussianChaos/Basic.lean` の `SYK.GaussianChaos.hermiteMulti`、二つの標準ガウス測度の定義を照合し、原稿の成長条件で後者の記法へ移す。正次数の平均零と Hermite 関数の積の可積分性も証明する。模型固有の符号ゲージを import しない。
+- [GaussianChaos/Orthogonality.lean](../Probability/GaussianChaos/Orthogonality.lean)：`SYK.GaussianChaos.hermiteMulti_orthogonality`、`inner_hermiteLp`、`hermiteFiniteProjection_eq_starProjection` が、原稿の Hermite 内積・階乗ノルムと任意の有限添字集合への直交射影公式の入口である。このファイルの `hasSum_hermiteCoefficients` と `hasSum_hermiteDegreeProjection` は $L^2$ 完全性を仮定する。完全性を別途渡さずに使う結果は、次の `GaussianChaos/PolynomialDensity.lean` を参照する。
+- [GaussianChaos/HermiteDensity.lean](../Probability/GaussianChaos/HermiteDensity.lean)：一変数実多項式の Hermite 基底、任意の実係数多変数多項式関数の Hermite 有限線形包への包含、$L^2$ クラスへの移送を証明する。多項式クラスがガウス $L^2$ に稠密なら規格化 Hermite 族も稠密であることを証明済み。
 - [GaussianMomentDetermination.lean](../Probability/GaussianMomentDetermination.lean)：指数モーメントを持つ有限実測度のモーメント一意性を扱う。
-- [GaussianPolynomialDensity.lean](../Probability/GaussianChaos/GaussianPolynomialDensity.lean)：`SYK.CLT.hermiteOrthonormal_dense`、`hasSum_hermiteCoefficients_unconditional`、`hasSum_hermiteDegreeProjection_unconditional` が完全性と展開の入口である。標準ガウスの指数関数と $L^2$ 関数との積の可積分性、有限積ガウス $L^2$ の多項式稠密性を経て、Hermite 完全性、階乗係数と次数別の無限和を証明済みである。これらの展開定理は完全性を追加仮定として受け取らない。
-- [SingularValues.lean](../Analysis/Matrix/SingularValues.lean)：特異値・min-max・Ky Fan・Schatten 評価の証明基盤である。[MatrixTraceExponential.lean](../Analysis/Matrix/MatrixTraceExponential.lean) は規格化トレース、Schatten 評価と指数の評価を扱う。[TraceExpDerivatives.lean](../Analysis/Matrix/TraceExpDerivatives.lean) の高階微分評価の入口は `MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound` と `iterDirectionalFDeriv_traceExp_bound_of_norm_le_one` であり、Hermitian な基点における反復方向微分を扱う。`Setting.Z` のスケール・実部・ガウス可積分性との接続は F04 の `PartitionHigherDerivatives.lean` で検証済みである。
+- [GaussianChaos/PolynomialDensity.lean](../Probability/GaussianChaos/PolynomialDensity.lean)：`SYK.GaussianChaos.hermiteOrthonormal_dense`、`hasSum_hermiteCoefficients_unconditional`、`hasSum_hermiteDegreeProjection_unconditional` が完全性と展開の入口である。標準ガウスの指数関数と $L^2$ 関数との積の可積分性、有限積ガウス $L^2$ の多項式稠密性を経て、Hermite 完全性、階乗係数と次数別の無限和を証明済みである。これらの展開定理は完全性を追加仮定として受け取らない。
+- [SingularValues.lean](../Analysis/Matrix/SingularValues.lean)：特異値・min-max・Ky Fan・Schatten 評価の証明基盤である。[TraceExponential.lean](../Analysis/Matrix/TraceExponential.lean) は規格化トレース、Schatten 評価と指数の評価を扱う。[TraceExpDerivatives.lean](../Analysis/Matrix/TraceExpDerivatives.lean) の高階微分評価の入口は `SYK.MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound` と `iterDirectionalFDeriv_traceExp_bound_of_norm_le_one` であり、Hermitian な基点における反復方向微分を扱う。`Setting.Z` のスケール・実部・ガウス可積分性との接続は F04 の `PartitionHigherDerivatives.lean` で検証済みである。
 - `Chaos/Rademacher.lean` は、Boolean ベクトル上の一様平均 `radE`、符号和、および次数 `q` の基本対称式である Rademacher カオスを定義する。`even_sum_rademacher_moment` は原稿 `eq:even-sum-Rademacher-moment` の有限和恒等式を証明する。Newton 恒等式でカオスを符号和から評価し、独立符号和の指数モーメント評価と組み合わせて、偶数 `q ≥ 4` と `0 ≤ t ≤ c_q N^{-(q-1)}` の下で `𝔼_ε[|S_{N,q}|^3 exp(t|S_{N,q}|)] ≤ C_q N^{3q/2}` を証明する。
 - `Chaos/PartitionHigherDerivatives.lean` は既存の行列トレース指数微分評価を `Setting.Z` の任意階の偏導関数に接続し、原稿 `eq:Z-derivative-bound` の係数、指数増大、ガウス–エルミート部分積分との接続を証明する。`Chaos/HigherChaosProjection.lean` は各次数の Hermite 射影ノルムを偶多重指数の和、さらに Rademacher モーメントで評価し、無限次数和を指数付き三次モーメントで抑える。`tsum_higherChaosProjection_le_power` と `higherChaosProjection_isLittleO` は高温半径内の原稿 `prop:higher-chaos-closure` のべき評価を証明する。
 - `../Analysis/ConvexDerivatives.lean` は、割線の差の評価と平均値の定理を準備し、凸関数列の導関数を左右の割線で挟む証明を形式化する。主定理 `convex_convergence_deriv_tendstoUniformlyOn` は、開集合 `I` 上の各関数の凸性・微分可能性、関数列の局所一様収束、極限関数の微分可能性と導関数の連続性を仮定し、任意のコンパクト集合 `K ⊆ I` 上で導関数の一様収束を結論する。原稿で必要な各点収束から局所一様収束への導出はこの補題に含まれない。条件付き CLT に必要な局所一様収束は `AnnealedInput` の仮定として受け取る。
@@ -88,11 +90,11 @@
 
 ```mermaid
 flowchart TD
-    basic["GaussianHermiteBasic"] --> chaos["GaussianChaos"]
+    basic["GaussianChaos/Basic"] --> chaos["GaussianChaos/CoefficientIBP"]
     basic --> parity["CliffordSignParity"]
     smooth["共有 Smooth"] --> chaos
     model["共有 Model"] --> parity
-    chaos --> orth["GaussianHermiteOrthogonality"]
+    chaos --> orth["GaussianChaos/Orthogonality"]
     orth --> prelim["PartitionSymmetry"]
     parity --> prelim
     parity --> rademacher["Rademacher：偶多重指数の符号化"]
@@ -108,13 +110,13 @@ flowchart TD
 
 汎用 Hermite 補題の実利用側はこの CLT 内の展開と符号対称性であるため、共有ガウス基盤へ CLT の記法を追加しない。四次モーメントの経路から二次 CLT と `SecondChaosAsymptotic` を外すことで、有限モーメント評価の数学的前提が直接読める。
 
-有限行列解析の `SingularValues → MatrixTraceExponential → TraceExpDerivatives` は現行配置を維持する。実際の外部利用側は `PartitionDerivatives` だけで、Model はこれを import しない。`SYK.normalizedTrace` は複素行列と非空型、`MatrixAnalysis.Matrix.normalizedTrace` は一般の `RCLike` と空型も対象にするため、型を保った整理で両定義を統合しない。CLT への規格化の接続は `Setting.Z_eq_traceExp` と `Setting.norm_traceExp_disorder` に残る。この配置を採用した判断と検証は [作業履歴](../../WORK_HISTORY.md#clt-refactor-2026-10-06) を参照する。
+有限行列解析の `SingularValues → TraceExponential → TraceExpDerivatives` は現行配置を維持する。実際の外部利用側は `PartitionDerivatives` だけで、Model はこれを import しない。`SYK.normalizedTrace` は複素行列と非空型、`SYK.MatrixAnalysis.Matrix.normalizedTrace` は一般の `RCLike` と空型も対象にするため、型を保った整理で両定義を統合しない。CLT への規格化の接続は `Setting.Z_eq_traceExp` と `Setting.norm_traceExp_disorder` に残る。この配置を採用した判断と検証は [作業履歴](../../WORK_HISTORY.md#clt-refactor-2026-10-06) を参照する。
 
 ## 重複証明と定義の整理
 
-現行実装は既存の型・仮定・規格化を保って証明を共有している。`SingularValues` の平方・単調性は mathlib の API、有限和 Hölder は非負実数の有限和不等式を使う。零を許す列を正値に強めない。二次観測量の可測性は `GaussianQuadraticObservable` から法則対応・二次 CLT・四次モーメントへ供給し、Hermite2 の評価式は `GaussianHermiteBasic` で共有する。四次モーメントの六つの項は可積分性を個別に確認して有限和を積分する。
+現行実装は既存の型・仮定・規格化を保って証明を共有している。`SingularValues` の平方・単調性は mathlib の API、有限和 Hölder は非負実数の有限和不等式を使う。零を許す列を正値に強めない。二次観測量の可測性は `GaussianQuadraticObservable` から法則対応・二次 CLT・四次モーメントへ供給し、Hermite2 の評価式は `GaussianChaos/Basic` で共有する。四次モーメントの六つの項は可積分性を個別に確認して有限和を積分する。
 
-行列トレース指数は `MatrixAnalysis.Matrix.traceExp` に一本化した。`DerivAux.contDiff_tE` と `iteratedFDeriv_tE_bound_hermitian` の公開名は保ち、対象を同じ定義へ接続する。List に沿う微分と mathlib の反復 Fréchet 微分の滑らかさによる接続、および二つの規格化トレースの型は保持する。`MatrixTraceExponential` の Duhamel は一次微分、Schatten・語の評価と Taylor 係数は高階微分の解析的証明を担う。
+行列トレース指数は `SYK.MatrixAnalysis.Matrix.traceExp` に一本化した。滑らかさは `SYK.MatrixAnalysis.Matrix.contDiff_traceExp` が与え、Hermitian な基点での高階微分評価は内部補題 `iteratedFDeriv_traceExp_bound_hermitian` で証明する。List に沿う微分と mathlib の反復 Fréchet 微分の滑らかさによる接続、および二つの規格化トレースの型は保持する。`TraceExponential` の Duhamel は一次微分、Schatten・語の評価と Taylor 係数は高階微分の解析的証明を担う。
 
 `Main` は分配 CLT を先に証明し、結合定理が下位の対数 CLT と組み合わせて共通半径を取る。個別の対数 CLT は結合定理から射影する。矢印は証明結果から利用側へ向かい、公開定理の全結論と入力 `hFE` は変えない。
 
@@ -207,9 +209,9 @@ N^a(log Z_N-E log Z_N)
 | 相互作用・H のトレース零、Jensen による `Z_N≥1`、モーメントと正しい中心化の恒等式 | `FiniteModel.lean`、`Basic.lean` |
 | `‖R_N‖₂²=O(N^(-3a))` | `Chaos/HigherChaosProjection.lean`、`Chaos/HigherChaosRemainder.lean`（`Setting.higherChaosRemainderLp_le_power`） |
 | `c_N=O(N^(-a))`、アニール入力から `log E Z_N=O(N)` | `Basic.lean`、CLT の漸近補題 |
-| `sup_N E U_N^4<∞`、`P(Y_N<1/2)=O(N^(-3a))`、期待値の誤差 | `Quadratic/GaussianFourthMoment.lean`、`Log/LogEventBound.lean`、`Log/LogAsymptotics.lean` |
+| `sup_N E U_N^4<∞`、`P(Y_N<1/2)=O(N^(-3a))`、期待値の誤差 | `Quadratic/GaussianFourthMoment.lean`、`Log/EventBound.lean`、`Log/Asymptotics.lean` |
 
-期待誤差は `Y_N≥1/2` と `Y_N<1/2` に分け、表のモーメント評価と分配関数の下界から制御する。分布収束だけからモーメント評価は推論しない。`LogAsymptotics.lean` は CLT に必要な `N^a E[log Y_N] → 0` を証明している。`Setting.cubed_scale_Y_lt_half_bounded` は `N^(3a) P(Y_N<1/2)` の終局的有界性を証明する。`Setting.integral_log_Y_isBigO` は非零の小さい実逆温度で、原稿の明示的な `E[log Y_N]=O(N^(-2a))` を証明する。右辺は自然数べきの逆数 `((N : ℝ)^(2*(q/2-1)))⁻¹` で表し、偶数 `q≥4` では原稿の指数と一致する。定数は固定した逆温度に依存してよい。数学的な導出は `main-results.tex` の `thm:free-energy-clt` の証明を参照する。
+期待誤差は `Y_N≥1/2` と `Y_N<1/2` に分け、表のモーメント評価と分配関数の下界から制御する。分布収束だけからモーメント評価は推論しない。`Log/Asymptotics.lean` は CLT に必要な `N^a E[log Y_N] → 0` を証明している。`Setting.cubed_scale_Y_lt_half_bounded` は `N^(3a) P(Y_N<1/2)` の終局的有界性を証明する。`Setting.integral_log_Y_isBigO` は非零の小さい実逆温度で、原稿の明示的な `E[log Y_N]=O(N^(-2a))` を証明する。右辺は自然数べきの逆数 `((N : ℝ)^(2*(q/2-1)))⁻¹` で表し、偶数 `q≥4` では原稿の指数と一致する。定数は固定した逆温度に依存してよい。数学的な導出は `main-results.tex` の `thm:free-energy-clt` の証明を参照する。
 
 ## 仮定する命題と保留した証明
 

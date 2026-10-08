@@ -1,4 +1,5 @@
-import SYK.CLT.Limit.LpDistributionTransfer
+import SYK.CLT.Limit.QuadraticBridge
+import SYK.Probability.LpDistributionTransfer
 
 /-!
 # Relative partition fluctuation on the product Gaussian space
@@ -10,17 +11,19 @@ give the conditional relative central limit theorem under AnnealedInput.
 open MeasureTheory ProbabilityTheory Filter
 open scoped Topology
 
+open SYK.GaussianChaos SYK.Probability
+
 namespace SYK.CLT
 
-local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (SYK.gaussianCouplings ι) := by
-  unfold SYK.gaussianCouplings
+local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (gaussianCouplings ι) := by
+  unfold gaussianCouplings
   infer_instance
 
 theorem Setting.scaled_higherChaosRemainderLp_ae {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     (S.fluctuationScale n • S.higherChaosRemainderLp β n :
       (InteractionIndex (S.N n) q → ℝ) → ℝ) =ᵐ[
-        SYK.gaussianCouplings (InteractionIndex (S.N n) q)]
+        gaussianCouplings (InteractionIndex (S.N n) q)]
       fun g => S.relativeFluctuation β n (WithLp.toLp 2 g) -
         (S.fluctuationScale n *
           (β * deriv (fun b => Real.log (S.meanZ b n)) β /
@@ -31,23 +34,23 @@ theorem Setting.scaled_higherChaosRemainderLp_ae {q : ℕ} (S : Setting q)
   have hYlp :
       ((S.fluctuationScale n •
         (S.YGaussianLp β n -
-          Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ)) :
-        Lp ℝ 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q))) :
+          Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ)) :
+        Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q))) :
         (InteractionIndex (S.N n) q → ℝ) → ℝ) =ᵐ[
-          SYK.gaussianCouplings (InteractionIndex (S.N n) q)]
+          gaussianCouplings (InteractionIndex (S.N n) q)]
         fun g => S.relativeFluctuation β n (WithLp.toLp 2 g) := by
     have hsmul := Lp.coeFn_smul (S.fluctuationScale n)
       (S.YGaussianLp β n -
-        Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ))
+        Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ))
     have hsub := Lp.coeFn_sub (S.YGaussianLp β n)
-      (Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ))
+      (Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ))
     filter_upwards [hY, hsmul, hsub] with g hgY hgsmul hgsub
     rw [hgsmul]
     simp only [Pi.smul_apply, smul_eq_mul]
     rw [hgsub]
     simpa only [Pi.smul_apply, Pi.sub_apply, smul_eq_mul] using hgY
   have hfun := congrArg
-    (fun f : Lp ℝ 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) =>
+    (fun f : Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q)) =>
       (f : (InteractionIndex (S.N n) q → ℝ) → ℝ)) hdecomp
   rw [hfun] at hYlp
   have hsum := Lp.coeFn_add
@@ -79,7 +82,7 @@ theorem Setting.relativeFluctuation_pi_clt {q : ℕ} (S : Setting q)
         atTop
         (fun x : ℝ =>
           (β * deriv hFE.ℓ β * Real.sqrt ((q.factorial : ℝ) / 2)) * x)
-        (fun n => SYK.gaussianCouplings (InteractionIndex (S.N n) q))
+        (fun n => gaussianCouplings (InteractionIndex (S.N n) q))
         (gaussianReal 0 1) := by
   obtain ⟨βq, hβq, hrem⟩ := S.scaled_higherChaosRemainderLp_norm_tendsto_zero
   refine ⟨βq, hβq, ?_⟩
@@ -92,15 +95,15 @@ theorem Setting.relativeFluctuation_pi_clt {q : ℕ} (S : Setting q)
   let Y (n : ℕ) (g : InteractionIndex (S.N n) q → ℝ) : ℝ :=
     S.relativeFluctuation β n (WithLp.toLp 2 g)
   let R (n : ℕ) : Lp ℝ 2
-      (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) :=
+      (gaussianCouplings (InteractionIndex (S.N n) q)) :=
     S.fluctuationScale n • S.higherChaosRemainderLp β n
   have hX : TendstoInDistribution X atTop
       (fun x : ℝ =>
         (β * deriv hFE.ℓ β * Real.sqrt ((q.factorial : ℝ) / 2)) * x)
-      (fun n => SYK.gaussianCouplings (InteractionIndex (S.N n) q))
+      (fun n => gaussianCouplings (InteractionIndex (S.N n) q))
       (gaussianReal 0 1) := S.scaledQuadraticGaussianLp_clt hFE β hβ0
   have hR (n : ℕ) : (R n : (InteractionIndex (S.N n) q → ℝ) → ℝ) =ᵐ[
-      SYK.gaussianCouplings (InteractionIndex (S.N n) q)]
+      gaussianCouplings (InteractionIndex (S.N n) q)]
       fun g => Y n g - X n g := by
     have hraw := S.scaled_higherChaosRemainderLp_ae β n
     have hsmul := Lp.coeFn_smul (S.fluctuationScale n)
@@ -109,15 +112,15 @@ theorem Setting.relativeFluctuation_pi_clt {q : ℕ} (S : Setting q)
     rw [hs]
     exact hg
   have hY (n : ℕ) : AEMeasurable (Y n)
-      (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) := by
+      (gaussianCouplings (InteractionIndex (S.N n) q)) := by
     have hXR : AEMeasurable (fun g => X n g + R n g)
-        (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) :=
+        (gaussianCouplings (InteractionIndex (S.N n) q)) :=
       (hX.forall_aemeasurable n).add ((Lp.aestronglyMeasurable (R n)).aemeasurable)
     apply hXR.congr
     filter_upwards [hR n] with g hg
     linarith
   exact varying_l2_perturb_clt
-    (fun n => SYK.gaussianCouplings (InteractionIndex (S.N n) q))
+    (fun n => gaussianCouplings (InteractionIndex (S.N n) q))
     (gaussianReal 0 1) X Y
     (fun x : ℝ =>
       (β * deriv hFE.ℓ β * Real.sqrt ((q.factorial : ℝ) / 2)) * x)

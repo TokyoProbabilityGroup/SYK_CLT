@@ -1,4 +1,4 @@
-import SYK.Probability.GaussianChaos.GaussianHermiteOrthogonality
+import SYK.Probability.GaussianChaos.Orthogonality
 import SYK.Model.GaussianDisorder
 
 /-!
@@ -11,6 +11,8 @@ Entry points: `centeredGaussianSquare`, `centeredGaussianSquare_second_moment`,
 -/
 
 open MeasureTheory ProbabilityTheory
+
+open SYK.GaussianChaos
 
 namespace SYK.CLT
 

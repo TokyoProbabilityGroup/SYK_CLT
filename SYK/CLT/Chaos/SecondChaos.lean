@@ -13,6 +13,8 @@ coefficient at every real inverse temperature. Main entry point: `Setting.Y_seco
 open MeasureTheory
 open scoped InnerProductSpace
 
+open SYK.GaussianChaos
+
 namespace SYK.CLT
 
 /-- The degree-two multi-indices supported at one interaction. -/
@@ -48,9 +50,9 @@ theorem hermiteFactorial_single_two {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- The diagonal degree-two Hermite product is `g_I² - 1`. -/
 theorem hermiteMulti_single_two {ι : Type*} [Fintype ι] [DecidableEq ι]
     (I : ι) (g : ι → ℝ) :
-    SYK.hermiteMulti (Pi.single I 2) g = g I ^ 2 - 1 := by
+    hermiteMulti (Pi.single I 2) g = g I ^ 2 - 1 := by
   classical
-  simp only [SYK.hermiteMulti]
+  simp only [hermiteMulti]
   rw [Finset.prod_eq_single I]
   · simp [pow_two]
   · intro J _ hJI

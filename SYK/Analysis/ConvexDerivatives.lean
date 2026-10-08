@@ -16,7 +16,7 @@ open Filter Metric
 open scoped Topology
 
 namespace SYK
-namespace CLT
+namespace Analysis
 
 /-- Triangle-inequality bound comparing the secant slopes of two functions. -/
 lemma abs_slope_sub_le (g G : ℝ → ℝ) {a b : ℝ} (hab : a < b) :
@@ -193,5 +193,5 @@ theorem convex_convergence_deriv_tendstoUniformlyOn
     linarith [hslopeR.1, hslopeR.2, hslopeL.1, hslopeL.2, hmvtR.1, hmvtR.2, hmvtL.1, hmvtL.2,
       hsq1, hsq2]
 
-end CLT
+end Analysis
 end SYK

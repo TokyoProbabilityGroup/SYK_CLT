@@ -1,4 +1,4 @@
-import SYK.Probability.GaussianChaos.GaussianHermiteOrthogonality
+import SYK.Probability.GaussianChaos.Orthogonality
 import Mathlib.Algebra.Polynomial.Sequence
 import Mathlib.RingTheory.MvPolynomial.Basic
 
@@ -8,11 +8,11 @@ import Mathlib.RingTheory.MvPolynomial.Basic
 The real probabilists' Hermite polynomials form a basis of `ℝ[X]`.
 This module puts multivariate polynomials in the finite Hermite span and
 transfers polynomial density to Hermite density. Gaussian polynomial density
-is proved in `GaussianPolynomialDensity`.
+is proved in `SYK.Probability.GaussianChaos.PolynomialDensity`.
 Entry point: `hermiteOrthonormal_dense_of_mvPolynomialLp_dense`.
 -/
 
-namespace SYK.CLT
+namespace SYK.GaussianChaos
 
 noncomputable def realHermiteSequence : Polynomial.Sequence ℝ where
   elems' n := (Polynomial.hermite n).map (Int.castRingHom ℝ)
@@ -90,9 +90,9 @@ private noncomputable def polynomialProdEvalCoordLinear {ι : Type*} [Fintype ι
 
 private theorem polynomialProdEval_hermite {ι : Type*} [Fintype ι]
     (α : ι → ℕ) :
-    polynomialProdEval (fun i => realHermiteBasis (α i)) = SYK.hermiteMulti α := by
+    polynomialProdEval (fun i => realHermiteBasis (α i)) = hermiteMulti α := by
   funext g
-  simp [polynomialProdEval, realHermiteBasis_apply, SYK.hermiteMulti,
+  simp [polynomialProdEval, realHermiteBasis_apply, hermiteMulti,
     Polynomial.eval_map, Polynomial.aeval_def]
 
 /-- A product of one-variable polynomial functions belongs to the finite
@@ -100,10 +100,10 @@ linear span of multivariate Hermite products. -/
 theorem polynomialProdEval_mem_hermiteMulti_span {ι : Type*} [Fintype ι]
     (p : ι → Polynomial ℝ) :
     polynomialProdEval p ∈
-      Submodule.span ℝ (Set.range (fun α : ι → ℕ => SYK.hermiteMulti α)) := by
+      Submodule.span ℝ (Set.range (fun α : ι → ℕ => hermiteMulti α)) := by
   classical
   let M : Submodule ℝ ((ι → ℝ) → ℝ) :=
-    Submodule.span ℝ (Set.range (fun α : ι → ℕ => SYK.hermiteMulti α))
+    Submodule.span ℝ (Set.range (fun α : ι → ℕ => hermiteMulti α))
   have hP : ∀ s : Finset ι, ∀ p : ι → Polynomial ℝ,
       (∀ j, j ∉ s → ∃ n, p j = realHermiteBasis n) →
       polynomialProdEval p ∈ M := by
@@ -146,7 +146,7 @@ linear span of Hermite products. -/
 theorem mvPolynomial_eval_mem_hermiteMulti_span {ι : Type*} [Fintype ι]
     (p : MvPolynomial ι ℝ) :
     (fun g : ι → ℝ => MvPolynomial.aeval g p) ∈
-      Submodule.span ℝ (Set.range (fun α : ι → ℕ => SYK.hermiteMulti α)) := by
+      Submodule.span ℝ (Set.range (fun α : ι → ℕ => hermiteMulti α)) := by
   classical
   induction p using MvPolynomial.induction_on' with
   | add p q hp hq =>
@@ -173,10 +173,10 @@ corresponding span of Hermite `L²` classes. -/
 theorem memLp_and_span_of_mem_hermiteMulti_span {ι : Type*} [Fintype ι]
     {f : (ι → ℝ) → ℝ}
     (hf : f ∈ Submodule.span ℝ
-      (Set.range (fun α : ι → ℕ => SYK.hermiteMulti α))) :
-    ∃ h : MeasureTheory.MemLp f 2 (SYK.gaussianCouplings ι),
+      (Set.range (fun α : ι → ℕ => hermiteMulti α))) :
+    ∃ h : MeasureTheory.MemLp f 2 (gaussianCouplings ι),
       h.toLp f ∈ Submodule.span ℝ (Set.range (hermiteLp (ι := ι))) := by
-  let M : Submodule ℝ (MeasureTheory.Lp ℝ 2 (SYK.gaussianCouplings ι)) :=
+  let M : Submodule ℝ (MeasureTheory.Lp ℝ 2 (gaussianCouplings ι)) :=
     Submodule.span ℝ (Set.range (hermiteLp (ι := ι)))
   induction hf using Submodule.span_induction with
   | mem f hf =>
@@ -202,7 +202,7 @@ span. This is the algebraic input for Gaussian `L²` density. -/
 theorem mvPolynomial_eval_memLp_and_hermiteSpan {ι : Type*} [Fintype ι]
     (p : MvPolynomial ι ℝ) :
     ∃ h : MeasureTheory.MemLp (fun g : ι → ℝ => MvPolynomial.aeval g p) 2
-        (SYK.gaussianCouplings ι),
+        (gaussianCouplings ι),
       h.toLp (fun g : ι → ℝ => MvPolynomial.aeval g p) ∈
         Submodule.span ℝ (Set.range (hermiteLp (ι := ι))) :=
   memLp_and_span_of_mem_hermiteMulti_span
@@ -210,7 +210,7 @@ theorem mvPolynomial_eval_memLp_and_hermiteSpan {ι : Type*} [Fintype ι]
 
 /-- The Gaussian `L²` class of a multivariate polynomial function. -/
 noncomputable def mvPolynomialLp {ι : Type*} [Fintype ι]
-    (p : MvPolynomial ι ℝ) : MeasureTheory.Lp ℝ 2 (SYK.gaussianCouplings ι) :=
+    (p : MvPolynomial ι ℝ) : MeasureTheory.Lp ℝ 2 (gaussianCouplings ι) :=
   (mvPolynomial_eval_memLp_and_hermiteSpan p).choose.toLp
     (fun g : ι → ℝ => MvPolynomial.aeval g p)
 
@@ -254,10 +254,10 @@ theorem hermiteOrthonormal_dense_of_mvPolynomialLp_dense
     exact hspan _ (mvPolynomialLp_mem_hermiteSpan p)
   apply top_unique
   calc
-    (⊤ : Submodule ℝ (MeasureTheory.Lp ℝ 2 (SYK.gaussianCouplings ι))) =
+    (⊤ : Submodule ℝ (MeasureTheory.Lp ℝ 2 (gaussianCouplings ι))) =
         (Submodule.span ℝ (Set.range (mvPolynomialLp (ι := ι)))).topologicalClosure :=
       hpoly.symm
     _ ≤ (Submodule.span ℝ (Set.range (hermiteOrthonormal (ι := ι)))).topologicalClosure :=
       Submodule.topologicalClosure_mono hle
 
-end SYK.CLT
+end SYK.GaussianChaos

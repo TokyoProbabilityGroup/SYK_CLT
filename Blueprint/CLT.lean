@@ -6,13 +6,13 @@ import SYK.CLT.Normalization
 import SYK.CLT.StandardModel
 import SYK.Analysis.ConvexDerivatives
 import SYK.Probability.GaussianIBP
-import SYK.Probability.GaussianChaos.GaussianChaos
-import SYK.Probability.GaussianChaos.GaussianHermiteBasic
+import SYK.Probability.GaussianChaos.CoefficientIBP
+import SYK.Probability.GaussianChaos.Basic
 import SYK.CLT.Quadratic.GaussianQuadraticObservable
 import SYK.CLT.Quadratic.IndependentFourthMoment
-import SYK.Probability.GaussianChaos.GaussianHermiteOrthogonality
-import SYK.Probability.GaussianChaos.GaussianHermiteDensity
-import SYK.Probability.GaussianChaos.GaussianPolynomialDensity
+import SYK.Probability.GaussianChaos.Orthogonality
+import SYK.Probability.GaussianChaos.HermiteDensity
+import SYK.Probability.GaussianChaos.PolynomialDensity
 import SYK.CLT.Chaos.SecondChaos
 
 open Verso.Genre
@@ -101,7 +101,7 @@ one family, with no additional pressure or derivative bounds as assumptions.
 Constructing `hFE` is outside the conditional CLT proof.
 :::
 
-:::theorem "clt_convex_derivative_transfer" (parent := "central_limit_theorem") (lean := "SYK.CLT.convex_convergence_deriv_tendstoUniformlyOn")
+:::theorem "clt_convex_derivative_transfer" (parent := "central_limit_theorem") (lean := "SYK.Analysis.convex_convergence_deriv_tendstoUniformlyOn")
 The Lean convexity lemma gives locally uniform convergence of derivatives
 when locally uniform convergence of differentiable convex functions to a
 $`C^1` limit is already known. The manuscript's `lem:convex-derivatives`
@@ -116,7 +116,7 @@ limiting variance. These are verified conditional Lean results.
 They do not imply positive variance at every finite size.
 :::
 
-:::theorem "clt_gaussian_hermite_ibp" (parent := "central_limit_theorem") (lean := "SYK.GaussianConcentration.hermiteMulti_ibp_of_expGrowth, SYK.GaussianConcentration.hermiteMulti_ibp_integrable, SYK.GaussianConcentration.hermiteMulti_pair_ibp, SYK.GaussianConcentration.hermiteMulti_eq_prod, SYK.GaussianConcentration.partialList_perm, SYK.CLT.hermite_coefficient_ibp, SYK.CLT.integral_hermiteMulti_eq_zero")
+:::theorem "clt_gaussian_hermite_ibp" (parent := "central_limit_theorem") (lean := "SYK.GaussianConcentration.hermiteMulti_ibp_of_expGrowth, SYK.GaussianConcentration.hermiteMulti_ibp_integrable, SYK.GaussianConcentration.hermiteMulti_pair_ibp, SYK.GaussianConcentration.hermiteMulti_eq_prod, SYK.GaussianConcentration.partialList_perm, SYK.GaussianChaos.hermite_coefficient_ibp, SYK.GaussianChaos.integral_hermiteMulti_eq_zero")
 The general identity in `lem:Gaussian-Hermite-IBP` is proved for any finite
 coordinate set and independent standard Gaussian coordinates. Let
 $`\alpha` be a nonnegative integer multi-index and let
@@ -152,7 +152,7 @@ The specialization to $`Z_N` is recorded below: its smoothness and
 all-order derivative growth estimates are checked in Lean.
 :::
 
-:::theorem "clt_hermite_polynomial_span" (parent := "central_limit_theorem") (lean := "SYK.CLT.realHermiteBasis, SYK.CLT.polynomialProdEval_mem_hermiteMulti_span, SYK.CLT.mvPolynomial_eval_mem_hermiteMulti_span, SYK.CLT.mvPolynomial_eval_memLp_and_hermiteSpan, SYK.CLT.hermiteOrthonormal_dense_of_mvPolynomialLp_dense")
+:::theorem "clt_hermite_polynomial_span" (parent := "central_limit_theorem") (lean := "SYK.GaussianChaos.realHermiteBasis, SYK.GaussianChaos.polynomialProdEval_mem_hermiteMulti_span, SYK.GaussianChaos.mvPolynomial_eval_mem_hermiteMulti_span, SYK.GaussianChaos.mvPolynomial_eval_memLp_and_hermiteSpan, SYK.GaussianChaos.hermiteOrthonormal_dense_of_mvPolynomialLp_dense")
 For a finite coordinate set, every real multivariate polynomial function is
 a finite real linear combination of products of probabilists' Hermite
 polynomials. Lean proves this first for a product of one-variable
@@ -162,7 +162,7 @@ span of the Hermite classes. Polynomial density and unconditional
 Hermite completeness are proved in the node below.
 :::
 
-:::theorem "clt_exponential_moment_determination" (parent := "central_limit_theorem") (lean := "SYK.CLT.measure_eq_of_moments, SYK.CLT.gaussianExp_memLp_two, SYK.CLT.gaussianLp_integrable_mul_exp")
+:::theorem "clt_exponential_moment_determination" (parent := "central_limit_theorem") (lean := "SYK.Probability.measure_eq_of_moments, SYK.GaussianChaos.gaussianExp_memLp_two, SYK.GaussianChaos.gaussianLp_integrable_mul_exp")
 Finite real measures with every real exponential moment are determined by
 their polynomial moments. Lean proves this through the analytic moment
 generating function and characteristic-function uniqueness. Real
@@ -171,7 +171,7 @@ arbitrary Gaussian $`L^2` functions are integrable. Applying moment
 determination to every linear projection proves polynomial density below.
 :::
 
-:::theorem "clt_finite_hermite_projection" (parent := "central_limit_theorem") (uses := "clt_gaussian_hermite_ibp") (lean := "SYK.CLT.hermiteMulti_orthogonality, SYK.CLT.inner_hermiteLp, SYK.CLT.hermiteFiniteProjection_eq_starProjection, SYK.CLT.mem_multiIndices_degree, SYK.CLT.hermiteOrthonormal_orthonormal, SYK.CLT.hasSum_hermiteDegreeProjection")
+:::theorem "clt_finite_hermite_projection" (parent := "central_limit_theorem") (uses := "clt_gaussian_hermite_ibp") (lean := "SYK.GaussianChaos.hermiteMulti_orthogonality, SYK.GaussianChaos.inner_hermiteLp, SYK.GaussianChaos.hermiteFiniteProjection_eq_starProjection, SYK.GaussianChaos.mem_multiIndices_degree, SYK.GaussianChaos.hermiteOrthonormal_orthonormal, SYK.GaussianChaos.hasSum_hermiteDegreeProjection")
 For every finite set of standard Gaussian coordinates, the probabilists'
 Hermite products satisfy
 
@@ -198,7 +198,7 @@ is supplied by the next node. The linked Lean declarations have no
 `sorryAx`.
 :::
 
-:::theorem "clt_hermite_complete" (parent := "central_limit_theorem") (uses := "clt_hermite_polynomial_span, clt_exponential_moment_determination, clt_finite_hermite_projection") (lean := "SYK.CLT.gaussianMonomialLp_dense, SYK.CLT.mvPolynomialLp_dense, SYK.CLT.hermiteOrthonormal_dense, SYK.CLT.hasSum_hermiteCoefficients_unconditional, SYK.CLT.hasSum_hermiteDegreeProjection_unconditional")
+:::theorem "clt_hermite_complete" (parent := "central_limit_theorem") (uses := "clt_hermite_polynomial_span, clt_exponential_moment_determination, clt_finite_hermite_projection") (lean := "SYK.GaussianChaos.gaussianMonomialLp_dense, SYK.GaussianChaos.mvPolynomialLp_dense, SYK.GaussianChaos.hermiteOrthonormal_dense, SYK.GaussianChaos.hasSum_hermiteCoefficients_unconditional, SYK.GaussianChaos.hasSum_hermiteDegreeProjection_unconditional")
 For every finite coordinate set $`\iota`, real multivariate polynomial
 classes are dense in $`L^2(\gamma_\iota)`. Orthogonality to polynomials
 implies vanishing moments under every real continuous linear observable.
@@ -387,10 +387,10 @@ identifies the quadratic term with the normalized Gaussian-square sum.
 and `SYK.CLT.Setting.quadraticGaussianLp_clt` gives the sum's limit
 on the product Gaussian space.
 The changing scalar is handled by
-`SYK.CLT.tendstoInDistribution_mul_coeff`, giving
+`SYK.Probability.tendstoInDistribution_mul_coeff`, giving
 `SYK.CLT.Setting.scaledQuadraticGaussianLp_clt` under `AnnealedInput`
 for nonzero inverse temperature.
-`SYK.CLT.varying_l2_perturb_clt` transfers the vanishing tail despite
+`SYK.Probability.varying_l2_perturb_clt` transfers the vanishing tail despite
 the varying coupling spaces. `SYK.CLT.Setting.relativeFluctuation_clt`
 states the resulting relative CLT on the model's Euclidean coupling space
 with the manuscript's exact `limitVariance`.

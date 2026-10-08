@@ -5,6 +5,8 @@ import Mathlib.Probability.CentralLimitTheorem
 open MeasureTheory ProbabilityTheory Filter
 open scoped Topology
 
+open SYK.GaussianChaos
+
 namespace SYK.CLT
 
 private theorem charFun_centeredGaussianSquares {ι : Type*} [Fintype ι]

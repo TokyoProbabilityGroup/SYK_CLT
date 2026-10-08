@@ -1,6 +1,6 @@
 import SYK.CLT.Basic
 import SYK.CLT.Limit.StandardizedCLT
-import SYK.CLT.Log.LogAsymptotics
+import SYK.CLT.Log.Asymptotics
 
 /-!
 # Conditional central limit theorem for the SYK model

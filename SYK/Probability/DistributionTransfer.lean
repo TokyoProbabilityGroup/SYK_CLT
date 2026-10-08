@@ -13,7 +13,7 @@ needed multiplication rule.
 open MeasureTheory Filter
 open scoped Topology
 
-namespace SYK.CLT
+namespace SYK.Probability
 
 private theorem dirac_prod_mul_law (c : ℝ) (μ : ProbabilityMeasure ℝ) :
     ((diracProba c).prod μ).map ((by fun_prop :
@@ -94,4 +94,4 @@ theorem tendstoInDistribution_mul_coeff
       exact AEMeasurable.map_map_of_aemeasurable (by fun_prop) hX.aemeasurable_limit
     simpa only [heq, hlim] using hmul
 
-end SYK.CLT
+end SYK.Probability

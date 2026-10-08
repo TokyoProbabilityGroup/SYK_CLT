@@ -1,11 +1,13 @@
-import SYK.CLT.Log.LogEventBound
-import SYK.CLT.Limit.LpDistributionTransfer
+import SYK.CLT.Log.EventBound
+import SYK.Probability.LpDistributionTransfer
 import SYK.CLT.Limit.EuclideanRelativeCLT
 
 /-! # Vanishing logarithmic linearization error -/
 
 open MeasureTheory ProbabilityTheory Filter
 open scoped Topology
+
+open SYK.GaussianChaos SYK.Probability
 
 namespace SYK.CLT
 
@@ -223,9 +225,9 @@ theorem Setting.varianceY_eq_varianceY_pi {q : ℕ}
     variance (S.Y β n) (standardGaussianMeasure (S.N n) q) =
       variance (fun g : InteractionIndex (S.N n) q → ℝ =>
         S.Y β n (WithLp.toLp 2 g))
-        (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) := by
+        (gaussianCouplings (InteractionIndex (S.N n) q)) := by
   change variance (S.Y β n)
-    ((SYK.gaussianCouplings (InteractionIndex (S.N n) q)).map
+    ((gaussianCouplings (InteractionIndex (S.N n) q)).map
       (MeasurableEquiv.toLp 2 (InteractionIndex (S.N n) q → ℝ))) = _
   rw [variance_map_equiv]
   rfl

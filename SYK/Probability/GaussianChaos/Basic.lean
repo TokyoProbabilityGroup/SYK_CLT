@@ -7,15 +7,16 @@ import Mathlib.MeasureTheory.Integral.Pi
 
 These definitions and sign/permutation identities apply to any finite coordinate
 set. The Majorana gauge and vertex-parity results are in `CliffordSignParity`;
-the coefficient integration-by-parts formulas are in `GaussianChaos`.
-Entry points: `SYK.hermiteMulti`, `SYK.gaussianCouplings`,
+the coefficient integration-by-parts formulas are in
+`SYK.Probability.GaussianChaos.CoefficientIBP`.
+Entry points: `SYK.GaussianChaos.hermiteMulti`, `SYK.GaussianChaos.gaussianCouplings`,
 `integral_gaussianCouplings_signed_perm`.
 -/
 
 open scoped BigOperators
 open MeasureTheory ProbabilityTheory
 
-namespace SYK
+namespace SYK.GaussianChaos
 
 /-- The degree-two probabilists' Hermite polynomial evaluated on the real line. -/
 theorem hermite_two_eval (x : ℝ) :
@@ -119,4 +120,4 @@ theorem integral_gaussianCouplings_signed_perm {ι E : Type*} [Fintype ι]
     _ = ∫ g, F g ∂gaussianCouplings ι :=
       integral_gaussianCouplings_sign c hc F
 
-end SYK
+end SYK.GaussianChaos

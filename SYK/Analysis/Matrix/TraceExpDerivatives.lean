@@ -1,4 +1,4 @@
-import SYK.Analysis.Matrix.MatrixTraceExponential
+import SYK.Analysis.Matrix.TraceExponential
 
 @[expose] public section
 
@@ -12,12 +12,12 @@ open MeasureTheory
 /-!
 # Directional derivatives of the normalized trace exponential
 
-Main entry points: `MatrixAnalysis.DerivAux.contDiff_tE`,
-`MatrixAnalysis.Matrix.traceExp`,
-`MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound`.
+Main entry points: `SYK.MatrixAnalysis.Matrix.contDiff_traceExp`,
+`SYK.MatrixAnalysis.Matrix.traceExp`,
+`SYK.MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound`.
 -/
 
-namespace MatrixAnalysis
+namespace SYK.MatrixAnalysis
 
 /-! ## Iterated directional derivatives of `tr(exp A)` -/
 
@@ -73,13 +73,13 @@ variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 noncomputable local instance : NormedSpace ℝ (Matrix n n 𝕜) :=
   NormedSpace.restrictScalars ℝ 𝕜 (Matrix n n 𝕜)
 
-local instance : SMul ℝ (Matrix n n 𝕜) :=
+private local instance : SMul ℝ (Matrix n n 𝕜) :=
   (NormedSpace.toModule (𝕜 := ℝ) (E := Matrix n n 𝕜)).toDistribMulAction.toMulAction.toSMul
 
-local instance : SMul 𝕜 (Matrix n n 𝕜) :=
+private local instance : SMul 𝕜 (Matrix n n 𝕜) :=
   (NormedSpace.toModule (𝕜 := 𝕜) (E := Matrix n n 𝕜)).toDistribMulAction.toMulAction.toSMul
 
-local instance : IsScalarTower ℝ 𝕜 (Matrix n n 𝕜) :=
+private local instance : IsScalarTower ℝ 𝕜 (Matrix n n 𝕜) :=
   ⟨by
     intro a b A
     ext i j
@@ -88,7 +88,8 @@ local instance : IsScalarTower ℝ 𝕜 (Matrix n n 𝕜) :=
     ring⟩
 
 /-- Smoothness of the normalized trace exponential as a real map. -/
-theorem contDiff_tE : ContDiff ℝ ⊤ (Matrix.traceExp : Matrix n n 𝕜 → 𝕜) := by
+theorem _root_.SYK.MatrixAnalysis.Matrix.contDiff_traceExp :
+    ContDiff ℝ ⊤ (Matrix.traceExp : Matrix n n 𝕜 → 𝕜) := by
   have hexp : ContDiff ℝ ⊤ (NormedSpace.exp : Matrix n n 𝕜 → Matrix n n 𝕜) := by
     rw [contDiff_iff_contDiffAt]
     intro x
@@ -113,8 +114,8 @@ theorem contDiff_tE : ContDiff ℝ ⊤ (Matrix.traceExp : Matrix n n 𝕜 → �
 open scoped Nat in
 /-- Sharp bound on the iterated derivatives of the normalized trace exponential at a Hermitian
 point: each direction contributes its operator norm. -/
-theorem iteratedFDeriv_tE_bound_hermitian [Nonempty n] (A : Matrix n n 𝕜) (hA : A.IsHermitian)
-    (k : ℕ) (v : Fin k → Matrix n n 𝕜) :
+private theorem iteratedFDeriv_traceExp_bound_hermitian [Nonempty n] (A : Matrix n n 𝕜)
+    (hA : A.IsHermitian) (k : ℕ) (v : Fin k → Matrix n n 𝕜) :
     ‖iteratedFDeriv ℝ k Matrix.traceExp A v‖ ≤ (∏ i, ‖v i‖) * ‖Matrix.traceExp A‖ := by
   set c0 := ‖A‖ with hc0
   set ν : n → ℝ := fun j => hA.eigenvalues j + c0 with hν_def
@@ -223,8 +224,8 @@ theorem iterDirectionalFDeriv_traceExp_bound
     ‖DirectionalDerivative.iterDirectionalFDeriv traceExp dirs A‖ ≤
       (dirs.map (fun B => ‖B‖)).prod * ‖traceExp A‖ := by
   rw [DirectionalDerivative.iterDirectionalFDeriv_eq_iteratedFDeriv traceExp
-    DerivAux.contDiff_tE dirs A, ← Fin.prod_univ_fun_getElem dirs norm]
-  exact DerivAux.iteratedFDeriv_tE_bound_hermitian A hA _ _
+    contDiff_traceExp dirs A, ← Fin.prod_univ_fun_getElem dirs norm]
+  exact DerivAux.iteratedFDeriv_traceExp_bound_hermitian A hA _ _
 
 /-- Unit-ball specialization of the higher derivative bound. -/
 theorem iterDirectionalFDeriv_traceExp_bound_of_norm_le_one
@@ -245,4 +246,4 @@ theorem iterDirectionalFDeriv_traceExp_bound_of_norm_le_one
 
 end Matrix
 
-end MatrixAnalysis
+end SYK.MatrixAnalysis

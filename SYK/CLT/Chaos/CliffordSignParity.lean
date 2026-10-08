@@ -1,4 +1,4 @@
-import SYK.Probability.GaussianChaos.GaussianHermiteBasic
+import SYK.Probability.GaussianChaos.Basic
 import SYK.Model.Majorana
 import SYK.Model.FiniteDimensionalGibbs
 import Mathlib.Analysis.CStarAlgebra.Matrix
@@ -26,6 +26,8 @@ coefficients and Hermite products. Entry points: `MajoranaSystem.exists_gauge`,
 
 open scoped BigOperators
 open MeasureTheory ProbabilityTheory
+
+open SYK.GaussianChaos
 
 namespace SYK
 

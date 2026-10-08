@@ -13,10 +13,12 @@ Gaussian squares, with the finite-size coefficient from the manuscript.
 open MeasureTheory ProbabilityTheory Filter
 open scoped Topology InnerProductSpace
 
+open SYK.GaussianChaos SYK.Probability
+
 namespace SYK.CLT
 
-local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (SYK.gaussianCouplings ι) := by
-  unfold SYK.gaussianCouplings
+local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (gaussianCouplings ι) := by
+  unfold gaussianCouplings
   infer_instance
 
 local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
@@ -25,7 +27,7 @@ local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) 
 
 theorem hermite_sum_ae {ι : Type*} [Fintype ι] [DecidableEq ι] :
     (fun g => (∑ i : ι, hermiteLp (Pi.single i 2) :
-      Lp ℝ 2 (SYK.gaussianCouplings ι)) g) =ᵐ[SYK.gaussianCouplings ι]
+      Lp ℝ 2 (gaussianCouplings ι)) g) =ᵐ[gaussianCouplings ι]
       fun g => ∑ i : ι, (g i ^ 2 - 1) := by
   classical
   have h (i : ι) := (hermiteMulti_memLp_two (Pi.single i 2)).coeFn_toLp
@@ -35,26 +37,26 @@ theorem hermite_sum_ae {ι : Type*} [Fintype ι] [DecidableEq ι] :
   rw [hsum]
   apply Finset.sum_congr rfl
   intro i _
-  rw [show (hermiteLp (Pi.single i 2)) g = SYK.hermiteMulti (Pi.single i 2) g
+  rw [show (hermiteLp (Pi.single i 2)) g = hermiteMulti (Pi.single i 2) g
     from hg i]
   exact hermiteMulti_single_two i g
 
 noncomputable def quadraticGaussianLp (ι : Type*) [Fintype ι]
     [DecidableEq ι] :
-    Lp ℝ 2 (SYK.gaussianCouplings ι) :=
+    Lp ℝ 2 (gaussianCouplings ι) :=
   (Real.sqrt (2 * (Fintype.card ι : ℝ)))⁻¹ •
     ∑ i : ι, hermiteLp (Pi.single i 2)
 
 theorem quadraticGaussianLp_ae {ι : Type*} [Fintype ι]
     [DecidableEq ι] :
-    (quadraticGaussianLp ι : (ι → ℝ) → ℝ) =ᵐ[SYK.gaussianCouplings ι]
+    (quadraticGaussianLp ι : (ι → ℝ) → ℝ) =ᵐ[gaussianCouplings ι]
       fun g => (Real.sqrt (Fintype.card ι : ℝ))⁻¹ *
         ∑ i : ι, centeredGaussianSquare (g i) := by
   classical
   have hsum := hermite_sum_ae (ι := ι)
   have hsmul := Lp.coeFn_smul
     (Real.sqrt (2 * (Fintype.card ι : ℝ)))⁻¹
-    (∑ i : ι, hermiteLp (Pi.single i 2) : Lp ℝ 2 (SYK.gaussianCouplings ι))
+    (∑ i : ι, hermiteLp (Pi.single i 2) : Lp ℝ 2 (gaussianCouplings ι))
   filter_upwards [hsum, hsmul] with g hg hs
   change (quadraticGaussianLp ι) g = _ at hs
   simp only [Pi.smul_apply, smul_eq_mul] at hs
@@ -92,7 +94,7 @@ theorem Setting.scaled_Y_decomposition {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     S.fluctuationScale n •
       (S.YGaussianLp β n -
-        Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ)) =
+        Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ)) =
       (S.fluctuationScale n *
         (β * deriv (fun b => Real.log (S.meanZ b n)) β /
           Real.sqrt (2 * (Nat.choose (S.N n) q : ℝ)))) •
@@ -107,20 +109,20 @@ theorem Setting.scaled_YGaussianLp_ae {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     (S.fluctuationScale n •
       (S.YGaussianLp β n -
-        Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ)) :
+        Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ)) :
       (InteractionIndex (S.N n) q → ℝ) → ℝ) =ᵐ[
-        SYK.gaussianCouplings (InteractionIndex (S.N n) q)]
+        gaussianCouplings (InteractionIndex (S.N n) q)]
       fun g => S.relativeFluctuation β n (WithLp.toLp 2 g) := by
   have hY := S.YGaussianLp_ae β n
   have hconst := Lp.coeFn_const
     (α := InteractionIndex (S.N n) q → ℝ)
-    (μ := SYK.gaussianCouplings (InteractionIndex (S.N n) q))
+    (μ := gaussianCouplings (InteractionIndex (S.N n) q))
     (p := 2) (c := (1 : ℝ))
   have hsub := Lp.coeFn_sub (S.YGaussianLp β n)
-    (Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ))
+    (Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ))
   have hsmul := Lp.coeFn_smul (S.fluctuationScale n)
     (S.YGaussianLp β n -
-      Lp.const 2 (SYK.gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ))
+      Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ))
   filter_upwards [hY, hconst, hsub, hsmul] with g hgY hgconst hgsub hgsmul
   simp only [Pi.smul_apply, smul_eq_mul, Pi.sub_apply]
   rw [hgY, hgconst]
@@ -132,13 +134,13 @@ theorem Setting.quadraticGaussianLp_clt {q : ℕ} (S : Setting q) :
       (fun n => (quadraticGaussianLp (InteractionIndex (S.N n) q) :
         (InteractionIndex (S.N n) q → ℝ) → ℝ))
       atTop (fun x : ℝ => x)
-      (fun n => SYK.gaussianCouplings (InteractionIndex (S.N n) q))
+      (fun n => gaussianCouplings (InteractionIndex (S.N n) q))
       (gaussianReal 0 1) where
   forall_aemeasurable n := (Lp.aestronglyMeasurable _).aemeasurable
   tendsto := by
     have h := S.normalizedQuadraticSum_clt.tendsto
     have heq (n : ℕ) :
-        (SYK.gaussianCouplings (InteractionIndex (S.N n) q)).map
+        (gaussianCouplings (InteractionIndex (S.N n) q)).map
           (quadraticGaussianLp (InteractionIndex (S.N n) q) :
             (InteractionIndex (S.N n) q → ℝ) → ℝ) =
         (standardGaussianMeasure (S.N n) q).map
@@ -161,10 +163,10 @@ theorem Setting.scaledQuadraticGaussianLp_clt {q : ℕ} (S : Setting q)
       atTop
       (fun x : ℝ =>
         (β * deriv hFE.ℓ β * Real.sqrt ((q.factorial : ℝ) / 2)) * x)
-      (fun n => SYK.gaussianCouplings (InteractionIndex (S.N n) q))
+      (fun n => gaussianCouplings (InteractionIndex (S.N n) q))
       (gaussianReal 0 1) := by
   exact tendstoInDistribution_mul_coeff
-    (fun n => SYK.gaussianCouplings (InteractionIndex (S.N n) q))
+    (fun n => gaussianCouplings (InteractionIndex (S.N n) q))
     (gaussianReal 0 1)
     (fun n => (quadraticGaussianLp (InteractionIndex (S.N n) q) :
       (InteractionIndex (S.N n) q → ℝ) → ℝ))

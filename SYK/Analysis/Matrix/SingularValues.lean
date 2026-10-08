@@ -34,9 +34,11 @@ noncomputable section
 
 This file develops singular-value estimates from the spectral theorem: min-max
 bounds, von Neumann's trace inequality, and Schatten-Hölder. Main entry points:
-`SingularAux.singularValues_of_positive`, `SingularAux.schatten_holder`,
-`SingularAux.sum_sv_comp_le`.
+`SYK.MatrixAnalysis.SingularAux.singularValues_of_positive`,
+`SYK.MatrixAnalysis.SingularAux.schatten_holder`.
 -/
+
+namespace SYK.MatrixAnalysis
 
 section InfrastructureA
 
@@ -49,7 +51,7 @@ variable {𝕜 E : Type*} [RCLike 𝕜]
 
 omit [FiniteDimensional 𝕜 E] in
 /-- Rayleigh quotient expansion in an orthonormal eigenbasis. -/
-theorem re_inner_eq_sum {ι : Type*} [Fintype ι] (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric)
+private theorem re_inner_eq_sum {ι : Type*} [Fintype ι] (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric)
     (e : OrthonormalBasis ι 𝕜 E) (ν : ι → ℝ) (he : ∀ j, T (e j) = (ν j : 𝕜) • e j) (x : E) :
     RCLike.re ⟪x, T x⟫_𝕜 = ∑ j, ν j * ‖⟪e j, x⟫_𝕜‖ ^ 2 := by
   have h1 : ⟪x, T x⟫_𝕜 = ∑ j, ⟪x, e j⟫_𝕜 * ⟪e j, T x⟫_𝕜 := (e.sum_inner_mul_inner x (T x)).symm
@@ -62,7 +64,7 @@ theorem re_inner_eq_sum {ι : Type*} [Fintype ι] (T : E →ₗ[𝕜] E) (hT : T
   rw [← RCLike.ofReal_pow, ← RCLike.ofReal_mul, RCLike.ofReal_re]
 
 omit [FiniteDimensional 𝕜 E] in
-theorem re_inner_le_of_orth_head (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
+private theorem re_inner_le_of_orth_head (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
     (e : OrthonormalBasis (Fin n) 𝕜 E) (ν : Fin n → ℝ) (hν : Antitone ν)
     (he : ∀ j, T (e j) = (ν j : 𝕜) • e j) (i : Fin n) (x : E)
     (hx : ∀ j, j < i → ⟪e j, x⟫_𝕜 = 0) :
@@ -74,7 +76,7 @@ theorem re_inner_le_of_orth_head (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n 
   · exact mul_le_mul_of_nonneg_right (hν h) (by positivity)
 
 omit [FiniteDimensional 𝕜 E] in
-theorem le_re_inner_of_orth_tail (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
+private theorem le_re_inner_of_orth_tail (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
     (e : OrthonormalBasis (Fin n) 𝕜 E) (ν : Fin n → ℝ) (hν : Antitone ν)
     (he : ∀ j, T (e j) = (ν j : 𝕜) • e j) (i : Fin n) (x : E)
     (hx : ∀ j, i < j → ⟪e j, x⟫_𝕜 = 0) :
@@ -86,7 +88,7 @@ theorem le_re_inner_of_orth_tail (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n 
   · exact mul_le_mul_of_nonneg_right (hν h) (by positivity)
 
 /-- A vector orthogonal to fewer than `dim E` given vectors exists. -/
-theorem exists_ne_zero_orth {ι : Type*} [Fintype ι] (v : ι → E)
+private theorem exists_ne_zero_orth {ι : Type*} [Fintype ι] (v : ι → E)
     (h : Fintype.card ι < Module.finrank 𝕜 E) :
     ∃ x : E, x ≠ 0 ∧ ∀ k, ⟪v k, x⟫_𝕜 = 0 := by
   let f : E →ₗ[𝕜] (ι → 𝕜) := LinearMap.pi fun k => innerₛₗ 𝕜 (v k)
@@ -97,14 +99,14 @@ theorem exists_ne_zero_orth {ι : Type*} [Fintype ι] (v : ι → E)
   have := congrFun (LinearMap.mem_ker.mp hx) k
   simpa [f] using this
 
-theorem eigenvalues_eigenbasis_eq (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
+private theorem eigenvalues_eigenbasis_eq (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
     (hn : Module.finrank 𝕜 E = n) (j : Fin n) :
     T (hT.eigenvectorBasis hn j) = ((hT.eigenvalues hn j : ℝ) : 𝕜) • hT.eigenvectorBasis hn j :=
   hT.apply_eigenvectorBasis hn j
 
 /-- Min-max, upper bound: if the Rayleigh quotient is at most `c` on the orthogonal complement of
 at most `i` vectors, then the `i`-th eigenvalue is at most `c`. -/
-theorem eigenvalues_le_of_forall (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
+private theorem eigenvalues_le_of_forall (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
     (hn : Module.finrank 𝕜 E = n) (i : Fin n) {ι : Type*} [Fintype ι] (u : ι → E)
     (hu : Fintype.card ι ≤ i) (c : ℝ)
     (h : ∀ x, (∀ k, ⟪u k, x⟫_𝕜 = 0) → RCLike.re ⟪x, T x⟫_𝕜 ≤ c * ‖x‖ ^ 2) :
@@ -130,7 +132,7 @@ theorem eigenvalues_le_of_forall (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n 
   exact le_of_mul_le_mul_right (h2.trans h1) hpos
 
 /-- Min-max, lower bound. -/
-theorem le_eigenvalues_of_forall (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
+private theorem le_eigenvalues_of_forall (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
     (hn : Module.finrank 𝕜 E = n) (i : Fin n) {ι : Type*} [Fintype ι] (u : ι → E)
     (hu : Fintype.card ι + i + 1 ≤ n) (c : ℝ)
     (h : ∀ x, (∀ k, ⟪u k, x⟫_𝕜 = 0) → c * ‖x‖ ^ 2 ≤ RCLike.re ⟪x, T x⟫_𝕜) :
@@ -182,24 +184,24 @@ namespace SingularAux
 variable {𝕜 E : Type*} [RCLike 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E]
 
-theorem re_inner_adjoint_comp_self (S : E →ₗ[𝕜] E) (x : E) :
+private theorem re_inner_adjoint_comp_self (S : E →ₗ[𝕜] E) (x : E) :
     RCLike.re ⟪x, (S.adjoint ∘ₗ S) x⟫_𝕜 = ‖S x‖ ^ 2 := by
   rw [LinearMap.comp_apply, LinearMap.adjoint_inner_right, inner_self_eq_norm_sq]
 
-theorem eig_nonneg (T : E →ₗ[𝕜] E) {n : ℕ} (hn : Module.finrank 𝕜 E = n) (i : Fin n) :
+private theorem eig_nonneg (T : E →ₗ[𝕜] E) {n : ℕ} (hn : Module.finrank 𝕜 E = n) (i : Fin n) :
     0 ≤ T.isSymmetric_adjoint_comp_self.eigenvalues hn i :=
   T.isPositive_adjoint_comp_self.nonneg_eigenvalues hn i
 
-theorem sv_sq (T : E →ₗ[𝕜] E) {i : ℕ} (hi : i < Module.finrank 𝕜 E) :
+private theorem sv_sq (T : E →ₗ[𝕜] E) {i : ℕ} (hi : i < Module.finrank 𝕜 E) :
     T.singularValues i ^ 2 = T.isSymmetric_adjoint_comp_self.eigenvalues rfl ⟨i, hi⟩ := by
   exact T.sq_singularValues_of_lt rfl hi
 
-theorem sv_antitone (T : E →ₗ[𝕜] E) : Antitone (fun i => T.singularValues i) := by
+private theorem sv_antitone (T : E →ₗ[𝕜] E) : Antitone (fun i => T.singularValues i) := by
   exact T.singularValues_antitone
 
 /-- The `i`-th singular value is bounded by any constant controlling the Rayleigh quotient of
 `T†T` off at most `i` vectors. -/
-theorem sv_le_of_forall (T : E →ₗ[𝕜] E) (i : ℕ) {ι : Type*} [Fintype ι] (u : ι → E)
+private theorem sv_le_of_forall (T : E →ₗ[𝕜] E) (i : ℕ) {ι : Type*} [Fintype ι] (u : ι → E)
     (hu : Fintype.card ι ≤ i) (c : ℝ) (hc : 0 ≤ c)
     (h : ∀ x, (∀ k, ⟪u k, x⟫_𝕜 = 0) → ‖T x‖ ^ 2 ≤ c ^ 2 * ‖x‖ ^ 2) :
     T.singularValues i ≤ c := by
@@ -214,7 +216,8 @@ theorem sv_le_of_forall (T : E →ₗ[𝕜] E) (i : ℕ) {ι : Type*} [Fintype �
     exact hc
 
 /-- For `x` orthogonal to the first `i` eigenvectors of `T†T`, `‖T x‖ ≤ s_i(T) ‖x‖`. -/
-theorem norm_apply_sq_le_of_orth (T : E →ₗ[𝕜] E) {i : ℕ} (hi : i < Module.finrank 𝕜 E) (x : E)
+private theorem norm_apply_sq_le_of_orth (T : E →ₗ[𝕜] E) {i : ℕ} (hi : i < Module.finrank 𝕜 E)
+    (x : E)
     (hx : ∀ j : Fin (Module.finrank 𝕜 E), (j : ℕ) < i →
       ⟪T.isSymmetric_adjoint_comp_self.eigenvectorBasis rfl j, x⟫_𝕜 = 0) :
     ‖T x‖ ^ 2 ≤ T.singularValues i ^ 2 * ‖x‖ ^ 2 := by
@@ -223,7 +226,7 @@ theorem norm_apply_sq_le_of_orth (T : E →ₗ[𝕜] E) {i : ℕ} (hi : i < Modu
     (T.isSymmetric_adjoint_comp_self.eigenvalues_antitone rfl)
     (T.isSymmetric_adjoint_comp_self.apply_eigenvectorBasis rfl) ⟨i, hi⟩ x hx
 
-theorem sv_comp_left_le (W T : E →ₗ[𝕜] E) (C : ℝ) (hC0 : 0 ≤ C)
+private theorem sv_comp_left_le (W T : E →ₗ[𝕜] E) (C : ℝ) (hC0 : 0 ≤ C)
     (hC : ∀ v, ‖W v‖ ≤ C * ‖v‖) (i : ℕ) :
     (W ∘ₗ T).singularValues i ≤ C * T.singularValues i := by
   by_cases hi : i < Module.finrank 𝕜 E
@@ -242,7 +245,7 @@ theorem sv_comp_left_le (W T : E →ₗ[𝕜] E) (C : ℝ) (hC0 : 0 ≤ C)
   · rw [(W ∘ₗ T).singularValues_of_finrank_le (by omega),
       T.singularValues_of_finrank_le (by omega), mul_zero]
 
-theorem sv_comp_right_le (T S : E →ₗ[𝕜] E) (C : ℝ) (hC0 : 0 ≤ C)
+private theorem sv_comp_right_le (T S : E →ₗ[𝕜] E) (C : ℝ) (hC0 : 0 ≤ C)
     (hC : ∀ v, ‖S v‖ ≤ C * ‖v‖) (i : ℕ) :
     (T ∘ₗ S).singularValues i ≤ T.singularValues i * C := by
   by_cases hi : i < Module.finrank 𝕜 E
@@ -264,7 +267,7 @@ theorem sv_comp_right_le (T S : E →ₗ[𝕜] E) (C : ℝ) (hC0 : 0 ≤ C)
   · rw [(T ∘ₗ S).singularValues_of_finrank_le (by omega),
       T.singularValues_of_finrank_le (by omega), zero_mul]
 
-theorem sv_eq_zero_of_orth (T : E →ₗ[𝕜] E) (i : ℕ) {ι : Type*} [Fintype ι] (u : ι → E)
+private theorem sv_eq_zero_of_orth (T : E →ₗ[𝕜] E) (i : ℕ) {ι : Type*} [Fintype ι] (u : ι → E)
     (hu : Fintype.card ι ≤ i) (h : ∀ x, (∀ k, ⟪u k, x⟫_𝕜 = 0) → T x = 0) :
     T.singularValues i = 0 :=
   le_antisymm (sv_le_of_forall T i u hu 0 le_rfl fun x hx => by simp [h x hx])
@@ -273,7 +276,7 @@ theorem sv_eq_zero_of_orth (T : E →ₗ[𝕜] E) (i : ℕ) {ι : Type*} [Fintyp
 /-! ### The normalized image family `w_a = s_a⁻¹ T b_a` -/
 
 /-- `‖T b_a‖ = s_a` for the eigenbasis of `T†T`. -/
-theorem norm_apply_eigenvectorBasis (T : E →ₗ[𝕜] E) (a : Fin (Module.finrank 𝕜 E)) :
+private theorem norm_apply_eigenvectorBasis (T : E →ₗ[𝕜] E) (a : Fin (Module.finrank 𝕜 E)) :
     ‖T (T.isSymmetric_adjoint_comp_self.eigenvectorBasis rfl a)‖ = T.singularValues a := by
   have h := sv_sq T a.2
   have h2 : ‖T (T.isSymmetric_adjoint_comp_self.eigenvectorBasis rfl a)‖ ^ 2 =
@@ -284,7 +287,7 @@ theorem norm_apply_eigenvectorBasis (T : E →ₗ[𝕜] E) (a : Fin (Module.finr
   have := h.trans h2.symm
   exact ((pow_left_inj₀ (T.singularValues_nonneg _) (norm_nonneg _) two_ne_zero).mp this).symm
 
-theorem inner_apply_eigenvectorBasis (T : E →ₗ[𝕜] E) (a b : Fin (Module.finrank 𝕜 E)) :
+private theorem inner_apply_eigenvectorBasis (T : E →ₗ[𝕜] E) (a b : Fin (Module.finrank 𝕜 E)) :
     ⟪T (T.isSymmetric_adjoint_comp_self.eigenvectorBasis rfl a),
       T (T.isSymmetric_adjoint_comp_self.eigenvectorBasis rfl b)⟫_𝕜 =
       if a = b then ((T.singularValues a ^ 2 : ℝ) : 𝕜) else 0 := by
@@ -297,10 +300,10 @@ theorem inner_apply_eigenvectorBasis (T : E →ₗ[𝕜] E) (a b : Fin (Module.f
   · rw [mul_zero]
 
 /-- The normalized family `w_a = s_a⁻¹ • T b_a`. -/
-noncomputable def wv (T : E →ₗ[𝕜] E) (a : Fin (Module.finrank 𝕜 E)) : E :=
+private noncomputable def wv (T : E →ₗ[𝕜] E) (a : Fin (Module.finrank 𝕜 E)) : E :=
   (((T.singularValues a)⁻¹ : ℝ) : 𝕜) • T (T.isSymmetric_adjoint_comp_self.eigenvectorBasis rfl a)
 
-theorem apply_eigenvectorBasis_eq_smul_wv (T : E →ₗ[𝕜] E) (a : Fin (Module.finrank 𝕜 E)) :
+private theorem apply_eigenvectorBasis_eq_smul_wv (T : E →ₗ[𝕜] E) (a : Fin (Module.finrank 𝕜 E)) :
     T (T.isSymmetric_adjoint_comp_self.eigenvectorBasis rfl a) =
       ((T.singularValues a : ℝ) : 𝕜) • wv T a := by
   by_cases h : T.singularValues a = 0
@@ -310,7 +313,7 @@ theorem apply_eigenvectorBasis_eq_smul_wv (T : E →ₗ[𝕜] E) (a : Fin (Modul
     simp
   · rw [wv, smul_smul, ← RCLike.ofReal_mul, mul_inv_cancel₀ h, RCLike.ofReal_one, one_smul]
 
-theorem inner_wv (T : E →ₗ[𝕜] E) (a b : Fin (Module.finrank 𝕜 E)) :
+private theorem inner_wv (T : E →ₗ[𝕜] E) (a b : Fin (Module.finrank 𝕜 E)) :
     ⟪wv T a, wv T b⟫_𝕜 = if a = b ∧ T.singularValues a ≠ 0 then 1 else 0 := by
   rw [wv, wv, inner_smul_left, inner_smul_right, inner_apply_eigenvectorBasis,
     RCLike.conj_ofReal]
@@ -325,7 +328,7 @@ theorem inner_wv (T : E →ₗ[𝕜] E) (a b : Fin (Module.finrank 𝕜 E)) :
   · exact absurd h2.1 h1
   · simp
 
-theorem norm_wv_le (T : E →ₗ[𝕜] E) (a : Fin (Module.finrank 𝕜 E)) : ‖wv T a‖ ≤ 1 := by
+private theorem norm_wv_le (T : E →ₗ[𝕜] E) (a : Fin (Module.finrank 𝕜 E)) : ‖wv T a‖ ≤ 1 := by
   have h := inner_wv T a a
   rw [inner_self_eq_norm_sq_to_K] at h
   split_ifs at h with h1
@@ -335,7 +338,7 @@ theorem norm_wv_le (T : E →ₗ[𝕜] E) (a : Fin (Module.finrank 𝕜 E)) : �
     nlinarith [norm_nonneg (wv T a)]
 
 /-- Bessel's inequality for the family `w`. -/
-theorem sum_norm_inner_wv_le (T : E →ₗ[𝕜] E) (v : E) :
+private theorem sum_norm_inner_wv_le (T : E →ₗ[𝕜] E) (v : E) :
     ∑ a, ‖⟪wv T a, v⟫_𝕜‖ ^ 2 ≤ ‖v‖ ^ 2 := by
   classical
   let S := {a : Fin (Module.finrank 𝕜 E) // T.singularValues a ≠ 0}
@@ -373,7 +376,7 @@ namespace SingularAux
 
 /-- Abel summation: decreasing nonnegative weights against sequences with nonnegative partial
 sums. -/
-theorem abel_nonneg (n : ℕ) (s d : ℕ → ℝ) (hs : ∀ i j, i ≤ j → j < n → s j ≤ s i)
+private theorem abel_nonneg (n : ℕ) (s d : ℕ → ℝ) (hs : ∀ i j, i ≤ j → j < n → s j ≤ s i)
     (hs0 : ∀ i < n, 0 ≤ s i) (hd : ∀ k < n, 0 ≤ ∑ i ∈ range (k + 1), d i) :
     0 ≤ ∑ i ∈ range n, s i * d i := by
   have key : ∀ m, m < n →
@@ -395,7 +398,8 @@ theorem abel_nonneg (n : ℕ) (s d : ℕ → ℝ) (hs : ∀ i j, i ≤ j → j <
 
 /-- Greedy bound: weights in `[0,1]` of total mass at most `k+1` against a decreasing
 nonnegative sequence. -/
-theorem greedy_le (n k : ℕ) (hk : k < n) (t c : ℕ → ℝ) (ht : ∀ i j, i ≤ j → j < n → t j ≤ t i)
+private theorem greedy_le (n k : ℕ) (hk : k < n) (t c : ℕ → ℝ)
+    (ht : ∀ i j, i ≤ j → j < n → t j ≤ t i)
     (htk : 0 ≤ t k) (hc0 : ∀ b < n, 0 ≤ c b) (hc1 : ∀ b < n, c b ≤ 1)
     (hsum : ∑ b ∈ range n, c b ≤ k + 1) :
     ∑ b ∈ range n, t b * c b ≤ ∑ b ∈ range (k + 1), t b := by
@@ -433,7 +437,7 @@ theorem greedy_le (n k : ℕ) (hk : k < n) (t c : ℕ → ℝ) (ht : ∀ i j, i 
   exact mul_nonneg htk (by linarith)
 
 /-- Rearrangement for doubly substochastic weights. -/
-theorem rearrangement (n : ℕ) (s t : ℕ → ℝ)
+private theorem rearrangement (n : ℕ) (s t : ℕ → ℝ)
     (hs : ∀ i j, i ≤ j → j < n → s j ≤ s i) (ht : ∀ i j, i ≤ j → j < n → t j ≤ t i)
     (hs0 : ∀ i < n, 0 ≤ s i) (ht0 : ∀ i < n, 0 ≤ t i) (P : ℕ → ℕ → ℝ)
     (hP0 : ∀ a < n, ∀ b < n, 0 ≤ P a b)
@@ -463,7 +467,7 @@ theorem rearrangement (n : ℕ) (s t : ℕ → ℝ)
       _ = k + 1 := by simp
 
 /-- The tangent line inequality for `x ↦ x ^ r`, `r ≥ 1`. -/
-theorem rpow_tangent (r : ℝ) (hr : 1 ≤ r) (x y : ℝ) (hx : 0 ≤ x) (hy : 0 ≤ y) :
+private theorem rpow_tangent (r : ℝ) (hr : 1 ≤ r) (x y : ℝ) (hx : 0 ≤ x) (hy : 0 ≤ y) :
     r * x ^ (r - 1) * (y - x) ≤ y ^ r - x ^ r := by
   rcases hx.eq_or_lt with h | h
   · subst h
@@ -488,7 +492,8 @@ theorem rpow_tangent (r : ℝ) (hr : 1 ≤ r) (x y : ℝ) (hx : 0 ≤ x) (hy : 0
     linarith
 
 /-- Weak majorization implies majorization of `r`-th powers (`r ≥ 1`). -/
-theorem sum_rpow_le_of_weak_maj (n : ℕ) (x y : ℕ → ℝ) (hx : ∀ i j, i ≤ j → j < n → x j ≤ x i)
+private theorem sum_rpow_le_of_weak_maj (n : ℕ) (x y : ℕ → ℝ)
+    (hx : ∀ i j, i ≤ j → j < n → x j ≤ x i)
     (hx0 : ∀ i < n, 0 ≤ x i) (hy0 : ∀ i < n, 0 ≤ y i)
     (hmaj : ∀ k < n, ∑ i ∈ range (k + 1), x i ≤ ∑ i ∈ range (k + 1), y i) (r : ℝ) (hr : 1 ≤ r) :
     ∑ i ∈ range n, x i ^ r ≤ ∑ i ∈ range n, y i ^ r := by
@@ -505,7 +510,7 @@ theorem sum_rpow_le_of_weak_maj (n : ℕ) (x y : ℕ → ℝ) (hx : ∀ i j, i �
   exact rpow_tangent r hr (x i) (y i) (hx0 i hi) (hy0 i hi)
 
 /-- Hölder's inequality in the form needed for Schatten norms. -/
-theorem sum_mul_rpow_le (s : Finset ℕ) (a b : ℕ → ℝ) (ha : ∀ i, 0 ≤ a i) (hb : ∀ i, 0 ≤ b i)
+private theorem sum_mul_rpow_le (s : Finset ℕ) (a b : ℕ → ℝ) (ha : ∀ i, 0 ≤ a i) (hb : ∀ i, 0 ≤ b i)
     {p q r : ℝ} (hp : 0 < p) (hq : 0 < q) (hr : 0 < r) (hrecip : 1 / r = 1 / p + 1 / q) :
     (∑ i ∈ s, (a i * b i) ^ r) ^ (1 / r) ≤
       (∑ i ∈ s, a i ^ p) ^ (1 / p) * (∑ i ∈ s, b i ^ q) ^ (1 / q) := by
@@ -535,7 +540,7 @@ open Finset
 namespace SingularAux
 
 /-- Rearrangement, `Fin` version. -/
-theorem rearrangement_fin (n : ℕ) (s t : Fin n → ℝ) (hs : Antitone s) (ht : Antitone t)
+private theorem rearrangement_fin (n : ℕ) (s t : Fin n → ℝ) (hs : Antitone s) (ht : Antitone t)
     (hs0 : ∀ i, 0 ≤ s i) (ht0 : ∀ i, 0 ≤ t i) (P : Fin n → Fin n → ℝ)
     (hP0 : ∀ a b, 0 ≤ P a b) (hrow : ∀ a, ∑ b, P a b ≤ 1) (hcol : ∀ b, ∑ a, P a b ≤ 1) :
     ∑ a, ∑ b, s a * t b * P a b ≤ ∑ i, s i * t i := by
@@ -568,7 +573,7 @@ variable {𝕜 E : Type*} [RCLike 𝕜]
 set_option quotPrecheck false in
 local notation "bas" T => (LinearMap.isSymmetric_adjoint_comp_self T).eigenvectorBasis rfl
 
-theorem apply_eq_sum_wv (X : E →ₗ[𝕜] E) (u : E) :
+private theorem apply_eq_sum_wv (X : E →ₗ[𝕜] E) (u : E) :
     X u = ∑ a, ⟪(bas X) a, u⟫_𝕜 • (((X.singularValues a : ℝ) : 𝕜) • wv X a) := by
   conv_lhs => rw [← (bas X).sum_repr' u]
   rw [map_sum]
@@ -576,7 +581,7 @@ theorem apply_eq_sum_wv (X : E →ₗ[𝕜] E) (u : E) :
   rw [map_smul, apply_eigenvectorBasis_eq_smul_wv]
 
 /-- **von Neumann's trace inequality**. -/
-theorem norm_trace_comp_le (X Y : E →ₗ[𝕜] E) :
+private theorem norm_trace_comp_le (X Y : E →ₗ[𝕜] E) :
     ‖LinearMap.trace 𝕜 E (X ∘ₗ Y)‖ ≤
       ∑ i ∈ range (Module.finrank 𝕜 E), X.singularValues i * Y.singularValues i := by
   set n := Module.finrank 𝕜 E
@@ -659,18 +664,18 @@ set_option quotPrecheck false in
 local notation "bas" T => (LinearMap.isSymmetric_adjoint_comp_self T).eigenvectorBasis rfl
 
 /-- The Ky Fan partial isometry `v ↦ ∑_{a<k} ⟪w_a, v⟫ b_a`. -/
-noncomputable def kyFan (X : E →ₗ[𝕜] E) (k : ℕ) : E →ₗ[𝕜] E :=
+private noncomputable def kyFan (X : E →ₗ[𝕜] E) (k : ℕ) : E →ₗ[𝕜] E :=
   ∑ a : Fin (Module.finrank 𝕜 E),
     if (a : ℕ) < k then (innerₛₗ 𝕜 (wv X a)).smulRight ((bas X) a) else 0
 
-theorem kyFan_apply (X : E →ₗ[𝕜] E) (k : ℕ) (v : E) :
+private theorem kyFan_apply (X : E →ₗ[𝕜] E) (k : ℕ) (v : E) :
     kyFan X k v = ∑ a : Fin (Module.finrank 𝕜 E),
       (if (a : ℕ) < k then ⟪wv X a, v⟫_𝕜 else 0) • (bas X) a := by
   simp only [kyFan, LinearMap.coe_sum, Finset.sum_apply]
   refine Finset.sum_congr rfl fun a _ => ?_
   split_ifs <;> simp
 
-theorem inner_kyFan (X : E →ₗ[𝕜] E) (k : ℕ) (v : E) (j : Fin (Module.finrank 𝕜 E)) :
+private theorem inner_kyFan (X : E →ₗ[𝕜] E) (k : ℕ) (v : E) (j : Fin (Module.finrank 𝕜 E)) :
     ⟪(bas X) j, kyFan X k v⟫_𝕜 = if (j : ℕ) < k then ⟪wv X j, v⟫_𝕜 else 0 := by
   rw [kyFan_apply, inner_sum]
   simp_rw [inner_smul_right,
@@ -678,7 +683,7 @@ theorem inner_kyFan (X : E →ₗ[𝕜] E) (k : ℕ) (v : E) (j : Fin (Module.fi
   rw [Finset.sum_ite_eq]
   simp
 
-theorem norm_kyFan_le (X : E →ₗ[𝕜] E) (k : ℕ) (v : E) : ‖kyFan X k v‖ ≤ ‖v‖ := by
+private theorem norm_kyFan_le (X : E →ₗ[𝕜] E) (k : ℕ) (v : E) : ‖kyFan X k v‖ ≤ ‖v‖ := by
   have h1 := (bas X).sum_sq_norm_inner_right (kyFan X k v)
   have h2 := sum_norm_inner_wv_le X v
   simp_rw [inner_kyFan] at h1
@@ -688,7 +693,7 @@ theorem norm_kyFan_le (X : E →ₗ[𝕜] E) (k : ℕ) (v : E) : ‖kyFan X k v�
     split_ifs <;> simp
   exact (pow_le_pow_iff_left₀ (norm_nonneg _) (norm_nonneg _) two_ne_zero).mp h3
 
-theorem trace_kyFan_comp (X : E →ₗ[𝕜] E) (k : ℕ) :
+private theorem trace_kyFan_comp (X : E →ₗ[𝕜] E) (k : ℕ) :
     LinearMap.trace 𝕜 E (kyFan X k ∘ₗ X) =
       ∑ j : Fin (Module.finrank 𝕜 E), if (j : ℕ) < k then ((X.singularValues j : ℝ) : 𝕜) else 0 := by
   rw [LinearMap.trace_eq_sum_inner _ (bas X)]
@@ -702,7 +707,7 @@ theorem trace_kyFan_comp (X : E →ₗ[𝕜] E) (k : ℕ) :
       simp [this]
   · rfl
 
-theorem kyFan_apply_eq_zero (X A : E →ₗ[𝕜] E) (k : ℕ) (v : E)
+private theorem kyFan_apply_eq_zero (X A : E →ₗ[𝕜] E) (k : ℕ) (v : E)
     (hv : ∀ j : Fin (Module.finrank 𝕜 E), (j : ℕ) < k → ⟪A.adjoint (wv X j), v⟫_𝕜 = 0) :
     kyFan X k (A v) = 0 := by
   rw [kyFan_apply]
@@ -712,7 +717,7 @@ theorem kyFan_apply_eq_zero (X A : E →ₗ[𝕜] E) (k : ℕ) (v : E)
   · rw [zero_smul]
 
 /-- Weak majorization `s(TS) ≺_w s(T) s(S)`. -/
-theorem sum_sv_comp_le (T S : E →ₗ[𝕜] E) (k : ℕ) (hk : k ≤ Module.finrank 𝕜 E) :
+private theorem sum_sv_comp_le (T S : E →ₗ[𝕜] E) (k : ℕ) (hk : k ≤ Module.finrank 𝕜 E) :
     ∑ i ∈ range k, (T ∘ₗ S).singularValues i ≤
       ∑ i ∈ range k, T.singularValues i * S.singularValues i := by
   set n := Module.finrank 𝕜 E
@@ -766,7 +771,8 @@ theorem schatten_holder (T S : E →ₗ[𝕜] E) {p q r : ℝ} (hp : 1 ≤ p) (h
   exact sum_mul_rpow_le _ _ _ (fun i => T.singularValues_nonneg i)
     (fun i => S.singularValues_nonneg i) (by linarith) (by linarith) (by linarith) hrecip
 
-theorem sum_rpow_mul_const (s : Finset ℕ) (f : ℕ → ℝ) (hf : ∀ i, 0 ≤ f i) (C : ℝ) (hC : 0 ≤ C)
+private theorem sum_rpow_mul_const (s : Finset ℕ) (f : ℕ → ℝ) (hf : ∀ i, 0 ≤ f i)
+    (C : ℝ) (hC : 0 ≤ C)
     {p : ℝ} (hp : 0 < p) :
     (∑ i ∈ s, (f i * C) ^ p) ^ (1 / p) = (∑ i ∈ s, f i ^ p) ^ (1 / p) * C := by
   simp_rw [Real.mul_rpow (hf _) hC]
@@ -880,3 +886,5 @@ theorem toEuclideanLin_conj_diagonal_apply (H : Matrix n n 𝕜) (hH : H.IsHermi
 end SingularAux
 
 end InfrastructureF
+
+end SYK.MatrixAnalysis

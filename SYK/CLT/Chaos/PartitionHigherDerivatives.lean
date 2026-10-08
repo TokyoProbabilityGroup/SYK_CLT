@@ -13,6 +13,8 @@ growth. Entry points: `Setting.abs_partialMulti_Z_le`,
 open MeasureTheory Filter
 open scoped Topology Matrix.Norms.L2Operator InnerProductSpace
 
+open SYK.GaussianChaos
+
 namespace SYK.CLT
 
 local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (gaussianCouplings ι) := by
@@ -163,7 +165,7 @@ theorem Setting.iterDirectionalFDeriv_Z_eq {q : ℕ} (S : Setting q)
   let T : Matrix (S.d n) (S.d n) ℂ → ℂ := MatrixAnalysis.Matrix.traceExp
   let L : CouplingSpace (S.N n) q →L[ℝ] Matrix (S.d n) (S.d n) ℂ :=
     (-β) • S.disorderMatrix n
-  have hT : ContDiff ℝ ⊤ T := MatrixAnalysis.DerivAux.contDiff_tE
+  have hT : ContDiff ℝ ⊤ T := MatrixAnalysis.Matrix.contDiff_traceExp
   have heq : S.Z β n = (Complex.reCLM ∘ T) ∘ L := by
     funext x
     exact S.Z_eq_traceExp β n x
@@ -278,7 +280,7 @@ theorem Setting.partialMulti_Z_exp_growth {q : ℕ} (S : Setting q)
 theorem Setting.hermite_coefficient_Z_eq_integral_partialMulti
     {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (α : InteractionIndex (S.N n) q → ℕ) :
-    (∫ g, SYK.hermiteMulti α g * S.Z β n (WithLp.toLp 2 g)
+    (∫ g, hermiteMulti α g * S.Z β n (WithLp.toLp 2 g)
       ∂gaussianCouplings (InteractionIndex (S.N n) q)) =
       ∫ g, GaussianConcentration.partialMulti α
         (fun x => S.Z β n (WithLp.toLp 2 x)) g
@@ -302,7 +304,7 @@ theorem Setting.integral_Z_pi {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
 theorem Setting.abs_integral_Z_mul_hermite_le
     {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (α : InteractionIndex (S.N n) q → ℕ) :
-    |∫ g, S.Z β n (WithLp.toLp 2 g) * SYK.hermiteMulti α g
+    |∫ g, S.Z β n (WithLp.toLp 2 g) * hermiteMulti α g
       ∂gaussianCouplings (InteractionIndex (S.N n) q)| ≤
       (|β| * couplingScale (S.params n)) ^ (∑ I, α I) * S.meanZ β n := by
   let F := fun g : InteractionIndex (S.N n) q → ℝ =>
@@ -316,9 +318,9 @@ theorem Setting.abs_integral_Z_mul_hermite_le
   have hi := hermite_coefficient_integrable α
     ((S.Z_contDiff_pi β n).of_le (by simp)) hgrowth
   have hcoeff := S.hermite_coefficient_Z_eq_integral_partialMulti β n α
-  have hcomm : (∫ g, S.Z β n (WithLp.toLp 2 g) * SYK.hermiteMulti α g
+  have hcomm : (∫ g, S.Z β n (WithLp.toLp 2 g) * hermiteMulti α g
       ∂gaussianCouplings (InteractionIndex (S.N n) q)) =
-      ∫ g, SYK.hermiteMulti α g * S.Z β n (WithLp.toLp 2 g)
+      ∫ g, hermiteMulti α g * S.Z β n (WithLp.toLp 2 g)
       ∂gaussianCouplings (InteractionIndex (S.N n) q) := by
     apply integral_congr_ae
     filter_upwards [] with g
@@ -345,7 +347,7 @@ theorem Setting.inner_hermiteLp_ZGaussianLp_eq_integral
     {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (α : InteractionIndex (S.N n) q → ℕ) :
     ⟪hermiteLp α, S.ZGaussianLp β n⟫_ℝ =
-      ∫ g, S.Z β n (WithLp.toLp 2 g) * SYK.hermiteMulti α g
+      ∫ g, S.Z β n (WithLp.toLp 2 g) * hermiteMulti α g
         ∂gaussianCouplings (InteractionIndex (S.N n) q) := by
   rw [MeasureTheory.L2.inner_def]
   have ha := (hermiteMulti_memLp_two α).coeFn_toLp
@@ -353,7 +355,7 @@ theorem Setting.inner_hermiteLp_ZGaussianLp_eq_integral
   apply integral_congr_ae
   filter_upwards [ha, hb] with g ha' hb'
   change (S.ZGaussianLp β n) g * (hermiteLp α) g = _
-  rw [show (hermiteLp α) g = SYK.hermiteMulti α g from ha',
+  rw [show (hermiteLp α) g = hermiteMulti α g from ha',
     show (S.ZGaussianLp β n) g = S.Z β n (WithLp.toLp 2 g) from hb']
 
 theorem Setting.abs_inner_hermiteLp_YGaussianLp_le
@@ -368,7 +370,7 @@ theorem Setting.abs_inner_hermiteLp_YGaussianLp_le
   rw [abs_mul, abs_inv, abs_of_pos hmean]
   calc
     (S.meanZ β n)⁻¹ *
-        |∫ g, S.Z β n (WithLp.toLp 2 g) * SYK.hermiteMulti α g
+        |∫ g, S.Z β n (WithLp.toLp 2 g) * hermiteMulti α g
           ∂gaussianCouplings (InteractionIndex (S.N n) q)| ≤
       (S.meanZ β n)⁻¹ *
         ((|β| * couplingScale (S.params n)) ^ (∑ I, α I) * S.meanZ β n) :=

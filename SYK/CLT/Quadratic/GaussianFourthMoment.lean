@@ -4,6 +4,8 @@ import SYK.CLT.Quadratic.GaussianQuadraticObservable
 
 open MeasureTheory ProbabilityTheory
 
+open SYK.GaussianChaos
+
 namespace SYK.CLT
 
 private theorem hermite_four_eval (x : ℝ) :
@@ -21,7 +23,7 @@ private theorem integrable_hermite_pair_real (n m : ℕ) :
     (fun _ => n) (fun _ => m)
   have hp := measurePreserving_eval (fun _ : Unit => gaussianReal 0 1) ()
   apply (hp.integrable_comp (by fun_prop)).mp
-  simpa [SYK.hermiteMulti, SYK.gaussianCouplings, Function.comp_def] using h
+  simpa [hermiteMulti, gaussianCouplings, Function.comp_def] using h
 
 private theorem centeredGaussianSquare_pow_four_pointwise (x : ℝ) :
     centeredGaussianSquare x ^ 4 =

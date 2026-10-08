@@ -4,6 +4,23 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="api-naming-2026-10-08"></a>
+
+## 公開前の名前空間・モジュール名の整理（2026-10-08）
+
+Kamijima の承認した計画に基づき、Claude が実施した。開始リビジョンは `3f36dc9`。リポジトリの公開に備え、宣言の名前空間・モジュールのパス・可視性だけを変え、定理文の数学的内容は変えていない。互換用の別名や旧パスは作っていない。
+
+- モジュールの改名：`Analysis/Matrix/TraceExponential`、`Probability/GaussianChaos/{Basic,CoefficientIBP,Orthogonality,HermiteDensity,PolynomialDensity}`、`CLT/Log/{Taylor,EventBound,Asymptotics}`。汎用補題の `LpDistributionTransfer` は `Probability/` へ移し、CLT への import を mathlib の1モジュールに置き換えた。docstring の「`L¹` or `L²`」の脱字も直した。
+- 名前空間：ガウスカオス層を `SYK.GaussianChaos`、`Probability/` 直下を `SYK.Probability`、凸関数列を `SYK.Analysis`、行列解析を `SYK.MatrixAnalysis`（`SingularAux`・`ExpAux`・`SVDAux` はその下）へ移した。対応は [AGENTS.md](AGENTS.md#公開-api-の変更) に記す。
+- 他のモジュールから使われず、公開のまま残す宣言の型にも現れない `*Aux` の補題63件を `private` にした（自動生成の `congr_simp` 2件も伴って private になった）。`DerivAux.contDiff_tE` は `SYK.MatrixAnalysis.Matrix.contDiff_traceExp`、`iteratedFDeriv_tE_bound_hermitian` は private の `iteratedFDeriv_traceExp_bound_hermitian` に改名した。
+- Blueprint の宣言参照と import、CLT の ARCHITECTURE・README、関係する docstring を更新した。
+
+検証：変更前後の全1258宣言を名前の対応に沿って比較し、型が文字列として一致した。公開から private への変更は上記の65件だけだった。`lake build SYK`（警告615件、変更前と同数）、親の `lake build`、HTML 生成と `vbp check`（`errors=[]`）が成功した。抽象・標準模型の CLT、`Setting.integral_log_Y_isBigO`、集中評価の裾と MGF、行列微分評価、Hermite 完全性などの主要定理は通常公理のみで、変更前と一致した。`hFE : AnnealedInput` は引き続き明示的な仮定である。
+
+文脈を引き継がない読み取り専用のサブエージェントが、変更前の記録から名前の対応と private 化の規則を独自に再計算して監査した。型・可視性・差分の範囲・公理依存・ビルドに問題はなかった。ARCHITECTURE の旧モジュール名1件、名前空間の表の不足1件、AGENTS.md の文言（自動生成補題の扱い）1件の指摘を反映した。
+
+残した課題：`GaussianIBP.lean`（`SYK` の外の名前空間を含む）、公開のまま残る `*Aux` 名、どこからも使われない公開補題、import の鎖の解消、局所インスタンスの集約、文書の役割の再配置、LICENSE、リポジトリ名の変更。旧モジュール名の olean がローカルキャッシュに残るため、キャッシュのない環境（CI など）でのビルド確認が望ましい。コミットは作成していない。
+
 <a id="repo-layout-2026-10-07"></a>
 
 ## 数学パッケージと文書の配置変更（2026-10-07）

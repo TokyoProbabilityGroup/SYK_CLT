@@ -1,10 +1,10 @@
 import SYK.Probability.GaussianConcentration.Smooth
-import SYK.Probability.GaussianChaos.GaussianHermiteBasic
+import SYK.Probability.GaussianChaos.Basic
 
 /-!
 # Gaussian Hermite coefficients for finite product Gaussians
 
-The general integration-by-parts theorem and `GaussianHermiteBasic` use
+The general integration-by-parts theorem and `SYK.Probability.GaussianChaos.Basic` use
 separately defined Hermite functions. This module identifies their
 normalizations and measures and transfers the coefficient formula without
 depending on the Majorana sign-parity theorem.
@@ -14,21 +14,21 @@ Entry points: `hermiteMulti_eq_signParity`, `gaussianCouplings_eq_pi`,
 
 open MeasureTheory ProbabilityTheory
 
-namespace SYK.CLT
+namespace SYK.GaussianChaos
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- The creation-operator construction and the sign-parity construction use
 the same probabilists' Hermite polynomial. -/
 theorem hermiteMulti_eq_signParity (α : ι → ℕ) (g : ι → ℝ) :
-    GaussianConcentration.hermiteMulti α g = SYK.hermiteMulti α g := by
-  simpa only [SYK.hermiteMulti] using GaussianConcentration.hermiteMulti_eq_prod α g
+    GaussianConcentration.hermiteMulti α g = hermiteMulti α g := by
+  simpa only [hermiteMulti] using GaussianConcentration.hermiteMulti_eq_prod α g
 
 omit [DecidableEq ι] in
 /-- The product Gaussian measure used for integration by parts is the law of
 the couplings used in the sign-parity theorem. -/
 theorem gaussianCouplings_eq_pi :
-    SYK.gaussianCouplings ι = Measure.pi (fun _ : ι => gaussianReal 0 1) := rfl
+    gaussianCouplings ι = Measure.pi (fun _ : ι => gaussianReal 0 1) := rfl
 
 /-- `lem:Gaussian-Hermite-IBP` in the notation used by the sign-parity result.
 The bounds concern exactly the partial derivatives `η ≤ α`. -/
@@ -38,9 +38,9 @@ theorem hermite_coefficient_ibp (α : ι → ℕ)
     (hgrowth : ∀ η : ι → ℕ, η ≤ α → ∃ C : ℝ, 0 < C ∧ ∀ g,
       |GaussianConcentration.partialMulti η f g| ≤
         C * Real.exp (C * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖)) :
-    (∫ g, SYK.hermiteMulti α g * f g ∂SYK.gaussianCouplings ι) =
-      ∫ g, GaussianConcentration.partialMulti α f g ∂SYK.gaussianCouplings ι := by
-  simpa only [SYK.hermiteMulti, SYK.gaussianCouplings] using
+    (∫ g, hermiteMulti α g * f g ∂gaussianCouplings ι) =
+      ∫ g, GaussianConcentration.partialMulti α f g ∂gaussianCouplings ι := by
+  simpa only [hermiteMulti, gaussianCouplings] using
     GaussianConcentration.hermiteMulti_ibp_of_expGrowth α hf hgrowth
 
 /-- Both sides of the Hermite coefficient identity are integrable under the
@@ -51,9 +51,9 @@ theorem hermite_coefficient_integrable (α : ι → ℕ)
     (hgrowth : ∀ η : ι → ℕ, η ≤ α → ∃ C : ℝ, 0 < C ∧ ∀ g,
       |GaussianConcentration.partialMulti η f g| ≤
         C * Real.exp (C * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖)) :
-    Integrable (fun g => SYK.hermiteMulti α g * f g) (SYK.gaussianCouplings ι) ∧
-      Integrable (GaussianConcentration.partialMulti α f) (SYK.gaussianCouplings ι) := by
-  simpa only [SYK.hermiteMulti, SYK.gaussianCouplings] using
+    Integrable (fun g => hermiteMulti α g * f g) (gaussianCouplings ι) ∧
+      Integrable (GaussianConcentration.partialMulti α f) (gaussianCouplings ι) := by
+  simpa only [hermiteMulti, gaussianCouplings] using
     GaussianConcentration.hermiteMulti_ibp_integrable α hf hgrowth
 
 omit [Fintype ι] in
@@ -85,7 +85,7 @@ This is the constant-test-function case of the finite-dimensional integration
 by parts theorem. -/
 theorem integral_hermiteMulti_eq_zero (α : ι → ℕ)
     (hα : 0 < ∑ i : ι, α i) :
-    (∫ g, SYK.hermiteMulti α g ∂SYK.gaussianCouplings ι) = 0 := by
+    (∫ g, hermiteMulti α g ∂gaussianCouplings ι) = 0 := by
   classical
   have hlist : GaussianConcentration.multiIndexList α ≠ [] := by
     intro h
@@ -117,8 +117,8 @@ omit [DecidableEq ι] in
 /-- Pairings of two multivariate Hermite polynomials are integrable under the
 standard product Gaussian measure. -/
 theorem integrable_hermiteMulti_mul (α β : ι → ℕ) :
-    Integrable (fun g => SYK.hermiteMulti α g * SYK.hermiteMulti β g)
-      (SYK.gaussianCouplings ι) := by
+    Integrable (fun g => hermiteMulti α g * hermiteMulti β g)
+      (gaussianCouplings ι) := by
   classical
   obtain ⟨C, c, hC, hc, hb⟩ := GaussianConcentration.hermiteMulti_exp_bound β
   let D := max C c
@@ -144,4 +144,4 @@ theorem integrable_hermiteMulti_mul (α β : ι → ℕ) :
     α hcontinuous D hD hbound
   simpa only [hermiteMulti_eq_signParity, gaussianCouplings_eq_pi] using hi
 
-end SYK.CLT
+end SYK.GaussianChaos

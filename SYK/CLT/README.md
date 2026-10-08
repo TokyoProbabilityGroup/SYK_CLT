@@ -24,17 +24,17 @@ The principal import paths are:
 
 | Task | Modules to inspect in order |
 | --- | --- |
-| Gaussian Hermite coefficients and completeness | `GaussianHermiteBasic` → `GaussianChaos` → `GaussianHermiteOrthogonality` → `GaussianHermiteDensity` and `GaussianMomentDetermination` → `GaussianPolynomialDensity` |
-| Singular values and matrix derivatives | `SingularValues` → `MatrixTraceExponential` → `TraceExpDerivatives` |
-| Finite SYK second chaos | `Basic`, `CliffordSignParity`, `GaussianHermiteOrthogonality` → `PartitionSymmetry`; `TraceExpDerivatives` → `PartitionDerivatives`; both → `SecondChaos` |
+| Gaussian Hermite coefficients and completeness | `GaussianChaos/Basic` → `GaussianChaos/CoefficientIBP` → `GaussianChaos/Orthogonality` → `GaussianChaos/HermiteDensity` and `GaussianMomentDetermination` → `GaussianChaos/PolynomialDensity` |
+| Singular values and matrix derivatives | `SingularValues` → `TraceExponential` → `TraceExpDerivatives` |
+| Finite SYK second chaos | `Basic`, `CliffordSignParity`, `GaussianChaos/Orthogonality` → `PartitionSymmetry`; `TraceExpDerivatives` → `PartitionDerivatives`; both → `SecondChaos` |
 | Independent estimates | `Rademacher` or `ConvexDerivatives` |
 | Quadratic Gaussian moments and CLT | `GaussianQuadraticObservable` → `GaussianFourthMoment` → `IndependentFourthMoment`; `GaussianQuadraticObservable` and `SecondChaosAsymptotic` → `GaussianQuadraticCLT` |
 
 `PartitionSymmetry` imports `Basic` for `Setting`, `Z`, and `Y`. The general Gaussian Hermite integration-by-parts API used by the active CLT modules is in `../Probability/GaussianConcentration/Smooth.lean`; search there before opening the large `GaussianIBP.lean`. The latter retains the earlier scalar Stein integration-by-parts development and is outside the recursive imports of `Main`. It is still imported by the Blueprint chapter source and built by the complete `SYK` library glob.
 
-`GaussianHermiteBasic` contains the finite product Gaussian measure, Hermite products, and their sign/permutation identities. `GaussianChaos` uses these without importing the model-specific `CliffordSignParity`. Finite quadratic observables and their first two moments are in `GaussianQuadraticObservable`; fourth-moment estimates do not import the quadratic CLT.
+`GaussianChaos/Basic` contains the finite product Gaussian measure, Hermite products, and their sign/permutation identities. `GaussianChaos/CoefficientIBP` uses these without importing the model-specific `CliffordSignParity`. Finite quadratic observables and their first two moments are in `GaussianQuadraticObservable`; fourth-moment estimates do not import the quadratic CLT.
 
-The [lemma index](ARCHITECTURE.md#補助-lean-ファイルの役割) gives the main declarations and assumptions. `MatrixTraceExponential` also documents the roles of its Duhamel, Schatten, word, and Taylor-coefficient estimates.
+The [lemma index](ARCHITECTURE.md#補助-lean-ファイルの役割) gives the main declarations and assumptions. `TraceExponential` also documents the roles of its Duhamel, Schatten, word, and Taylor-coefficient estimates.
 
 ## Current status
 

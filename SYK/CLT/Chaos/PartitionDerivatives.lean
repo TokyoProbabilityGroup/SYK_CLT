@@ -15,6 +15,8 @@ Entry points: `Setting.Z_contDiff_couplings`, `Setting.Z_hasDerivAt_beta`,
 open MeasureTheory Filter
 open scoped Topology Matrix.Norms.L2Operator
 
+open SYK.GaussianChaos
+
 namespace SYK.CLT
 
 local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
@@ -43,7 +45,7 @@ theorem Setting.Z_contDiff_couplings {q : ℕ} (S : Setting q) (β : ℝ) (n : �
     ContDiff ℝ ⊤ (S.Z β n) := by
   have ht : ContDiff ℝ ⊤
       (MatrixAnalysis.Matrix.traceExp : Matrix (S.d n) (S.d n) ℂ → ℂ) :=
-    MatrixAnalysis.DerivAux.contDiff_tE
+    MatrixAnalysis.Matrix.contDiff_traceExp
   have h := Complex.reCLM.contDiff.comp (ht.comp
     ((contDiff_const : ContDiff ℝ ⊤ (fun _ : CouplingSpace (S.N n) q => (-β : ℝ))).smul
       (S.disorderMatrix n).contDiff))
@@ -80,7 +82,7 @@ theorem Setting.norm_fderiv_Z_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
       |β| * ‖S.disorderMatrix n v‖ * S.Z β n g := by
   let T : Matrix (S.d n) (S.d n) ℂ → ℂ := MatrixAnalysis.Matrix.traceExp
   let L := (-β) • S.disorderMatrix n
-  have ht : ContDiff ℝ ⊤ T := MatrixAnalysis.DerivAux.contDiff_tE
+  have ht : ContDiff ℝ ⊤ T := MatrixAnalysis.Matrix.contDiff_traceExp
   have h := Complex.reCLM.hasFDerivAt.comp g
     ((ht.differentiable (by simp) (L g)).hasFDerivAt.comp g L.hasFDerivAt)
   have heq : (fun x => (T (L x)).re) = S.Z β n := by
