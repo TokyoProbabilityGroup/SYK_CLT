@@ -9,7 +9,7 @@
 | `SYK/Analysis/Matrix/` | 特異値・トレース指数関数・微分評価 | `SYK.MatrixAnalysis` |
 | `SYK/Analysis/ConvexDerivatives.lean` | 凸関数列の導関数の収束 | `SYK.Analysis` |
 | `SYK/Probability/GaussianChaos/` | Hermite 基本定義・部分積分・直交性・密度・完全性 | `SYK.GaussianChaos` |
-| `SYK/Probability/` 直下 | モーメント一意性・分布移送 | `SYK.Probability`（旧 `GaussianIBP.lean` を除く） |
+| `SYK/Probability/` 直下 | モーメント一意性・分布移送 | `SYK.Probability` |
 | `SYK/Probability/GaussianConcentration/` | 共有ガウス基盤 | `SYK.GaussianConcentration` |
 | `SYK/CLT/Chaos/` | 模型の符号対称性・分配関数の微分・二次/高次/零次カオス | `SYK.CLT`（符号ゲージ・頂点偶奇則は `SYK` と `SYK.MajoranaSystem`） |
 | `SYK/CLT/Quadratic/` | 有限個のガウス変数二乗の観測量・四次モーメント・二次和の CLT | `SYK.CLT` |
@@ -71,7 +71,7 @@
 
 補題を利用するときは、以下の用途と宣言名から対象を選び、ソースで定理文と必要な定義を確認する。名前空間、節の変数、型クラス、局所記法も確認し、証明の詳細は必要になった箇所を読む。この参照方法は通常の文書・Lean ソースを対象とし、適用される `AGENTS.md` の確認範囲を限定しない。以下の説明は索引であり、正確な仮定と型は Lean 宣言を参照する。
 
-- `../Probability/GaussianIBP.lean` は、指数傾斜によるシフト恒等式、差商の一様評価、支配収束を用いて、実ガウス分布の Stein 型部分積分を構成する旧経路である。`Main` の再帰 import に含まれず、`../../Blueprint/CLT.lean` の参照と子 `SYK` ライブラリのグロブによる全量ビルドを残す。現行の CLT の部分積分は共有 `../Probability/GaussianConcentration/Smooth.lean` を使う。同基盤は、独立標準ガウスと probabilists' Hermite 多項式に対し、`C^{|α|}` の正則性と `η ≤ α` の各偏導関数に対する指数増大から、多重指数部分積分 `hermiteMulti_ibp_of_expGrowth` と両辺の可積分性を与える。これは `lem:Gaussian-Hermite-IBP` の一般部分に対応するが、`Setting.Z` の各偏導関数の評価を供給したり、この公式を `Z_N` に適用したりするものではない。
+- [GaussianConcentration/Smooth.lean](../Probability/GaussianConcentration/Smooth.lean) は CLT の部分積分の土台である。この共有基盤は、独立標準ガウスと probabilists' Hermite 多項式に対し、`C^{|α|}` の正則性と `η ≤ α` の各偏導関数に対する指数増大から、多重指数部分積分 `hermiteMulti_ibp_of_expGrowth` と両辺の可積分性を与える。これは `lem:Gaussian-Hermite-IBP` の一般部分に対応するが、`Setting.Z` の各偏導関数の評価を供給したり、この公式を `Z_N` に適用したりするものではない。
 - [GaussianChaos/Basic.lean](../Probability/GaussianChaos/Basic.lean)：任意の有限型に対する `SYK.GaussianChaos.hermiteMulti`、`gaussianCouplings` と符号反転・置換による期待値の不変性を置く。模型や CLT を import しない。これらを使うマヨラナ系の符号ゲージ・頂点偶奇則は `CliffordSignParity.lean` に置く。
 - [GaussianChaos/CoefficientIBP.lean](../Probability/GaussianChaos/CoefficientIBP.lean)：`SYK.GaussianChaos.hermite_coefficient_ibp` と `hermite_coefficient_integrable` が係数の部分積分と両辺の可積分性の入口である。`SYK.GaussianConcentration.hermiteMulti` と `GaussianChaos/Basic.lean` の `SYK.GaussianChaos.hermiteMulti`、二つの標準ガウス測度の定義を照合し、原稿の成長条件で後者の記法へ移す。正次数の平均零と Hermite 関数の積の可積分性も証明する。模型固有の符号ゲージを import しない。
 - [GaussianChaos/Orthogonality.lean](../Probability/GaussianChaos/Orthogonality.lean)：`SYK.GaussianChaos.hermiteMulti_orthogonality`、`inner_hermiteLp`、`hermiteFiniteProjection_eq_starProjection` が、原稿の Hermite 内積・階乗ノルムと任意の有限添字集合への直交射影公式の入口である。このファイルの `hasSum_hermiteCoefficients` と `hasSum_hermiteDegreeProjection` は $L^2$ 完全性を仮定する。完全性を別途渡さずに使う結果は、次の `GaussianChaos/PolynomialDensity.lean` を参照する。

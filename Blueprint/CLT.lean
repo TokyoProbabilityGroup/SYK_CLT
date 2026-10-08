@@ -5,7 +5,6 @@ import SYK.CLT.Main
 import SYK.CLT.Normalization
 import SYK.CLT.StandardModel
 import SYK.Analysis.ConvexDerivatives
-import SYK.Probability.GaussianIBP
 import SYK.Probability.GaussianChaos.CoefficientIBP
 import SYK.Probability.GaussianChaos.Basic
 import SYK.CLT.Quadratic.GaussianQuadraticObservable

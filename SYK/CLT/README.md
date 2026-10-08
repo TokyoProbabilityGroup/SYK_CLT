@@ -30,7 +30,7 @@ The principal import paths are:
 | Independent estimates | `Rademacher` or `ConvexDerivatives` |
 | Quadratic Gaussian moments and CLT | `GaussianQuadraticObservable` → `GaussianFourthMoment` → `IndependentFourthMoment`; `GaussianQuadraticObservable` and `SecondChaosAsymptotic` → `GaussianQuadraticCLT` |
 
-`PartitionSymmetry` imports `Basic` for `Setting`, `Z`, and `Y`. The general Gaussian Hermite integration-by-parts API used by the active CLT modules is in `../Probability/GaussianConcentration/Smooth.lean`; search there before opening the large `GaussianIBP.lean`. The latter retains the earlier scalar Stein integration-by-parts development and is outside the recursive imports of `Main`. It is still imported by the Blueprint chapter source and built by the complete `SYK` library glob.
+`PartitionSymmetry` imports `Basic` for `Setting`, `Z`, and `Y`. The general Gaussian Hermite integration-by-parts API used by the active CLT modules is in `../Probability/GaussianConcentration/Smooth.lean`.
 
 `GaussianChaos/Basic` contains the finite product Gaussian measure, Hermite products, and their sign/permutation identities. `GaussianChaos/CoefficientIBP` uses these without importing the model-specific `CliffordSignParity`. Finite quadratic observables and their first two moments are in `GaussianQuadraticObservable`; fourth-moment estimates do not import the quadratic CLT.
 
@@ -60,7 +60,7 @@ latexmk -pdf introduction.tex
 
 Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-references and citations whose definitions lie in other subfiles remain unresolved in a standalone build; the complete manuscript build resolves them.
 
-The conditional CLT is integrated into `Main.lean`. The current `GaussianIBP.lean` diagnostics include deprecated Mathlib names and linter warnings. See the [input verification](../../WORK_HISTORY.md#clt-input-2026-10-04) and [manuscript audit](../../WORK_HISTORY.md#clt-audit-2026-10-04) for the completed checks. After modifying a Lean file, check it from the shared workspace root:
+The conditional CLT is integrated into `Main.lean`. See the [input verification](../../WORK_HISTORY.md#clt-input-2026-10-04) and [manuscript audit](../../WORK_HISTORY.md#clt-audit-2026-10-04) for the completed checks. After modifying a Lean file, check it from the shared workspace root:
 
 ```bash
 lake env lean SYK/SYK/CLT/path/to/File.lean
