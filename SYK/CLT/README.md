@@ -10,8 +10,8 @@ This directory contains the Lean formalization work for the central limit theore
 - `Normalization.lean`: the finite standard-representation check `partitionFunction_standard`; this module is not imported by the abstract CLT proofs.
 - `../../Paper/CLT_SYK.tex`: manuscript root containing the shared preamble, front matter, and references.
 - `../../Paper/sections/`: independently compilable top-level manuscript sections; together with the root file, these are the source of truth for the paper theorem statements.
-- `ARCHITECTURE.md`: internal proof-dependency and status documentation.
-- `EDITING_PLAN.md`: internal manuscript-audit and formalization plan.
+- `ARCHITECTURE.md`: current mathematical API, proof dependencies, and manuscript correspondence.
+- `EDITING_PLAN.md`: remaining convex-convergence, external-input, and annealed-input tasks.
 - `AGENTS.md`: topic-specific instructions for Codex.
 
 The internal planning documents are written in Japanese for collaboration between the researcher and Codex. Public mathematical artifacts, including this README, the manuscript, and Lean source files, are written in English.
@@ -34,23 +34,15 @@ The principal import paths are:
 
 `GaussianHermiteBasic` contains the finite product Gaussian measure, Hermite products, and their sign/permutation identities. `GaussianChaos` uses these without importing the model-specific `CliffordSignParity`. Finite quadratic observables and their first two moments are in `GaussianQuadraticObservable`; fourth-moment estimates do not import the quadratic CLT.
 
-The quadratic observables expose their measurability for the law transfer, CLT, and fourth-moment consumers. The degree-two Hermite evaluation is shared in `GaussianHermiteBasic`. In the matrix chain, singular-value squares and monotonicity use Mathlib's existing API; finite-sum Hölder uses its nonnegative-real inequality. `TraceExpDerivatives` uses one `MatrixAnalysis.Matrix.traceExp` definition for smoothness and all derivative bounds. `MatrixTraceExponential` documents the roles of its Duhamel, Schatten, word, and Taylor-coefficient estimates.
+The [lemma index](ARCHITECTURE.md#補助-lean-ファイルの役割) gives the main declarations and assumptions. `MatrixTraceExponential` also documents the roles of its Duhamel, Schatten, word, and Taylor-coefficient estimates.
 
 ## Current status
 
-`FiniteModel.lean` defines the normalized Gaussian partition function for general finite-dimensional matrix Majorana systems. `Basic.lean` defines families of diverging even system sizes, the relative, standardized, and centered logarithmic fluctuations, and `AnnealedInput`. The three CLT statements in `Main.lean` take `{q : ℕ} (S : Setting q) (hFE : AnnealedInput q S)`; evenness and `q ≥ 4` are fields of `S`, with no duplicate arguments. `AnnealedInput` receives the assertions of the manuscript's `prop:annealed-free-energy` for `S`: an even convex `C¹` limit on the whole real line, locally uniform convergence of the normalized pressure and derivative, and `β ℓ_q'(β) > 0` at every nonzero real inverse temperature. `partition_and_log_partition_clt` states all three CLTs with one common radius for real `0 < |β| < βq`: the relative and centered logarithmic limits have variance `(q!/2) β² (ℓ_q'(β))²`, while the standardized limit has variance `1`. `partition_clt` proves the partition-function conclusion directly. The joint theorem combines that result with the lower-level logarithmic CLT using a common smaller radius; `log_partition_clt` projects its logarithmic conclusion. The proposition is assumed for `S`; proving it or constructing `hFE` is outside the conditional CLT proof.
+For fixed even $q \ge 4$, conditional on `hFE : AnnealedInput q S`, the theorems supply a common radius $\beta_q>0$ for real inverse temperatures $0<|\beta|<\beta_q$. The relative fluctuations $N^{q/2-1}(Z_N/\mathbb E Z_N-1)$ and centered logarithmic fluctuations $N^{q/2-1}(\log Z_N-\mathbb E\log Z_N)$ converge in distribution to centered Gaussians with variance $(q!/2)\beta^2(\ell_q'(\beta))^2$. Here $\ell_q$ is the limit supplied by `hFE`; the standardized partition-function fluctuations converge to a centered Gaussian with variance $1$.
 
-`partition_and_log_partition_clt` and both individual CLT theorems are Lean-checked without `sorryAx`, conditional on `AnnealedInput`. The finite-model proofs establish tracelessness, `Z ≥ 1`, `partition_moments`, positivity and expectation one of `Y`, square integrability, integrability of both logarithms, and equality of their centered versions. Specialization to the standard representation gives the manuscript trace normalization. The finite-model results do not depend on `AnnealedInput`. `TraceExpDerivatives.lean` supplies the derivative estimates used in the chaos proof. The logarithmic CLT uses the chaos remainder and the lower bound `Z ≥ 1`.
+These conditional results in `Main.lean` are Lean-checked. `StandardModel.lean` applies them to the standard family `N=q+2*n`. The finite-model and Gaussian-chaos results, and the explicit logarithmic mean-error estimate, are also implemented. The annealed proposition and construction of `hFE` remain open.
 
-The sign-gauge module uses the shared `SYK.partitionFunction` directly. Parity for `Setting.Z`, vanishing first chaos, and the exact second-chaos coefficient are proved for every real inverse temperature in Gaussian $L^2$, without `AnnealedInput`. `PartitionSymmetry.lean`, `PartitionDerivatives.lean`, and `SecondChaos.lean` supply the symmetry, dominated differentiation, and coefficient identification.
-
-The manuscript develops the partition-function CLT through an exact second-chaos decomposition and a direct Rademacher estimate for all higher chaoses. It also develops the transfer to the centered log-partition function.
-
-The current manuscript's `thm: input` states the deterministic annealed-pressure limit at every fixed real inverse temperature and differentiability of the limiting function. Its statement contains neither an expected quenched-pressure limit nor an almost-sure assertion. He2026 supplies the positive-temperature input; Gaussian symmetry and the identity at zero extend it to real temperatures. The manuscript's and Lean's relative, standardized, and logarithmic CLTs all exclude zero inverse temperature.
-
-`Setting.integral_log_Y_isBigO` proves the explicit `O(N^(-2a))` logarithmic mean-error bound. `StandardModel.lean` constructs the standard model family and applies all three conditional CLTs; these results are Lean-checked without `sorryAx`. The finite Gaussian lemmas are separated from model symmetry and asymptotic CLT inputs while preserving the public declarations and normalization. The proposition remains an explicit assumption. Its proof and the pointwise-to-locally-uniform step in `lem:convex-derivatives` are deferred. See [the editing plan](EDITING_PLAN.md) for specifications and acceptance criteria.
-
-For individual proof files and their main declarations, see the [lemma index](ARCHITECTURE.md#補助-lean-ファイルの役割).
+See [the architecture document](ARCHITECTURE.md#現行原稿の主張) for the theorem statements, normalization, manuscript correspondence, proof dependencies, and formalization boundaries. The [editing plan](EDITING_PLAN.md) contains the three remaining tasks, and [the work history](../../WORK_HISTORY.md) records completed verification. Gaussian integration by parts and moment calculations are distinct from assuming the annealed limit.
 
 ## Verification
 
@@ -74,4 +66,4 @@ The conditional CLT is integrated into `Main.lean`. The current `GaussianIBP.lea
 lake env lean SYK/SYK/CLT/path/to/File.lean
 ```
 
-Use `lake build` for changes affecting the full workspace. The LaTeX manuscript and Lean formalization have separate verification requirements; successful verification of one does not establish the correctness of the other.
+Use `lake build SYK` for the mathematical library and `lake build` for the complete workspace. Inspect the principal theorem types and `#print axioms` as described in [the repository guide](../../README.md#building-and-testing). The LaTeX manuscript and Lean formalization have separate verification requirements; successful verification of one does not establish the correctness of the other.

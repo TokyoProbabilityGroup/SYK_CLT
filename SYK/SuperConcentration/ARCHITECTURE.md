@@ -2,7 +2,7 @@
 
 ## 目的
 
-共有 SYK 模型のうち物理的なギブス状態を扱う層と、模型に依存しないガウス集中不等式の基盤部分を接続し、通常のトレースで定義した SYK 分配関数の対数に対する集中不等式を証明する。`DensityMatrix`・`MajoranaBound`・`Main` に評価を分け、MGF・上下・両側の裾を供給する。残る作業は [編集計画](EDITING_PLAN.md)、過去の検証根拠は [作業履歴](../../WORK_HISTORY.md#super-w05) を参照する。
+共有 SYK 模型のうち物理的なギブス状態を扱う層と、模型に依存しないガウス集中不等式の基盤部分を接続し、通常のトレースで定義した SYK 分配関数の対数に対する集中不等式を証明する。`DensityMatrix`・`MajoranaBound`・`Main` に評価を分け、MGF・上下・両側の裾を供給する。残件は [全体計画](../../EDITING_PLAN.md)、過去の検証根拠は [作業履歴](../../WORK_HISTORY.md#super-w05) を参照する。
 
 ## 依存関係
 
@@ -66,6 +66,19 @@ L = β / sqrt q,
 複素数 `z` に対する分配関数の整関数性や対数微分は、`Model` の解析部分で扱う。この証明には正の実数値を取る分配関数が必要なので、複素逆温度に対して非零性を仮定する API は経由しない。
 
 抽象的なマヨラナ系に対する二乗和評価と対数分配関数の評価には、標準行列表現やトレース直交性を要求しない。必要な入力は共有の行列解析、標準ハミルトニアン、汎用ガウス集中である。旧配置と削除済み API の経緯は [作業履歴](../../WORK_HISTORY.md#super-legacy) を参照する。
+
+## 公開定理と有限サイズの評価
+
+`Main.lean` の公開定理は `SYK.logPartition_hasSubgaussianMGF`、`logPartition_upper_tail_standardGaussian`、`logPartition_lower_tail_standardGaussian`、`logPartition_two_sided_tail_standardGaussian` である。入力は `P : SYK.Params`、非空有限行列表現の `MajoranaSystem`、`β : ℝ≥0`。裾の指数表示は追加で `β ≠ 0`・`t > 0` を仮定する。逆温度ゼロの場合は `logPartition_tail_of_beta_zero`、`logPartition_centered_of_beta_zero` と上下の対応定理で処理し、MGF はこの場合も含む。
+
+`SYK.syk_sum_sq_expectation_le` は任意の密度行列 `ρ` について次を証明する。
+
+```text
+Σ_{|A|=q} |Tr(ρ Ψ_A)|² ≤ choose(N,q-1)/q,
+有限サイズのリプシッツ定数の二乗 ≤ (β couplingScale(P))² choose(N,q-1)/q.
+```
+
+`couplingScale(P) = sqrt((q-1)!/N^(q-1))` を用いて後者を `β²/q` で抑え、上の MGF と裾評価を得る。標準ガウス座標に関する評価で、規模 `N` に依存しない上界である。
 
 ## モジュールと名前空間
 

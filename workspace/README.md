@@ -22,7 +22,7 @@ This directory supplies the parent `ResearchWorkspace` configuration for the loc
     └── workspace/
 ```
 
-One parent dependency cache serves the mathematical package and the documentation. Lake may place package build artifacts under each package's `.lake/build/`; these are local artifacts, not another dependency checkout or a separately installed mathlib. Sharing the workspace does not introduce mathematical dependencies between topics.
+One parent dependency cache serves the mathematical package and the documentation, avoiding duplicate downloads and storage of the large mathlib dependency. Lake may place package build artifacts under each package's `.lake/build/`; these are local artifacts, not another dependency checkout or a separately installed mathlib. Sharing the workspace does not introduce mathematical dependencies between topics.
 
 ## Template files and targets
 
@@ -32,6 +32,16 @@ One parent dependency cache serves the mathematical package and the documentatio
 - `AGENTS.md` supplies project-independent rules; repository and topic rules also apply.
 
 `lake build` and `lake build Blueprint` check the complete mathematics and documentation. `lake build SYK` checks the mathematical package only. No aggregate mathematical import file is required. The parent renderer is `SYK/Blueprint/Build.lean`.
+
+```mermaid
+flowchart TD
+    mathlib["Pinned mathlib"] --> math["SYK mathematical package"]
+    math --> parent["ResearchWorkspace"]
+    verso["Pinned Verso Blueprint"] --> parent
+    parent --> document["Blueprint.Main and four chapters"]
+    document --> renderer["Blueprint.Build: HTML and optional PDF"]
+    renderer --> check["vbp reference check"]
+```
 
 ## Initial setup
 
@@ -66,7 +76,7 @@ git -C SYK ls-files --others --exclude-standard
 
 A clone at the commit alone omits uncommitted changes. Transfer untracked sources separately, apply the patch with `git -C SYK apply ../syk-worktree.patch`, and verify the received files before editing. Read parent, repository, and applicable topic `AGENTS.md` files. Assignment scope and handoff requirements are in [the project plan](../EDITING_PLAN.md#別環境への引き継ぎ).
 
-Check an edited mathematical file with `lake env lean SYK/SYK/path/to/File.lean`, then the affected build target, and finally `lake build`. For documentation or referenced declarations, also check the affected chapter and `Blueprint/Main.lean` and `Blueprint/Build.lean`, generate HTML, and run `vbp check`. Inspect theorem statements, assumptions, and `#print axioms` separately; successful generation does not complete an assumed mathematical input.
+Check an edited mathematical file with `lake env lean SYK/SYK/path/to/File.lean`, then the affected build target, and finally `lake build`. For Blueprint source or referenced Lean declarations, also check the affected chapter and `Blueprint/Main.lean` and `Blueprint/Build.lean`, generate HTML, and run `vbp check`. Inspect theorem statements, assumptions, and `#print axioms` separately; successful generation does not complete an assumed mathematical input.
 
 ## Updating an existing workspace
 
@@ -86,6 +96,8 @@ A compatible new mathematics project can be a local dependency package or anothe
 <a id="restoring-verso"></a>
 
 ## Blueprint dependencies
+
+The document is `Blueprint/Main.lean`, with four chapter modules; `Blueprint/Build.lean` renders it. The explicit renderer command is used because the installed `vbp build` searches for root-level generators. The renderer retains the Windows search-asset preparation and copy needed by Verso 4.32.0, which otherwise leaves a relative source prefix in bundled asset paths. See [the verification history](../WORK_HISTORY.md#gaussian-foundation).
 
 Verso Blueprint is enabled in the parent only; the child `SYK` package depends on mathlib. Active parent and child manifests preserve the previously pinned external revisions. The obsolete saved Verso lock is no longer distributed; do not overwrite the active parent manifest with a historical lock.
 

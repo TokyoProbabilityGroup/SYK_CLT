@@ -2,8 +2,6 @@
 
 Research on the Sachdev–Ye–Kitaev (SYK) model from the perspective of probability theory.
 
-## Abstract
-
 ## Requirements
 
 - Lean 4.32.2
@@ -27,7 +25,7 @@ SYK/                       # repository and mathematical Lake package
 └── workspace/             # parent ResearchWorkspace template
 ```
 
-The mathematical package keeps the name `SYK` and the declarations' existing namespaces. The parent workspace depends on this local package and on Verso Blueprint. Documentation is outside the mathematical source tree. The Gaussian `AnnealedInput` is an explicit assumption of the CLTs and is documented in the CLT chapter.
+The CLTs assume the Gaussian `AnnealedInput` explicitly. See [the CLT architecture](SYK/CLT/ARCHITECTURE.md) and [the concentration architecture](SYK/SuperConcentration/ARCHITECTURE.md) for current mathematical specifications.
 
 ## Setup instructions
 
@@ -39,10 +37,11 @@ git clone git@github.com:TokyoProbabilityGroup/SYK.git
 cp SYK/workspace/lakefile.toml .
 cp SYK/workspace/lake-manifest.json .
 cp SYK/workspace/lean-toolchain .
+cp SYK/workspace/AGENTS.md .
 lake exe cache get
 ```
 
-Review existing parent files before overwriting them. The parent `ResearchWorkspace` uses `SYK/` as a local dependency; the repository's own `lakefile.toml` declares only mathlib and the mathematical library. Projects in the parent workspace share a single `.lake/packages/` directory to avoid downloading and storing duplicate copies of mathlib and other dependencies. Run the following commands from that parent directory. See [the workspace guide](workspace/README.md) for handoff and configuration details.
+Review existing parent files before overwriting them. Projects in the parent workspace share a single `.lake/packages/` directory to avoid downloading and storing duplicate copies of mathlib and other dependencies. Run the following commands from that parent directory. See [the workspace guide](workspace/README.md) for handoff and configuration details.
 
 ## Building and testing
 
@@ -52,7 +51,7 @@ lake build SYK
 lake env lean SYK/SYK/CLT/Main.lean
 ```
 
-The parent's default `Blueprint` target requires the complete dependent `SYK` library before building all documentation modules. `lake build SYK` checks only the mathematical library; `lake build Blueprint` includes the documentation and its required mathematical build. There is no aggregate mathematical import file.
+`lake build` checks mathematics and Blueprint; `lake build SYK` checks mathematics only. [The workspace guide](workspace/README.md#template-files-and-targets) explains the targets and dependency configuration.
 
 The CLTs are Lean-checked conditional on `AnnealedInput`; constructing that input remains separate. Build success alone does not establish agreement between the formal statements and every manuscript claim. After changing a Lean file, check it individually before the final workspace build.
 
@@ -71,7 +70,7 @@ Check the displayed assumptions, quantifier order, normalizations, and conclusio
 
 ## Blueprint
 
-The document is `Blueprint/Main.lean`, with four chapters under `Blueprint/`; the renderer is `Blueprint/Build.lean`. Generate HTML and check the manifest from the parent workspace:
+Generate HTML and check its references from the parent workspace:
 
 ```bash
 lake lean SYK/Blueprint/Build.lean -- --run SYK/Blueprint/Build.lean --output SYK/_out/site
@@ -86,7 +85,7 @@ Generated HTML is under `SYK/_out/site/html-multi/` and is ignored by Git. For a
 python3 -m http.server 8000 --bind 127.0.0.1 --directory SYK/_out/site/html-multi
 ```
 
-Open `http://localhost:8000/`. The explicit renderer path is used because the installed `vbp build` discovers root-level generators.
+Open `http://localhost:8000/`. [The workspace guide](workspace/README.md#blueprint-dependencies) explains the explicit renderer and platform details.
 
 ## Manuscript and notes
 
