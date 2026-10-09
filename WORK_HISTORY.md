@@ -4,6 +4,18 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="import-cleanup-2026-10-09"></a>
+
+## import の整理と公開前の文書修正（2026-10-09）
+
+Kamijima の承認した方針で Claude が実施した。定理文・証明本体は変えていない。
+
+- import：宣言レベルの参照から、各モジュールが実際に使う SYK モジュールを求めた。使っていない import を外し、外したことで届かなくなった依存だけを直接 import に足した（11モジュール）。実際に使っている既存の import は残した。import の最長の鎖は22段から17段になった。
+- 冒頭の説明がなかった6モジュール（`Model` の3つ、`StandardGaussian`、`SecondChaosAsymptotic`、`GaussianQuadraticCLT`）に英語のモジュール docstring を追加した。
+- 古い記述の修正：旧作業ID（F02・F04・F05・W06・Z01）、存在しない `ModelParameters`、公開用 README の「Codex」、未参照のアンカーを直した。前回の記録にあった「CI は Lean 以外の変更でも起動する」は実際の設定と合っていなかったので、実際の起動条件（main への push で `**.lean` が変わったとき）に訂正した。CI の設定自体は変えていない。
+
+検証：`lake build SYK`（警告541件、変更前と同数）、親の `lake build`、HTML 生成と `vbp check`（`errors=[]`）が成功した。変更前後の全宣言の型を比較し、差は `local instance` の自動生成名の番号の振り直しだけだった。
+
 <a id="gaussian-ibp-removal-2026-10-08"></a>
 
 ## 未使用の `GaussianIBP.lean` の削除（2026-10-08）
@@ -43,7 +55,7 @@ Kamijima が担当・統合し、承認済みの構成変更を実施した。�
 
 ## Verso の検証復帰（2026-10-07）
 
-Kamijima が担当・統合した。保存した Verso Blueprint `v4.32.0` と依存リビジョンを復帰し、章のビルド、HTML 生成、`vbp check`、CI の生成・参照検査を有効にした。CI は Lean 以外の関連設定変更でも起動する条件へ更新した。
+Kamijima が担当・統合した。保存した Verso Blueprint `v4.32.0` と依存リビジョンを復帰し、章のビルド、HTML 生成、`vbp check`、CI の生成・参照検査を有効にした。CI の起動条件（main への push で `**.lean` が変わったとき）は変えていない。
 
 任意 PDF の検査は、章の表示数式終端に残る `$$`、旧 `\rm`、余分な inline `$` で失敗した。旧 `Chapters/AnnealedFE.lean` と `Chapters/CLT.lean` の表示構文だけを直し、数式内容・宣言参照・証明状態を保った。
 

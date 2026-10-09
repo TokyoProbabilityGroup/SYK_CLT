@@ -93,8 +93,6 @@ The template is not automatically applied to an existing parent workspace. Recon
 
 A compatible new mathematics project can be a local dependency package or another library in the parent workspace. Keep one shared dependency cache and avoid copying mathlib into the repository. Incompatible Lean or dependency versions may require another workspace.
 
-<a id="restoring-verso"></a>
-
 ## Blueprint dependencies
 
 The document is `Blueprint/Main.lean`, with four chapter modules; `Blueprint/Build.lean` renders it. The explicit renderer command is used because the installed `vbp build` searches for root-level generators. The renderer retains the Windows search-asset preparation and copy needed by Verso 4.32.0, which otherwise leaves a relative source prefix in bundled asset paths. See [the verification history](../WORK_HISTORY.md#gaussian-foundation).

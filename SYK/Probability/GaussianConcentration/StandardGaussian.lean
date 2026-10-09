@@ -11,6 +11,18 @@ import Mathlib.Tactic.NormNum
 import Mathlib.Tactic.Positivity
 import Mathlib.Tactic.Ring
 
+/-!
+# The standard Gaussian on a finite coordinate space
+
+For any finite index type `ι`, `standardGaussianMeasureOnEuclidean ι` is the product
+of standard one-dimensional Gaussians transported to `EuclideanSpace ℝ ι`. The file
+proves that it is a Gaussian probability measure and the integrability of
+exponential-growth functions against it, the Herbst-type step from a covariance bound
+to an exponential-moment bound (`herbst_of_cov_bound`), and Stein's identity: in one
+dimension (`gaussianReal_stein`) and coordinatewise on the product measure
+(`pi_gaussian_stein_coord`). It is independent of the SYK model.
+-/
+
 open scoped BigOperators ENNReal NNReal
 open MeasureTheory
 open ProbabilityTheory

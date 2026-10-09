@@ -1,6 +1,16 @@
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.LinearAlgebra.Matrix.Trace
 
+/-!
+# Parameters and interaction labels of the SYK model
+
+`Params` records the number of Majorana generators `N` and the interaction order
+`q`, with `q` even, positive and at most `N`; it carries no inverse temperature.
+An interaction label is a `q`-element subset of `Fin N`, and `orderedIndices`
+lists its elements in increasing order, which fixes the order of the Majorana
+product in `SYK.Model.Majorana`.
+-/
+
 namespace SYK
 
 /-- Parameters of an SYK model. -/

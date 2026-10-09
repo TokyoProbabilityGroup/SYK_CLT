@@ -1,5 +1,17 @@
 import SYK.Model.Definitions
 
+/-!
+# Abstract Majorana systems and interaction operators
+
+`MajoranaSystem N A` is a family of `N` self-adjoint generators `ψ i` in a complex
+star-algebra `A` with `ψ i ψ j + ψ j ψ i = 2 δ_ij`. For an interaction label `s`,
+`psiProduct` is the ordered product of its generators, `phase q = i ^ (q / 2)`, and
+`interactionOperator = phase q • psiProduct` is self-adjoint for even `q`. The file
+also proves the algebraic identities used downstream (squares, reordering signs,
+commutation with generators inside or outside `s`) and defines the deterministic
+`hamiltonian`. Nothing here assumes a matrix representation or irreducibility.
+-/
+
 open scoped BigOperators ComplexConjugate
 
 namespace SYK

@@ -2,6 +2,17 @@ import SYK.CLT.Chaos.SecondChaosAsymptotic
 import SYK.CLT.Quadratic.GaussianQuadraticObservable
 import Mathlib.Probability.CentralLimitTheorem
 
+/-!
+# Central limit theorem for normalized sums of Gaussian squares
+
+The characteristic function of `|I_N|^(-1/2) Σ_I (g_I² - 1) / √2` converges to that of
+the standard normal law (`Setting.centeredGaussianSquares_charFun_tendsto`), which gives
+convergence in distribution on the coupling spaces of the family
+(`Setting.normalizedQuadraticSum_clt`). The observable and its finite-size laws are in
+`GaussianQuadraticObservable`; the interaction count tends to infinity by
+`SecondChaosAsymptotic`.
+-/
+
 open MeasureTheory ProbabilityTheory Filter
 open scoped Topology
 

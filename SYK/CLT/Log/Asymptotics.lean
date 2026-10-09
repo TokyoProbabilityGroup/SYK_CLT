@@ -1,6 +1,8 @@
 import SYK.CLT.Log.EventBound
 import SYK.Probability.LpDistributionTransfer
 import SYK.CLT.Limit.EuclideanRelativeCLT
+import SYK.CLT.Limit.QuadraticGaussianVariance
+import SYK.CLT.Log.Taylor
 
 /-! # Vanishing logarithmic linearization error -/
 

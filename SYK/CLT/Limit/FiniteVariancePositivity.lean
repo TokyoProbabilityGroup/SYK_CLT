@@ -1,4 +1,4 @@
-import SYK.CLT.Limit.QuadraticGaussianVariance
+import SYK.CLT.Basic
 
 /-!
 # Positive finite-size disorder variance

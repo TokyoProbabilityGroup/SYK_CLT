@@ -1,5 +1,5 @@
-import SYK.CLT.Log.Taylor
 import SYK.CLT.Quadratic.IndependentFourthMoment
+import SYK.CLT.Limit.QuadraticBridge
 
 /-! # Small-event estimates for the logarithmic CLT -/
 

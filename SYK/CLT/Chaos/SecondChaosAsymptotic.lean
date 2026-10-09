@@ -1,5 +1,14 @@
-import SYK.CLT.Chaos.SecondChaos
+import SYK.CLT.Basic
 import Mathlib.Analysis.SpecialFunctions.Choose
+
+/-!
+# Asymptotics of the second-chaos coefficient
+
+Along a system-size family `S : Setting q`, the number of interactions satisfies
+`C(N, q) ~ N^q / q!` and diverges (`interactionCard_tendsto`). Combined with the
+annealed input `hFE`, the scaled exact second-chaos coefficient of `Y_N` converges to
+`β ℓ_q'(β) √(q!/2)` (`secondChaosScaledCoefficient_tendsto`).
+-/
 
 open Filter Asymptotics
 open scoped Topology

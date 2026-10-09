@@ -12,9 +12,9 @@ This directory contains the Lean formalization work for the central limit theore
 - `../../Paper/sections/`: independently compilable top-level manuscript sections; together with the root file, these are the source of truth for the paper theorem statements.
 - `ARCHITECTURE.md`: current mathematical API, proof dependencies, and manuscript correspondence.
 - `EDITING_PLAN.md`: remaining convex-convergence, external-input, and annealed-input tasks.
-- `AGENTS.md`: topic-specific instructions for Codex.
+- `AGENTS.md`: topic-specific instructions for coding agents.
 
-The internal planning documents are written in Japanese for collaboration between the researcher and Codex. Public mathematical artifacts, including this README, the manuscript, and Lean source files, are written in English.
+The internal planning documents are written in Japanese for collaboration between the researcher and coding agents. Public mathematical artifacts, including this README, the manuscript, and Lean source files, are written in English.
 
 ## Finding a lemma
 

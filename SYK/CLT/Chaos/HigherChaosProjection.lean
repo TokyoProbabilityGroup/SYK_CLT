@@ -1,4 +1,3 @@
-import SYK.Probability.GaussianChaos.PolynomialDensity
 import SYK.CLT.Chaos.PartitionHigherDerivatives
 import SYK.CLT.Chaos.Rademacher
 

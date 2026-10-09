@@ -1,4 +1,5 @@
 import SYK.CLT.Chaos.PartitionDerivatives
+import SYK.CLT.Chaos.PartitionSymmetry
 
 /-!
 # Higher derivatives of the finite SYK partition function

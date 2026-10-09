@@ -768,7 +768,7 @@ for the partial derivatives `η ≤ α`. The creation-operator polynomials agree
 with the product of probabilists' Hermite polynomials. Derivative order
 independence, the intermediate product bounds, and integrability are proved
 here; `ExpIBPChain` is only an internal sufficient condition for iteration.
-The lemma's application to `Z_N` awaits the separate F04 derivative estimates.
+Applying the lemma to a concrete function such as `Z_N` is left to the users of this module.
 -/
 
 open MeasureTheory

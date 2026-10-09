@@ -1,4 +1,5 @@
 import SYK.CLT.Limit.FiniteVariancePositivity
+import SYK.CLT.Limit.QuadraticGaussianVariance
 
 open MeasureTheory ProbabilityTheory Filter
 open scoped Topology NNReal

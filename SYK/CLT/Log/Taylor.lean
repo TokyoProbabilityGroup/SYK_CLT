@@ -1,4 +1,4 @@
-import SYK.CLT.Limit.StandardizedCLT
+import SYK.CLT.Basic
 
 /-!
 # Pointwise logarithmic approximation

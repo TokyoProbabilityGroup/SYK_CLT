@@ -1,6 +1,18 @@
 import SYK.Model.Majorana
 import SYK.Probability.GaussianConcentration.StandardGaussian
 
+/-!
+# Gaussian disorder for the SYK Hamiltonian
+
+`CouplingSpace N q` is the Euclidean space of real couplings indexed by interaction
+labels, and `standardGaussianMeasure` is the product of standard normal laws on it.
+`couplingScale` is `σ_N = √((q-1)! / N^(q-1))`, so the actual coefficient
+`J_A = σ_N g_A` has variance `(q-1)! / N^(q-1)`; this is the variance of one
+coefficient, not of the whole Hamiltonian. `normalizedHamiltonian` is the Hamiltonian
+in the standard coordinates `g_A`, together with its affine and self-adjointness
+properties.
+-/
+
 open scoped ENNReal
 open MeasureTheory
 open ProbabilityTheory

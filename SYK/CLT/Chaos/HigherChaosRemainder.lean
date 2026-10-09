@@ -1,10 +1,11 @@
 import SYK.CLT.Chaos.HigherChaosProjection
+import SYK.Probability.GaussianChaos.PolynomialDensity
 
 /-!
 # The higher-chaos remainder in Gaussian L²
 
 The degree projections are pairwise orthogonal. Their convergent tail gives
-an exact L² remainder whose norm squared is the sum bounded in F05.
+an exact L² remainder whose norm squared is the sum bounded in `HigherChaosProjection`.
 -/
 
 open MeasureTheory Filter Asymptotics

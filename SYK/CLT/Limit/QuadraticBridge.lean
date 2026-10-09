@@ -2,6 +2,7 @@ import SYK.CLT.Chaos.ZeroChaos
 import SYK.CLT.Chaos.SecondChaosAsymptotic
 import SYK.CLT.Quadratic.GaussianQuadraticCLT
 import SYK.Probability.DistributionTransfer
+import SYK.CLT.Chaos.SecondChaos
 
 /-!
 # Quadratic Hermite sum and Gaussian-square sum
