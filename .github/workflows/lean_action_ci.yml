@@ -30,12 +30,14 @@ jobs:
           ls -la
 
       - uses: leanprover/lean-action@v1
-        # Use defaultTargets from the version-controlled Lake configuration.
+        # The parent workspace has no default targets; build the Blueprint package,
+        # which also checks the complete mathematical library.
         with:
+          build-args: SYKBlueprint
           use-github-cache: false
 
       - name: Build Blueprint site
-        run: lake lean SYK/Blueprint/Build.lean -- --run SYK/Blueprint/Build.lean --output SYK/_out/site
+        run: lake lean SYK/Blueprint/SYKBlueprintMain.lean -- --run SYK/Blueprint/SYKBlueprintMain.lean --output SYK/_out/site
 
       - name: Check Blueprint output
         run: lake exe vbp check --site SYK/_out/site

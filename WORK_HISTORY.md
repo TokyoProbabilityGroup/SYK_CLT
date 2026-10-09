@@ -4,6 +4,16 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="blueprint-package-2026-10-09"></a>
+
+## Blueprint の独立パッケージ化（2026-10-09）
+
+Kamijima の承認した計画に基づき、Claude が実施した。Blueprint を、リポジトリ内の独立した Lake パッケージ `SYKBlueprint`（`Blueprint/`）にした。モジュール名は `Blueprint.*` から `SYKBlueprint.*` へ変えた。配置は Verso Blueprint の雛形と参照例（`FLTBlueprint` など）に合わせ、文書の最上位 `SYKBlueprint.lean`、生成入口 `SYKBlueprintMain.lean`（`vbp build` が `{パッケージ名}Main.lean` を探す）、章 `SYKBlueprint/*.lean` とした。パッケージは自身の `lakefile.toml`（`SYK` へのパス依存、Verso Blueprint v4.32.0、`needs = ["SYK/SYK:leanArts"]`）と `lake-manifest.json`（親と同じリビジョン）を持つ。
+
+親ワークスペースの `lakefile.toml` は `SYK` と `SYKBlueprint` の `require` だけを持ち、独自のターゲットも既定対象も持たない。そのため全体の検査は `lake build SYKBlueprint` と明示する（CI は `build-args: SYKBlueprint`）。`lake update SYKBlueprint` はネットワークを使わずに完了し、全パッケージのリビジョンは変更前と一致した。親の雛形（`workspace/`）、ルートの `AGENTS.md`、各 README・`AGENTS.md`・CI の生成パスを合わせて更新した。
+
+検証：`lake build SYK`、`lake build SYKBlueprint`、HTML 生成と `vbp check`（`errors=[]`、`ok=true`）が成功した。`SYK/Blueprint/.lake/packages` は作られず、依存の取得は親の `.lake/packages` に共有されている。GitHub 上の CI と、リポジトリ単体（親の雛形なし）での `Blueprint/` のビルドは未確認である。ルートの `AGENTS.md` の全体ビルドの記述は、親に既定対象がなくなったため、各プロジェクトの規則が定める対象を実行する書き方に改めた。
+
 <a id="import-cleanup-2026-10-09"></a>
 
 ## import の整理と公開前の文書修正（2026-10-09）

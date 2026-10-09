@@ -20,7 +20,7 @@ SYK/                       # repository and mathematical Lake package
 │   └── CLT/               # Chaos, Quadratic, Limit, Log, and main results
 ├── Paper/                 # CLT_SYK.tex and its four sections
 ├── Notes/                 # lecture notes and their distributed PDF
-├── Blueprint/             # Main.lean, Build.lean, and four chapter files
+├── Blueprint/             # SYKBlueprint package: document, generator entry point, four chapters
 ├── lakefile.toml           # mathlib-only mathematical package
 └── workspace/             # parent ResearchWorkspace template
 ```
@@ -46,12 +46,12 @@ Review existing parent files before overwriting them. Projects in the parent wor
 ## Building and testing
 
 ```bash
-lake build
+lake build SYKBlueprint
 lake build SYK
 lake env lean SYK/SYK/CLT/Main.lean
 ```
 
-`lake build` checks mathematics and Blueprint; `lake build SYK` checks mathematics only. [The workspace guide](workspace/README.md#template-files-and-targets) explains the targets and dependency configuration.
+`lake build SYKBlueprint` checks mathematics and Blueprint; `lake build SYK` checks mathematics only. [The workspace guide](workspace/README.md#template-files-and-targets) explains the targets and dependency configuration.
 
 The CLTs are Lean-checked conditional on `AnnealedInput`; constructing that input remains separate. Build success alone does not establish agreement between the formal statements and every manuscript claim. After changing a Lean file, check it individually before the final workspace build.
 
@@ -73,7 +73,7 @@ Check the displayed assumptions, quantifier order, normalizations, and conclusio
 Generate HTML and check its references from the parent workspace:
 
 ```bash
-lake lean SYK/Blueprint/Build.lean -- --run SYK/Blueprint/Build.lean --output SYK/_out/site
+lake lean SYK/Blueprint/SYKBlueprintMain.lean -- --run SYK/Blueprint/SYKBlueprintMain.lean --output SYK/_out/site
 lake exe vbp check --site SYK/_out/site
 ```
 

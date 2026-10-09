@@ -7,8 +7,8 @@ This directory supplies the parent `ResearchWorkspace` configuration for the loc
 ```text
 <workspace-root>/
 ├── AGENTS.md
-├── lakefile.toml            # ResearchWorkspace
-├── lake-manifest.json       # local SYK and pinned external dependencies
+├── lakefile.toml            # ResearchWorkspace: requires SYK and SYKBlueprint
+├── lake-manifest.json       # local packages and pinned external dependencies
 ├── lean-toolchain
 ├── .lake/packages/          # shared dependency checkouts
 └── SYK/                     # cloned repository
@@ -16,7 +16,10 @@ This directory supplies the parent `ResearchWorkspace` configuration for the loc
     ├── lake-manifest.json   # mathematical dependency lock
     ├── lean-toolchain      # same Lean version as the parent
     ├── SYK/                # Analysis, Probability, Model, SuperConcentration, CLT
-    ├── Blueprint/          # Main.lean, Build.lean, and four chapters
+    ├── Blueprint/          # SYKBlueprint package: lakefile.toml, lake-manifest.json,
+    │   ├── SYKBlueprint.lean      # the document
+    │   ├── SYKBlueprintMain.lean  # generator entry point
+    │   └── SYKBlueprint/          # four chapters
     ├── Paper/
     ├── Notes/
     └── workspace/
@@ -26,20 +29,20 @@ One parent dependency cache serves the mathematical package and the documentatio
 
 ## Template files and targets
 
-- `lakefile.toml` defines `ResearchWorkspace`, the local path dependency `SYK`, pinned Verso Blueprint, and the documentation library `Blueprint` with source directory `SYK/`. Its `needs` includes `SYK/SYK:leanArts`, so the default documentation build checks every mathematical module.
-- `lake-manifest.json` locks the local package and the external dependency revisions. The repository's own manifest locks its mathlib-only dependency closure; keep shared revisions consistent.
+- `lakefile.toml` defines `ResearchWorkspace` and requires two local packages: `SYK` (the mathematics) and `SYKBlueprint` (the documentation, in `SYK/Blueprint/`). It declares no targets of its own, so a bare `lake build` in the parent builds nothing; name the target explicitly.
+- `lake-manifest.json` locks the two local packages and the external dependency revisions. Each local package also has its own manifest (`SYK/lake-manifest.json`, `SYK/Blueprint/lake-manifest.json`); keep shared revisions consistent across all three.
 - `lean-toolchain` fixes Lean for the parent and dependent package.
 - `AGENTS.md` supplies project-independent rules; repository and topic rules also apply.
 
-`lake build` and `lake build Blueprint` check the complete mathematics and documentation. `lake build SYK` checks the mathematical package only. No aggregate mathematical import file is required. The parent renderer is `SYK/Blueprint/Build.lean`.
+`lake build SYKBlueprint` checks the complete mathematics (its `needs` includes `SYK/SYK:leanArts`) and the documentation. `lake build SYK` checks the mathematical package only. No aggregate mathematical import file is required. The renderer is `SYK/Blueprint/SYKBlueprintMain.lean`.
 
 ```mermaid
 flowchart TD
     mathlib["Pinned mathlib"] --> math["SYK mathematical package"]
-    math --> parent["ResearchWorkspace"]
-    verso["Pinned Verso Blueprint"] --> parent
-    parent --> document["Blueprint.Main and four chapters"]
-    document --> renderer["Blueprint.Build: HTML and optional PDF"]
+    verso["Pinned Verso Blueprint"] --> blueprint["SYKBlueprint package"]
+    math --> blueprint
+    blueprint --> document["SYKBlueprint and four chapters"]
+    document --> renderer["SYKBlueprintMain: HTML and optional PDF"]
     renderer --> check["vbp reference check"]
 ```
 
@@ -54,8 +57,8 @@ cp SYK/workspace/lake-manifest.json .
 cp SYK/workspace/lean-toolchain .
 cp SYK/workspace/AGENTS.md .
 lake exe cache get
-lake build
-lake lean SYK/Blueprint/Build.lean -- --run SYK/Blueprint/Build.lean --output SYK/_out/site
+lake build SYKBlueprint
+lake lean SYK/Blueprint/SYKBlueprintMain.lean -- --run SYK/Blueprint/SYKBlueprintMain.lean --output SYK/_out/site
 lake exe vbp check --site SYK/_out/site
 ```
 
@@ -76,7 +79,7 @@ git -C SYK ls-files --others --exclude-standard
 
 A clone at the commit alone omits uncommitted changes. Transfer untracked sources separately, apply the patch with `git -C SYK apply ../syk-worktree.patch`, and verify the received files before editing. Read parent, repository, and applicable topic `AGENTS.md` files. Assignment scope and handoff requirements are in [the project plan](../EDITING_PLAN.md#別環境への引き継ぎ).
 
-Check an edited mathematical file with `lake env lean SYK/SYK/path/to/File.lean`, then the affected build target, and finally `lake build`. For Blueprint source or referenced Lean declarations, also check the affected chapter and `Blueprint/Main.lean` and `Blueprint/Build.lean`, generate HTML, and run `vbp check`. Inspect theorem statements, assumptions, and `#print axioms` separately; successful generation does not complete an assumed mathematical input.
+Check an edited mathematical file with `lake env lean SYK/SYK/path/to/File.lean`, then the affected build target, and finally `lake build SYKBlueprint`. For Blueprint source or referenced Lean declarations, also check the affected chapter and `SYKBlueprint.lean` and `SYKBlueprintMain.lean`, generate HTML, and run `vbp check`. Inspect theorem statements, assumptions, and `#print axioms` separately; successful generation does not complete an assumed mathematical input.
 
 ## Updating an existing workspace
 
@@ -95,11 +98,11 @@ A compatible new mathematics project can be a local dependency package or anothe
 
 ## Blueprint dependencies
 
-The document is `Blueprint/Main.lean`, with four chapter modules; `Blueprint/Build.lean` renders it. The explicit renderer command is used because the installed `vbp build` searches for root-level generators. The renderer retains the Windows search-asset preparation and copy needed by Verso 4.32.0, which otherwise leaves a relative source prefix in bundled asset paths. See [the verification history](../WORK_HISTORY.md#gaussian-foundation).
+The document is `SYKBlueprint.lean` in the package `SYKBlueprint` (`SYK/Blueprint/`), with four chapter modules under `SYKBlueprint/`; `SYKBlueprintMain.lean` renders it. From the parent workspace the explicit renderer command above is used, because `vbp build` looks for a generator only in the current directory, and the parent has none. Inside `SYK/Blueprint/` the standard `lake exe vbp build` finds `SYKBlueprintMain.lean` and writes `_out/site/`; this standalone route (which needs its own download of mathlib) has not been verified. The renderer retains the Windows search-asset preparation and copy needed by Verso 4.32.0, which otherwise leaves a relative source prefix in bundled asset paths. See [the verification history](../WORK_HISTORY.md#gaussian-foundation).
 
-Verso Blueprint is enabled in the parent only; the child `SYK` package depends on mathlib. Active parent and child manifests preserve the previously pinned external revisions. The obsolete saved Verso lock is no longer distributed; do not overwrite the active parent manifest with a historical lock.
+Verso Blueprint is required by `SYKBlueprint` only; the mathematical `SYK` package depends on mathlib alone, and the parent requires both packages. The manifests of the parent and of `SYKBlueprint` preserve the previously pinned external revisions. The obsolete saved Verso lock is no longer distributed; do not overwrite the active parent manifest with a historical lock.
 
-When updating an older workspace, apply the parent package configuration and the repository's mathematical package together, reconcile the lock files, then run the complete build and documentation commands above. Existing CI materializes this parent template and uses the same renderer/check commands. PDF compilation is optional and is not required by CI.
+When updating an older workspace, apply the parent package configuration together with the repository's `SYK` and `SYKBlueprint` packages, reconcile the lock files, then run the complete build and documentation commands above. Existing CI materializes this parent template and uses the same build, renderer and check commands. PDF compilation is optional and is not required by CI.
 
 ## Files excluded from this template
 

@@ -261,4 +261,4 @@ flowchart TD
 
 有限模型の定義・証明は `FiniteModel.lean` に、標準表現との規格化照合は `Normalization.lean` に置く。必要な補題の再利用先が増えた場合は、実際の型と利用関係を確認して共有層への移設を検討する。原稿の `prop:annealed-free-energy` に対応する入力を `Basic.lean` の `AnnealedInput q S` が受け取り、`Main.lean` はそれを仮定して主定理を証明する。命題自体の証明は [その他の残件](EDITING_PLAN.md#その他の残件) に置く。主要補題の所在は上の索引を参照する。
 
-対応する公開説明は `../../Blueprint/CLT.lean` に置く。更新時の規則と残件は [全体計画](../../EDITING_PLAN.md#blueprint-の更新) を参照する。
+対応する公開説明は `../../Blueprint/SYKBlueprint/CLT.lean` に置く。更新時の規則と残件は [全体計画](../../EDITING_PLAN.md#blueprint-の更新) を参照する。

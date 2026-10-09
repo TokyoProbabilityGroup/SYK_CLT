@@ -41,7 +41,7 @@ SYK リポジトリ全体に適用する。数学コードは `SYK/`、公開用
 
 ## ビルドと Blueprint
 
-現行の数学ライブラリは `SYK`、親の既定対象は `Blueprint` であり、`needs = ["SYK/SYK:leanArts"]` により数学全体も検査する。コマンドと環境準備は [README](README.md#building-and-testing) と [ワークスペース案内](workspace/README.md) を参照する。配布設定の変更では他プロジェクトを保持し、親との整合を確認する。
+現行の数学ライブラリは `SYK`、Blueprint は独立した Lake パッケージ `SYKBlueprint`（`Blueprint/`）であり、`needs = ["SYK/SYK:leanArts"]` により数学全体も検査する。親ワークスペースは既定対象を持たないので、全体の検査は `lake build SYKBlueprint` と指定する。コマンドと環境準備は [README](README.md#building-and-testing) と [ワークスペース案内](workspace/README.md) を参照する。配布設定の変更では他プロジェクトを保持し、親との整合を確認する。
 
 章・本文・生成入口・参照宣言を変更したら、関係する章と両入口を Lean で検査し、HTML を生成して `vbp check` を実行する。対応する TeX 環境での PDF は任意検査とする。数学ライブラリの検査と章の主張・仮定・宣言参照の照合も行う。
 

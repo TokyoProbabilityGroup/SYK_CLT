@@ -1,5 +1,5 @@
 # Lake / build artifacts
-/_out/
+_out/
 .lake/
 lake-packages/
 build/

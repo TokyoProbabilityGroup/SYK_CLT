@@ -1,0 +1,26 @@
+name = "SYKBlueprint"
+version = "0.1.0"
+defaultTargets = ["SYKBlueprint"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+experimental.module = true
+
+[[require]]
+name = "SYK"
+path = ".."
+
+[[require]]
+name = "VersoBlueprint"
+git = "https://github.com/leanprover/verso-blueprint"
+rev = "v4.32.0"
+
+[[lean_lib]]
+name = "SYKBlueprint"
+roots = ["SYKBlueprint"]
+globs = ["SYKBlueprint", "SYKBlueprint.+", "SYKBlueprintMain"]
+# Check the complete mathematical library before building its documentation.
+needs = ["SYK/SYK:leanArts"]

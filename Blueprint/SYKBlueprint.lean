@@ -3,10 +3,10 @@ import VersoManual
 import VersoBlueprint
 import VersoBlueprint.Commands.Graph
 import VersoBlueprint.Commands.Summary
-import Blueprint.Model
-import Blueprint.GaussianConcentration
-import Blueprint.SuperConcentration
-import Blueprint.CLT
+import SYKBlueprint.Model
+import SYKBlueprint.GaussianConcentration
+import SYKBlueprint.SuperConcentration
+import SYKBlueprint.CLT
 
 set_option linter.mathlibStandardSet false
 
@@ -22,10 +22,10 @@ their mathematical dependencies.
 It distinguishes declarations already checked by Lean from results that remain to be
 formalized.
 
-{include 0 Blueprint.Model}
-{include 0 Blueprint.GaussianConcentration}
-{include 0 Blueprint.SuperConcentration}
-{include 0 Blueprint.CLT}
+{include 0 SYKBlueprint.Model}
+{include 0 SYKBlueprint.GaussianConcentration}
+{include 0 SYKBlueprint.SuperConcentration}
+{include 0 SYKBlueprint.CLT}
 
 {blueprint_graph}
 {blueprint_summary}

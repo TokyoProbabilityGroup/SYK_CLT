@@ -1,6 +1,6 @@
 import VersoManual
 import VersoBlueprint.PreviewManifest
-import Blueprint.Main
+import SYKBlueprint
 
 open Verso Doc
 open Verso.Genre Manual
@@ -32,7 +32,7 @@ def main (args : List String) : IO UInt32 := do
   let output := outputDirectory args
   prepareWindowsSearchAssets output
   let result ← Informal.PreviewManifest.blueprintMainWithPreviewData
-    (%doc Blueprint.Main)
+    (%doc SYKBlueprint)
     args
     (extensionImpls := by exact extension_impls%)
   if result == 0 then

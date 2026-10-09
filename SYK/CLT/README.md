@@ -66,4 +66,4 @@ The conditional CLT is integrated into `Main.lean`. See the [input verification]
 lake env lean SYK/SYK/CLT/path/to/File.lean
 ```
 
-Use `lake build SYK` for the mathematical library and `lake build` for the complete workspace. Inspect the principal theorem types and `#print axioms` as described in [the repository guide](../../README.md#building-and-testing). The LaTeX manuscript and Lean formalization have separate verification requirements; successful verification of one does not establish the correctness of the other.
+Use `lake build SYK` for the mathematical library and `lake build SYKBlueprint` for the mathematics together with the Blueprint. Inspect the principal theorem types and `#print axioms` as described in [the repository guide](../../README.md#building-and-testing). The LaTeX manuscript and Lean formalization have separate verification requirements; successful verification of one does not establish the correctness of the other.
