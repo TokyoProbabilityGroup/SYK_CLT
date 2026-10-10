@@ -34,7 +34,7 @@ The principal import paths are:
 
 `GaussianChaos/Basic` contains the finite product Gaussian measure, Hermite products, and their sign/permutation identities. `GaussianChaos/CoefficientIBP` uses these without importing the model-specific `CliffordSignParity`. Finite quadratic observables and their first two moments are in `GaussianQuadraticObservable`; fourth-moment estimates do not import the quadratic CLT.
 
-The opening docstring of each module also states its main declarations and assumptions; `TraceExponential`, for example, documents the roles of its Duhamel, Schatten, word, and Taylor-coefficient estimates.
+The opening docstring of each module also states its main declarations and assumptions; `TraceExponential`, for example, documents the roles of its Schatten, word, and Taylor-coefficient estimates.
 
 ## Current status
 

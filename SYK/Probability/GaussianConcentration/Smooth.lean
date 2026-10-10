@@ -165,26 +165,6 @@ lemma gradient_exp_smul {ι : Type*} [Fintype ι]
     simpa only [smul_smul, mul_comm] using h1.exp
   rw [gradient, gradient, hexp.fderiv, map_smul]
 
-/-- Projecting the rotation-invariant product Gaussian onto its first coordinate returns the
-standard Gaussian: `(μ.prod μ).map ((rotation θ ·).1) = μ`.  In particular the affine
-combination `cos θ • a + sin θ • b` has law `μ`. -/
-lemma map_rotation_fst {ι : Type*} [Fintype ι] (θ : ℝ) :
-    (((standardGaussianMeasureOnEuclidean ι).prod
-        (standardGaussianMeasureOnEuclidean ι)).map
-          (fun p => (ContinuousLinearMap.rotation θ p).1))
-      = standardGaussianMeasureOnEuclidean ι := by
-  have hmean : (standardGaussianMeasureOnEuclidean ι)[id] = 0 :=
-    standardGaussianMeasureOnEuclidean_integral_id
-  have hrot := IsGaussian.map_rotation_eq_self hmean θ
-  have hfstcomp :
-      (fun p : EuclideanSpace ℝ ι × EuclideanSpace ℝ ι => (ContinuousLinearMap.rotation θ p).1)
-        = Prod.fst ∘ (ContinuousLinearMap.rotation θ) := rfl
-  rw [hfstcomp, ← Measure.map_map measurable_fst
-      (ContinuousLinearMap.rotation θ).continuous.measurable, hrot]
-  have h := Measure.fst_prod (μ := standardGaussianMeasureOnEuclidean ι)
-    (ν := standardGaussianMeasureOnEuclidean ι)
-  exact h
-
 
 /-
 The rotation `(a,b) ↦ (cos θ • a + sin θ • b, -(sin θ • a) + cos θ • b)` preserves the
@@ -718,26 +698,6 @@ lemma gaussian_cov_H_bound (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0
       nlinarith [ show 0 ≤ |s| * Real.exp ( s * F x ) * L by positivity, show 0 ≤ |s| * Real.exp ( s * F x ) * ‖gradient F x‖ by positivity, hgrad x, mul_le_mul_of_nonneg_left ( hgrad x ) ( show 0 ≤ |s| * Real.exp ( s * F x ) by positivity ) ];
   · rw [ MeasureTheory.integral_const_mul ]
 
-/-
-Interval-integrability of the covariance representation integrand `θ ↦ sin θ · H θ`.
--/
-lemma gaussian_cov_sinH_intervalIntegrable (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
-    (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s : ℝ) :
-    IntervalIntegrable (fun θ => Real.sin θ *
-        ∫ x, ∫ y, inner ℝ (gradient (fun z => Real.exp (s * F z)) x)
-          (gradient F (Real.cos θ • x - Real.sin θ • y))
-          ∂(standardGaussianMeasureOnEuclidean ι) ∂(standardGaussianMeasureOnEuclidean ι))
-      volume 0 (Real.pi/2) := by
-  rw [ intervalIntegrable_iff_integrableOn_Ioc_of_le Real.pi_div_two_pos.le ] at *;
-  refine' MeasureTheory.Integrable.congr _ _;
-  refine' fun θ => ∫ p : ( EuclideanSpace ℝ ι × EuclideanSpace ℝ ι ), - ( F p.1 * inner ℝ ( gradient ( fun z => Real.exp ( s * F z ) ) ( Real.cos θ • p.1 + Real.sin θ • p.2 ) ) ( -Real.sin θ • p.1 + Real.cos θ • p.2 ) ) ∂ ( standardGaussianMeasureOnEuclidean ι |> Measure.prod <| standardGaussianMeasureOnEuclidean ι );
-  · exact (integrable_cov_joint F L hL hF hgrad s).neg.integral_prod_right
-  · filter_upwards [ MeasureTheory.ae_restrict_mem measurableSet_Ioc ] with θ hθ;
-    have := gaussian_cov_per_theta F L hL hF hgrad s θ;
-    rw [ MeasureTheory.integral_neg, MeasureTheory.integral_prod ];
-    · linarith;
-    · convert integrable_cov_Phi F L hL hF hgrad s θ using 1
-
 /-- The sharp Gaussian covariance bound for a `C¹` function with globally bounded
 gradient. -/
 lemma gaussian_cov_bound_smooth (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
@@ -936,19 +896,6 @@ theorem coord_stein_of_euclidean_expGrowth
   exact coord_stein_of_expGrowth h i hh C c hc hC
     (fun g => (hhb g).trans (hbound g))
     (fun g => (hdb g).trans (hbound g))
-
-/-- The first-order instance with the same positive constant in front of and
-inside the exponential, exactly as in the manuscript's growth condition. -/
-theorem coord_stein_of_manuscript_growth
-    (h : (ι → ℝ) → ℝ) (i : ι) (hh : ContDiff ℝ 1 h)
-    (C : ℝ) (hC : 0 < C)
-    (hhb : ∀ g, |h g| ≤
-      C * Real.exp (C * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖))
-    (hdb : ∀ g, |coordDeriv i h g| ≤
-      C * Real.exp (C * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖)) :
-    (∫ g, g i * h g ∂(Measure.pi fun _ : ι => gaussianReal 0 1)) =
-      ∫ g, coordDeriv i h g ∂(Measure.pi fun _ : ι => gaussianReal 0 1) :=
-  coord_stein_of_euclidean_expGrowth h i hh C C hC.le hC.le hhb hdb
 
 /-- Iterate coordinate derivatives in the order given by a list. -/
 noncomputable def partialList :
@@ -1240,30 +1187,6 @@ theorem coordDeriv_aeval (i : ι) (p : Polynomial ℤ) (g : ι → ℝ) :
       Polynomial.aeval (g i) (Polynomial.derivative p) := by
   classical
   simp [coordDeriv, Polynomial.deriv_aeval]
-
-omit [Fintype ι] in
-/-- The creation operator agrees with the probabilists' Hermite recurrence
-on functions of one coordinate. -/
-theorem creation_hermite (i : ι) (n : ℕ) (g : ι → ℝ) :
-    creation i (fun h => Polynomial.aeval (h i) (Polynomial.hermite n)) g =
-      Polynomial.aeval (g i) (Polynomial.hermite (n + 1)) := by
-  rw [creation, coordDeriv_aeval, Polynomial.hermite_succ]
-  simp [Polynomial.aeval_X]
-
-omit [Fintype ι] in
-/-- A block of repeated creation operators is the one-variable Hermite polynomial. -/
-theorem hermiteList_replicate (i : ι) (n : ℕ) (g : ι → ℝ) :
-    hermiteList (List.replicate n i) g =
-      Polynomial.aeval (g i) (Polynomial.hermite n) := by
-  induction n generalizing g with
-  | zero => simp [hermiteList]
-  | succ n ih =>
-      change creation i (hermiteList (List.replicate n i)) g = _
-      have hfun : hermiteList (List.replicate n i) =
-          fun h => Polynomial.aeval (h i) (Polynomial.hermite n) := by
-        funext h
-        exact ih h
-      rw [hfun, creation_hermite]
 
 private def UpdateInvariant (i : ι) (f : (ι → ℝ) → ℝ) : Prop := by
   classical
@@ -1671,63 +1594,5 @@ theorem hermiteMulti_pair_ibp (α β : ι → ℕ) :
         (by dsimp [D]; linarith [le_max_right C c]) hb
   simpa only [← hermiteMulti_eq_prod] using
     hermiteMulti_ibp_of_expGrowth α hdiff hgrowth
-
-/-- Analytic input for iterating one-coordinate integration by parts.
-The `Good` predicate must be established for the intended function class and
-measure before the resulting identity can be applied. -/
-structure IBPFamily (γ : Measure (ι → ℝ)) where
-  Good : ((ι → ℝ) → ℝ) → Prop
-  one_good : Good (fun _ => 1)
-  coordDeriv_good : ∀ {f}, Good f → ∀ i, Good (coordDeriv i f)
-  creation_good : ∀ {f}, Good f → ∀ i, Good (creation i f)
-  ibp : ∀ {φ ψ}, Good φ → Good ψ → ∀ i,
-    (∫ g, creation i φ g * ψ g ∂γ) =
-      ∫ g, φ g * coordDeriv i ψ g ∂γ
-
-omit [Fintype ι] in
-private theorem hermiteList_good {γ : Measure (ι → ℝ)}
-    (A : IBPFamily γ) (l : List ι) : A.Good (hermiteList l) := by
-  induction l with
-  | nil => exact A.one_good
-  | cons i l ih => exact A.creation_good ih i
-
-omit [Fintype ι] in
-/-- Repeated coordinate integration by parts for a list of coordinates. -/
-theorem hermiteList_ibp {γ : Measure (ι → ℝ)}
-    (A : IBPFamily γ) (l : List ι)
-    {f : (ι → ℝ) → ℝ} (hf : A.Good f) :
-    (∫ g, hermiteList l g * f g ∂γ) =
-      ∫ g, partialList l f g ∂γ := by
-  induction l generalizing f with
-  | nil =>
-      simp [hermiteList, partialList]
-  | cons i l ih =>
-      calc
-        (∫ g, hermiteList (i :: l) g * f g ∂γ) =
-            ∫ g, hermiteList l g * coordDeriv i f g ∂γ := by
-              simpa [hermiteList] using
-                A.ibp (hermiteList_good A l) hf i
-        _ = ∫ g, partialList l (coordDeriv i f) g ∂γ :=
-          ih (A.coordDeriv_good hf i)
-        _ = ∫ g, partialList (i :: l) f g ∂γ := by
-          rfl
-
-/-- Multi-index form of the abstract iterated integration by parts identity. -/
-theorem hermiteMulti_ibp {γ : Measure (ι → ℝ)}
-    (A : IBPFamily γ) (α : ι → ℕ)
-    {f : (ι → ℝ) → ℝ} (hf : A.Good f) :
-    (∫ g, hermiteMulti α g * f g ∂γ) =
-      ∫ g, partialMulti α f g ∂γ := by
-  simpa [hermiteMulti, partialMulti] using
-    hermiteList_ibp A (multiIndexList α) hf
-
-/-- The abstract identity with the standard product normalization of Hermite
-polynomials. Its analytic input is still the explicit `IBPFamily` argument. -/
-theorem hermiteMulti_ibp_prod {γ : Measure (ι → ℝ)}
-    (A : IBPFamily γ) (α : ι → ℕ)
-    {f : (ι → ℝ) → ℝ} (hf : A.Good f) :
-    (∫ g, (∏ i : ι, Polynomial.aeval (g i) (Polynomial.hermite (α i))) * f g ∂γ) =
-      ∫ g, partialMulti α f g ∂γ := by
-  simpa only [← hermiteMulti_eq_prod] using hermiteMulti_ibp A α hf
 
 end SYK.GaussianConcentration

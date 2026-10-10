@@ -4,6 +4,25 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="unused-declarations-2026-10-10"></a>
+
+## 使われていない宣言の削除（2026-10-10）
+
+`MAINT-UNUSED` の第3分類を処理した。研究者の方針は、Lean コードで使われておらず削除できる宣言は基本的に削除し、ライブラリを小さく保つことである。削除前のソースは `d5972da` にあり、以下の結果はそこから復元できる。
+
+今でも数学的に有益で、必要になれば復元を検討するもの：
+
+- **一次の Duhamel 公式**（`TraceExponential` の `Duhamel` 名前空間全体）。`fderiv_exp_apply` は、完備ノルム代数で `D exp(X)[V] = ∫₀¹ exp(sX) V exp((1-s)X) ds` を示していた。補助の `kernel`・`exp_sub_exp_eq_integral`・`continuous_duhamelIntegral`・`hasFDerivAt_exp`・`hasFDerivAt_exp_affine` も一緒に削除した。`normalizedTrace_duhamel_kernel` は、トレースの巡回性により `τ(exp(sA) B exp((1-s)A)) = τ(B exp A)` を示していた。これらは原稿の `eq:iterated-Duhamel-formula` の `k=1` の場合に当たる。ただし Lean の高階微分評価は冪級数と Schatten 評価を使うので、この経路を通らない。
+- **ガウスの回転不変性の射影**（`Smooth` の `map_rotation_fst`）。`(μ⊗μ)` を回転して第1成分へ射影すると `μ` になる、つまり `cos θ·a + sin θ·b` が標準ガウスに従うことを示していた。同じ回転の測度保存は `rotation_measurePreserving` に残っている。
+- **Schatten ノルムの反例**（`not_normalizedSchattenNorm_antitone`・`normalizedSchattenNorm_antitone_counterexample`・`normalizedSchattenNorm_diag_one_zero` と private の `diagOneZero` 系）。規格化 Schatten ノルムが `p` について減少するという以前の誤った主張を、`diag(1,0)` で否定していた。正しい単調増加は `normalizedSchattenNorm_monotone` にある。
+- **抽象的な部分積分の枠組み**（`Smooth` の `IBPFamily`・`hermiteList_ibp`・`hermiteMulti_ibp`・`hermiteMulti_ibp_prod`）。仮の `Good` 述語を入力とする反復部分積分だった。具体的な仮定で述べる `hermiteMulti_ibp_of_expGrowth` に置き換わっていた。
+
+途中段階として削除したもの：`coord_stein_of_manuscript_growth`（`hermiteMulti_ibp_of_expGrowth` の一次の場合）、`hermiteList_replicate`・`creation_hermite`、`gaussian_cov_sinH_intervalIntegrable`、`gradient_coord_eq`（`toLp` 版の `gradient_toLp_coord_eq_fderiv` が使われている）、`integrable_abs_mul_exp_abs_gaussianReal`、`Radial.hasFDerivAt_radial`（Euler の恒等式。原稿に対応する主張はない）、`normalizedTrace_mul_comm`（`normalizedTrace_duhamel_kernel` だけが使っていた）。
+
+以前からどこにも使われていなかった private 宣言も削除した：`charpoly_exp_smul`・`roots_charpoly_exp_smul`・`charpoly_toEuclideanLin`・`exp_smul_posDef`・`charpoly_adjoint_comp_self_of_positive`・`trace_exp_re_pos`（`TraceExponential`）、`eigenvalues_eigenbasis_eq`・`eig_nonneg`（`SingularValues`）。モジュール機能を有効にしているため、private 宣言は import 側の環境に現れない。そこで、宣言のあるファイル内の出現で調べ、ドット記法で使われるものを除いた。
+
+検証：`lake build SYKBlueprint` が成功し、警告は531件から519件に減った。Blueprint の生成と `vbp check` も成功した。変更前後の全宣言を比較し、残った759件は名前・可視性・種類・モジュール・型が完全に一致した。差は上の削除分（構造体の自動生成宣言を含む）だけである。主要定理は通常公理のみに依存する。孤立する宣言がなくなるまで、公開宣言の Lean の走査と private 宣言の検査を繰り返した。
+
 <a id="matrix-namespace-2026-10-10"></a>
 
 ## 行列解析の副名前空間の廃止（2026-10-10）

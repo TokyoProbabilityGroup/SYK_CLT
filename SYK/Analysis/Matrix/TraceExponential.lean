@@ -33,9 +33,8 @@ noncomputable section
 /-!
 # Matrix exponential and normalized trace bounds
 
-The spectral estimates used below are in `SingularValues`. The file contains the radial chain
-rule and the Duhamel formula for the first derivative of the exponential, the normalized
-Schatten norms, and the trace bounds for words together with the Taylor coefficients of
+The spectral estimates used below are in `SingularValues`. The file contains the normalized
+Schatten norms and the trace bounds for words together with the Taylor coefficients of
 `τ ∘ exp`. Main entry points:
 `SYK.MatrixAnalysis.normalizedTrace`, `SYK.MatrixAnalysis.normalizedSchattenNorm`,
 `SYK.MatrixAnalysis.word_trace_bound`.
@@ -131,26 +130,6 @@ private theorem exp_smul_spectral (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β
         (β * hH.eigenvalues j)).symm
   rw [hdiag]
 
-private theorem charpoly_exp_smul (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
-    (NormedSpace.exp (β • H)).charpoly =
-      ∏ j, (Polynomial.X - Polynomial.C (Real.exp (β * hH.eigenvalues j) : 𝕜)) := by
-  rw [exp_smul_spectral H hH β, Matrix.charpoly_mul_comm, ← Matrix.mul_assoc,
-    Unitary.coe_star_mul_self, one_mul, Matrix.charpoly_diagonal]
-
-private theorem roots_charpoly_exp_smul (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
-    (NormedSpace.exp (β • H)).charpoly.roots =
-      Multiset.map (fun j => (Real.exp (β * hH.eigenvalues j) : 𝕜)) Finset.univ.val := by
-  rw [charpoly_exp_smul H hH β]
-  rw [Polynomial.roots_prod _ _ (Finset.prod_ne_zero_iff.mpr (fun j _ =>
-    Polynomial.X_sub_C_ne_zero _))]
-  simp only [Polynomial.roots_X_sub_C, Multiset.bind_singleton]
-
-private theorem charpoly_toEuclideanLin (A : Matrix n n 𝕜) :
-    (Matrix.toEuclideanLin A).charpoly = A.charpoly := by
-  rw [← LinearMap.charpoly_toMatrix (Matrix.toEuclideanLin A)
-    (EuclideanSpace.basisFun n 𝕜).toBasis,
-    Matrix.toEuclideanLin_eq_toLin_orthonormal, LinearMap.toMatrix_toLin]
-
 section
 open scoped ComplexOrder
 
@@ -161,14 +140,6 @@ private theorem exp_smul_posSemidef (H : Matrix n n 𝕜) (hH : H.IsHermitian) (
   rw [Matrix.IsUnit.posSemidef_star_right_conjugate_iff hU]
   rw [Matrix.posSemidef_diagonal_iff]
   exact fun i => RCLike.ofReal_nonneg.mpr (Real.exp_pos _).le
-
-private theorem exp_smul_posDef (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
-    (NormedSpace.exp (β • H)).PosDef := by
-  rw [exp_smul_spectral H hH β]
-  have hU : IsUnit (↑hH.eigenvectorUnitary : Matrix n n 𝕜) := Unitary.isUnit_coe
-  rw [Matrix.IsUnit.posDef_star_right_conjugate_iff hU]
-  rw [Matrix.posDef_diagonal_iff]
-  exact fun i => RCLike.ofReal_pos.mpr (Real.exp_pos _)
 
 end
 
@@ -219,25 +190,6 @@ private theorem singularValues_sum_rpow (T : E →ₗ[𝕜] E) {p : ℝ} (hp : 0
   · intro i hi
     simp [Real.zero_rpow hp.ne']
 
-private theorem charpoly_adjoint_comp_self_of_positive (T : E →ₗ[𝕜] E) (hT : T.IsPositive) :
-    (T.adjoint ∘ₗ T).charpoly =
-      ∏ i : Fin (Module.finrank 𝕜 E),
-        (X - C ((hT.isSymmetric.eigenvalues rfl i ^ 2 : ℝ) : 𝕜)) := by
-  let b := (hT.isSymmetric.eigenvectorBasis rfl).toBasis
-  have hmat : LinearMap.toMatrix b b (T.adjoint ∘ₗ T) =
-      Matrix.diagonal (fun i => ((hT.isSymmetric.eigenvalues rfl i ^ 2 : ℝ) : 𝕜)) := by
-    ext i j
-    have hbj : b j = hT.isSymmetric.eigenvectorBasis rfl j := congrFun (OrthonormalBasis.coe_toBasis _) j
-    rw [LinearMap.toMatrix_apply, hT.adjoint_eq, LinearMap.comp_apply, hbj,
-      hT.isSymmetric.apply_eigenvectorBasis, map_smul, hT.isSymmetric.apply_eigenvectorBasis,
-      smul_smul, ← hbj, map_smul, b.repr_self, Finsupp.smul_apply, Finsupp.single_apply,
-      Matrix.diagonal_apply]
-    by_cases hij : i = j
-    · subst hij
-      simp [sq]
-    · simp [hij, Ne.symm hij]
-  rw [← LinearMap.charpoly_toMatrix (T.adjoint ∘ₗ T) b, hmat, Matrix.charpoly_diagonal]
-
 private theorem eigenvalues_adjoint_comp_self_of_positive (T : E →ₗ[𝕜] E)
     (hT : T.IsPositive) :
     T.isSymmetric_adjoint_comp_self.eigenvalues rfl =
@@ -280,8 +232,6 @@ The sections below turn these tools into estimates for matrix exponentials.
 
 The main reusable pieces are:
 
-* a radial chain rule for scalar rescaling;
-* a Banach-algebra Duhamel formula for the derivative of the exponential;
 * normalized trace and normalized Schatten norms;
 * Schatten Hölder and operator-norm multiplication bounds;
 * the exact Schatten norm of an exponential of a Hermitian matrix;
@@ -291,146 +241,6 @@ Taylor-coefficient bounds here after shifting the Hermitian base point to a posi
 -/
 
 namespace SYK.MatrixAnalysis
-
-/-! ## Radial chain rule -/
-
-namespace Radial
-
-variable {E F : Type*}
-  [NormedAddCommGroup E] [NormedSpace ℝ E]
-  [NormedAddCommGroup F] [NormedSpace ℝ F]
-
-/--
-Derivative of `t ↦ f (t • x)` at `t = 1`.  This is the abstract form of the Euler/radial identity
-used when a model depends linearly on a collection of couplings.
--/
-theorem hasFDerivAt_radial
-    (f : E → F) (x : E) (f' : E →L[ℝ] F)
-    (hf : HasFDerivAt f f' x) :
-    HasFDerivAt (fun t : ℝ => f (t • x))
-      (ContinuousLinearMap.smulRight (1 : ℝ →L[ℝ] ℝ) (f' x)) 1 := by
-  have h1 : HasDerivAt (fun t : ℝ => t • x) x 1 := by
-    simpa using (hasDerivAt_id (1 : ℝ)).smul_const x
-  have h2 : HasFDerivAt f f' ((1 : ℝ) • x) := by simpa using hf
-  exact (h2.comp_hasDerivAt 1 h1).hasFDerivAt
-
-end Radial
-
-/-! ## Duhamel formula
-
-The integral kernel represents the first derivative of the exponential without assuming
-commutativity. Cyclicity of the trace later removes the position of the inserted direction.
-Higher derivatives in `TraceExpDerivatives` use the analytic power-series bounds instead.
--/
-
-namespace Duhamel
-
-variable {𝔸 : Type*}
-  [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸]
-
-/-- The Duhamel kernel `exp(sX) V exp((1-s)X)`. -/
-noncomputable def kernel (X V : 𝔸) (s : ℝ) : 𝔸 :=
-  NormedSpace.exp (s • X) * V * NormedSpace.exp ((1 - s) • X)
-
-/-- Integral form of `exp Y - exp X`. -/
-theorem exp_sub_exp_eq_integral (X Y : 𝔸) :
-    NormedSpace.exp Y - NormedSpace.exp X =
-      ∫ s : ℝ in (0 : ℝ)..1,
-        NormedSpace.exp (s • Y) * (Y - X) * NormedSpace.exp ((1 - s) • X) := by
-  have hderiv : ∀ s ∈ Set.uIcc (0 : ℝ) 1,
-      HasDerivAt (fun s : ℝ => NormedSpace.exp (s • Y) * NormedSpace.exp ((1 - s) • X))
-        (NormedSpace.exp (s • Y) * (Y - X) * NormedSpace.exp ((1 - s) • X)) s := by
-    intro s _
-    have h1 : HasDerivAt (fun u : ℝ => NormedSpace.exp (u • Y)) (NormedSpace.exp (s • Y) * Y) s :=
-      hasDerivAt_exp_smul_const Y s
-    have h2' : HasDerivAt (fun u : ℝ => NormedSpace.exp (u • X))
-        (X * NormedSpace.exp ((1 - s) • X)) (1 - s) :=
-      hasDerivAt_exp_smul_const' X (1 - s)
-    have h3 : HasDerivAt (fun u : ℝ => 1 - u) (-1) s := by
-      simpa using (hasDerivAt_id s).const_sub 1
-    have h2 : HasDerivAt (fun u : ℝ => NormedSpace.exp ((1 - u) • X))
-        ((-1 : ℝ) • (X * NormedSpace.exp ((1 - s) • X))) s := h2'.scomp s h3
-    convert h1.mul h2 using 1
-    · rfl
-    · rw [neg_smul, one_smul]
-      noncomm_ring
-  have hcont : Continuous fun s : ℝ =>
-      NormedSpace.exp (s • Y) * (Y - X) * NormedSpace.exp ((1 - s) • X) := by
-    have : Continuous (NormedSpace.exp : 𝔸 → 𝔸) :=
-      continuous_iff_continuousAt.2 fun x => (NormedSpace.exp_analytic (𝕂 := ℝ) x).continuousAt
-    fun_prop
-  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv (hcont.intervalIntegrable _ _)]
-  simp
-
-/-- Joint continuity of the Duhamel-type integral in the left exponent and the inserted term. -/
-theorem continuous_duhamelIntegral (X : 𝔸) :
-    Continuous fun p : 𝔸 × 𝔸 => ∫ s : ℝ in (0 : ℝ)..1,
-        NormedSpace.exp (s • p.1) * p.2 * NormedSpace.exp ((1 - s) • X) := by
-  have : Continuous (NormedSpace.exp : 𝔸 → 𝔸) :=
-    continuous_iff_continuousAt.2 fun x => (NormedSpace.exp_analytic (𝕂 := ℝ) x).continuousAt
-  apply intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'
-  fun_prop
-
-/--
-Duhamel formula for a differentiable curve in a real Banach algebra.
-
-If `A'(θ) = V`, then
-`d/dθ exp(A(θ)) = ∫_0^1 exp(s A(θ)) V exp((1-s) A(θ)) ds`.
--/
-theorem hasFDerivAt_exp
-    (A : ℝ → 𝔸) (θ : ℝ) (V : 𝔸)
-    (hA : HasFDerivAt A (ContinuousLinearMap.smulRight (1 : ℝ →L[ℝ] ℝ) V) θ) :
-    HasFDerivAt (fun t : ℝ => NormedSpace.exp (A t))
-      (ContinuousLinearMap.smulRight (1 : ℝ →L[ℝ] ℝ)
-        (∫ s : ℝ in (0 : ℝ)..1, kernel (A θ) V s)) θ := by
-  set X := A θ with hX
-  let Φ : 𝔸 × 𝔸 → 𝔸 := fun p => ∫ s : ℝ in (0 : ℝ)..1,
-    NormedSpace.exp (s • p.1) * p.2 * NormedSpace.exp ((1 - s) • X)
-  have hΦ : Continuous Φ := continuous_duhamelIntegral X
-  have hA' : HasDerivAt A V θ := hasDerivAt_iff_hasFDerivAt.mpr hA
-  suffices h : HasDerivAt (fun t => NormedSpace.exp (A t)) (Φ (X, V)) θ from h.hasFDerivAt
-  rw [hasDerivAt_iff_tendsto_slope]
-  have hslopeA := hasDerivAt_iff_tendsto_slope.mp hA'
-  have hcontA : Filter.Tendsto A (nhdsWithin θ {θ}ᶜ) (nhds X) :=
-    hA'.continuousAt.tendsto.mono_left nhdsWithin_le_nhds
-  have key : ∀ t, slope (fun t => NormedSpace.exp (A t)) θ t = Φ (A t, slope A θ t) := by
-    intro t
-    rw [slope_def_module, slope_def_module, exp_sub_exp_eq_integral X (A t),
-      ← intervalIntegral.integral_smul]
-    show _ = ∫ s : ℝ in (0 : ℝ)..1,
-      NormedSpace.exp (s • A t) * ((t - θ)⁻¹ • (A t - X)) * NormedSpace.exp ((1 - s) • X)
-    congr 1
-    ext s
-    rw [mul_smul_comm, smul_mul_assoc]
-  rw [show slope (fun t => NormedSpace.exp (A t)) θ = fun t => Φ (A t, slope A θ t) from
-    funext key]
-  exact hΦ.continuousAt.tendsto.comp (hcontA.prodMk_nhds hslopeA)
-
-/-- Duhamel formula specialized to the affine curve `X + tV`. -/
-theorem hasFDerivAt_exp_affine (X V : 𝔸) (θ : ℝ) :
-    HasFDerivAt (fun t : ℝ => NormedSpace.exp (X + t • V))
-      (ContinuousLinearMap.smulRight (1 : ℝ →L[ℝ] ℝ)
-        (∫ s : ℝ in (0 : ℝ)..1, kernel (X + θ • V) V s)) θ := by
-  have h : HasDerivAt (fun t : ℝ => X + t • V) V θ := by
-    simpa using ((hasDerivAt_id θ).smul_const V).const_add X
-  exact hasFDerivAt_exp (fun t : ℝ => X + t • V) θ V h.hasFDerivAt
-
-/-- The full Fréchet derivative of the Banach-algebra exponential in a direction. -/
-theorem fderiv_exp_apply (X V : 𝔸) :
-    (fderiv ℝ (NormedSpace.exp : 𝔸 → 𝔸) X) V =
-      ∫ s : ℝ in (0 : ℝ)..1, kernel X V s := by
-  have hdiff : DifferentiableAt ℝ (NormedSpace.exp : 𝔸 → 𝔸) X :=
-    (NormedSpace.exp_analytic (𝕂 := ℝ) X).differentiableAt
-  have hline : HasDerivAt (fun t : ℝ => X + t • V) V 0 := by
-    simpa using ((hasDerivAt_id (0 : ℝ)).smul_const V).const_add X
-  have hbase : HasFDerivAt (NormedSpace.exp : 𝔸 → 𝔸)
-      (fderiv ℝ (NormedSpace.exp : 𝔸 → 𝔸) X) (X + (0 : ℝ) • V) := by
-    simpa using hdiff.hasFDerivAt
-  have hchain := hbase.comp_hasDerivAt 0 hline
-  have hduhamel := (hasFDerivAt_exp_affine X V 0).hasDerivAt
-  simpa [kernel] using hchain.unique hduhamel
-
-end Duhamel
 
 /-! ## Normalized Schatten norms
 
@@ -563,20 +373,6 @@ theorem trace_exp_smul_of_isHermitian (H : Matrix n n 𝕜)
 
 end
 
-namespace ExpAux
-
-variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
-
-/-- A Hermitian matrix exponential has strictly positive real trace. -/
-private theorem trace_exp_re_pos [Nonempty n]
-    (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) :
-    0 < RCLike.re (NormedSpace.exp (β • H)).trace := by
-  rw [trace_exp_smul_of_isHermitian H hH β]
-  simp only [map_sum, RCLike.ofReal_re]
-  exact Finset.sum_pos (fun j _ => Real.exp_pos _) Finset.univ_nonempty
-
-end ExpAux
-
 section
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
@@ -614,31 +410,6 @@ omit [DecidableEq n] in
 theorem normalizedTrace_smul (c : 𝕜) (A : Matrix n n 𝕜) :
     normalizedTrace (c • A) = c * normalizedTrace A := by
   simp [normalizedTrace, Matrix.trace_smul, mul_left_comm]
-
-omit [DecidableEq n] in
-/-- Cyclicity for two factors. -/
-theorem normalizedTrace_mul_comm (A B : Matrix n n 𝕜) :
-    normalizedTrace (A * B) = normalizedTrace (B * A) := by
-  simp [normalizedTrace, Matrix.trace_mul_comm A B]
-
-/-- Cyclicity makes the trace of a one-insertion Duhamel word independent of the weight. -/
-theorem normalizedTrace_duhamel_kernel (A B : Matrix n n 𝕜) (s : ℝ) :
-    normalizedTrace (NormedSpace.exp (s • A) * B *
-      NormedSpace.exp ((1 - s) • A)) =
-      normalizedTrace (B * NormedSpace.exp A) := by
-  have hcomm : Commute ((1 - s) • A) (s • A) :=
-    ((Commute.refl A).smul_left (1 - s)).smul_right s
-  calc
-    normalizedTrace (NormedSpace.exp (s • A) * B * NormedSpace.exp ((1 - s) • A)) =
-        normalizedTrace (NormedSpace.exp ((1 - s) • A) *
-          (NormedSpace.exp (s • A) * B)) :=
-      normalizedTrace_mul_comm _ _
-    _ = normalizedTrace ((NormedSpace.exp ((1 - s) • A) *
-          NormedSpace.exp (s • A)) * B) := by rw [mul_assoc]
-    _ = normalizedTrace (NormedSpace.exp (((1 - s) • A) + (s • A)) * B) := by
-      rw [Matrix.exp_add_of_commute _ _ hcomm]
-    _ = normalizedTrace (B * NormedSpace.exp A) := by
-      rw [← add_smul, sub_add_cancel, one_smul, normalizedTrace_mul_comm]
 
 /-- Normalized Schatten `p`-norm of a matrix, using its Euclidean linear map. -/
 noncomputable def normalizedSchattenNorm (p : ℝ) (A : Matrix n n 𝕜) : ℝ :=
@@ -810,86 +581,6 @@ theorem normalizedSchattenNorm_monotone
     ⟨⟨0, by rw [finrank_euclideanSpace]; exact Fintype.card_pos⟩⟩
   have := powerMean_mono (SVDAux.sv (Matrix.toEuclideanLin A)) (SVDAux.sv_nonneg _) hp hpq
   simpa [finrank_euclideanSpace] using this
-
-private def diagOneZero : Matrix (Fin 2) (Fin 2) ℝ := Matrix.diagonal ![(1 : ℝ), 0]
-
-private lemma diagOneZero_star : diagOneZero.conjTranspose = diagOneZero := by
-  ext i j
-  fin_cases i <;> fin_cases j <;> simp [diagOneZero, Matrix.conjTranspose_apply]
-
-private lemma diagOneZero_mul : diagOneZero * diagOneZero = diagOneZero := by
-  simp [diagOneZero, Matrix.diagonal_mul_diagonal]
-
-private lemma diagOneZero_adjoint_comp :
-    (Matrix.toEuclideanLin diagOneZero).adjoint ∘ₗ Matrix.toEuclideanLin diagOneZero =
-      Matrix.toEuclideanLin diagOneZero := by
-  rw [← Matrix.toEuclideanLin_conjTranspose_eq_adjoint, diagOneZero_star]
-  rw [← toEuclideanLin_mul', diagOneZero_mul]
-
-private lemma diagOneZero_det :
-    LinearMap.det (Matrix.toEuclideanLin diagOneZero) = 0 := by
-  rw [← LinearMap.det_toMatrix (EuclideanSpace.basisFun (Fin 2) ℝ).toBasis]
-  rw [Matrix.toEuclideanLin_eq_toLin_orthonormal, LinearMap.toMatrix_toLin]
-  simp [diagOneZero, Matrix.det_diagonal]
-
-private lemma diagOneZero_trace :
-    LinearMap.trace ℝ (EuclideanSpace ℝ (Fin 2))
-      (Matrix.toEuclideanLin diagOneZero) = 1 := by
-  rw [Matrix.toEuclideanLin_eq_toLin_orthonormal,
-    LinearMap.trace_eq_matrix_trace ℝ (EuclideanSpace.basisFun (Fin 2) ℝ).toBasis,
-    LinearMap.toMatrix_toLin]
-  simp [diagOneZero, Matrix.trace_diagonal, Fin.sum_univ_two]
-
-private lemma diagOneZero_singularValues :
-    (Matrix.toEuclideanLin diagOneZero).singularValues 0 = 1 ∧
-      (Matrix.toEuclideanLin diagOneZero).singularValues 1 = 0 := by
-  let T := Matrix.toEuclideanLin diagOneZero
-  let hS := T.isSymmetric_adjoint_comp_self
-  have hn : Module.finrank ℝ (EuclideanSpace ℝ (Fin 2)) = 2 := by
-    simp [finrank_euclideanSpace]
-  have heig : hS.eigenvalues hn = ![1, 0] := by
-    refine eigenvalues_eq_of_basis _ hS hn (EuclideanSpace.basisFun (Fin 2) ℝ) _
-      ?_ ?_
-    · intro i j hij
-      fin_cases i <;> fin_cases j <;> simp_all
-    · intro j
-      have hT : T.adjoint ∘ₗ T = T := diagOneZero_adjoint_comp
-      rw [hT]
-      ext i
-      fin_cases i <;> fin_cases j <;>
-        simp [T, diagOneZero, Matrix.toLpLin_apply]
-  constructor
-  · rw [T.singularValues_of_lt hn (by decide : 0 < 2), heig]
-    simp
-  · rw [T.singularValues_of_lt hn (by decide : 1 < 2), heig]
-    simp
-
-/-- The normalized Schatten norms of `diagonal ![1, 0]`. -/
-theorem normalizedSchattenNorm_diag_one_zero {p : ℝ} (hp : 0 < p) :
-    normalizedSchattenNorm p (Matrix.diagonal ![(1 : ℝ), 0]) = (1 / 2 : ℝ) ^ (1 / p) := by
-  rw [normalizedSchattenNorm_eq_sum hp]
-  simp only [SVDAux.sv, Fintype.card_fin]
-  rw [finrank_euclideanSpace]
-  change ((∑ i : Fin 2, (Matrix.toEuclideanLin diagOneZero).singularValues i ^ p) /
-    (2 : ℝ)) ^ (1 / p) = (1 / 2 : ℝ) ^ (1 / p)
-  obtain ⟨h0, h1⟩ := diagOneZero_singularValues
-  simp [Fin.sum_univ_two, h0, h1, Real.zero_rpow hp.ne']
-
-/-- Counterexample to the original `normalizedSchattenNorm_antitone`. -/
-theorem normalizedSchattenNorm_antitone_counterexample :
-    normalizedSchattenNorm 1 (Matrix.diagonal ![(1 : ℝ), 0]) <
-      normalizedSchattenNorm 2 (Matrix.diagonal ![(1 : ℝ), 0]) := by
-  rw [normalizedSchattenNorm_diag_one_zero one_pos, normalizedSchattenNorm_diag_one_zero two_pos]
-  exact Real.rpow_lt_rpow_of_exponent_gt (by norm_num) (by norm_num) (by norm_num)
-
-/-- The negation of the original `normalizedSchattenNorm_antitone` (already for `2 × 2` real
-matrices). -/
-theorem not_normalizedSchattenNorm_antitone :
-    ¬ ∀ (A : Matrix (Fin 2) (Fin 2) ℝ) (p q : ℝ), 1 ≤ p → p ≤ q →
-        normalizedSchattenNorm q A ≤ normalizedSchattenNorm p A := by
-  intro h
-  have := h (Matrix.diagonal ![(1 : ℝ), 0]) 1 2 le_rfl (by norm_num)
-  exact absurd this (not_le.mpr normalizedSchattenNorm_antitone_counterexample)
 
 /--
 For Hermitian `H`, the Schatten norm of a Gibbs factor is an exact power of the partition function.

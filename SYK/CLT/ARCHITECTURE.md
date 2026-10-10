@@ -121,7 +121,7 @@ flowchart TD
 - Hermite2 の評価式は `GaussianChaos/Basic` で共有する。
 - 四次モーメントの六つの項は、可積分性を個別に確認してから、有限和として積分する。
 
-行列トレース指数の定義は、`SYK.MatrixAnalysis.traceExp` の1つだけである。滑らかさは `SYK.MatrixAnalysis.contDiff_traceExp` が与え、Hermitian な基点での高階微分評価は、内部補題 `iteratedFDeriv_traceExp_bound_hermitian` で証明する。List に沿う微分と mathlib の反復 Fréchet 微分は、滑らかさによって接続する。この接続と、二つの規格化トレースの型は保つ。`TraceExponential` では、Duhamel の公式が一次微分を、Schatten ノルムと語の評価、Taylor 係数が高階微分の解析的な証明を担う。
+行列トレース指数の定義は、`SYK.MatrixAnalysis.traceExp` の1つだけである。滑らかさは `SYK.MatrixAnalysis.contDiff_traceExp` が与え、Hermitian な基点での高階微分評価は、内部補題 `iteratedFDeriv_traceExp_bound_hermitian` で証明する。List に沿う微分と mathlib の反復 Fréchet 微分は、滑らかさによって接続する。この接続と、二つの規格化トレースの型は保つ。`TraceExponential` では、Schatten ノルムと語の評価、Taylor 係数が高階微分の解析的な証明を担う。Duhamel の公式は使わない。
 
 `Main` は分配 CLT を先に証明し、結合定理が下位の対数 CLT と組み合わせて共通半径を取る。個別の対数 CLT は結合定理から射影する。矢印は証明結果から利用側へ向かい、公開定理の全結論と入力 `hFE` は変えない。
 

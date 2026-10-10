@@ -572,21 +572,6 @@ lemma integrable_exp_abs_gaussianReal (c : ℝ) :
   · exact Continuous.aestronglyMeasurable ( by continuity );
   · filter_upwards [ ] with x using by rw [ Real.norm_of_nonneg ( Real.exp_nonneg _ ) ] ; cases abs_cases x <;> simp +decide [ * ] <;> positivity;
 
-/-
-`|y| exp (c |y|)` is integrable against the one-dimensional standard Gaussian.
--/
-lemma integrable_abs_mul_exp_abs_gaussianReal (c : ℝ) :
-    Integrable (fun y : ℝ => |y| * Real.exp (c * |y|)) (gaussianReal 0 1) := by
-  -- We'll use the fact that |y| * exp(c * |y|) ≤ exp((|c| + 1) * |y|).
-  have h_bound : ∀ y : ℝ, |y| * Real.exp (c * |y|) ≤ Real.exp ((|c| + 1) * |y|) := by
-    intro y;
-    exact le_trans ( mul_le_mul_of_nonneg_right ( show |y| ≤ Real.exp |y| by linarith [ Real.add_one_le_exp |y| ] ) ( Real.exp_nonneg _ ) ) ( by rw [ ← Real.exp_add ] ; exact Real.exp_le_exp.mpr ( by cases abs_cases c <;> cases abs_cases y <;> nlinarith ) );
-  refine' MeasureTheory.Integrable.mono' _ _ _;
-  refine' fun y => Real.exp ( ( |c| + 1 ) * |y| );
-  · convert integrable_exp_abs_gaussianReal ( |c| + 1 ) using 1;
-  · exact Continuous.aestronglyMeasurable ( by continuity );
-  · filter_upwards [ ] using fun x => by simpa using h_bound x;
-
 /-- `exp (c ∑ⱼ |yⱼ|)` is integrable against the product standard Gaussian. -/
 lemma integrable_exp_c_sum_abs_pi {ι : Type*} [Fintype ι] (c : ℝ) :
     Integrable (fun y : ι → ℝ => Real.exp (c * ∑ j, |y j|))
@@ -767,16 +752,6 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
   congr 1
   funext y
   exact h_slice y
-
-/-
-The `i`-th coordinate of the gradient equals the partial derivative in direction `i`.
--/
-lemma gradient_coord_eq {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (g : EuclideanSpace ℝ ι → ℝ) (w : EuclideanSpace ℝ ι) (i : ι) :
-    (gradient g w) i = fderiv ℝ g w (EuclideanSpace.single i 1) := by
-  simp +decide [ gradient ];
-  rw [ ← InnerProductSpace.toDual_symm_apply ];
-  rw [ EuclideanSpace.inner_single_right ] ; norm_num
 
 /-
 Transferring the `i`-th gradient coordinate through the `toLp` identification: it becomes

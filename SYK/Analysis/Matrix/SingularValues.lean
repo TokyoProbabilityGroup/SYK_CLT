@@ -99,11 +99,6 @@ private theorem exists_ne_zero_orth {ι : Type*} [Fintype ι] (v : ι → E)
   have := congrFun (LinearMap.mem_ker.mp hx) k
   simpa [f] using this
 
-private theorem eigenvalues_eigenbasis_eq (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
-    (hn : Module.finrank 𝕜 E = n) (j : Fin n) :
-    T (hT.eigenvectorBasis hn j) = ((hT.eigenvalues hn j : ℝ) : 𝕜) • hT.eigenvectorBasis hn j :=
-  hT.apply_eigenvectorBasis hn j
-
 /-- Min-max, upper bound: if the Rayleigh quotient is at most `c` on the orthogonal complement of
 at most `i` vectors, then the `i`-th eigenvalue is at most `c`. -/
 private theorem eigenvalues_le_of_forall (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n : ℕ}
@@ -187,10 +182,6 @@ variable {𝕜 E : Type*} [RCLike 𝕜]
 private theorem re_inner_adjoint_comp_self (S : E →ₗ[𝕜] E) (x : E) :
     RCLike.re ⟪x, (S.adjoint ∘ₗ S) x⟫_𝕜 = ‖S x‖ ^ 2 := by
   rw [LinearMap.comp_apply, LinearMap.adjoint_inner_right, inner_self_eq_norm_sq]
-
-private theorem eig_nonneg (T : E →ₗ[𝕜] E) {n : ℕ} (hn : Module.finrank 𝕜 E = n) (i : Fin n) :
-    0 ≤ T.isSymmetric_adjoint_comp_self.eigenvalues hn i :=
-  T.isPositive_adjoint_comp_self.nonneg_eigenvalues hn i
 
 private theorem sv_sq (T : E →ₗ[𝕜] E) {i : ℕ} (hi : i < Module.finrank 𝕜 E) :
     T.singularValues i ^ 2 = T.isSymmetric_adjoint_comp_self.eigenvalues rfl ⟨i, hi⟩ := by
