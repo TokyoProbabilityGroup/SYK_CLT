@@ -23,6 +23,22 @@
 
 検証：`lake build SYKBlueprint` が成功し、警告は531件から519件に減った。Blueprint の生成と `vbp check` も成功した。変更前後の全宣言を比較し、残った759件は名前・可視性・種類・モジュール・型が完全に一致した。差は上の削除分（構造体の自動生成宣言を含む）だけである。主要定理は通常公理のみに依存する。孤立する宣言がなくなるまで、公開宣言の Lean の走査と private 宣言の検査を繰り返した。
 
+### 参照のない小さな宣言の削除
+
+研究者の判断で、参照がなく API として残す利益も小さい次の宣言を削除した。削除前のソースはコミット `89d0f69` にある。
+
+今でも数学的に有益なもの：
+
+- **一般の有限模型での奇数 Hermite 係数の消滅**（`CliffordSignParity` の `expectation_partitionFunction_mul_hermite_eq_zero`）。規格化しない `Tr exp(−βH(g))` と係数 `σ_N` を掛けない結合 `g` に対し、`N` が偶数で `α` が奇数なら `𝔼[Z·H_α]=0` を示していた。原稿の `lem: parity rule lemma` の `eq:odd-coefficient-zero` に当たるのは規格化した `Setting.Z` に対する `Setting.integral_Z_mul_hermite_eq_zero` で、CLT はそちらを使う。削除した版は同じ証明（頂点の符号反転 `hermiteMulti_vertex_flip` とゲージ不変性 `partitionFunction_sign_gauge`）の別の組み立てで、原稿に対応する主張はない。
+- **規格化 Schatten ノルムの単調性と Gibbs 因子の厳密式**（`normalizedSchattenNorm_monotone`・`powerMean_mono`、`normalizedSchattenNorm_exp_hermitian`）。前者は規格化 Schatten ノルムが `p` について非減少であること（冪平均の不等式）、後者は `‖exp(−tβH)‖_{1/t} = (tr exp(−βH))^t` である。CLT の高階微分評価は冪級数と語の評価を使うので通らない。
+- **ゼロ Lipschitz 定数の裾**（`product_standardGaussian_upper_tail_zero`・`product_standardGaussian_lower_tail_zero`、`logPartition_upper_tail_of_beta_zero`・`logPartition_lower_tail_of_beta_zero`）。Lipschitz 定数が 0 なら、正の偏差の事象の確率は 0 であることを示していた。`β = 0` の中心化と両側の裾の主張は `logPartition_centered_of_beta_zero` などに残る。
+
+そのほかに削除したもの：`gibbsState` とその `gibbsState_eq_expectation_thermalDensity`・`realLogPartitionFunction`（`FiniteDimensionalGibbs`）、`expectation_eq_ofReal_re`、`normalizedTrace_add`・`normalizedTrace_zero`、`Schatten.normalizedNorm_nonneg`、`polynomial_eval_mem_hermite_span` と補助の `polynomialEvalLinear`、`iterDirectionalFDeriv_traceExp_bound_of_norm_le_one`、private の `sum_sv_exp`・`sum_eigenvalues_exp_smul`・`singularValues_fin_of_positive`。
+
+走査は `rfl` で閉じる補題の `simp`・`dsimp` 経由の使用を検出できない。実際に `gaussianCouplings_eq_pi` と `matrixTraceCLM_apply` は走査で未使用と判定されたが、`simp only` が使っていたため、削除をやめて残した。この 2 件は、使われているので削除しない。
+
+検証：`lake build SYKBlueprint` が成功し、警告は 519 件のまま変わらない。Blueprint の生成と `vbp check` も成功した。変更前後の全宣言の比較で、残った 742 件は型を含めて一致し、差は上の 17 件の削除だけである。主要定理は通常公理のみに依存する。
+
 <a id="matrix-namespace-2026-10-10"></a>
 
 ## 行列解析の副名前空間の廃止（2026-10-10）

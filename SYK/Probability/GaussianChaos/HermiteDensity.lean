@@ -32,31 +32,6 @@ theorem realHermiteBasis_apply (n : ℕ) :
     realHermiteBasis n = (Polynomial.hermite n).map (Int.castRingHom ℝ) := by
   simp [realHermiteBasis, realHermiteSequence]
 
-private noncomputable def polynomialEvalLinear : Polynomial ℝ →ₗ[ℝ] (ℝ → ℝ) :=
-  LinearMap.pi fun x => Polynomial.leval x
-
-/-- Every one-variable real polynomial function lies in the finite linear
-span of the Hermite functions. -/
-theorem polynomial_eval_mem_hermite_span (p : Polynomial ℝ) :
-    (fun x : ℝ => p.eval x) ∈
-      Submodule.span ℝ (Set.range fun n : ℕ =>
-        fun x : ℝ => Polynomial.aeval x (Polynomial.hermite n)) := by
-  have hp : p ∈ Submodule.span ℝ (Set.range realHermiteBasis) := by
-    rw [realHermiteBasis.span_eq]
-    trivial
-  change polynomialEvalLinear p ∈ _
-  induction hp using Submodule.span_induction with
-  | mem q hq =>
-      obtain ⟨n, rfl⟩ := hq
-      apply Submodule.subset_span
-      refine ⟨n, ?_⟩
-      funext x
-      simp [polynomialEvalLinear, realHermiteBasis_apply,
-        Polynomial.eval_map, Polynomial.aeval_def]
-  | zero => simp
-  | add p q _ _ hp hq => simpa using Submodule.add_mem _ hp hq
-  | smul a p _ hp => simpa using Submodule.smul_mem _ a hp
-
 /-- The product of a family of one-variable polynomial functions. -/
 def polynomialProdEval {ι : Type*} [Fintype ι]
     (p : ι → Polynomial ℝ) : (ι → ℝ) → ℝ :=

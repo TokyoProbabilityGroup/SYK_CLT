@@ -504,38 +504,4 @@ theorem hermiteMulti_vertex_flip {N q : ℕ} (α : InteractionIndex N q → ℕ)
     rw [Finset.prod_pow_eq_pow_sum, ← Finset.sum_filter, hx.neg_one_pow]
   rw [hsign, neg_one_mul]
 
-/-- **Parity rule.** If `α` is odd (and `N` is even), then `𝔼[Z_N(β; G) H_α(G)] = 0`
-for i.i.d. standard Gaussian couplings `G`. -/
-theorem expectation_partitionFunction_mul_hermite_eq_zero {n : Type*} [Fintype n]
-    [DecidableEq n] (P : Params) (hN : Even P.N) (M : MajoranaSystem P.N (Matrix n n ℂ))
-    (β : ℝ) (α : InteractionIndex P.N P.q → ℕ) (hα : IsOddMultiIndex α) :
-    ∫ g, SYK.partitionFunction (β : ℂ) (hamiltonian P M g) * (hermiteMulti α g : ℂ)
-      ∂gaussianCouplings (InteractionIndex P.N P.q) = 0 := by
-  classical
-  have hex : ∃ x : Fin P.N, Odd (∑ I with x ∈ I.1, α I) := by
-    by_contra h
-    push Not at h
-    exact hα fun x => Nat.not_odd_iff_even.mp (h x)
-  obtain ⟨x, hx⟩ := hex
-  set s : Fin P.N → ℝ := fun y => if y = x then -1 else 1 with hs_def
-  have hs : ∀ y, s y = 1 ∨ s y = -1 := fun y => by
-    by_cases h : y = x <;> simp [hs_def, h]
-  set c : InteractionIndex P.N P.q → ℝ := fun I => if x ∈ I.1 then -1 else 1 with hc_def
-  have hc : ∀ I, c I = 1 ∨ c I = -1 := fun I => by
-    by_cases h : x ∈ I.1 <;> simp [hc_def, h]
-  have hsc : ∀ I, signCharacter s I = c I := fun I => by
-    simp only [signCharacter, hs_def, hc_def]
-    rw [Finset.prod_ite_eq']
-  have hZ : ∀ g, SYK.partitionFunction (β : ℂ) (hamiltonian P M (fun I => c I * g I)) =
-      SYK.partitionFunction (β : ℂ) (hamiltonian P M g) :=
-    fun g => by
-      rw [partitionFunction_sign_gauge P hN M β g s hs]
-      simp only [hsc]
-  have hH : ∀ g, hermiteMulti α (fun I => c I * g I) = -hermiteMulti α g :=
-    fun g => hermiteMulti_vertex_flip α x hx g
-  have key := integral_gaussianCouplings_sign c hc
-    (fun g => SYK.partitionFunction (β : ℂ) (hamiltonian P M g) *
-      (hermiteMulti α g : ℂ))
-  simp only [hZ, hH, Complex.ofReal_neg, mul_neg, integral_neg] at key
-  linear_combination -key / 2
 end SYK

@@ -18,8 +18,7 @@ part and Gaussian growth of `Setting.Z` is made in
 `SYK/CLT/Chaos/PartitionHigherDerivatives.lean`.
 Main entry points: `SYK.MatrixAnalysis.contDiff_traceExp`,
 `SYK.MatrixAnalysis.traceExp`,
-`SYK.MatrixAnalysis.iterDirectionalFDeriv_traceExp_bound`,
-`SYK.MatrixAnalysis.iterDirectionalFDeriv_traceExp_bound_of_norm_le_one`.
+`SYK.MatrixAnalysis.iterDirectionalFDeriv_traceExp_bound`.
 -/
 
 namespace SYK.MatrixAnalysis
@@ -235,23 +234,6 @@ theorem iterDirectionalFDeriv_traceExp_bound
   rw [DirectionalDerivative.iterDirectionalFDeriv_eq_iteratedFDeriv traceExp
     contDiff_traceExp dirs A, ← Fin.prod_univ_fun_getElem dirs norm]
   exact DerivAux.iteratedFDeriv_traceExp_bound_hermitian A hA _ _
-
-/-- Unit-ball specialization of the higher derivative bound. -/
-theorem iterDirectionalFDeriv_traceExp_bound_of_norm_le_one
-    [Nonempty n]
-    (A : Matrix n n 𝕜) (hA : A.IsHermitian)
-    (dirs : List (Matrix n n 𝕜))
-    (hdirs : ∀ B ∈ dirs, ‖B‖ ≤ 1) :
-    ‖DirectionalDerivative.iterDirectionalFDeriv traceExp dirs A‖ ≤
-      ‖traceExp A‖ := by
-  refine (iterDirectionalFDeriv_traceExp_bound A hA dirs).trans ?_
-  have hprod : (dirs.map (fun B => ‖B‖)).prod ≤ 1 := by
-    rw [← Fin.prod_univ_fun_getElem dirs norm]
-    exact Finset.prod_le_one (fun i _ => norm_nonneg _)
-      (fun i _ => hdirs _ (List.getElem_mem _))
-  calc (dirs.map (fun B => ‖B‖)).prod * ‖traceExp A‖ ≤ 1 * ‖traceExp A‖ :=
-        mul_le_mul_of_nonneg_right hprod (norm_nonneg _)
-    _ = ‖traceExp A‖ := one_mul _
 
 end
 

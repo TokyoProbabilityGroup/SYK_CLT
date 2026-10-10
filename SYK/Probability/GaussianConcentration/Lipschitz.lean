@@ -355,35 +355,6 @@ theorem euclidean_lipschitz_gaussian_concentration
           congr 1
           ring
 
-/-- If the Lipschitz constant is zero, every positive upper-tail event is empty. -/
-theorem product_standardGaussian_upper_tail_zero
-    {ι : Type*} [Fintype ι]
-    (F : EuclideanSpace ℝ ι → ℝ) (t : ℝ) (ht : 0 < t)
-    (hLip : LipschitzWith (0 : ℝ≥0) F) :
-    standardGaussianMeasureOnEuclidean ι
-        {x | F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι > t} = 0 := by
-  have hset :
-      {x : EuclideanSpace ℝ ι |
-        F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι > t} = ∅ := by
-    ext x
-    rw [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false,
-      centered_eq_zero_of_lipschitz_zero F hLip x]
-    exact not_lt_of_ge ht.le
-  rw [hset]
-  simp
-
-/-- If the Lipschitz constant is zero, every positive lower-tail event is empty. -/
-theorem product_standardGaussian_lower_tail_zero
-    {ι : Type*} [Fintype ι]
-    (F : EuclideanSpace ℝ ι → ℝ) (t : ℝ) (ht : 0 < t)
-    (hLip : LipschitzWith (0 : ℝ≥0) F) :
-    standardGaussianMeasureOnEuclidean ι
-        {x | (∫ y, F y ∂standardGaussianMeasureOnEuclidean ι) - F x > t} = 0 := by
-  convert product_standardGaussian_upper_tail_zero (fun x => -F x) t ht hLip.neg using 2
-  · rw [MeasureTheory.integral_neg]
-    ext
-    simp [sub_eq_neg_add, add_comm]
-
 /-- If the Lipschitz constant is zero, every positive centered tail event is empty. -/
 theorem product_standardGaussian_two_sided_tail_zero
     {ι : Type*} [Fintype ι]

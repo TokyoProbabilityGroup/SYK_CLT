@@ -484,26 +484,4 @@ theorem logPartition_centered_of_beta_zero
   simp only [logPartition_eq_log_card_of_beta_zero P β M hβ]
   simp
 
-/-- Every positive upper deviation has probability zero at β = 0. -/
-theorem logPartition_upper_tail_of_beta_zero
-    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
-    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (hβ : β = 0) (t : ℝ) (ht : 0 < t) :
-    standardGaussianMeasure P.N P.q
-      {J | logPartition P β M J -
-        ∫ K, logPartition P β M K ∂standardGaussianMeasure P.N P.q > t} = 0 := by
-  simp only [logPartition_eq_log_card_of_beta_zero P β M hβ]
-  simp [not_lt.mpr ht.le]
-
-/-- Every positive lower deviation has probability zero at β = 0. -/
-theorem logPartition_lower_tail_of_beta_zero
-    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
-    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
-    (hβ : β = 0) (t : ℝ) (ht : 0 < t) :
-    standardGaussianMeasure P.N P.q
-      {J | (∫ K, logPartition P β M K ∂standardGaussianMeasure P.N P.q) -
-        logPartition P β M J > t} = 0 := by
-  simp only [logPartition_eq_log_card_of_beta_zero P β M hβ]
-  simp [not_lt.mpr ht.le]
-
 end SYK

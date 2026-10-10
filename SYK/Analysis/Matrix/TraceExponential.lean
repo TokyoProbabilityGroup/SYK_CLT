@@ -143,17 +143,6 @@ private theorem exp_smul_posSemidef (H : Matrix n n 𝕜) (hH : H.IsHermitian) (
 
 end
 
-private theorem sum_eigenvalues_exp_smul (H : Matrix n n 𝕜) (hH : H.IsHermitian)
-    (β : ℝ) (f : ℝ → ℝ)
-    (hT : (Matrix.toEuclideanLin (NormedSpace.exp (β • H))).IsPositive) :
-    ∑ i : Fin (Module.finrank 𝕜 (EuclideanSpace 𝕜 n)),
-      f (hT.isSymmetric.eigenvalues rfl i) =
-        ∑ j, f (Real.exp (β * hH.eigenvalues j)) := by
-  exact sum_eigenvalues_eq_of_basis _ hT.isSymmetric hH.eigenvectorBasis
-    (fun j => Real.exp (β * hH.eigenvalues j)) (fun j => by
-      rw [exp_smul_spectral H hH β]
-      exact toEuclideanLin_conj_diagonal_apply H hH _ j) f
-
 end SYK.MatrixAnalysis.ExpAux
 
 
@@ -196,29 +185,7 @@ private theorem eigenvalues_adjoint_comp_self_of_positive (T : E →ₗ[𝕜] E)
       fun i => (hT.isSymmetric.eigenvalues rfl i) ^ 2 :=
   eigenvalues_adjoint_comp_self_of_positive' T hT
 
-private theorem singularValues_fin_of_positive (T : E →ₗ[𝕜] E) (hT : T.IsPositive)
-    (i : Fin (Module.finrank 𝕜 E)) :
-    T.singularValues i = hT.isSymmetric.eigenvalues rfl i := by
-  rw [T.singularValues_fin rfl,
-    eigenvalues_adjoint_comp_self_of_positive T hT,
-    Real.sqrt_sq_eq_abs, abs_of_nonneg (hT.nonneg_eigenvalues rfl i)]
-
 end SYK.MatrixAnalysis.SVDAux
-
-namespace SYK.MatrixAnalysis.ExpAux
-
-private theorem sum_sv_exp {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
-    (H : Matrix n n 𝕜) (hH : H.IsHermitian) (β : ℝ) (f : ℝ → ℝ) :
-    ∑ i : Fin (Module.finrank 𝕜 (EuclideanSpace 𝕜 n)),
-      f (SVDAux.sv (Matrix.toEuclideanLin (NormedSpace.exp (β • H))) i) =
-        ∑ j, f (Real.exp (β * hH.eigenvalues j)) := by
-  let T := Matrix.toEuclideanLin (NormedSpace.exp (β • H))
-  have hT : T.IsPositive :=
-    Matrix.isPositive_toEuclideanLin_iff.mpr (exp_smul_posSemidef H hH β)
-  simpa only [SVDAux.sv, T, SVDAux.singularValues_fin_of_positive T hT] using
-    sum_eigenvalues_exp_smul H hH β f hT
-
-end SYK.MatrixAnalysis.ExpAux
 
 
 open scoped BigOperators InnerProductSpace Matrix.Norms.L2Operator
@@ -234,7 +201,6 @@ The main reusable pieces are:
 
 * normalized trace and normalized Schatten norms;
 * Schatten Hölder and operator-norm multiplication bounds;
-* the exact Schatten norm of an exponential of a Hermitian matrix;
 * positive-trace and word bounds, followed by change-of-origin Taylor-coefficient estimates;
 The higher-derivative bound itself is in `TraceExpDerivatives`: it uses the word and
 Taylor-coefficient bounds here after shifting the Hermitian base point to a positive matrix.
@@ -267,14 +233,6 @@ The definition is intended for `0 < p`.  In applications below we use `1 ≤ p`.
 -/
 noncomputable def normalizedNorm (p : ℝ) (T : E →ₗ[𝕜] E) : ℝ :=
   (powerSum p T / (Module.finrank 𝕜 E : ℝ)) ^ (1 / p)
-
-/-- Nonnegativity of the normalized Schatten norm. -/
-theorem normalizedNorm_nonneg [Nontrivial E]
-    {p : ℝ} (_hp : 0 < p) (T : E →ₗ[𝕜] E) :
-    0 ≤ normalizedNorm p T := by
-  unfold normalizedNorm powerSum
-  refine Real.rpow_nonneg (div_nonneg ?_ (Nat.cast_nonneg _)) _
-  exact Finset.sum_nonneg fun i _ => Real.rpow_nonneg (T.singularValues_nonneg i) _
 
 end Schatten
 
@@ -391,20 +349,10 @@ omit [DecidableEq n] in
     normalizedTraceCLM A = normalizedTrace A := by
   simp [normalizedTraceCLM, normalizedTrace]
 
-omit [DecidableEq n] in
-@[simp] theorem normalizedTrace_zero :
-    normalizedTrace (0 : Matrix n n 𝕜) = 0 := by
-  simp [normalizedTrace]
-
 @[simp] theorem normalizedTrace_one [Nonempty n] :
     normalizedTrace (1 : Matrix n n 𝕜) = 1 := by
   have : (Fintype.card n : 𝕜) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
   simp [normalizedTrace, Matrix.trace_one, this]
-
-omit [DecidableEq n] in
-theorem normalizedTrace_add (A B : Matrix n n 𝕜) :
-    normalizedTrace (A + B) = normalizedTrace A + normalizedTrace B := by
-  simp [normalizedTrace, Matrix.trace_add, mul_add]
 
 omit [DecidableEq n] in
 theorem normalizedTrace_smul (c : 𝕜) (A : Matrix n n 𝕜) :
@@ -541,70 +489,6 @@ theorem normalizedSchattenNorm_opNorm_mul_le
 Dimension-normalized Schatten norms are nondecreasing in the exponent. The matrix
 `diagonal ![1, 0]` gives a counterexample to the reverse inequality below.
 -/
-
-/-- Power means are nondecreasing in the exponent. -/
-theorem powerMean_mono {ι : Type*} [Fintype ι] [Nonempty ι] (σ : ι → ℝ) (hσ : ∀ i, 0 ≤ σ i)
-    {p q : ℝ} (hp : 0 < p) (hpq : p ≤ q) :
-    ((∑ i, σ i ^ p) / (Fintype.card ι : ℝ)) ^ (1 / p) ≤
-      ((∑ i, σ i ^ q) / (Fintype.card ι : ℝ)) ^ (1 / q) := by
-  have hq : 0 < q := by linarith
-  have hN : 0 < (Fintype.card ι : ℝ) := by exact_mod_cast Fintype.card_pos
-  have hJ := Real.rpow_arith_mean_le_arith_mean_rpow Finset.univ
-    (fun _ => 1 / (Fintype.card ι : ℝ)) (fun i => σ i ^ p) (fun _ _ => by positivity)
-    (by rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]; field_simp)
-    (fun i _ => Real.rpow_nonneg (hσ i) _) (by rw [le_div_iff₀ hp]; linarith : 1 ≤ q / p)
-  have hpow : ∀ i, (σ i ^ p) ^ (q / p) = σ i ^ q := fun i => by
-    rw [← Real.rpow_mul (hσ i), mul_div_cancel₀ _ hp.ne']
-  simp only [hpow, ← Finset.mul_sum] at hJ
-  have hsp : 0 ≤ ∑ i, σ i ^ p := Finset.sum_nonneg fun i _ => Real.rpow_nonneg (hσ i) _
-  have hsq : 0 ≤ ∑ i, σ i ^ q := Finset.sum_nonneg fun i _ => Real.rpow_nonneg (hσ i) _
-  have e : ∀ x : ℝ, x / (Fintype.card ι : ℝ) = 1 / (Fintype.card ι : ℝ) * x := fun x => by ring
-  rw [e (∑ i, σ i ^ p), e (∑ i, σ i ^ q)]
-  have hm : 0 ≤ 1 / (Fintype.card ι : ℝ) * ∑ i, σ i ^ p := by positivity
-  calc (1 / (Fintype.card ι : ℝ) * ∑ i, σ i ^ p) ^ (1 / p)
-      = ((1 / (Fintype.card ι : ℝ) * ∑ i, σ i ^ p) ^ (q / p)) ^ (1 / q) := by
-        rw [← Real.rpow_mul hm]
-        congr 1
-        field_simp
-    _ ≤ (1 / (Fintype.card ι : ℝ) * ∑ i, σ i ^ q) ^ (1 / q) :=
-        Real.rpow_le_rpow (Real.rpow_nonneg hm _) hJ (by positivity)
-
-/-- Dimension-normalized Schatten norms are nondecreasing in `p` by the power-mean inequality. -/
-theorem normalizedSchattenNorm_monotone
-    [Nonempty n]
-    {p q : ℝ} (hp : 0 < p) (hpq : p ≤ q)
-    (A : Matrix n n 𝕜) :
-    normalizedSchattenNorm p A ≤ normalizedSchattenNorm q A := by
-  have hq : 0 < q := by linarith
-  rw [normalizedSchattenNorm_eq_sum hp, normalizedSchattenNorm_eq_sum hq]
-  haveI : Nonempty (Fin (Module.finrank 𝕜 (EuclideanSpace 𝕜 n))) :=
-    ⟨⟨0, by rw [finrank_euclideanSpace]; exact Fintype.card_pos⟩⟩
-  have := powerMean_mono (SVDAux.sv (Matrix.toEuclideanLin A)) (SVDAux.sv_nonneg _) hp hpq
-  simpa [finrank_euclideanSpace] using this
-
-/--
-For Hermitian `H`, the Schatten norm of a Gibbs factor is an exact power of the partition function.
-This is the normalized version of
-`‖exp(-t β H)‖_{1/t} = (tr exp(-β H))^t`.
--/
-theorem normalizedSchattenNorm_exp_hermitian
-    [Nonempty n]
-    (H : Matrix n n 𝕜) (hH : H.IsHermitian)
-    (β : ℝ) {t : ℝ} (ht : 0 < t) :
-    normalizedSchattenNorm (1 / t)
-        (NormedSpace.exp ((-(t * β)) • H)) =
-      ‖normalizedTrace (NormedSpace.exp ((-β) • H))‖ ^ t := by
-  have hN : 0 < (Fintype.card n : ℝ) := by exact_mod_cast Fintype.card_pos
-  rw [normalizedSchattenNorm_eq_sum (one_div_pos.mpr ht), one_div_one_div,
-    ExpAux.sum_sv_exp H hH _ (fun s => s ^ (1 / t)), normalizedTrace,
-    trace_exp_smul_of_isHermitian H hH, norm_mul, norm_inv, RCLike.norm_natCast, ← map_sum,
-    RCLike.norm_ofReal,
-    abs_of_pos (Finset.sum_pos (fun j _ => Real.exp_pos _) Finset.univ_nonempty), inv_mul_eq_div]
-  congr 2
-  refine Finset.sum_congr rfl fun j _ => ?_
-  rw [← Real.exp_mul]
-  congr 1
-  field_simp
 
 
 /-! ### Trace bounds for words and the Taylor coefficients of `τ ∘ exp`

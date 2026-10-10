@@ -56,14 +56,6 @@ theorem expectation_im_eq_zero
     (expectation ρ A).im = 0 := by
   exact Complex.conj_eq_iff_im.mp (expectation_star_eq hρ hA)
 
-omit [DecidableEq d] in
-theorem expectation_eq_ofReal_re
-    {ρ A : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hA : star A = A) :
-    ((expectation ρ A).re : ℂ) = expectation ρ A := by
-  apply Complex.ext
-  · simp
-  · simp [expectation_im_eq_zero hρ hA]
-
 theorem density_variance_nonneg
     {ρ B : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hB : star B = B) :
     0 ≤ (expectation ρ (B * B)).re - (expectation ρ B).re ^ 2 := by
@@ -174,22 +166,11 @@ theorem partitionFunction_mul_log_deriv (H : Matrix d d ℂ) (z : ℂ)
 
 section PhysicalGibbs
 
-/-- Thermal expectation using the unnormalized trace convention. -/
-noncomputable def gibbsState [Nonempty d]
-    (β : NNReal) (H O : Matrix d d ℂ) : ℂ :=
-  Matrix.trace (O * gibbsOperator (β : ℂ) H) /
-    partitionFunction (β : ℂ) H
-
 /-- The normalized Gibbs matrix, using the positive partition function. -/
 noncomputable def thermalDensity [Nonempty d]
     (β : NNReal) (H : Matrix d d ℂ) : Matrix d d ℂ :=
   ((partitionFunction (β : ℂ) H).re⁻¹ : ℝ) •
     gibbsOperator (β : ℂ) H
-
-/-- The real logarithm of the partition function at physical temperature. -/
-noncomputable def realLogPartitionFunction
-    (β : NNReal) (H : Matrix d d ℂ) : ℝ :=
-  Real.log (partitionFunction (β : ℂ) H).re
 
 theorem gibbsOperator_posDef (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) : (gibbsOperator (β : ℂ) H).PosDef := by
@@ -331,23 +312,6 @@ theorem thermalDensity_isDensityMatrix [Nonempty d] (β : NNReal)
     rw [← hreal]
     simp only [Complex.ofReal_re]
     simp [ne_of_gt hZ]
-
-theorem gibbsState_eq_expectation_thermalDensity [Nonempty d]
-    (β : NNReal) {H O : Matrix d d ℂ} (hH : star H = H) :
-    gibbsState β H O = expectation (thermalDensity β H) O := by
-  have hZ : 0 < (partitionFunction (β : ℂ) H).re :=
-    partitionFunction_pos β hH
-  have hreal := partitionFunction_eq_ofReal_re β hH
-  rw [gibbsState, expectation, thermalDensity, Matrix.smul_mul,
-    Matrix.trace_smul]
-  change Matrix.trace (O * gibbsOperator (β : ℂ) H) /
-      partitionFunction (β : ℂ) H =
-    (((partitionFunction (β : ℂ) H).re⁻¹ : ℝ) : ℂ) *
-      Matrix.trace (gibbsOperator (β : ℂ) H * O)
-  rw [← hreal]
-  simp only [Complex.ofReal_re]
-  field_simp
-  simpa [ne_of_gt hZ] using Matrix.trace_mul_comm O (gibbsOperator β H)
 
 end PhysicalGibbs
 
