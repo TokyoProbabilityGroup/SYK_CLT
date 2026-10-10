@@ -1,7 +1,7 @@
 import SYK.Analysis.Matrix.TraceExpDerivatives
 import SYK.CLT.Basic
 import SYK.Probability.GaussianChaos.Basic
-import SYK.Probability.GaussianConcentration.Smooth
+import SYK.Probability.GaussianConcentration.HermiteIBP
 import Mathlib.Analysis.Calculus.ParametricIntegral
 
 /-!

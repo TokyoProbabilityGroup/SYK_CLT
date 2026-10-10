@@ -1,4 +1,4 @@
-import SYK.Probability.GaussianConcentration.Smooth
+import SYK.Probability.GaussianConcentration.HermiteIBP
 import SYK.Probability.GaussianChaos.Basic
 
 /-!

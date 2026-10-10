@@ -4,6 +4,14 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="smooth-split-2026-10-11"></a>
+
+## `Smooth.lean` の分割（2026-10-11）
+
+`SYK/Probability/GaussianConcentration/Smooth.lean` は、共分散の補間による滑らかな場合の共分散評価と、多重指数のガウス・エルミート部分積分（`lem:Gaussian-Hermite-IBP`）を一つのファイルに連結していた。後者は前者の宣言を使わず、`StandardGaussian.lean` の `pi_gaussian_stein_coord` だけに依存する。そこで後者を `HermiteIBP.lean` へ移した。宣言の本文・名前・名前空間（`SYK.GaussianConcentration`）は変えていない。利用側は、共分散評価を使う `Lipschitz` が `Smooth` を、Hermite 部分積分を使う `GaussianChaos/CoefficientIBP` と `CLT/Chaos/PartitionDerivatives` が `HermiteIBP` を `import` する。`Smooth` の不要な Mathlib の `import` 16 件と、`HermiteIBP` の不要な `open scoped` も外した。
+
+検証：元のファイルの前半・後半と、現在の `Smooth.lean`・`HermiteIBP.lean` を比べ、宣言の本文が一致し、差は `import`・`open`・冒頭の説明だけであることを確認した。変更した 5 ファイルを `lake lean` で個別に検査し、`lake build SYK` と `lake build SYKBlueprint` が成功した。`log_partition_clt`・`standard_log_partition_clt`・`logPartition_hasSubgaussianMGF`・`hermiteMulti_ibp_of_expGrowth`・`gaussian_cov_bound_smooth` は通常公理のみに依存する。Blueprint の HTML 生成と `vbp check` は実施していない（章の本文と参照する宣言は変更していない）。
+
 <a id="lint-2026-10-10"></a>
 
 ## linter の警告の解消（2026-10-10）
