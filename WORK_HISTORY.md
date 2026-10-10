@@ -20,9 +20,15 @@
 
 最後に `Smooth`（174件）を解消した。同じ方法で、長い行の折り返しと `by` ブロックの展開 160件ほど、`refine'` 41件の書き換え、柔軟な `simp`・`simp_all` 12件の固定、未使用の引数 13件の削除を行った。`multiGoal` は、`on_goal 1 => rw [...]` と `ring_nf` を `·` の中へ移す形で解消した。`refine'` の穴のうち、`norm_add_le`・`LinearIsometryEquiv.continuous`・`Real.abs_sin_le_one` などの引数は単一化で決まるので `_` のままにした。`?_` にすると、ゴールが増えるか、解けずに `whnf` の計算量の上限に達した。
 
-残る警告は、承認が要る11件である（`EDITING_PLAN.md` の一覧）。
+残る警告 11 件は、未使用の仮定を外す変更なので、研究者の承認を得て解消した。
 
-検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 11 件に減った。変更前後の全 742 宣言の型・可視性・種類・モジュールは完全に一致し、主要 4 定理は通常公理のみに依存する。
+- 未使用の `[DecidableEq ι]`（`integrable_abs_coord_mul_exp_c_sum_abs_pi`・`euclidean_norm_le_sum_abs`・`hermite_product_exp_bound`・`integrable_of_euclidean_expBound`・`integrable_coord_mul_of_euclidean_expBound`）と `[DecidableEq d]`（`density_variance_nonneg`）を外した。後者は証明に `classical` を加えた。
+- `pi_gaussian_stein_coord` と、それに仮定を渡すだけの `coord_stein_of_expGrowth` から、未使用の `hc : 0 ≤ c`・`hC : 0 ≤ C` を外した。論文の `lem:Gaussian-Hermite-IBP` に対応する `hermiteMulti_ibp_of_expGrowth`（`0 < C` を持つ）は変えていない。呼び出し側の `coord_stein_of_euclidean_expGrowth` は、この 2 つの仮定を自分の証明で使うので残している。
+- `Smooth` の private 補題 3 件（`PolyFunction.deriv_closed`・`polyFunction_hermiteList`・`polyFunction_partialList`）の未使用の `[Fintype ι]` は、証明が使うので `[Finite ι]` に弱め、証明の中で `Fintype.ofFinite` を使う形にした。
+
+以上で `MAINT-LINT` は完了し、linter の警告は 0 件である。ガウス基盤の保守計画（`GaussianConcentration/EDITING_PLAN.md`）は課題がなくなったので削除した。
+
+検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 0 件になった。Blueprint の生成と `vbp check` も成功した。変更前後の全 742 宣言を比べると、型が変わったのは上の仮定の削除だけで、名前・可視性・種類・モジュールは完全に一致する。主要 4 定理は通常公理のみに依存する。
 
 <a id="repo-rename-2026-10-10"></a>
 

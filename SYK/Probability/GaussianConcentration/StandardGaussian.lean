@@ -766,7 +766,7 @@ lemma integrable_exp_c_sum_abs_pi {ι : Type*} [Fintype ι] (c : ℝ) :
 /-
 `|yᵢ| exp (c ∑ⱼ |yⱼ|)` is integrable against the product standard Gaussian.
 -/
-lemma integrable_abs_coord_mul_exp_c_sum_abs_pi {ι : Type*} [Fintype ι] [DecidableEq ι]
+lemma integrable_abs_coord_mul_exp_c_sum_abs_pi {ι : Type*} [Fintype ι]
     (c : ℝ) (i : ι) :
     Integrable (fun y : ι → ℝ => |y i| * Real.exp (c * ∑ j, |y j|))
       (Measure.pi fun _ : ι => gaussianReal 0 1) := by
@@ -793,7 +793,7 @@ one-dimensional Stein identity `gaussianReal_stein`.
 -/
 lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
     (h : (ι → ℝ) → ℝ) (i : ι)
-    (hh : ContDiff ℝ 1 h) (C c : ℝ) (hc : 0 ≤ c) (hC : 0 ≤ C)
+    (hh : ContDiff ℝ 1 h) (C c : ℝ)
     (hhb : ∀ y, |h y| ≤ C * Real.exp (c * ∑ j, |y j|))
     (hdb : ∀ y,
       |fderiv ℝ h y (Pi.single i 1)| ≤ C * Real.exp (c * ∑ k, |y k|)) :

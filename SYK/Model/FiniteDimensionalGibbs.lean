@@ -56,9 +56,11 @@ theorem expectation_im_eq_zero
     (expectation ρ A).im = 0 := by
   exact Complex.conj_eq_iff_im.mp (expectation_star_eq hρ hA)
 
+omit [DecidableEq d] in
 theorem density_variance_nonneg
     {ρ B : Matrix d d ℂ} (hρ : IsDensityMatrix ρ) (hB : star B = B) :
     0 ≤ (expectation ρ (B * B)).re - (expectation ρ B).re ^ 2 := by
+  classical
   let z : ℂ := expectation ρ B
   let C : Matrix d d ℂ := B - z • (1 : Matrix d d ℂ)
   have hzstar : star z = z := by

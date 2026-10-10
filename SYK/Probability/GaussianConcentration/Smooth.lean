@@ -97,7 +97,7 @@ lemma gaussian_ibp_coord {ι : Type*} [Fintype ι] (g : EuclideanSpace ℝ ι �
     exact (hcoord _ j).trans ((hgradb _).trans
       (mul_le_mul_of_nonneg_left (Real.exp_le_exp.mpr (hexpmono y)) hC))
   have eq3 := pi_gaussian_stein_coord
-    (fun z => g (WithLp.toLp 2 z)) i hcd C |c| (abs_nonneg c) hC hhb'
+    (fun z => g (WithLp.toLp 2 z)) i hcd C |c| hhb'
     (fun y => hdb' y i)
   have hμ : standardGaussianMeasureOnEuclidean ι
       = (Measure.pi fun _ : ι => gaussianReal 0 1).map (WithLp.toLp 2) := rfl
@@ -970,7 +970,7 @@ theorem coordDeriv_eq_fderiv (i : ι)
 chosen coordinate derivative needs a growth bound. -/
 theorem coord_stein_of_expGrowth
     (h : (ι → ℝ) → ℝ) (i : ι) (hh : ContDiff ℝ 1 h)
-    (C c : ℝ) (hc : 0 ≤ c) (hC : 0 ≤ C)
+    (C c : ℝ)
     (hhb : ∀ g, |h g| ≤ C * Real.exp (c * ∑ j, |g j|))
     (hdb : ∀ g, |coordDeriv i h g| ≤ C * Real.exp (c * ∑ j, |g j|)) :
     (∫ g, g i * h g ∂(Measure.pi fun _ : ι => gaussianReal 0 1)) =
@@ -980,8 +980,9 @@ theorem coord_stein_of_expGrowth
     intro g
     simpa [coordDeriv_eq_fderiv i hh g] using hdb g
   simpa only [← coordDeriv_eq_fderiv i hh] using
-    SYK.GaussianConcentration.pi_gaussian_stein_coord h i hh C c hc hC hhb hdb'
+    SYK.GaussianConcentration.pi_gaussian_stein_coord h i hh C c hhb hdb'
 
+omit [DecidableEq ι] in
 /-- The bound for the Euclidean norm used for the disorder vector
 in the manuscript. -/
 theorem euclidean_norm_le_sum_abs (g : ι → ℝ) :
@@ -1050,6 +1051,7 @@ theorem hermite_factor_exp_bound (i : ι) (n : ℕ) :
     (Real.exp_le_exp.mpr
       (mul_le_mul_of_nonneg_left (abs_coord_le_euclidean_norm g i) hc)) hC)
 
+omit [DecidableEq ι] in
 /-- A finite product of Hermite factors has exponential Euclidean growth. -/
 theorem hermite_product_exp_bound (α : ι → ℕ) (s : Finset ι) :
     ∃ C c : ℝ, 0 ≤ C ∧ 0 ≤ c ∧ ∀ g : ι → ℝ,
@@ -1095,7 +1097,7 @@ theorem coord_stein_of_euclidean_expGrowth
     apply mul_le_mul_of_nonneg_left _ hC
     exact Real.exp_le_exp.mpr
       (mul_le_mul_of_nonneg_left (euclidean_norm_le_sum_abs g) hc)
-  exact coord_stein_of_expGrowth h i hh C c hc hC
+  exact coord_stein_of_expGrowth h i hh C c
     (fun g => (hhb g).trans (hbound g))
     (fun g => (hdb g).trans (hbound g))
 
@@ -1176,6 +1178,7 @@ theorem contDiff_partialList (l : List ι) (n : ℕ)
         contDiff_coordDeriv_succ i (l.length + n) hf'
       simpa [partialList] using ih hd
 
+omit [DecidableEq ι] in
 /-- A continuous function with an exponential Euclidean-norm bound is
 integrable against the finite product standard Gaussian. -/
 theorem integrable_of_euclidean_expBound
@@ -1194,6 +1197,7 @@ theorem integrable_of_euclidean_expBound
     (Real.exp_le_exp.mpr
       (mul_le_mul_of_nonneg_left (euclidean_norm_le_sum_abs g) hc)) hC)
 
+omit [DecidableEq ι] in
 /-- The same bound remains integrable after multiplication by one Gaussian
 coordinate. -/
 theorem integrable_coord_mul_of_euclidean_expBound
@@ -1644,8 +1648,10 @@ private theorem PolyFunction.expBound {f : (ι → ℝ) → ℝ}
   | sub _ _ hf hh => exact hf.sub hh
   | mul _ _ hf hh => exact hf.mul hh
 
-private theorem PolyFunction.deriv_closed {f : (ι → ℝ) → ℝ}
+omit [Fintype ι] in
+private theorem PolyFunction.deriv_closed [Finite ι] {f : (ι → ℝ) → ℝ}
     (hf : PolyFunction f) (i : ι) : PolyFunction (coordDeriv i f) := by
+  have := Fintype.ofFinite ι
   induction hf with
   | const a =>
       change PolyFunction (fun g => deriv (fun _ : ℝ => a) (g i))
@@ -1679,7 +1685,10 @@ private theorem PolyFunction.deriv_closed {f : (ι → ℝ) → ℝ}
       exact (ihf.mul hh).sub (by
         simpa using (PolyFunction.const 0).sub (hf.mul ihh))
 
-private theorem polyFunction_hermiteList (l : List ι) : PolyFunction (hermiteList l) := by
+omit [Fintype ι] in
+private theorem polyFunction_hermiteList [Finite ι] (l : List ι) :
+    PolyFunction (hermiteList l) := by
+  have := Fintype.ofFinite ι
   induction l with
   | nil => exact PolyFunction.const 1
   | cons i l ih => exact ((PolyFunction.coord i).mul ih).sub (ih.deriv_closed i)
@@ -1765,8 +1774,10 @@ theorem hermiteMulti_ibp_integrable (α : ι → ℕ)
       integrable_hermiteMulti_mul_of_expGrowth α hf.continuous C₀ hC₀.le h₀
   · exact integrable_of_euclidean_expBound _ hd C C hC.le hC.le hb
 
-private theorem polyFunction_partialList (l : List ι) {f : (ι → ℝ) → ℝ}
+omit [Fintype ι] in
+private theorem polyFunction_partialList [Finite ι] (l : List ι) {f : (ι → ℝ) → ℝ}
     (hf : PolyFunction f) : PolyFunction (partialList l f) := by
+  have := Fintype.ofFinite ι
   induction l generalizing f with
   | nil => exact hf
   | cons i l ih => exact ih (hf.deriv_closed i)
