@@ -4,6 +4,14 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="stein-proof-2026-10-11"></a>
+
+## `gaussianReal_stein` の証明の書き直し（2026-10-11）
+
+`StandardGaussian.lean` の一次元 Stein の恒等式 `gaussianReal_stein` の証明（約 350 行）を、mathlib の `integral_gaussianReal_eq_integral_smul`（密度による積分の表示）と `integral_mul_deriv_eq_deriv_mul_of_integrable`（`ℝ` 上の部分積分）を使う約 60 行の証明に置き換えた。`u = g`、`v = φ`（標準ガウス密度）とし、`φ' = -x φ` を使う。補助補題として、密度の微分 `hasDerivAt_gaussianPDFReal_zero_one` と、ガウス測度での可積分性を密度つきのルベーグ可積分性へ移す `integrable_gaussianPDFReal_mul` を private で加えた。可積分性は既存の `integrable_exp_abs_gaussianReal` から導くので、この補題を宣言を変えずに `gaussianReal_stein` の前へ移した。`set_option maxHeartbeats 400000` は不要になり削除した。`ring` が `ring_nf` に退避する info 13 件もこれで消えた。
+
+検証：`StandardGaussian.lean` を `lake lean` で検査し、エラーと警告はなく、残る info は対象外の `ring` の 1 件だけだった。`lake build SYK` と `lake build SYKBlueprint` が成功した。`SYK.Probability.GaussianConcentration.*` の公開宣言（private を除く 641 行）の名前・モジュール・型を変更の前後で書き出し、完全に一致することを確認した。`gaussianReal_stein`・`pi_gaussian_stein_coord`・`log_partition_clt`・`standard_log_partition_clt`・`logPartition_hasSubgaussianMGF` は通常公理のみに依存する。
+
 <a id="smooth-split-2026-10-11"></a>
 
 ## `Smooth.lean` の分割（2026-10-11）
