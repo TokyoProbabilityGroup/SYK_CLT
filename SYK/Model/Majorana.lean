@@ -19,9 +19,12 @@ namespace SYK
 /-- An abstract complex star-algebra carrying `N` Majorana generators. -/
 structure MajoranaSystem (N : ℕ) (A : Type*)
     [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A] where
+  /-- The Majorana generators. -/
   ψ : Fin N → A
+  /-- The canonical anticommutation relations `ψᵢψⱼ + ψⱼψᵢ = 2δᵢⱼ`. -/
   majorana_rel :
     ∀ i j, ψ i * ψ j + ψ j * ψ i = if i = j then 2 else 0
+  /-- Each generator is self-adjoint. -/
   self_adjoint : ∀ i, star (ψ i) = ψ i
 
 namespace MajoranaSystem

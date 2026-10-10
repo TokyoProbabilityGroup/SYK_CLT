@@ -14,6 +14,8 @@ import SYK.Probability.GaussianChaos.HermiteDensity
 import SYK.Probability.GaussianChaos.PolynomialDensity
 import SYK.CLT.Chaos.SecondChaos
 
+set_option linter.mathlibStandardSet false
+
 open Verso.Genre
 open Verso.Genre.Manual
 open Informal

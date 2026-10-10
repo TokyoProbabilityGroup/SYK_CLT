@@ -4,6 +4,14 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="blueprint-lint-2026-10-11"></a>
+
+## Blueprint の警告の解消（2026-10-11）
+
+`lake build SYKBlueprint` の警告 78 件を 2 件（依存パッケージ VersoBlueprint の universe 警告）にした。`Blueprint/SYKBlueprint/CLT.lean` に、`Model.lean`・`GaussianConcentration.lean` と同じ `set_option linter.mathlibStandardSet false` を加え、Verso の本文への書式 linter の警告 61 件を解消した。Verso の「宣言に docstring がない」警告 15 件は、`SYK.Params`・`SYK.MajoranaSystem`・`SYK.CLT.AnnealedInput` の各フィールドに docstring を加えて解消した（定理文・型・仮定は変えていない）。
+
+検証：`lake build SYK` と `lake build SYKBlueprint` が成功し、警告は上の 2 件だけである。Blueprint の HTML を再生成し、`vbp check` は `ok=true`・`errors=[]` だった。HTML 生成時に `CLT.lean:25` の `$`q\ge4`` の数式変換に失敗する info が 1 件出る（本文の数式の書式で、今回の変更とは無関係）。
+
 <a id="ring-cleanup-2026-10-11"></a>
 
 ## `ring` の `ring_nf` への退避の整理（2026-10-11）
