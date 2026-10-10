@@ -1,6 +1,7 @@
 # SYK
 
 Research on the Sachdev–Ye–Kitaev (SYK) model from the perspective of probability theory.
+This repository contains the manuscript [A Central Limit Theorem for High-Temperature SYK Model](Paper/CLT_SYK.tex) and its Lean 4 formalization, with the remaining assumptions described below.
 
 ## Requirements
 
@@ -90,6 +91,14 @@ Open `http://localhost:8000/`. [The workspace guide](workspace/README.md#bluepri
 ## Manuscript and notes
 
 From `SYK_CLT/Paper/`, run `latexmk -pdf CLT_SYK.tex`. The four files under `Paper/sections/` can also be compiled independently from that directory; references defined in other sections may remain unresolved in standalone builds. From `SYK_CLT/Notes/`, run `latexmk -pdf note.tex`. The manuscript and Lean formalization have separate verification requirements.
+
+## Licensing and citation
+
+All original Lean source files (`.lean`) throughout this repository, including `SYK/` and `Blueprint/`, are licensed under the [Apache License 2.0](LICENSE). This grant applies only to the Lean sources. Dependencies and third-party material retain their own licenses and attribution notices; other documents, manuscripts, lecture notes, bibliographies, figures, and PDFs are outside this grant.
+
+The accompanying paper, including its LaTeX sources, bibliography, and PDF, is copyrighted by its authors, with all rights reserved, and is not covered by Apache-2.0. See [Paper/COPYRIGHT.md](Paper/COPYRIGHT.md). The intended arXiv submission license is the arXiv perpetual, non-exclusive license; it is a submission choice, not a reuse license granted to GitHub users.
+
+Please cite Yoshinori Kamijima, Kohei Sasaya, Shuta Nakajima, and Ryoichiro Noda, *A Central Limit Theorem for High-Temperature SYK Model*. [CITATION.cff](CITATION.cff) records the preferred paper citation and identifies the formalization repository. When referring to the Lean formalization, also include the [repository URL](https://github.com/TokyoProbabilityGroup/SYK_CLT) and the commit used. No arXiv identifier, DOI, or publication date has been verified for this paper, so none is included.
 
 ## References
 

@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: >-
+  Please cite the research paper listed in preferred-citation. When referring
+  to the Lean formalization, also include the repository URL and the commit used.
+type: software
+title: "SYK_CLT: Lean 4 formalization"
+authors:
+  - family-names: Kamijima
+    given-names: Yoshinori
+  - family-names: Nakajima
+    given-names: Shuta
+  - family-names: Noda
+    given-names: Ryoichiro
+  - family-names: Sasaya
+    given-names: Kohei
+
+repository-code: "https://github.com/TokyoProbabilityGroup/SYK_CLT"
+url: "https://github.com/TokyoProbabilityGroup/SYK_CLT"
+license: Apache-2.0
+abstract: >-
+  Lean 4 formalization accompanying A Central Limit Theorem for High-Temperature
+  SYK Model. Apache-2.0 applies only to the original Lean sources; the paper
+  remains all rights reserved.
+preferred-citation:
+  type: generic
+  title: "A Central Limit Theorem for High-Temperature SYK Model"
+  authors:
+    - family-names: Kamijima
+      given-names: Yoshinori
+    - family-names: Nakajima
+      given-names: Shuta
+    - family-names: Noda
+      given-names: Ryoichiro
+    - family-names: Sasaya
+      given-names: Kohei
+  notes: "Manuscript source: Paper/CLT_SYK.tex."
