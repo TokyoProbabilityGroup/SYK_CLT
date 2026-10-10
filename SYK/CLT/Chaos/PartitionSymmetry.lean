@@ -307,7 +307,8 @@ theorem multiIndex_degree_two_cases {ι : Type*} [Fintype ι] [DecidableEq ι]
     by_cases hKI : K = I
     · subst K
       simp [hI1, hJI, δ] at hδK ⊢
-    · simp [δ, hKI] at hδK ⊢
+    · simp only [hKI, ↓reduceIte, Pi.add_apply, ne_eq, not_false_eq_true, Pi.single_eq_of_ne,
+        zero_add, δ] at hδK ⊢
       exact hδK
 
 /-- A degree-one multi-index is odd when interactions are nonempty. -/

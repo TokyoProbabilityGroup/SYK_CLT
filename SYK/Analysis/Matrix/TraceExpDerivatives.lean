@@ -54,7 +54,7 @@ theorem iterDirectionalFDeriv_eq_iteratedFDeriv (f : E → F) (hf : ContDiff ℝ
       hf.differentiable_iteratedFDeriv (by exact_mod_cast WithTop.coe_lt_top _) x
     simp only [iterDirectionalFDeriv]
     rw [hfun, fderiv_continuousMultilinear_apply_const_apply hdiff]
-    show _ = iteratedFDeriv ℝ (vs.length + 1) f x (fun i => (v :: vs).get i)
+    change _ = iteratedFDeriv ℝ (vs.length + 1) f x (fun i => (v :: vs).get i)
     rw [iteratedFDeriv_succ_apply_left]
     rfl
 

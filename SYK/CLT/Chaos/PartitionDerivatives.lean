@@ -115,16 +115,16 @@ theorem Setting.Z_contDiff_beta {q : ℕ} (S : Setting q) (n : ℕ)
 theorem Setting.Z_hasDerivAt_beta {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :
     HasDerivAt (fun b => S.Z b n g) (fderiv ℝ (S.Z 1 n) (β • g) g) β := by
-  have h := ((S.Z_contDiff_couplings 1 n).differentiable (by simp) (β • g)).hasFDerivAt.comp_hasDerivAt β
-    ((hasDerivAt_id β).smul_const g)
+  have h := ((S.Z_contDiff_couplings 1 n).differentiable (by simp)
+    (β • g)).hasFDerivAt.comp_hasDerivAt β ((hasDerivAt_id β).smul_const g)
   simpa only [Function.comp_def, S.Z_smul, mul_one, one_smul, id_eq] using h
 
 /-- Euler's radial identity for the finite partition function. -/
 theorem Setting.fderiv_Z_self_eq_beta_deriv {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
     fderiv ℝ (S.Z β n) g g = β * deriv (fun b => S.Z b n g) β := by
-  have hleft := ((S.Z_contDiff_couplings β n).differentiable (by simp) ((1 : ℝ) • g)).hasFDerivAt.comp_hasDerivAt 1
-    ((hasDerivAt_id (1 : ℝ)).smul_const g)
+  have hleft := ((S.Z_contDiff_couplings β n).differentiable (by simp)
+    ((1 : ℝ) • g)).hasFDerivAt.comp_hasDerivAt 1 ((hasDerivAt_id (1 : ℝ)).smul_const g)
   have hright := ((S.Z_contDiff_beta n g).differentiable (by simp) (1 * β)).hasDerivAt.comp 1
     ((hasDerivAt_id (1 : ℝ)).mul_const β)
   simp only [one_smul, Function.comp_def] at hleft
@@ -191,7 +191,8 @@ theorem Setting.meanZ_hasDerivAt {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) 
   have h := hasDerivAt_integral_of_dominated_loc_of_deriv_le
     (F := fun b g => S.Z b n g) (F' := fun b g => deriv (fun t => S.Z t n g) b)
     (Metric.ball_mem_nhds β (by norm_num : (0 : ℝ) < 1))
-    (Filter.Eventually.of_forall fun b => (S.Z_contDiff_couplings b n).continuous.aestronglyMeasurable)
+    (Filter.Eventually.of_forall fun b =>
+      (S.Z_contDiff_couplings b n).continuous.aestronglyMeasurable)
     ((S.partition_moments β n).1.integrable (by norm_num))
     (S.continuous_deriv_Z_beta β n).aestronglyMeasurable
     (Filter.Eventually.of_forall hbound) hi
@@ -264,7 +265,8 @@ theorem Setting.integral_Z_mul_sq_sub_one_ibp {q : ℕ} (S : Setting q)
     simp [GaussianConcentration.coordDeriv]
   have hnorm (g : InteractionIndex (S.N n) q → ℝ) :
       |g I| ≤ Real.exp ‖WithLp.toLp 2 g‖ :=
-    (PiLp.norm_apply_le (WithLp.toLp 2 g) I).trans (by linarith [Real.add_one_le_exp ‖WithLp.toLp 2 g‖])
+    (PiLp.norm_apply_le (WithLp.toLp 2 g) I).trans
+      (by linarith [Real.add_one_le_exp ‖WithLp.toLp 2 g‖])
   have hprod (g : InteractionIndex (S.N n) q → ℝ) (x : ℝ)
       (hx : |x| ≤ C * Real.exp (c * ‖WithLp.toLp 2 g‖)) :
       |g I * x| ≤ C * Real.exp ((c + 1) * ‖WithLp.toLp 2 g‖) := by
@@ -307,7 +309,8 @@ theorem Setting.sum_integral_Z_mul_sq_sub_one {q : ℕ} (S : Setting q)
     have hcont : Continuous (GaussianConcentration.coordDeriv I F) :=
       (GaussianConcentration.contDiff_coordDeriv_succ I 0
         ((S.Z_contDiff_pi β n).of_le (by simp))).continuous
-    exact GaussianConcentration.integrable_coord_mul_of_euclidean_expBound _ hcont I C c hc hC (hd I)
+    exact GaussianConcentration.integrable_coord_mul_of_euclidean_expBound _ hcont I C c hc hC
+      (hd I)
   have hrad (g : InteractionIndex (S.N n) q → ℝ) :
       (∑ I, g I * GaussianConcentration.coordDeriv I F g) =
         β * deriv (fun b => S.Z b n (WithLp.toLp 2 g)) β := by

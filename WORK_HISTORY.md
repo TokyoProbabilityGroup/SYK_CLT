@@ -4,6 +4,16 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="lint-2026-10-10"></a>
+
+## linter の警告の解消（2026-10-10）
+
+`MAINT-LINT` の途中経過である。行列解析・CLT・Model の数ファイルの警告 12 件を直した。長い行の折り返し 9 件（`SingularValues`・`TraceExponential`・`PartitionDerivatives`）、`show` から `change` への置換 1 件（`TraceExpDerivatives`）、後続のタクティクが使う柔軟な `simp` の `simp only [...]` への固定 2 件（`PartitionSymmetry`・`Rademacher`）である。ビルドのログに出る `Try this` の提案は、複数の場所を同時に直すときに不完全なことがあった。そのため、提案は編集後の `lake env lean` で毎回確かめる。
+
+`FiniteDimensionalGibbs` の `density_variance_nonneg` の未使用 `[DecidableEq d]`（1件）は、定理の仮定が減るので承認を待っている。
+
+検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 507 件に減った。変更前後の全 742 宣言の型・可視性・種類・モジュールは完全に一致し、主要 4 定理は通常公理のみに依存する。
+
 <a id="repo-rename-2026-10-10"></a>
 
 ## リポジトリ名の変更（2026-10-10）
