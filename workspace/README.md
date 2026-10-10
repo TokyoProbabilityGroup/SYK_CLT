@@ -17,6 +17,7 @@ This directory supplies the parent `ResearchWorkspace` configuration for the loc
     ├── lean-toolchain      # same Lean version as the parent
     ├── SYK/                # Analysis, Probability, Model, SuperConcentration, CLT
     ├── Blueprint/          # SYKBlueprint package: lakefile.toml, lake-manifest.json,
+    │   ├── lean-toolchain         # same Lean version as the parent
     │   ├── SYKBlueprint.lean      # the document
     │   ├── SYKBlueprintMain.lean  # generator entry point
     │   └── SYKBlueprint/          # four chapters
@@ -26,6 +27,12 @@ This directory supplies the parent `ResearchWorkspace` configuration for the loc
 ```
 
 One parent dependency cache serves the mathematical package and the documentation, avoiding duplicate downloads and storage of the large mathlib dependency. Lake may place package build artifacts under each package's `.lake/build/`; these are local artifacts, not another dependency checkout or a separately installed mathlib. Sharing the workspace does not introduce mathematical dependencies between topics.
+
+### Opening a package as the project root
+
+`SYK/` and `SYK/Blueprint/` each have a `lean-toolchain`, so an editor that searches upward for the nearest `lean-toolchain` (the Lean 4 VS Code extension does) treats that directory as the project root and starts `lake serve` there. To keep this from creating a second copy of mathlib, both `lakefile.toml` files set `packagesDir` to the parent workspace's `.lake/packages` (`../.lake/packages` and `../../.lake/packages`), and the `packagesDir` of their `lake-manifest.json` agrees. A parent workspace ignores a dependency's `packagesDir`, so building from the workspace root is unchanged. Package build artifacts stay under each package's own `.lake/build/`, whichever directory is the root.
+
+This relies on the layout above: the repository is cloned directly inside the workspace root, which holds the shared `.lake/packages`. Opening `SYK/` without such a parent has not been verified; it would need its own dependency checkout and a different `packagesDir`. Keep the three `lean-toolchain` files and the dependency revisions of all manifests identical. If `SYK/.lake/packages` or `SYK/Blueprint/.lake/packages` exists, it is a stale duplicate and can be deleted.
 
 ## Template files and targets
 
@@ -98,7 +105,7 @@ A compatible new mathematics project can be a local dependency package or anothe
 
 ## Blueprint dependencies
 
-The document is `SYKBlueprint.lean` in the package `SYKBlueprint` (`SYK/Blueprint/`), with four chapter modules under `SYKBlueprint/`; `SYKBlueprintMain.lean` renders it. From the parent workspace the explicit renderer command above is used, because `vbp build` looks for a generator only in the current directory, and the parent has none. Inside `SYK/Blueprint/` the standard `lake exe vbp build` finds `SYKBlueprintMain.lean` and writes `_out/site/`; this standalone route (which needs its own download of mathlib) has not been verified. The renderer retains the Windows search-asset preparation and copy needed by Verso 4.32.0, which otherwise leaves a relative source prefix in bundled asset paths.
+The document is `SYKBlueprint.lean` in the package `SYKBlueprint` (`SYK/Blueprint/`), with four chapter modules under `SYKBlueprint/`; `SYKBlueprintMain.lean` renders it. From the parent workspace the explicit renderer command above is used, because `vbp build` looks for a generator only in the current directory, and the parent has none. Inside `SYK/Blueprint/` the standard `lake exe vbp build` finds `SYKBlueprintMain.lean` and writes `_out/site/`; this route uses the parent workspace's dependency cache through `packagesDir` (see above). Building in `SYK/Blueprint/` without a parent workspace has not been verified. The renderer retains the Windows search-asset preparation and copy needed by Verso 4.32.0, which otherwise leaves a relative source prefix in bundled asset paths.
 
 Verso Blueprint is required by `SYKBlueprint` only; the mathematical `SYK` package depends on mathlib alone, and the parent requires both packages. The manifests of the parent and of `SYKBlueprint` preserve the previously pinned external revisions. The obsolete saved Verso lock is no longer distributed; do not overwrite the active parent manifest with a historical lock.
 

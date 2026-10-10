@@ -2,6 +2,9 @@ name = "SYK"
 version = "0.1.0"
 keywords = ["math"]
 defaultTargets = ["SYK"]
+# Share the parent workspace's dependency checkouts when this package is opened as the
+# project root (for example by an editor); a parent workspace ignores this setting.
+packagesDir = "../.lake/packages"
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`

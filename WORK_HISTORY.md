@@ -4,6 +4,16 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="editor-root-2026-10-10"></a>
+
+## エディタのプロジェクトルートと依存キャッシュの共有（2026-10-10）
+
+VS Code の InfoView が動かない原因を調べた。Lean 拡張（v0.0.240）は、開いたファイルから親へたどり、最初に見つかった `lean-toolchain` のあるディレクトリをプロジェクトのルートとして `lake serve` を起動する。`SYK/lean-toolchain` があるので `SYK/` がルートとなり、親の共有キャッシュを使わず `SYK/.lake/packages` に mathlib 等のソース（692MB）を複製していた。`SYK/Blueprint/` は `lakefile.toml` はあるが `lean-toolchain` がないため、拡張がエラーを出してサーバーを起動しなかった。ワークスペースのルートからのビルドは、この間も共有キャッシュを使い、重複を作っていない。
+
+研究者の承認のもとで、`SYK/lakefile.toml` と `SYK/Blueprint/lakefile.toml` に `packagesDir`（親の `.lake/packages`）を設定し、両方の `lake-manifest.json` の `packagesDir` を合わせた。`SYK/Blueprint/lean-toolchain` を追加した（ルートの規則が禁じる「明示的な指示なしの `lean-toolchain` の追加」に当たるので、承認を得た）。依存のリビジョンと Lean のバージョンは変えていない。
+
+検証：`SYK/` と `SYK/Blueprint/` をそれぞれルートにして `lake env printenv LEAN_PATH`・`lake build` を実行し、依存が親の `.lake/packages` から解決され、複製も再ビルドも起きないことを確認した（約1秒）。ワークスペースのルートからの `lake build SYKBlueprint` も変更前と同じである。VS Code での InfoView の動作は、手元で確認する必要がある。
+
 <a id="unused-declarations-2026-10-10"></a>
 
 ## 使われていない宣言の削除（2026-10-10）
