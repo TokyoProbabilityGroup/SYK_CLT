@@ -8,7 +8,7 @@
 
 ## linter の警告の解消（2026-10-10）
 
-`MAINT-LINT` の途中経過である。行列解析・CLT・Model の数ファイルの警告 12 件を直した。長い行の折り返し 9 件（`SingularValues`・`TraceExponential`・`PartitionDerivatives`）、`show` から `change` への置換 1 件（`TraceExpDerivatives`）、後続のタクティクが使う柔軟な `simp` の `simp only [...]` への固定 2 件（`PartitionSymmetry`・`Rademacher`）である。ビルドのログに出る `Try this` の提案は、複数の場所を同時に直すときに不完全なことがあった。そのため、提案は編集後の `lake env lean` で毎回確かめる。
+`MAINT-LINT` を行った。まず、行列解析・CLT・Model の数ファイルの警告 12 件を直した。長い行の折り返し 9 件（`SingularValues`・`TraceExponential`・`PartitionDerivatives`）、`show` から `change` への置換 1 件（`TraceExpDerivatives`）、後続のタクティクが使う柔軟な `simp` の `simp only [...]` への固定 2 件（`PartitionSymmetry`・`Rademacher`）である。ビルドのログに出る `Try this` の提案は、複数の場所を同時に直すときに不完全なことがあった。そのため、提案は編集後の `lake env lean` で毎回確かめる。
 
 `FiniteDimensionalGibbs` の `density_variance_nonneg` の未使用 `[DecidableEq d]`（1件）は、定理の仮定が減るので承認を待っている。
 
@@ -29,6 +29,30 @@
 以上で `MAINT-LINT` は完了し、linter の警告は 0 件である。ガウス基盤の保守計画（`GaussianConcentration/EDITING_PLAN.md`）は課題がなくなったので削除した。
 
 検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 0 件になった。Blueprint の生成と `vbp check` も成功した。変更前後の全 742 宣言を比べると、型が変わったのは上の仮定の削除だけで、名前・可視性・種類・モジュールは完全に一致する。主要 4 定理は通常公理のみに依存する。
+
+<a id="clt-scope-fixed-2026-10-10"></a>
+
+## 条件付き CLT の仕様確定（2026-10-10）
+
+研究者の決定により、`AnnealedInput` を明示的に仮定する条件付き CLT と標準模型族への条件付き適用を確定仕様とし、凸収束補題の補完・外部入力の再調査・アニール入力の構築の3課題を計画から削除した。構造文書、CLT の案内と Blueprint の範囲説明も同期した。入力の構築とアニール命題自体は未形式化のままであり、課題の削除を証明の完了とは扱わない。数学の Lean 宣言・仮定・証明は変更していない。
+
+検証：変更文書の相対リンク35件のファイル・アンカー、計画からの3課題の削除、廃止した節への参照が残っていないことを確認した。原稿の該当ラベルと Lean の明示的な入力も確認した。エージェント環境では elan 設定ファイルへの書込権限によりビルドできなかったが、その後、研究者が手元のターミナルで案内した検査を実施し、完了を報告した。`lake build SYKBlueprint`、Blueprint の CLT 章と両入口の Lean 検査、HTML 再生成、`vbp check` を完了し、`ok=true`・`errors=[]` を確認した（研究者の実行報告に基づく）。GitHub Actions の実行と Pages 公開の確認は、このローカル検証には含まない。
+
+<a id="blueprint-workflow-split-2026-10-10"></a>
+
+## 検証 CI と Pages 公開の分離（2026-10-10）
+
+研究者の依頼により、下記の公開準備で統合した workflow を分離した。`lean_action_ci.yml` は `Lean Action CI` として数学・Blueprint のビルドと参照検査だけを行う。新設の `blueprint-pages.yml` は `Blueprint Pages` として独立に同じビルド・検査を行い、成功した HTML を公開する。Pages の操作と公開権限は公開 workflow にのみ置き、両者の concurrency group を分けた。検証 CI は古い実行をキャンセルし、公開 workflow は実行中の公開をキャンセルしない。公開手順と全体計画も分離後のファイル名に合わせた。
+
+検証：両ファイルの build・生成・check のステップが文字列として一致すること、検証 CI に Pages 操作・書込権限がないこと、公開の main 条件2か所、build への依存、artifact パス、各 workflow 自身の起動条件、手動実行、更新文書の相対リンク先の存在をスクリプトで確認した。YAML 構文の parser による検査、Actions 実行、初回公開は未実施。数学・Blueprint の Lean ソースは変更していないため Lean の再検査は行っていない。公開完了は全体計画の `BLUEPRINT-PAGES` に引き続き残す。
+
+<a id="blueprint-pages-preparation-2026-10-10"></a>
+
+## GitHub Pages 公開の準備（2026-10-10）
+
+公開依頼に基づき既存の `lean_action_ci.yml` を `Blueprint Pages` に拡張した。親ワークスペースでの数学・Blueprint ビルド、HTML 生成、`vbp check` を保持し、成功後に HTML のみを Pages artifact として転送する。公開は `main` に限定し、`pages: write` と `id-token: write` は後続の deploy job のみに付与した。Lake 設定・manifest・toolchain・workflow の変更も起動条件に加えた。操作手順は当時 `Blueprint/README.md` に置いた。その後、研究者向けの作業手順書として公開ファイルには含めない方針とした。数学のソース・主張・依存の版は変更していない。
+
+検証：設定の処理順、公開条件、artifact のパスと GitHub 公式の Pages 権限要件を照合した。既存 HTML の `base` 要素を解決してローカル参照2309件のパス存在を確認し、欠落0件、ルート絶対パス0件だった。これは既存成果物のパス検査であり、新規生成・アンカー・検索の実動作の検査ではない。YAML parser は環境に存在せず構文の自動検査は未実施。Git は設定ファイルへのアクセスを拒否され、親 `AGENTS.md` も権限付きの再試行後に読めなかった。`lake`・`gh` は利用できず、Lean 再ビルド、Git の差分確認、GitHub 設定変更、push、Actions と公開 URL の検証は未実施。残件と完了条件は全体計画の `BLUEPRINT-PAGES` に記録した。
 
 <a id="repo-rename-2026-10-10"></a>
 

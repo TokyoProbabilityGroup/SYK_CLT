@@ -11,6 +11,9 @@ urlcolor=blue]{hyperref}
 \intervalconfig{soft open fences}
 \usepackage{derivative}
 \usepackage{mleftright}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{arrows.meta,positioning,calc}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
@@ -29,7 +32,12 @@ urlcolor=blue]{hyperref}
 
 \title{A Central Limit Theorem for High-Temperature SYK
 Model}
-\author{}
+\author{Yoshinori Kamijima\thanks{Information Networking for Innovation and Design, Toyo University. E-mail: kamijima@iniad.org}
+\and Shuta Nakajima\thanks{Department of Mathematics, Keio University. E-mail: njima@keio.jp}
+\and Ryoichiro Noda\thanks{Faculty of Science and Engineering, Waseda University.
+E-mail: r\textunderscore noda@aoni.waseda.jp}
+\and K\^{o}hei Sasaya\thanks{Graduate School of Mathematical Sciences, The University of Tokyo. E-mail: sasaya@g.ecc.u-tokyo.ac.jp}
+}
 \date{}
 
 \begin{document}
@@ -37,9 +45,9 @@ Model}
 \maketitle
 
 \begin{abstract}
-Fix an even integer $q\geq4$, and let $Z_N(\beta)$ be the
-partition function of the Gaussian $q$-body Sachdev--Ye--Kitaev model with $N$
-Majorana fermions.  We prove that for all sufficiently small inverse temperatures
+The Sachdev--Ye--Kitaev (SYK) model is a quantum many-body model of Majorana
+fermions with all-to-all random interactions. It has attracted wide interest in condensed matter and high-energy physics as a solvable model of non-Fermi liquids and holography. Fix an even integer $q\geq4$, and let $Z_N(\beta)$ be the
+partition function of the Gaussian $q$-body SYK model.  We prove that for all sufficiently small inverse temperatures
 $\beta > 0$, there exists $\rho=\rho(\beta)>0$ such that
 \[
 N^{q/2 -1}(\log Z_N(\beta)-\E[\log Z_N(\beta)])
@@ -60,11 +68,21 @@ free energy, central limit theorem, Gaussian chaos.
 \subfile{sections/gaussian-chaos}
 \subfile{sections/higher-chaoses}
 \subfile{sections/main-results}
-\medskip
-\noindent\emph{Statement on the use of AI.}
-The proof of the first main theorem was initially developed with ChatGPT
-5.6 Sol PRO. The authors subsequently checked and revised the proof and
-deduced the second main theorem from the first. The authors used Codex to generate Lean 4 code for verifying their proofs assuming Proposition~\ref{prop:annealed-free-energy}.
+
+\appendix
+\paragraph{Lean formalization.}
+We have formalized the proofs of our main results in Lean 4, conditional
+on Proposition~\ref{prop:annealed-free-energy}. Proposition~\ref{prop:annealed-free-energy} is
+treated as an explicit assumption and has not
+been formalized. 
+The Lean code is available at
+\url{https://github.com/TokyoProbabilityGroup/SYK_CLT}.
+
+\section*{Acknowledgements}
+  The first author was supported by JSPS KAKENHI Grant Number JP26K17003.
+ The second author was supported by JSPS KAKENHI Grant Numbers JP24K16937 and JP25K00911. 
+ The third author was supported by JSPS KAKENHI Grant Number JP26KJ0336. 
+  The fourth author was supported by JSPS KAKENHI Grant Numbers JP24KJ0022 and JP26K17012.
 \begin{thebibliography}{99}
 
 \bibitem{AGK2025}
@@ -95,6 +113,12 @@ D.~Gamarnik, F.~Pernice, A.~Schmidhuber, and A.~Zlokapa,
 \newblock The free energy limit of the SYK model at high temperature,
 \newblock \href{https://arxiv.org/abs/2605.02768}
 {arXiv:2605.02768v1}, 2026.
+
+\bibitem{GGTW2025}
+B.~Georgiev, J.~G\'omez-Serrano, T.~Tao, and A.~Z.~Wagner,
+\newblock Mathematical exploration and discovery at scale,
+\newblock \href{https://arxiv.org/abs/2511.02864}
+{arXiv:2511.02864}, 2025.
 
 \bibitem{He2026}
 Y.~He,

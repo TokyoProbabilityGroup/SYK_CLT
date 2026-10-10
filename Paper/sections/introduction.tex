@@ -3,6 +3,113 @@
 
 \begin{document}
 
+
+\section*{Research process with AI and Lean}
+
+In the past year, AI has been used more and more in mathematical research, often together with the Lean proof assistant \cite{GGTW2025}.   
+We had been studying the Sachdev--Ye--Kitaev (SYK) model together in a seminar, during which we became  interested in establishing  a central limit theorem (CLT) for its free energy. 
+We decided to investigate this problem as a case study of a mathematical research workflow involving AI and Lean.
+
+We first attempted to prove the CLT for the free energy directly through discussions with AI (ChatGPT 5.5 Pro), but these initial attempts did not lead to a proof.
+We then proposed studying the CLT for the partition function itself, rather than directly for the free energy.
+After suggesting this alternative approach to AI and continuing the discussion, we obtained proofs of the CLTs for the partition function and, consequently, the free energy. 
+We subsequently examined the AI-generated proof carefully and worked on verifying and refining it.
+In particular, the initial proof of a key estimate relied on a complicated analytic argument. 
+Through further discussions with AI (ChatGPT 5.6 Pro), we finally developed a simpler combinatorial argument, which is the approach adopted in Section~\ref{sec:Rademacher-remainder} to control the higher-order chaos terms.
+We then reorganized the paper so that the proofs are more accessible to human readers. In parallel, we formalized the refined proofs in Lean: the AI generated the code, and we reviewed it.
+
+We expect that the workflow illustrated in Figure~\ref{fig:workflow} will be useful particularly for master's and PhD students beginning mathematical research with AI. Moreover, the process of examining and discussing AI-generated arguments may itself help researchers deepen their mathematical understanding.  
+From a practical perspective, refining a mathematical proof before formalizing it in Lean can help produce simpler and better-structured code. 
+
+
+\begin{figure}[t]
+    \centering
+    \resizebox{0.9\linewidth}{!}{%
+    \begin{tikzpicture}[
+        node distance=10mm and 18mm,
+        >=Latex,
+        human/.style={
+            draw=red,
+            thick,
+            rounded corners=2pt,
+            rectangle,
+            align=center,
+            minimum height=10mm,
+            inner sep=6pt,
+            fill=red!10
+        },
+        ai/.style={
+            draw=blue,
+            thick,
+            rounded corners=2pt,
+            rectangle,
+            align=center,
+            minimum height=10mm,
+            inner sep=6pt,
+            fill=blue!10
+        },
+        final/.style={
+            draw=black!70,
+            thick,
+            rounded corners=2pt,
+            rectangle,
+            align=center,
+            minimum height=10mm,
+            inner sep=6pt,
+            fill=white
+        },
+        arr/.style={
+            -{Latex[length=2.2mm]},
+            shorten <=1.5mm,
+            shorten >=1.5mm,
+            thick
+        },
+        darr/.style={
+            <->,
+            shorten <=1.5mm,
+            shorten >=1.5mm,
+            thick
+        }
+    ]
+
+    \node[human] (study) {Study the research topic};
+    \node[ai, below=of study] (problem) {Formulate the problem and explore solutions};
+    \node[human, below=of problem] (polish) {Refine and polish the proof};
+    \node[ai, below=of polish] (lean) {Generate Lean code from the polished proof};
+
+    \node[human] (check) at ($(lean.south)+(-45mm,-23mm)$) {Examine the Lean code};
+    \node[human] (manuscript) at ($(lean.south)+(45mm,-23mm)$) {Refine the manuscript for human readers};
+
+    \coordinate (mid) at ($(check)!0.5!(manuscript)$);
+    \node[final, below=18mm of mid] (complete) {Completion of the work};
+
+    \draw[arr] (study) -- (problem);
+    \draw[arr] (problem) -- (polish);
+    \draw[arr] (polish) -- (lean);
+
+    \draw[arr] (problem.north east)
+        .. controls +(40mm,20mm) and +(40mm,-20mm) .. (problem.south east)
+        node[pos=0.5,human] (feedback) {Human feedback};
+
+    \draw[arr, shorten <=4.5mm, shorten >=4.5mm] (lean.south) -- (check.north);
+    \draw[arr, shorten <=4.5mm, shorten >=4.5mm] (lean.south) -- (manuscript.north);
+
+    \draw[darr, dashed] (check.east) -- node[above] {Mutual feedback} (manuscript.west);
+
+    \draw[arr, shorten <=4.5mm, shorten >=4.5mm] (check.south) -- (complete.north);
+    \draw[arr, shorten <=4.5mm, shorten >=4.5mm] (manuscript.south) -- (complete.north);
+
+    \end{tikzpicture}
+    }
+    \caption{
+        A schematic workflow for mathematical research with AI and Lean.
+Boxes shaded in red indicate steps carried out primarily by human researchers,
+whereas boxes shaded in blue indicate steps in which AI may play an essential role.
+    }
+    \label{fig:workflow}
+\end{figure}
+
+
 \section{Introduction and main results}
 \label{sec:introduction}
 
