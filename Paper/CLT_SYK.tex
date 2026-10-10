@@ -11,6 +11,9 @@ urlcolor=blue]{hyperref}
 \intervalconfig{soft open fences}
 \usepackage{derivative}
 \usepackage{mleftright}
+\usepackage{tikz}
+\usepackage{graphicx}
+\usetikzlibrary{arrows.meta,positioning,calc}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
@@ -29,7 +32,12 @@ urlcolor=blue]{hyperref}
 
 \title{A Central Limit Theorem for High-Temperature SYK
 Model}
-\author{}
+\author{Yoshinori Kamijima\thanks{Information Networking for Innovation and Design, Toyo University. E-mail: kamijima@iniad.org}
+\and Shuta Nakajima\thanks{Department of Mathematics, Keio University. E-mail: njima@keio.jp}
+\and Ryoichiro Noda\thanks{Faculty of Science and Engineering, Waseda University.
+E-mail: r\textunderscore noda@aoni.waseda.jp}
+\and K\^{o}hei Sasaya\thanks{Graduate School of Mathematical Sciences, The University of Tokyo. E-mail: sasaya@g.ecc.u-tokyo.ac.jp}
+}
 \date{}
 
 \begin{document}
@@ -60,11 +68,15 @@ free energy, central limit theorem, Gaussian chaos.
 \subfile{sections/gaussian-chaos}
 \subfile{sections/higher-chaoses}
 \subfile{sections/main-results}
-\medskip
-\noindent\emph{Statement on the use of AI.}
-The proof of the first main theorem was initially developed with ChatGPT
-5.6 Sol PRO. The authors subsequently checked and revised the proof and
-deduced the second main theorem from the first. The authors used Codex to generate Lean 4 code for verifying their proofs assuming Proposition~\ref{prop:annealed-free-energy}.
+
+\appendix
+\section*{Lean formalization}
+
+\section*{Acknowledgements}
+  The first author was supported by JSPS KAKENHI Grant Number JP26K17003.
+ The second author was supported by JSPS KAKENHI Grant Numbers JP24K16937 and JP25K00911. 
+ The third author was supported by JSPS KAKENHI Grant Number JP26KJ0336. 
+  The fourth author was supported by JSPS KAKENHI Grant Numbers JP24KJ0022 and JP26K17012.
 \begin{thebibliography}{99}
 
 \bibitem{AGK2025}
