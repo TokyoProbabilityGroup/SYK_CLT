@@ -1,5 +1,5 @@
 # Lake / build artifacts
-/_out/
+_out/
 .lake/
 lake-packages/
 build/
@@ -28,8 +28,8 @@ build/
 *.synctex(busy)
 *.synctex.gz
 *.synctex.gz(busy)
-/CLT/refs/CLT_SYK.pdf
-/CLT/refs/sections/*.pdf
+/Paper/CLT_SYK.pdf
+/Paper/sections/*.pdf
 .vscode
 
 # OS junk
@@ -38,9 +38,6 @@ Thumbs.db
 
 # nested local repos
 2Dcollision/
-
-# nested local repos
-SYK/
 
 # nested local repos
 research_public/

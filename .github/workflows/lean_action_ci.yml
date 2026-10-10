@@ -19,24 +19,25 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v5
         with:
-          path: SYK
+          path: SYK_CLT
 
       - name: Materialize workspace root
         run: |
           set -euo pipefail
-          cp SYK/workspace/lakefile.toml      ./lakefile.toml
-          cp SYK/workspace/lake-manifest.json ./lake-manifest.json
-          cp SYK/workspace/lean-toolchain     ./lean-toolchain
+          cp SYK_CLT/workspace/lakefile.toml      ./lakefile.toml
+          cp SYK_CLT/workspace/lake-manifest.json ./lake-manifest.json
+          cp SYK_CLT/workspace/lean-toolchain     ./lean-toolchain
           ls -la
 
       - uses: leanprover/lean-action@v1
-        # Use defaultTargets from the version-controlled Lake configuration.
+        # The parent workspace has no default targets; build the Blueprint package,
+        # which also checks the complete mathematical library.
         with:
+          build-args: SYKBlueprint
           use-github-cache: false
 
-      # Verso is temporarily disabled to reduce CI work. Preserve for restoration.
-      # - name: Build Blueprint site
-      #   run: lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site
-      #
-      # - name: Check Blueprint output
-      #   run: lake exe vbp check --site SYK/_out/site
+      - name: Build Blueprint site
+        run: lake lean SYK_CLT/Blueprint/SYKBlueprintMain.lean -- --run SYK_CLT/Blueprint/SYKBlueprintMain.lean --output SYK_CLT/_out/site
+
+      - name: Check Blueprint output
+        run: lake exe vbp check --site SYK_CLT/_out/site

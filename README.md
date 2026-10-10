@@ -2,102 +2,94 @@
 
 Research on the Sachdev–Ye–Kitaev (SYK) model from the perspective of probability theory.
 
-## Abstract
-
 ## Requirements
 
 - Lean 4.32.2
 - Mathlib 4.32.2
+- Verso Blueprint v4.32.0 for the documentation workspace
+
+## Repository layout
+
+```text
+SYK_CLT/                   # repository and mathematical Lake package
+├── SYK/                   # mathematical Lean modules, namespace SYK
+│   ├── Analysis/
+│   ├── Probability/
+│   ├── Model/
+│   ├── SuperConcentration/
+│   └── CLT/               # Chaos, Quadratic, Limit, Log, and main results
+├── Paper/                 # CLT_SYK.tex and its four sections
+├── Notes/                 # lecture notes and their distributed PDF
+├── Blueprint/             # SYKBlueprint package: document, generator entry point, four chapters
+├── lakefile.toml           # mathlib-only mathematical package
+└── workspace/             # parent ResearchWorkspace template
+```
+
+The CLTs assume the Gaussian AnnealedInput explicitly. See the CLT README (SYK/CLT/README.md) and the concentration README (SYK/SuperConcentration/README.md) for the current statements and verification commands.
 
 ## Setup instructions
 
-To avoid duplicating the disk space used by [mathlib](https://github.com/leanprover-community/mathlib4), clone this repository into a workspace directory and copy the configuration files from `SYK/workspace/` to the workspace root, alongside the cloned `SYK/` directory.
-Specifically, please run the following commands:
-
-```bash
-cd <working directory>  # Replace <working directory> with a path of your choice.
-git clone git@github.com:TokyoProbabilityGroup/SYK.git
-cp SYK/workspace/lakefile.toml .
-cp SYK/workspace/lake-manifest.json .
-cp SYK/workspace/lean-toolchain .
-lake exe cache get
-```
-
-This produces the following directory structure:
-
-```
-<working directory>/
-├── SYK/
-│   ├── .git/
-│   ├── .github/
-│   ├── Annealed_FE/
-│   ├── Blueprint.lean
-│   ├── BlueprintMain.lean
-│   ├── Chapters/
-│   ├── ...
-│   ├── workspace/
-│   ├── .gitignore
-│   └── README.md
-├── .lake/
-│   ├── build/
-│   ├── config/
-│   └── packages/
-├── lake-manifest.json
-├── lakefile.toml
-└── lean-toolchain
-```
-
-## Building and testing
-
-To build the workspace's default targets, run:
+Clone this repository into a shared workspace and copy the parent configuration template:
 
 ```bash
 cd <working directory>
-lake build
+git clone git@github.com:TokyoProbabilityGroup/SYK_CLT.git
+cp SYK_CLT/workspace/lakefile.toml .
+cp SYK_CLT/workspace/lake-manifest.json .
+cp SYK_CLT/workspace/lean-toolchain .
+cp SYK_CLT/workspace/AGENTS.md .
+lake exe cache get
 ```
 
-`defaultTargets` in `lakefile.toml` selects the libraries built by `lake build`.
-The mathematical topics have individual targets such as `Model`, `SuperConcentration`, and `CLT`; the `SYK` target currently checks shared foundations under `SYK/Probability/` and their dependencies. Blueprint and chapter modules are temporarily excluded.
-The main CLTs are Lean-checked conditional on `AnnealedInput`; constructing that input remains a separate task. A successful build alone does not establish that the formal statements match every claim in the manuscript.
-There is no aggregate Lean import file: Lake manages the build targets directly.
-All project-specific Lean sources remain inside the repository; only the shared Lake configuration, dependency manifest, and toolchain file are copied to the workspace root.
-To build one library separately, run a command such as `lake build Model`.
-After modifying a Lean source file, first check that file directly from the workspace root.
-For example:
+Review existing parent files before overwriting them. Projects in the parent workspace share a single `.lake/packages/` directory to avoid downloading and storing duplicate copies of mathlib and other dependencies. Run the following commands from that parent directory. See [the workspace guide](workspace/README.md) for handoff and configuration details.
+
+## Building and testing
 
 ```bash
-lake env lean SYK/Model/Definitions.lean
+lake build SYKBlueprint
+lake build SYK
+lake env lean SYK_CLT/SYK/CLT/Main.lean
 ```
+
+`lake build SYKBlueprint` checks mathematics and Blueprint; `lake build SYK` checks mathematics only. [The workspace guide](workspace/README.md#template-files-and-targets) explains the targets and dependency configuration.
+
+The CLTs are Lean-checked conditional on `AnnealedInput`; constructing that input remains separate. Build success alone does not establish agreement between the formal statements and every manuscript claim. After changing a Lean file, check it individually before the final workspace build.
+
+For the main results, inspect their types and axiom dependencies in a Lean editor or scratch file using the parent workspace:
+
+```lean
+import SYK.CLT.StandardModel
+
+#check SYK.CLT.partition_and_log_partition_clt
+#print axioms SYK.CLT.partition_and_log_partition_clt
+#check SYK.CLT.standard_partition_and_log_partition_clt
+#print axioms SYK.CLT.standard_partition_and_log_partition_clt
+```
+
+Check the displayed assumptions, quantifier order, normalizations, and conclusions against the manuscript. Both theorems require an explicit `hFE : AnnealedInput ...`; `#print axioms` checks their axiom dependencies but does not prove this input. These statement and assumption checks are needed when assessing which manuscript claims the formalization verifies, in addition to routine builds.
 
 ## Blueprint
 
-Verso is temporarily disabled to reduce GitHub Actions work. The source files remain intact; generation and validation commands below are commented out. See [restoration instructions](workspace/README.md#restoring-verso).
-
-The formalization blueprint is written in `Blueprint.lean` and `Chapters/`.
-To generate the HTML site and validate its manifest, run from the workspace root:
+Generate HTML and check its references from the parent workspace:
 
 ```bash
-# lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site
-# lake exe vbp check --site SYK/_out/site
+lake lean SYK_CLT/Blueprint/SYKBlueprintMain.lean -- --run SYK_CLT/Blueprint/SYKBlueprintMain.lean --output SYK_CLT/_out/site
+lake exe vbp check --site SYK_CLT/_out/site
 ```
 
-After restoring Verso, run both commands after changing `Blueprint.lean`, `BlueprintMain.lean`, a file under `Chapters/`, or a Lean declaration name referenced by the Blueprint.
-`lake lean` builds the entry point's imports and runs the renderer directly. No shell script or separately compiled renderer executable is required.
-`vbp check` verifies the consistency of the generated manifest, HTML cache, and internal references.
+After changing documentation or referenced declarations, check the affected chapters and both entry modules with Lean, then run these commands. `vbp check` verifies manifest, HTML cache, and internal-reference consistency; it does not prove mathematical claims.
 
-The generated site is written to `SYK/_out/site/html-multi/` and is excluded from Git.
-To build a PDF as well, append `--pdf` to the renderer command above.
-This requires `lualatex`, or a compatible engine, to be available on `PATH`.
-To inspect the generated site locally, run:
+Generated HTML is under `SYK_CLT/_out/site/html-multi/` and is ignored by Git. For an optional PDF, append `--pdf` to the renderer command; a compatible LuaLaTeX environment is required. To serve the generated HTML locally:
 
 ```bash
-# The installed vbp build --serve only discovers generators at the workspace root.
-# Our generator is SYK/BlueprintMain.lean, so serve the generated site directly.
-# The built-in vbp server also uses Python's HTTP server internally.
-python3 -m http.server 8000 --bind 127.0.0.1 --directory SYK/_out/site/html-multi
+python3 -m http.server 8000 --bind 127.0.0.1 --directory SYK_CLT/_out/site/html-multi
 ```
 
-Then open `http://localhost:8000/`. Serving the generated site requires Python 3.
+Open `http://localhost:8000/`. [The workspace guide](workspace/README.md#blueprint-dependencies) explains the explicit renderer and platform details.
+
+## Manuscript and notes
+
+From `SYK_CLT/Paper/`, run `latexmk -pdf CLT_SYK.tex`. The four files under `Paper/sections/` can also be compiled independently from that directory; references defined in other sections may remain unresolved in standalone builds. From `SYK_CLT/Notes/`, run `latexmk -pdf note.tex`. The manuscript and Lean formalization have separate verification requirements.
 
 ## References
 

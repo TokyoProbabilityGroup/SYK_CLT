@@ -1,50 +1,10 @@
-name = "SYK"
+name = "ResearchWorkspace"
 version = "0.1.0"
-keywords = ["math"]
-# Restore Annealed_FE and Universality when their individual builds are ready.
-defaultTargets = ["Model", "SuperConcentration", "CLT", "SYK"]
-# defaultTargets = ["Model", "SuperConcentration", "CLT", "SYK", "Annealed_FE", "Universality"]
-
-[leanOptions]
-pp.unicode.fun = true # pretty-prints `fun a ↦ b`
-relaxedAutoImplicit = false
-weak.linter.mathlibStandardSet = true
-maxSynthPendingDepth = 3
-experimental.module = true
-
-# Verso is temporarily disabled to reduce CI work. Preserve for restoration.
-# [[require]]
-# name = "VersoBlueprint"
-# git = "https://github.com/leanprover/verso-blueprint"
-# rev = "v4.32.0"
 
 [[require]]
-name = "mathlib"
-scope = "leanprover-community"
-rev = "v4.32.2"
-
-[[lean_lib]]
 name = "SYK"
-# Shared foundations; Blueprint sources are preserved but temporarily excluded.
-globs = ["SYK.Probability.GaussianConcentration.+"]
-# globs = ["SYK.Probability.GaussianConcentration.+", "SYK.Blueprint", "SYK.Chapters.+"]
+path = "SYK_CLT"
 
-[[lean_lib]]
-name = "Annealed_FE"
-globs = ["SYK.Annealed_FE.+"]
-
-[[lean_lib]]
-name = "CLT"
-globs = ["SYK.CLT.+"]
-
-[[lean_lib]]
-name = "SuperConcentration"
-globs = ["SYK.SuperConcentration.+"]
-
-[[lean_lib]]
-name = "Model"
-globs = ["SYK.Model.+"]
-
-[[lean_lib]]
-name = "Universality"
-globs = ["SYK.Universality.+"]
+[[require]]
+name = "SYKBlueprint"
+path = "SYK_CLT/Blueprint"
