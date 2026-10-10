@@ -18,7 +18,7 @@ The internal planning documents are written in Japanese for collaboration betwee
 
 ## Finding a lemma
 
-From the shared workspace root, start with a declaration name and its callers: `rg -n 'NAME' SYK/SYK/CLT SYK/SYK/Probability SYK/SYK/Model SYK/SYK/Analysis`. For an unfamiliar file, search its `theorem`, `lemma`, `def`, and `namespace` lines before reading proofs. Each lemma module's opening docstring lists its role and main entry points.
+From the shared workspace root, start with a declaration name and its callers: `rg -n 'NAME' SYK_CLT/SYK/CLT SYK_CLT/SYK/Probability SYK_CLT/SYK/Model SYK_CLT/SYK/Analysis`. For an unfamiliar file, search its `theorem`, `lemma`, `def`, and `namespace` lines before reading proofs. Each lemma module's opening docstring lists its role and main entry points.
 
 The principal import paths are:
 
@@ -63,7 +63,7 @@ Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-
 The conditional CLT is integrated into `Main.lean`. For `partition_clt`, `log_partition_clt`, `partition_and_log_partition_clt` and the three standard-family theorems in `StandardModel.lean`, `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`; `hFE : AnnealedInput q S` remains an explicit hypothesis. After modifying a Lean file, check it from the shared workspace root:
 
 ```bash
-lake env lean SYK/SYK/CLT/path/to/File.lean
+lake env lean SYK_CLT/SYK/CLT/path/to/File.lean
 ```
 
 Use `lake build SYK` for the mathematical library and `lake build SYKBlueprint` for the mathematics together with the Blueprint. Inspect the principal theorem types and `#print axioms` as described in [the repository guide](../../README.md#building-and-testing). The LaTeX manuscript and Lean formalization have separate verification requirements; successful verification of one does not establish the correctness of the other.

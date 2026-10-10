@@ -3,8 +3,8 @@ version = "0.1.0"
 
 [[require]]
 name = "SYK"
-path = "SYK"
+path = "SYK_CLT"
 
 [[require]]
 name = "SYKBlueprint"
-path = "SYK/Blueprint"
+path = "SYK_CLT/Blueprint"

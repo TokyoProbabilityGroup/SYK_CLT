@@ -11,7 +11,7 @@ Research on the Sachdev–Ye–Kitaev (SYK) model from the perspective of probab
 ## Repository layout
 
 ```text
-SYK/                       # repository and mathematical Lake package
+SYK_CLT/                   # repository and mathematical Lake package
 ├── SYK/                   # mathematical Lean modules, namespace SYK
 │   ├── Analysis/
 │   ├── Probability/
@@ -33,11 +33,11 @@ Clone this repository into a shared workspace and copy the parent configuration 
 
 ```bash
 cd <working directory>
-git clone git@github.com:TokyoProbabilityGroup/SYK.git
-cp SYK/workspace/lakefile.toml .
-cp SYK/workspace/lake-manifest.json .
-cp SYK/workspace/lean-toolchain .
-cp SYK/workspace/AGENTS.md .
+git clone git@github.com:TokyoProbabilityGroup/SYK_CLT.git
+cp SYK_CLT/workspace/lakefile.toml .
+cp SYK_CLT/workspace/lake-manifest.json .
+cp SYK_CLT/workspace/lean-toolchain .
+cp SYK_CLT/workspace/AGENTS.md .
 lake exe cache get
 ```
 
@@ -48,7 +48,7 @@ Review existing parent files before overwriting them. Projects in the parent wor
 ```bash
 lake build SYKBlueprint
 lake build SYK
-lake env lean SYK/SYK/CLT/Main.lean
+lake env lean SYK_CLT/SYK/CLT/Main.lean
 ```
 
 `lake build SYKBlueprint` checks mathematics and Blueprint; `lake build SYK` checks mathematics only. [The workspace guide](workspace/README.md#template-files-and-targets) explains the targets and dependency configuration.
@@ -73,23 +73,23 @@ Check the displayed assumptions, quantifier order, normalizations, and conclusio
 Generate HTML and check its references from the parent workspace:
 
 ```bash
-lake lean SYK/Blueprint/SYKBlueprintMain.lean -- --run SYK/Blueprint/SYKBlueprintMain.lean --output SYK/_out/site
-lake exe vbp check --site SYK/_out/site
+lake lean SYK_CLT/Blueprint/SYKBlueprintMain.lean -- --run SYK_CLT/Blueprint/SYKBlueprintMain.lean --output SYK_CLT/_out/site
+lake exe vbp check --site SYK_CLT/_out/site
 ```
 
 After changing documentation or referenced declarations, check the affected chapters and both entry modules with Lean, then run these commands. `vbp check` verifies manifest, HTML cache, and internal-reference consistency; it does not prove mathematical claims.
 
-Generated HTML is under `SYK/_out/site/html-multi/` and is ignored by Git. For an optional PDF, append `--pdf` to the renderer command; a compatible LuaLaTeX environment is required. To serve the generated HTML locally:
+Generated HTML is under `SYK_CLT/_out/site/html-multi/` and is ignored by Git. For an optional PDF, append `--pdf` to the renderer command; a compatible LuaLaTeX environment is required. To serve the generated HTML locally:
 
 ```bash
-python3 -m http.server 8000 --bind 127.0.0.1 --directory SYK/_out/site/html-multi
+python3 -m http.server 8000 --bind 127.0.0.1 --directory SYK_CLT/_out/site/html-multi
 ```
 
 Open `http://localhost:8000/`. [The workspace guide](workspace/README.md#blueprint-dependencies) explains the explicit renderer and platform details.
 
 ## Manuscript and notes
 
-From `SYK/Paper/`, run `latexmk -pdf CLT_SYK.tex`. The four files under `Paper/sections/` can also be compiled independently from that directory; references defined in other sections may remain unresolved in standalone builds. From `SYK/Notes/`, run `latexmk -pdf note.tex`. The manuscript and Lean formalization have separate verification requirements.
+From `SYK_CLT/Paper/`, run `latexmk -pdf CLT_SYK.tex`. The four files under `Paper/sections/` can also be compiled independently from that directory; references defined in other sections may remain unresolved in standalone builds. From `SYK_CLT/Notes/`, run `latexmk -pdf note.tex`. The manuscript and Lean formalization have separate verification requirements.
 
 ## References
 

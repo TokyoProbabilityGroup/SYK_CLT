@@ -4,6 +4,16 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="repo-rename-2026-10-10"></a>
+
+## リポジトリ名の変更（2026-10-10）
+
+研究者が GitHub のリポジトリ名を `SYK` から `SYK_CLT` に変更し、ローカルのディレクトリも `SYK_CLT/` にした。Lake のパッケージ名 `SYK`・`SYKBlueprint`、Lean のライブラリ名、宣言の名前空間は変えていない。変わるのはディレクトリ名だけである。
+
+ワークスペースのルートの `lakefile.toml` と `lake-manifest.json`（`SYK` と `SYKBlueprint` の `path`・`dir`）、雛形 `workspace/` の同じ 2 ファイル、CI（`actions/checkout` の `path` と雛形のコピー・生成のパス）、`workspace/README.md`、トピック別の説明 3 か所を `SYK_CLT` に合わせた。この文書より前の記述にある旧パスと旧コマンドは、当時の事実として残している。
+
+検証：ワークスペースのルートからの `lake build SYKBlueprint` が再ビルドなしで成功した（約3秒）。
+
 <a id="editor-root-2026-10-10"></a>
 
 ## エディタのプロジェクトルートと依存キャッシュの共有（2026-10-10）
