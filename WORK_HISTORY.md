@@ -14,7 +14,11 @@
 
 続いて `Lipschitz`（75件）を解消した。長い行 29 件の折り返し、`refine'` 18 件の `refine` への書き換え（解決される穴は `_` のまま、ゴールになる穴だけ `?_` にした）、柔軟な `simp`・`simp_all` 20 件の `only` への固定、未使用の引数 1 件、不要な `simpa` 1 件、`multiGoal` 5 件である。`multiGoal` は、後から `refine fun a => ...` で与えていた暗黙の関数（`integral_mono_of_nonneg` の `g`、`tendsto_integral_of_dominated_convergence` の `bound`）を、最初の `refine` の引数として渡すことで解消した。折り返しの検査は、`lake env lean` にも lakefile の `leanOptions`（linter の設定）を渡さないと警告が出ないので、`-Dweak.linter.mathlibStandardSet=true` などを明示して行った。
 
-検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 432 件に減った。変更前後の全 742 宣言の型・可視性・種類・モジュールは完全に一致し、主要 4 定理は通常公理のみに依存する。
+続いて `StandardGaussian`（257件）を解消した。長い行 129 件の折り返しと、長すぎるインラインの `by` ブロック 14 件の展開、`refine'` 58 件の `refine` への書き換え、柔軟な `simp`・`simp_all` の `only` への固定、未使用の引数 15 件の削除、`multiGoal` 16 件の解消である。`Integrable.mono'` の暗黙の関数 `g` は、後から `refine fun x => ...` で与えるのをやめて、`(g := ...)` として最初の `refine` に渡した。`by_cases ... <;> simp` の5箇所は、同じファイルの別の箇所と同じ `simpa [hj] using ...` の形に揃えた。`simp?` の提案は `<;>` で複数のゴールに適用されると分岐ごとに異なるので、両方の補題の和集合を使った。
+
+`StandardGaussian` に残る3件は、承認が要る：`integrable_abs_coord_mul_exp_c_sum_abs_pi` の未使用 `[DecidableEq ι]`、`pi_gaussian_stein_coord` の未使用の仮定 `hc : 0 ≤ c`・`hC : 0 ≤ C`。
+
+検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 178 件に減った。変更前後の全 742 宣言の型・可視性・種類・モジュールは完全に一致し、主要 4 定理は通常公理のみに依存する。
 
 <a id="repo-rename-2026-10-10"></a>
 
