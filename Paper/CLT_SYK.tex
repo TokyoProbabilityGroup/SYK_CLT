@@ -70,7 +70,13 @@ free energy, central limit theorem, Gaussian chaos.
 \subfile{sections/main-results}
 
 \appendix
-\section*{Lean formalization}
+\paragraph{Lean formalization.}
+We have formalized the proofs of our main results in Lean 4, using Mathlib, conditional
+on Proposition~\ref{prop:annealed-free-energy}. Proposition~\ref{prop:annealed-free-energy} is
+treated as an explicit assumption and has not
+been formalized. 
+The Lean code is available at
+\url{https://github.com/TokyoProbabilityGroup/SYK_CLT}.
 
 \section*{Acknowledgements}
   The first author was supported by JSPS KAKENHI Grant Number JP26K17003.
@@ -107,6 +113,12 @@ D.~Gamarnik, F.~Pernice, A.~Schmidhuber, and A.~Zlokapa,
 \newblock The free energy limit of the SYK model at high temperature,
 \newblock \href{https://arxiv.org/abs/2605.02768}
 {arXiv:2605.02768v1}, 2026.
+
+\bibitem{GGTW2025}
+B.~Georgiev, J.~G\'omez-Serrano, T.~Tao, and A.~Z.~Wagner,
+\newblock Mathematical exploration and discovery at scale,
+\newblock \href{https://arxiv.org/abs/2511.02864}
+{arXiv:2511.02864}, 2025.
 
 \bibitem{He2026}
 Y.~He,
