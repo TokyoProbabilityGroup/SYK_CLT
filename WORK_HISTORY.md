@@ -4,6 +4,14 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="ring-cleanup-2026-10-11"></a>
+
+## `ring` の `ring_nf` への退避の整理（2026-10-11）
+
+`ring` が目標を閉じられず `ring_nf` に退避していた info 7 件（`gaussianReal_stein` の書き直しで消えた 13 件を除く）を整理した。`ring_nf` が目標を閉じる 1 件（`StandardGaussian`）は `ring_nf` に置換した。残りは、`ring_nf` の途中の正規形に後続のタクティクが依存していたので、置換せずに書き方を変えた。`Smooth`・`Lipschitz` の `exp (a) = exp (b) * exp (c)` の形の 4 件は `rw [← Real.exp_add]; congr 1; ring` とし、1 件は `mul_add`・`Real.exp_add` で展開してから `ring` とした。`Smooth` の回転の変数変換の 1 件は、`F` の引数を先に `rw [show …]` で書き換えて、不要な `ring` を 2 つ削除した。ゴールを変えていなかった 1 件の `ring` は削除した。
+
+検証：`StandardGaussian`・`Smooth`・`Lipschitz` を `lake lean` で検査し、エラー・警告・info は 0 件だった。`lake build SYK` と `lake build SYKBlueprint` が成功した。`SYK.Probability.GaussianConcentration.*` の全宣言の名前・モジュール・型を変更の前後で書き出して比べ、一致した。主要定理は通常公理のみに依存する。
+
 <a id="stein-proof-2026-10-11"></a>
 
 ## `gaussianReal_stein` の証明の書き直し（2026-10-11）

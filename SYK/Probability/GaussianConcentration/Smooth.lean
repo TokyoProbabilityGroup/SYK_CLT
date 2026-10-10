@@ -471,10 +471,10 @@ lemma gaussian_cov_change_of_var (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (
     · simp +decide only [ContinuousLinearMap.rotation, neg_smul, ContinuousLinearMap.coe_mk',
         LinearMap.coe_mk, AddHom.coe_mk, smul_add, smul_neg, inner_gradient_left, map_add, map_neg,
         map_smul, smul_eq_mul];
-      congr with p ; ring;
+      congr with p
       rw [ show Real.cos θ • Real.cos θ • p.1 + Real.cos θ • Real.sin θ • p.2 - ( - ( Real.sin θ •
         Real.sin θ • p.1 ) + Real.sin θ • Real.cos θ • p.2 ) = p.1
-        by ext i; simpa using by ring_nf; rw [ Real.sin_sq, Real.cos_sq ] ; ring ] ; ring;
+        by ext i; simpa using by ring_nf; rw [ Real.sin_sq, Real.cos_sq ] ; ring ]
     · exact Continuous.aemeasurable ( by continuity );
     · refine MeasureTheory.Integrable.aestronglyMeasurable ?_;
       rw [ rotation_measurePreserving θ |>.map_eq ] ; assumption;
@@ -759,8 +759,7 @@ lemma gaussian_cov_repr (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 �
   · refine MeasureTheory.Integrable.mono' (g := fun x => Real.exp ( |s| * ( |F 0| + L * ‖x‖ ) )) ?_
       ?_ ?_;
     · convert integrable_exp_mul_norm ( |s| * L ) |> fun h => h.const_mul ( Real.exp ( |s| * |F
-        0| ) ) using 1 ; ext ; ring;
-      rw [ ← Real.exp_add ];
+        0| ) ) using 1 ; ext ; rw [ ← Real.exp_add ] ; congr 1 ; ring
     · exact Continuous.aestronglyMeasurable ( by exact Real.continuous_exp.comp
                                                   ( continuous_const.mul hF.continuous ) );
     · have h_bound : ∀ x, |F x| ≤ |F 0| + L * ‖x‖ := by
@@ -847,8 +846,7 @@ lemma gaussian_cov_H_bound (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0
     refine MeasureTheory.Integrable.mono' (g := fun x => Real.exp ( |s| * ( |F 0| + L * ‖x‖ ) )) ?_
       ?_ ?_;
     · convert integrable_exp_mul_norm ( |s| * L ) |> fun h => h.const_mul ( Real.exp ( |s| * |F
-        0| ) ) using 2 ; ring;
-      rw [ ← Real.exp_add ];
+        0| ) ) using 2 ; rw [ ← Real.exp_add ] ; congr 1 ; ring
     · exact Continuous.aestronglyMeasurable ( by exact Real.continuous_exp.comp
                                                   ( continuous_const.mul hF.continuous ) );
     · filter_upwards [ ] with x using
@@ -869,7 +867,7 @@ lemma gaussian_cov_H_bound (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0
         gradient F x := by
         unfold gradient;
         rw [ fderiv_exp ] <;> norm_num [ hF.contDiffAt.differentiableAt ];
-        rw [ fderiv_const_mul ] <;> norm_num [ hF.contDiffAt.differentiableAt ] ; ring;
+        rw [ fderiv_const_mul ] <;> norm_num [ hF.contDiffAt.differentiableAt ]
         rw [ smul_smul, mul_comm ];
       simp_all +decide [ norm_smul ];
       nlinarith [ show 0 ≤ |s| * Real.exp ( s * F x ) * L

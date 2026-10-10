@@ -161,8 +161,7 @@ lemma tendsto_integrals_of_approx {ι : Type*} [Fintype ι]
     · exact fun n => Continuous.aestronglyMeasurable ( Real.continuous_exp.comp
         ( continuous_const.mul ( hcont n ) ) );
     · convert integrable_exp_mul_norm ( |s| * L ) |> fun h => h.const_mul ( Real.exp ( |s| * C ) )
-        using 1 ; ext ; ring;
-      rw [ ← Real.exp_add ];
+        using 1 ; ext ; rw [ ← Real.exp_add ] ; congr 1 ; ring
     · intro n; filter_upwards [ ] with x; rw [ Real.norm_of_nonneg ( Real.exp_nonneg _ ) ] ;
         exact Real.exp_le_exp.mpr ( by cases abs_cases s <;> nlinarith [ abs_le.mp ( hbound n
                                         x ) ] ) ;
@@ -191,8 +190,8 @@ lemma tendsto_integrals_of_approx {ι : Type*} [Fintype ι]
             convert integrable_exp_mul_norm ( |s| * L ) using 1;
           simpa only [ mul_assoc ] using h_integrable.const_mul C;
         · exact h_integrable.const_mul L;
-      convert h_integrable.const_mul ( Real.exp ( |s| * C ) ) using 2 ; ring;
-      simp only [mul_assoc, ← Real.exp_add];
+      convert h_integrable.const_mul ( Real.exp ( |s| * C ) ) using 2
+      rw [ mul_add, Real.exp_add, ← mul_assoc |s| L ]; ring
     · intro n
       simp only [norm_mul, Real.norm_eq_abs, Real.abs_exp];
       filter_upwards [ ] with x using mul_le_mul ( hbound n x ) ( Real.exp_le_exp.mpr
