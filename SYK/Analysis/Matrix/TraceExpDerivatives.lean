@@ -16,10 +16,10 @@ The iterated directional derivatives at a Hermitian base point are bounded by th
 the operator norms of the directions times `‖traceExp A‖`. The connection to the scale, real
 part and Gaussian growth of `Setting.Z` is made in
 `SYK/CLT/Chaos/PartitionHigherDerivatives.lean`.
-Main entry points: `SYK.MatrixAnalysis.Matrix.contDiff_traceExp`,
-`SYK.MatrixAnalysis.Matrix.traceExp`,
-`SYK.MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound`,
-`SYK.MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound_of_norm_le_one`.
+Main entry points: `SYK.MatrixAnalysis.contDiff_traceExp`,
+`SYK.MatrixAnalysis.traceExp`,
+`SYK.MatrixAnalysis.iterDirectionalFDeriv_traceExp_bound`,
+`SYK.MatrixAnalysis.iterDirectionalFDeriv_traceExp_bound_of_norm_le_one`.
 -/
 
 namespace SYK.MatrixAnalysis
@@ -63,11 +63,11 @@ end DirectionalDerivative
 
 /-- The real normed-space structure on matrices obtained by restricting scalars, used by the
 real Fréchet derivatives below. -/
-noncomputable local instance Matrix.realNormedSpace {𝕜 n : Type*} [RCLike 𝕜] [Fintype n]
+noncomputable local instance realNormedSpace {𝕜 n : Type*} [RCLike 𝕜] [Fintype n]
     [DecidableEq n] : NormedSpace ℝ (Matrix n n 𝕜) :=
   NormedSpace.restrictScalars ℝ 𝕜 (Matrix n n 𝕜)
 
-namespace Matrix
+section
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 
@@ -75,9 +75,9 @@ variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 noncomputable def traceExp (A : Matrix n n 𝕜) : 𝕜 :=
   normalizedTrace (NormedSpace.exp A)
 
-end Matrix
+end
 
-namespace DerivAux
+section RealScalars
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 
@@ -96,8 +96,8 @@ private local instance : IsScalarTower ℝ 𝕜 (Matrix n n 𝕜) :=
     ring⟩
 
 /-- Smoothness of the normalized trace exponential as a real map. -/
-theorem _root_.SYK.MatrixAnalysis.Matrix.contDiff_traceExp :
-    ContDiff ℝ ⊤ (Matrix.traceExp : Matrix n n 𝕜 → 𝕜) := by
+theorem contDiff_traceExp :
+    ContDiff ℝ ⊤ (traceExp : Matrix n n 𝕜 → 𝕜) := by
   have hexp : ContDiff ℝ ⊤ (NormedSpace.exp : Matrix n n 𝕜 → Matrix n n 𝕜) := by
     rw [contDiff_iff_contDiffAt]
     intro x
@@ -112,48 +112,50 @@ theorem _root_.SYK.MatrixAnalysis.Matrix.contDiff_traceExp :
     ext a b
     rfl
   have hsmooth : @ContDiff ℝ _ (Matrix n n 𝕜) _ _ 𝕜 _
-      (NormedAlgebra.toNormedSpace 𝕜) ⊤ Matrix.traceExp := by
+      (NormedAlgebra.toNormedSpace 𝕜) ⊤ traceExp := by
     change @ContDiff ℝ _ (Matrix n n 𝕜) _ _ 𝕜 _
       (NormedAlgebra.toNormedSpace 𝕜) ⊤ (fun A : Matrix n n 𝕜 =>
         (Fintype.card n : 𝕜)⁻¹ * Matrix.trace (NormedSpace.exp A))
     exact contDiff_const.mul (htrace.comp hexp)
   exact hNS ▸ hsmooth
 
+namespace DerivAux
+
 open scoped Nat in
 /-- Sharp bound on the iterated derivatives of the normalized trace exponential at a Hermitian
 point: each direction contributes its operator norm. -/
 private theorem iteratedFDeriv_traceExp_bound_hermitian [Nonempty n] (A : Matrix n n 𝕜)
     (hA : A.IsHermitian) (k : ℕ) (v : Fin k → Matrix n n 𝕜) :
-    ‖iteratedFDeriv ℝ k Matrix.traceExp A v‖ ≤ (∏ i, ‖v i‖) * ‖Matrix.traceExp A‖ := by
+    ‖iteratedFDeriv ℝ k traceExp A v‖ ≤ (∏ i, ‖v i‖) * ‖traceExp A‖ := by
   set c0 := ‖A‖ with hc0
   set ν : n → ℝ := fun j => hA.eigenvalues j + c0 with hν_def
   have hν : ∀ j, 0 ≤ ν j := fun j => by
-    have := Matrix.abs_eigenvalues_le A hA j
+    have := abs_eigenvalues_le A hA j
     simp only [ν]
     linarith [neg_abs_le (hA.eigenvalues j)]
-  set D := Matrix.conjDiag A hA ν with hD_def
-  have hDeq : D = A + ((c0 : ℝ) : 𝕜) • (1 : Matrix n n 𝕜) := Matrix.conjDiag_add_const A hA c0
-  have hDtr : ∀ l : ℕ, ‖Matrix.normalizedTrace (D ^ l)‖ =
+  set D := conjDiag A hA ν with hD_def
+  have hDeq : D = A + ((c0 : ℝ) : 𝕜) • (1 : Matrix n n 𝕜) := conjDiag_add_const A hA c0
+  have hDtr : ∀ l : ℕ, ‖normalizedTrace (D ^ l)‖ =
       (∑ j, ν j ^ l) / Fintype.card n := fun l => by
-    rw [Matrix.normalizedTrace_conjDiag_pow, RCLike.norm_ofReal, abs_of_nonneg
+    rw [normalizedTrace_conjDiag_pow, RCLike.norm_ofReal, abs_of_nonneg
       (div_nonneg (Finset.sum_nonneg fun j _ => pow_nonneg (hν j) l) (Nat.cast_nonneg _))]
   have hDs : ∀ l : ℕ, 1 ≤ l →
-      Matrix.normalizedSchattenNorm l D ^ l = ‖Matrix.normalizedTrace (D ^ l)‖ := fun l hl => by
-    rw [hDtr, Matrix.normalizedSchattenNorm_conjDiag_pow A hA ν hν l hl]
-  have htE : ‖Matrix.traceExp A‖ = (∑ j, Real.exp (hA.eigenvalues j)) / Fintype.card n := by
-    have h := Matrix.trace_exp_smul_of_isHermitian A hA 1
+      normalizedSchattenNorm l D ^ l = ‖normalizedTrace (D ^ l)‖ := fun l hl => by
+    rw [hDtr, normalizedSchattenNorm_conjDiag_pow A hA ν hν l hl]
+  have htE : ‖traceExp A‖ = (∑ j, Real.exp (hA.eigenvalues j)) / Fintype.card n := by
+    have h := trace_exp_smul_of_isHermitian A hA 1
     rw [one_smul] at h
     simp only [one_mul] at h
-    rw [Matrix.traceExp, Matrix.normalizedTrace, h, ← RCLike.ofReal_sum, ← RCLike.ofReal_natCast,
+    rw [traceExp, normalizedTrace, h, ← RCLike.ofReal_sum, ← RCLike.ofReal_natCast,
       ← RCLike.ofReal_inv, ← RCLike.ofReal_mul, RCLike.norm_ofReal, abs_of_nonneg (by positivity),
       inv_mul_eq_div]
   set S := (∑ j, Real.exp (ν j)) / Fintype.card n with hS_def
-  have hS : HasSum (fun l : ℕ => ‖Matrix.normalizedTrace (D ^ l)‖ / (l ! : ℝ)) S := by
+  have hS : HasSum (fun l : ℕ => ‖normalizedTrace (D ^ l)‖ / (l ! : ℝ)) S := by
     have h1 : ∀ j, HasSum (fun l : ℕ => ν j ^ l / (l ! : ℝ)) (Real.exp (ν j)) := fun j => by
       rw [Real.exp_eq_exp_ℝ]
       exact NormedSpace.expSeries_div_hasSum_exp (ν j)
     have h2 := (hasSum_sum (s := Finset.univ) fun j _ => h1 j).div_const (Fintype.card n : ℝ)
-    have hterms : (fun l : ℕ => ‖Matrix.normalizedTrace (D ^ l)‖ / (l ! : ℝ)) =
+    have hterms : (fun l : ℕ => ‖normalizedTrace (D ^ l)‖ / (l ! : ℝ)) =
         fun l => (∑ j, ν j ^ l / (l ! : ℝ)) / (Fintype.card n : ℝ) := by
       funext l
       rw [hDtr, Finset.sum_div, Finset.sum_div, Finset.sum_div]
@@ -161,7 +163,7 @@ private theorem iteratedFDeriv_traceExp_bound_hermitian [Nonempty n] (A : Matrix
       ring
     rw [hterms, hS_def]
     exact h2
-  have hSeq : Real.exp (-c0) * S = ‖Matrix.traceExp A‖ := by
+  have hSeq : Real.exp (-c0) * S = ‖traceExp A‖ := by
     rw [htE, hS_def, mul_div_assoc', Finset.mul_sum]
     congr 1
     refine Finset.sum_congr rfl fun j _ => ?_
@@ -170,7 +172,7 @@ private theorem iteratedFDeriv_traceExp_bound_hermitian [Nonempty n] (A : Matrix
     congr 1
     ring
   set a : 𝕜 := ((Real.exp (-c0) : ℝ) : 𝕜) with ha
-  set L : Matrix n n 𝕜 →L[𝕜] 𝕜 := a • Matrix.normalizedTraceCLM with hL
+  set L : Matrix n n 𝕜 →L[𝕜] 𝕜 := a • normalizedTraceCLM with hL
   set P := L.compFormalMultilinearSeries (NormedSpace.expSeries 𝕜 (Matrix n n 𝕜)) with hP
   have hfps : HasFPowerSeriesOnBall (L ∘ NormedSpace.exp) P 0 ⊤ :=
     L.comp_hasFPowerSeriesOnBall NormedSpace.exp_hasFPowerSeriesOnBall
@@ -178,15 +180,15 @@ private theorem iteratedFDeriv_traceExp_bound_hermitian [Nonempty n] (A : Matrix
     have := hfps.changeOrigin (y := D) (by simp)
     simpa using this
   have hfpsR := hfpsD.restrictScalars (𝕜 := ℝ)
-  have hshift : (Matrix.traceExp : Matrix n n 𝕜 → 𝕜) =
+  have hshift : (traceExp : Matrix n n 𝕜 → 𝕜) =
       fun X => (L ∘ NormedSpace.exp) (X + ((c0 : ℝ) : 𝕜) • (1 : Matrix n n 𝕜)) := by
     funext X
-    simp only [Function.comp_apply, Matrix.exp_add_smul_one, hL, ha,
-      smul_apply, Matrix.normalizedTraceCLM_apply,
-      Matrix.normalizedTrace_smul, smul_eq_mul, Matrix.traceExp]
+    simp only [Function.comp_apply, exp_add_smul_one, hL, ha,
+      smul_apply, normalizedTraceCLM_apply,
+      normalizedTrace_smul, smul_eq_mul, traceExp]
     rw [← mul_assoc, ← RCLike.ofReal_mul, ← Real.exp_add, neg_add_cancel, Real.exp_zero,
       RCLike.ofReal_one, one_mul]
-  have hiter : iteratedFDeriv ℝ k Matrix.traceExp A =
+  have hiter : iteratedFDeriv ℝ k traceExp A =
       iteratedFDeriv ℝ k (L ∘ NormedSpace.exp) D := by
     rw [hshift, iteratedFDeriv_comp_add_right']
     simp only
@@ -194,14 +196,14 @@ private theorem iteratedFDeriv_traceExp_bound_hermitian [Nonempty n] (A : Matrix
   rw [hiter, hfpsR.iteratedFDeriv_eq_sum_of_completeSpace]
   have hcoef : ∀ σ : Equiv.Perm (Fin k),
       ‖(P.changeOrigin D).restrictScalars ℝ k (fun i => v (σ i))‖ ≤
-        (∏ i, ‖v i‖) / (k ! : ℝ) * ‖Matrix.traceExp A‖ := by
+        (∏ i, ‖v i‖) / (k ! : ℝ) * ‖traceExp A‖ := by
     intro σ
-    have h := Matrix.changeOrigin_coef_bound D hDs a S hS k (fun i => v (σ i))
+    have h := changeOrigin_coef_bound D hDs a S hS k (fun i => v (σ i))
     rw [Equiv.prod_comp σ (fun i => ‖v i‖)] at h
     calc ‖(P.changeOrigin D).restrictScalars ℝ k (fun i => v (σ i))‖
         = ‖(P.changeOrigin D k) (fun i => v (σ i))‖ := rfl
       _ ≤ ‖a‖ * (∏ i, ‖v i‖) / (k ! : ℝ) * S := h
-      _ = (∏ i, ‖v i‖) / (k ! : ℝ) * ‖Matrix.traceExp A‖ := by
+      _ = (∏ i, ‖v i‖) / (k ! : ℝ) * ‖traceExp A‖ := by
           rw [← hSeq, ha, RCLike.norm_ofReal, abs_of_pos (Real.exp_pos _)]
           ring
   refine (norm_sum_le _ _).trans ((Finset.sum_le_sum fun σ _ => hcoef σ).trans (le_of_eq ?_))
@@ -210,7 +212,9 @@ private theorem iteratedFDeriv_traceExp_bound_hermitian [Nonempty n] (A : Matrix
 
 end DerivAux
 
-namespace Matrix
+end RealScalars
+
+section
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 
@@ -249,6 +253,6 @@ theorem iterDirectionalFDeriv_traceExp_bound_of_norm_le_one
         mul_le_mul_of_nonneg_right hprod (norm_nonneg _)
     _ = ‖traceExp A‖ := one_mul _
 
-end Matrix
+end
 
 end SYK.MatrixAnalysis

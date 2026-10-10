@@ -33,22 +33,22 @@ theorem Setting.disorderMatrix_apply {q : ℕ} (S : Setting q) (n : ℕ)
 theorem Setting.Z_eq_traceExp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :
     S.Z β n g =
-      (MatrixAnalysis.Matrix.traceExp ((-β) • S.disorderMatrix n g)).re := by
+      (MatrixAnalysis.traceExp ((-β) • S.disorderMatrix n g)).re := by
   simp [Setting.Z, realPartitionFunction, partitionFunction, normalizedTrace,
-    gibbsOperator, MatrixAnalysis.Matrix.traceExp, MatrixAnalysis.Matrix.normalizedTrace,
+    gibbsOperator, MatrixAnalysis.traceExp, MatrixAnalysis.normalizedTrace,
     Setting.disorderMatrix_apply, inv_mul_eq_div]
 
 /-- Smoothness in the disorder, needed for finite Gaussian integration by parts. -/
 theorem Setting.Z_contDiff_couplings {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     ContDiff ℝ ⊤ (S.Z β n) := by
   have ht : ContDiff ℝ ⊤
-      (MatrixAnalysis.Matrix.traceExp : Matrix (S.d n) (S.d n) ℂ → ℂ) :=
-    MatrixAnalysis.Matrix.contDiff_traceExp
+      (MatrixAnalysis.traceExp : Matrix (S.d n) (S.d n) ℂ → ℂ) :=
+    MatrixAnalysis.contDiff_traceExp
   have h := Complex.reCLM.contDiff.comp (ht.comp
     ((contDiff_const : ContDiff ℝ ⊤ (fun _ : CouplingSpace (S.N n) q => (-β : ℝ))).smul
       (S.disorderMatrix n).contDiff))
   change ContDiff ℝ ⊤ (fun x =>
-    (MatrixAnalysis.Matrix.traceExp ((-β) • S.disorderMatrix n x)).re) at h
+    (MatrixAnalysis.traceExp ((-β) • S.disorderMatrix n x)).re) at h
   simpa only [← S.Z_eq_traceExp] using h
 
 /-- Scaling the disorder is the same as scaling the real inverse temperature. -/
@@ -61,13 +61,13 @@ theorem Setting.Z_smul {q : ℕ} (S : Setting q) (β t : ℝ) (n : ℕ)
 
 theorem Setting.norm_traceExp_disorder {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :
-    ‖MatrixAnalysis.Matrix.traceExp ((-β) • S.disorderMatrix n g)‖ = S.Z β n g := by
-  have heq : MatrixAnalysis.Matrix.traceExp ((-β) • S.disorderMatrix n g) =
+    ‖MatrixAnalysis.traceExp ((-β) • S.disorderMatrix n g)‖ = S.Z β n g := by
+  have heq : MatrixAnalysis.traceExp ((-β) • S.disorderMatrix n g) =
       (S.Z β n g : ℂ) := by
     apply Complex.ext
     · exact (S.Z_eq_traceExp β n g).symm
     · simpa [partitionFunction, normalizedTrace, gibbsOperator,
-        MatrixAnalysis.Matrix.traceExp, MatrixAnalysis.Matrix.normalizedTrace,
+        MatrixAnalysis.traceExp, MatrixAnalysis.normalizedTrace,
         Setting.disorderMatrix_apply, inv_mul_eq_div, Complex.real_smul] using
         partitionFunction_im_eq_zero (S.params n) (S.majorana n) β g
   rw [heq, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg]
@@ -78,9 +78,9 @@ theorem Setting.norm_fderiv_Z_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (g v : CouplingSpace (S.N n) q) :
     ‖fderiv ℝ (S.Z β n) g v‖ ≤
       |β| * ‖S.disorderMatrix n v‖ * S.Z β n g := by
-  let T : Matrix (S.d n) (S.d n) ℂ → ℂ := MatrixAnalysis.Matrix.traceExp
+  let T : Matrix (S.d n) (S.d n) ℂ → ℂ := MatrixAnalysis.traceExp
   let L := (-β) • S.disorderMatrix n
-  have ht : ContDiff ℝ ⊤ T := MatrixAnalysis.Matrix.contDiff_traceExp
+  have ht : ContDiff ℝ ⊤ T := MatrixAnalysis.contDiff_traceExp
   have h := Complex.reCLM.hasFDerivAt.comp g
     ((ht.differentiable (by simp) (L g)).hasFDerivAt.comp g L.hasFDerivAt)
   have heq : (fun x => (T (L x)).re) = S.Z β n := by
@@ -93,7 +93,7 @@ theorem Setting.norm_fderiv_Z_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
   have hA : (L g).IsHermitian := by
     change star ((-β) • S.disorderMatrix n g) = (-β) • S.disorderMatrix n g
     simp [Setting.disorderMatrix_apply, normalizedHamiltonian_self_adjoint]
-  have hb := MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound
+  have hb := MatrixAnalysis.iterDirectionalFDeriv_traceExp_bound
     (L g) hA [L v]
   simp only [MatrixAnalysis.DirectionalDerivative.iterDirectionalFDeriv,
     List.map_cons, List.map_nil, List.prod_cons, List.prod_nil, mul_one] at hb
@@ -102,7 +102,7 @@ theorem Setting.norm_fderiv_Z_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     _ ≤ ‖L v‖ * ‖T (L g)‖ := hb
     _ = _ := by
       change ‖(-β) • S.disorderMatrix n v‖ *
-        ‖MatrixAnalysis.Matrix.traceExp ((-β) • S.disorderMatrix n g)‖ = _
+        ‖MatrixAnalysis.traceExp ((-β) • S.disorderMatrix n g)‖ = _
       rw [S.norm_traceExp_disorder, norm_smul]
       simp
 

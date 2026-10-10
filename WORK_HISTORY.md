@@ -4,6 +4,21 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="matrix-namespace-2026-10-10"></a>
+
+## 行列解析の副名前空間の廃止（2026-10-10）
+
+`MAINT-NAMESPACE` と `MAINT-ROOT` を行った。`SYK.MatrixAnalysis.Matrix`（53件）と `SYK.MatrixAnalysis.LinearMap`（7件）の宣言を `SYK.MatrixAnalysis` の直下へ移した。mathlib の `Matrix`・`LinearMap` と同名の副名前空間があると、宣言を誤認しやすく、`open _root_.Matrix` も必要になっていたためである。`normalizedTrace` は改名せず、Model の `SYK.normalizedTrace` とは別の定義であることを docstring に書いた。
+
+`_root_` を使っていた2件は通常の位置で宣言した。
+
+- `trace_exp_smul_of_isHermitian` は `ExpAux` の外へ出した。
+- `contDiff_traceExp` は、`DerivAux` の private な局所インスタンス3つと一緒に `section RealScalars` に置いた。インスタンスの適用範囲は変更前と同じで、後続の定理文には及ばない。
+
+旧名前空間の区画は名前のない `section` に置き換え、`variable` の適用範囲を保った。外部の利用箇所は `CLT/Chaos/PartitionDerivatives.lean` と `PartitionHigherDerivatives.lean` だけだった。
+
+検証：`lake build SYKBlueprint` が成功し、警告は531件で変更前と同数だった。Blueprint の生成と `vbp check` も成功した。変更前後の全798宣言を、改名の対応を当てはめて比較し、名前・可視性・種類・モジュール・型が完全に一致した。主要定理（`log_partition_clt`・`standard_log_partition_clt`・`standard_partition_clt`・`logPartition_hasSubgaussianMGF`）は通常公理のみに依存する。
+
 <a id="docs-cleanup-2026-10-10"></a>
 
 ## 文書の整理（2026-10-10）

@@ -110,7 +110,7 @@ flowchart TD
 
 汎用の Hermite 補題を実際に利用するのは、この CLT 内の展開と符号対称性である。そのため、共有ガウス基盤に CLT の記法を追加しない。四次モーメントの経路には、二次 CLT と `SecondChaosAsymptotic` を含めない。これにより、有限モーメント評価の数学的な前提を直接読める。
 
-有限行列解析の3つのファイルは、`SingularValues`、`TraceExponential`、`TraceExpDerivatives` の順に依存する。実際の外部の利用側は `PartitionDerivatives` だけで、Model はこれを import しない。`SYK.normalizedTrace` は複素行列と非空型、`SYK.MatrixAnalysis.Matrix.normalizedTrace` は一般の `RCLike` と空型も対象にするため、両定義は統合せず別々に保つ。CLT への規格化の接続は `Setting.Z_eq_traceExp` と `Setting.norm_traceExp_disorder` に残る。この配置を採用した判断と検証は [作業履歴](../../WORK_HISTORY.md#clt-refactor-2026-10-06) を参照する。
+有限行列解析の3つのファイルは、`SingularValues`、`TraceExponential`、`TraceExpDerivatives` の順に依存する。実際の外部の利用側は `PartitionDerivatives` だけで、Model はこれを import しない。`SYK.normalizedTrace` は複素行列と非空型、`SYK.MatrixAnalysis.normalizedTrace` は一般の `RCLike` と空型も対象にするため、両定義は統合せず別々に保つ。CLT への規格化の接続は `Setting.Z_eq_traceExp` と `Setting.norm_traceExp_disorder` に残る。この配置を採用した判断と検証は [作業履歴](../../WORK_HISTORY.md#clt-refactor-2026-10-06) を参照する。
 
 ## 証明の共有
 
@@ -121,7 +121,7 @@ flowchart TD
 - Hermite2 の評価式は `GaussianChaos/Basic` で共有する。
 - 四次モーメントの六つの項は、可積分性を個別に確認してから、有限和として積分する。
 
-行列トレース指数の定義は、`SYK.MatrixAnalysis.Matrix.traceExp` の1つだけである。滑らかさは `SYK.MatrixAnalysis.Matrix.contDiff_traceExp` が与え、Hermitian な基点での高階微分評価は、内部補題 `iteratedFDeriv_traceExp_bound_hermitian` で証明する。List に沿う微分と mathlib の反復 Fréchet 微分は、滑らかさによって接続する。この接続と、二つの規格化トレースの型は保つ。`TraceExponential` では、Duhamel の公式が一次微分を、Schatten ノルムと語の評価、Taylor 係数が高階微分の解析的な証明を担う。
+行列トレース指数の定義は、`SYK.MatrixAnalysis.traceExp` の1つだけである。滑らかさは `SYK.MatrixAnalysis.contDiff_traceExp` が与え、Hermitian な基点での高階微分評価は、内部補題 `iteratedFDeriv_traceExp_bound_hermitian` で証明する。List に沿う微分と mathlib の反復 Fréchet 微分は、滑らかさによって接続する。この接続と、二つの規格化トレースの型は保つ。`TraceExponential` では、Duhamel の公式が一次微分を、Schatten ノルムと語の評価、Taylor 係数が高階微分の解析的な証明を担う。
 
 `Main` は分配 CLT を先に証明し、結合定理が下位の対数 CLT と組み合わせて共通半径を取る。個別の対数 CLT は結合定理から射影する。矢印は証明結果から利用側へ向かい、公開定理の全結論と入力 `hFE` は変えない。
 

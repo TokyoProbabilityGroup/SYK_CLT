@@ -157,13 +157,13 @@ theorem Setting.iterDirectionalFDeriv_Z_eq {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (dirs : List (CouplingSpace (S.N n) q))
     (g : CouplingSpace (S.N n) q) :
     iterDirectionalFDeriv (S.Z β n) dirs g =
-      (iterDirectionalFDeriv MatrixAnalysis.Matrix.traceExp
+      (iterDirectionalFDeriv MatrixAnalysis.traceExp
         (dirs.map fun v => (-β) • S.disorderMatrix n v)
         ((-β) • S.disorderMatrix n g)).re := by
-  let T : Matrix (S.d n) (S.d n) ℂ → ℂ := MatrixAnalysis.Matrix.traceExp
+  let T : Matrix (S.d n) (S.d n) ℂ → ℂ := MatrixAnalysis.traceExp
   let L : CouplingSpace (S.N n) q →L[ℝ] Matrix (S.d n) (S.d n) ℂ :=
     (-β) • S.disorderMatrix n
-  have hT : ContDiff ℝ ⊤ T := MatrixAnalysis.Matrix.contDiff_traceExp
+  have hT : ContDiff ℝ ⊤ T := MatrixAnalysis.contDiff_traceExp
   have heq : S.Z β n = (Complex.reCLM ∘ T) ∘ L := by
     funext x
     exact S.Z_eq_traceExp β n x
@@ -190,16 +190,16 @@ theorem Setting.abs_iterDirectionalFDeriv_Z_le {q : ℕ} (S : Setting q)
   have hA : ((-β) • S.disorderMatrix n g).IsHermitian := by
     change star ((-β) • S.disorderMatrix n g) = (-β) • S.disorderMatrix n g
     simp [S.disorderMatrix_apply, normalizedHamiltonian_self_adjoint]
-  have hb := MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound
+  have hb := MatrixAnalysis.iterDirectionalFDeriv_traceExp_bound
     ((-β) • S.disorderMatrix n g) hA
     (dirs.map fun v => (-β) • S.disorderMatrix n v)
   calc
     _ ≤ ‖MatrixAnalysis.DirectionalDerivative.iterDirectionalFDeriv
-        MatrixAnalysis.Matrix.traceExp
+        MatrixAnalysis.traceExp
         (dirs.map fun v => (-β) • S.disorderMatrix n v)
         ((-β) • S.disorderMatrix n g)‖ := Complex.abs_re_le_norm _
     _ ≤ ((dirs.map fun v => (-β) • S.disorderMatrix n v).map fun B => ‖B‖).prod *
-        ‖MatrixAnalysis.Matrix.traceExp ((-β) • S.disorderMatrix n g)‖ := hb
+        ‖MatrixAnalysis.traceExp ((-β) • S.disorderMatrix n g)‖ := hb
     _ = _ := by
       rw [S.norm_traceExp_disorder, hprod]
 
