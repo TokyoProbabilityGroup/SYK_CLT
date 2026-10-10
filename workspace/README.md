@@ -77,7 +77,7 @@ git -C SYK diff --binary HEAD > syk-worktree.patch
 git -C SYK ls-files --others --exclude-standard
 ```
 
-A clone at the commit alone omits uncommitted changes. Transfer untracked sources separately, apply the patch with `git -C SYK apply ../syk-worktree.patch`, and verify the received files before editing. Read parent, repository, and applicable topic `AGENTS.md` files. Do not fill in missing files by guesswork. State the task, owner, purpose, editable scope, inputs, integration owner, and verification conditions in the request, and treat commits and publication as separate explicit steps.
+A clone at the commit alone omits uncommitted changes. Transfer untracked sources separately, apply the patch with `git -C SYK apply ../syk-worktree.patch`, and verify the received files before editing. Read parent, repository, and applicable topic `AGENTS.md` files; start coding agents in the parent workspace, where Lake commands are run, so that this chain applies. Remaining tasks, their status, and pending decisions are in `SYK/EDITING_PLAN.md`. Do not fill in missing files by guesswork. State the task, owner, purpose, editable scope, inputs, integration owner, and verification conditions in the request, and treat commits and publication as separate explicit steps.
 
 Check an edited mathematical file with `lake env lean SYK/SYK/path/to/File.lean`, then the affected build target, and finally `lake build SYKBlueprint`. For Blueprint source or referenced Lean declarations, also check the affected chapter and `SYKBlueprint.lean` and `SYKBlueprintMain.lean`, generate HTML, and run `vbp check`. Inspect theorem statements, assumptions, and `#print axioms` separately; successful generation does not complete an assumed mathematical input.
 
