@@ -25,7 +25,7 @@ SYK/                       # repository and mathematical Lake package
 └── workspace/             # parent ResearchWorkspace template
 ```
 
-The CLTs assume the Gaussian `AnnealedInput` explicitly. See [the CLT architecture](SYK/CLT/ARCHITECTURE.md) and [the concentration architecture](SYK/SuperConcentration/ARCHITECTURE.md) for current mathematical specifications.
+The CLTs assume the Gaussian AnnealedInput explicitly. See the CLT README (SYK/CLT/README.md) and the concentration README (SYK/SuperConcentration/README.md) for the current statements and verification commands.
 
 ## Setup instructions
 

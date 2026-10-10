@@ -9,7 +9,7 @@ $$
 \le 2\exp\!\left(-\frac{q t^2}{2\beta^2}\right).
 $$
 
-The public entry point is `SYK.SuperConcentration.Main`. The [architecture document](ARCHITECTURE.md#公開定理と有限サイズの評価) records the exact assumptions, normalization, finite-size estimates, MGF parameter, and tail constants. The [work history](../../WORK_HISTORY.md#super-w05) records verification. These results are independent of the annealed input assumed by the CLTs.
+The public entry point is `SYK.SuperConcentration.Main`. The exact assumptions, normalization, MGF parameter, and tail constants are those of its theorem statements, in particular `logPartition_lipschitz`, `logPartition_hasSubgaussianMGF`, and `logPartition_two_sided_tail_standardGaussian`. For these and the zero-temperature statements, `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`. These results are independent of the annealed input assumed by the CLTs.
 
 ## File guide
 

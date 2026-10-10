@@ -10,9 +10,9 @@ This directory contains the Lean formalization work for the central limit theore
 - `Normalization.lean`: the finite standard-representation check `partitionFunction_standard`; this module is not imported by the abstract CLT proofs.
 - `../../Paper/CLT_SYK.tex`: manuscript root containing the shared preamble, front matter, and references.
 - `../../Paper/sections/`: independently compilable top-level manuscript sections; together with the root file, these are the source of truth for the paper theorem statements.
-- `ARCHITECTURE.md`: current mathematical API, proof dependencies, and manuscript correspondence.
-- `EDITING_PLAN.md`: remaining convex-convergence, external-input, and annealed-input tasks.
-- `AGENTS.md`: topic-specific instructions for coding agents.
+- `ARCHITECTURE.md` (Japanese): current mathematical API, proof dependencies, and manuscript correspondence.
+- `EDITING_PLAN.md` (Japanese): remaining convex-convergence, external-input, and annealed-input tasks.
+- `AGENTS.md` (Japanese): topic-specific instructions for coding agents.
 
 The internal planning documents are written in Japanese for collaboration between the researcher and coding agents. Public mathematical artifacts, including this README, the manuscript, and Lean source files, are written in English.
 
@@ -42,7 +42,7 @@ For fixed even $q \ge 4$, conditional on `hFE : AnnealedInput q S`, the theorems
 
 These conditional results in `Main.lean` are Lean-checked. `StandardModel.lean` applies them to the standard family `N=q+2*n`. The finite-model and Gaussian-chaos results, and the explicit logarithmic mean-error estimate, are also implemented. The annealed proposition and construction of `hFE` remain open.
 
-See [the architecture document](ARCHITECTURE.md#現行原稿の主張) for the theorem statements, normalization, manuscript correspondence, proof dependencies, and formalization boundaries. The [editing plan](EDITING_PLAN.md) contains the three remaining tasks, and [the work history](../../WORK_HISTORY.md) records completed verification. Gaussian integration by parts and moment calculations are distinct from assuming the annealed limit.
+The theorem statements are in `Main.lean` for an abstract family and in `StandardModel.lean` for the standard family; `AnnealedInput` is declared in `Basic.lean`. The CLT chapter of the [Blueprint](../../Blueprint/SYKBlueprint/CLT.lean) explains the statements, normalization, and the boundary between formalized and assumed parts. Three tasks remain: local uniform convergence of convex functions from pointwise convergence, a survey of the external input, and the construction of `AnnealedInput` from an explicit external input. Gaussian integration by parts and moment calculations are distinct from assuming the annealed limit.
 
 ## Verification
 
@@ -60,7 +60,7 @@ latexmk -pdf introduction.tex
 
 Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-references and citations whose definitions lie in other subfiles remain unresolved in a standalone build; the complete manuscript build resolves them.
 
-The conditional CLT is integrated into `Main.lean`. See the [input verification](../../WORK_HISTORY.md#clt-input-2026-10-04) and [manuscript audit](../../WORK_HISTORY.md#clt-audit-2026-10-04) for the completed checks. After modifying a Lean file, check it from the shared workspace root:
+The conditional CLT is integrated into `Main.lean`. For `partition_clt`, `log_partition_clt`, `partition_and_log_partition_clt` and the three standard-family theorems in `StandardModel.lean`, `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`; `hFE : AnnealedInput q S` remains an explicit hypothesis. After modifying a Lean file, check it from the shared workspace root:
 
 ```bash
 lake env lean SYK/SYK/CLT/path/to/File.lean
