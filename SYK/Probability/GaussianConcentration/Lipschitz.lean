@@ -56,17 +56,18 @@ lemma exists_smooth_lipschitz_approx {ι : Type*} [Fintype ι]
             · filter_upwards [ ] with a;
               rw [ ← mul_sub, norm_mul, Real.norm_of_nonneg ( by exact ( ψ n ).nonneg_normed _ ) ];
               exact mul_le_mul_of_nonneg_left ( hLip.dist_le_mul _ _ ) ( by exact ( ψ n ).nonneg_normed _ ) |> le_trans <| by simp +decide [ dist_eq_norm ] ;
-            · rw [ MeasureTheory.integral_mul_const, ( ψ n ).integral_normed ] ; aesop;
+            · rw [ MeasureTheory.integral_mul_const, ( ψ n ).integral_normed ]
+              simp only [one_mul, Real.coe_toNNReal', le_refl]
           · refine' Continuous.integrable_of_hasCompactSupport _ _;
             · exact Continuous.mul ( ContDiffBump.continuous_normed _ ) ( hLip.continuous.comp ( continuous_const.sub continuous_id' ) );
             · have h_compact_support : HasCompactSupport (fun t => (ψ n).normed volume t) := by
                 convert ( ψ n ).hasCompactSupport_normed; all_goals infer_instance;
-              exact h_compact_support.mono fun t ht => by aesop;
+              exact h_compact_support.mono fun t ht => Function.support_mul_subset_left _ _ ht
           · refine' Continuous.integrable_of_hasCompactSupport _ _;
             · exact Continuous.mul ( ContDiffBump.continuous_normed _ ) ( hLip.continuous.comp ( continuous_const.sub continuous_id' ) );
             · have h_compact_support : HasCompactSupport (fun t => (ψ n).normed volume t) := by
                 convert ( ψ n ).hasCompactSupport_normed; all_goals infer_instance;
-              exact h_compact_support.mono fun x hx => by aesop;
+              exact h_compact_support.mono fun x hx => Function.support_mul_subset_left _ _ hx
         · intro n x
           have h_bound : ∀ t ∈ Metric.ball (0 : EuclideanSpace ℝ ι) ((ψ n).rOut), |F (x - t)| ≤ |F 0| + L + L * ‖x‖ := by
             intro t ht

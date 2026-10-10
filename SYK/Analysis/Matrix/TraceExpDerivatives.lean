@@ -177,7 +177,7 @@ private theorem iteratedFDeriv_traceExp_bound_hermitian [Nonempty n] (A : Matrix
       fun X => (L ∘ NormedSpace.exp) (X + ((c0 : ℝ) : 𝕜) • (1 : Matrix n n 𝕜)) := by
     funext X
     simp only [Function.comp_apply, Matrix.exp_add_smul_one, hL, ha,
-      ContinuousLinearMap.smul_apply, Matrix.normalizedTraceCLM_apply,
+      smul_apply, Matrix.normalizedTraceCLM_apply,
       Matrix.normalizedTrace_smul, smul_eq_mul, Matrix.traceExp]
     rw [← mul_assoc, ← RCLike.ofReal_mul, ← Real.exp_add, neg_add_cancel, Real.exp_zero,
       RCLike.ofReal_one, one_mul]

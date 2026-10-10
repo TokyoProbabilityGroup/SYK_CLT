@@ -4,6 +4,16 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="gaussian-maintenance-2026-10-10"></a>
+
+## ガウス基盤の探索タクティク・非推奨 API の整理（2026-10-10）
+
+`Probability/GaussianConcentration/` の `aesop`・`grind` 12か所（`grind +suggestions` を含む）を、ゴールを確認したうえで明示的な証明に置き換えた。符号反転不変性は mathlib の `gaussianReal_map_neg`、台の包含は `Function.support_mul_subset_left`、`L.toNNReal` は `Real.coe_toNNReal'` を使い、`Function.update` の計算と直積集合の等式は場合分けで示した。`pi_gaussian_stein_coord` の外側の3つの `have h_split` は、最後の合成で参照するため `h_slice`・`h_lhs`・`h_rhs` と名付けた。
+
+非推奨 API 8件（`integral_finset_sum`、`ContinuousMultilinearMap.sum_apply`・`smul_apply`、`ContinuousLinearMap.smul_apply`、非推奨の import 2件）を新しい名前に直した。`maxHeartbeats` は、`Smooth` の引き上げを削除し、`gaussianReal_stein` は 4000000 から 400000（既定値の2倍）に下げて理由のコメントを付けた。
+
+検証：`lake build SYK` が成功し、警告は541件から531件に減った（非推奨8件と `maxHeartbeats` の2件）。変更前後の全宣言の型・可視性・モジュールは完全に一致した。主要定理は通常公理のみ。書式の警告は残っている。
+
 <a id="aux-names-2026-10-10"></a>
 
 ## 公開のまま残る `*Aux` 名の整理（2026-10-10）

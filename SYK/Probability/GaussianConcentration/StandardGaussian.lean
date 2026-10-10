@@ -305,7 +305,8 @@ against the standard Gaussian satisfies `∫ x * g x dγ = ∫ g' x dγ`.  This 
 boundary-free integration-by-parts on `ℝ` together with the identity `φ' = -x φ` for the
 Gaussian density `φ`.
 -/
-set_option maxHeartbeats 4000000 in
+set_option maxHeartbeats 400000 in
+-- The elementary density computation below needs about twice the default heartbeats.
 lemma gaussianReal_stein (g g' : ℝ → ℝ)
     (hg : ∀ x, HasDerivAt g (g' x) x) (hg'cont : Continuous g')
     (C c : ℝ) (hgbound : ∀ x, |g x| ≤ C * Real.exp (c * |x|))
@@ -524,7 +525,8 @@ lemma standardGaussianMeasureOnEuclidean_integral_id {ι : Type*} [Fintype ι] :
     unfold standardGaussianMeasureOnEuclidean;
     rw [ MeasureTheory.Measure.map_map ];
     · have h_gauss_symm : ∀ (μ : MeasureTheory.Measure ℝ), μ = gaussianReal 0 1 → MeasureTheory.Measure.map (fun x => -x) μ = μ := by
-        grind +suggestions;
+        intro μ hμ
+        rw [hμ, gaussianReal_map_neg, neg_zero]
       have h_gauss_symm : MeasureTheory.Measure.map (fun x : ι → ℝ => fun i => -x i) (Measure.pi fun _ : ι => gaussianReal 0 1) = Measure.pi fun _ : ι => gaussianReal 0 1 := by
         refine' ( MeasureTheory.Measure.pi_eq _ ).symm;
         intro s hs; rw [ MeasureTheory.Measure.map_apply ];
@@ -635,11 +637,16 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
       · exact MeasureTheory.Integrable.const_mul ( integrable_exp_c_sum_abs_pi c ) _;
       · fun_prop;
       · exact Filter.Eventually.of_forall hdb
-  have h_split : ∀ y : {j // j ≠ i} → ℝ, ∫ x : ℝ, x * h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x) ∂(gaussianReal 0 1) = ∫ x : ℝ, (fderiv ℝ h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x)) (Pi.single i 1) ∂(gaussianReal 0 1) := by
+  have h_slice : ∀ y : {j // j ≠ i} → ℝ, ∫ x : ℝ, x * h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x) ∂(gaussianReal 0 1) = ∫ x : ℝ, (fderiv ℝ h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x)) (Pi.single i 1) ∂(gaussianReal 0 1) := by
     intro y
     set Yb : ι → ℝ := fun j => if h : j = i then 0 else y ⟨j,h⟩
     have h_Yb : ∀ x, Function.update Yb i x = fun j => if h : j = i then x else y ⟨j,h⟩ := by
-      grind;
+      intro x
+      funext j
+      by_cases hj : j = i
+      · subst hj
+        simp
+      · simp [Yb, hj]
     have h_G : ∀ x, HasDerivAt (fun t => h (Function.update Yb i t)) ((fderiv ℝ h (Function.update Yb i x)) (Pi.single i 1)) x := by
       intro x
       have h_chain : HasDerivAt (fun t => h (Function.update Yb i t)) ((fderiv ℝ h (Function.update Yb i x)) (Pi.single i 1)) x := by
@@ -655,16 +662,17 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
         rw [Finset.sum_eq_add_sum_sdiff_singleton_of_mem (Finset.mem_univ i)];
         refine' congr_arg₂ ( · + · ) _ _;
         · simp +decide [ Function.update_apply ];
-        · refine' Finset.sum_bij ( fun j _ => ⟨ j, by aesop ⟩ ) _ _ _ _ <;> simp +decide [ Function.update_apply ];
-          aesop;
+        · refine' Finset.sum_bij ( fun j hj => ⟨ j, by simpa using hj ⟩ ) _ _ _ _ <;>
+            simp +decide [ Function.update_apply ]
+          simp +contextual [Yb]
       exact ⟨by simpa only [h_sum] using hhb (Function.update Yb i x),
         by simpa only [h_sum] using hdb (Function.update Yb i x)⟩
     have := @gaussianReal_stein;
     convert this ( fun x => h ( Function.update Yb i x ) ) ( fun x => ( fderiv ℝ h ( Function.update Yb i x ) ) ( Pi.single i 1 ) ) h_G _ ( C * Real.exp ( c * ∑ j, |y j| ) ) c _ _ using 1;
     · fun_prop;
     · intro x; convert h_G_bound x |>.1 using 1; rw [ mul_assoc, ← Real.exp_add ] ; ring;
-    · intro x; specialize h_G_bound x; rw [ mul_assoc, ← Real.exp_add ] ; ring_nf at *; aesop;
-  have h_split : ∫ y : ι → ℝ, y i * h y ∂(Measure.pi fun _ : ι => gaussianReal 0 1) = ∫ y : {j // j ≠ i} → ℝ, ∫ x : ℝ, x * h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x) ∂(gaussianReal 0 1) ∂(Measure.pi fun _ : {j // j ≠ i} => gaussianReal 0 1) := by
+    · intro x; specialize h_G_bound x; rw [ mul_assoc, ← Real.exp_add ] ; ring_nf at *; exact h_G_bound.2
+  have h_lhs : ∫ y : ι → ℝ, y i * h y ∂(Measure.pi fun _ : ι => gaussianReal 0 1) = ∫ y : {j // j ≠ i} → ℝ, ∫ x : ℝ, x * h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x) ∂(gaussianReal 0 1) ∂(Measure.pi fun _ : {j // j ≠ i} => gaussianReal 0 1) := by
     have h_split : Measure.pi (fun _ : ι => gaussianReal 0 1) = Measure.map (fun p : ℝ × ({j // j ≠ i} → ℝ) => Function.update (fun j => if h : j = i then 0 else p.2 ⟨j,h⟩) i p.1) (gaussianReal 0 1 |> Measure.prod <| Measure.pi fun _ : {j // j ≠ i} => gaussianReal 0 1) := by
       refine' MeasureTheory.Measure.pi_eq _;
       intro s hs; rw [ MeasureTheory.Measure.map_apply ];
@@ -672,7 +680,17 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
         · rw [Finset.prod_eq_mul_prod_sdiff_singleton_of_mem (Finset.mem_univ i)]
           simp +decide [MeasureTheory.Measure.prod_prod]
           refine' congr rfl ( Finset.prod_bij ( fun j _ => j ) _ _ _ _ ) <;> simp +decide;
-        · grind;
+        · ext p
+          simp only [Set.mem_preimage, Set.mem_univ_pi, Set.mem_prod]
+          constructor
+          · intro hp
+            refine ⟨by simpa using hp i, fun j => ?_⟩
+            simpa [Function.update_of_ne j.2, j.2] using hp j
+          · rintro ⟨h1, h2⟩ j
+            by_cases hj : j = i
+            · subst hj
+              simpa using h1
+            · simpa [Function.update_of_ne hj, hj] using h2 ⟨j, hj⟩
       · refine' measurable_pi_lambda _ _;
         intro j; by_cases hj : j = i <;> simp +decide [ hj, Function.update_apply ] ;
         · exact measurable_fst;
@@ -697,7 +715,7 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
       · exact measurable_fst;
       · exact measurable_pi_apply _ |> Measurable.comp <| measurable_snd;
     · exact h_split ▸ h_integrable.1.aestronglyMeasurable;
-  have h_split : ∫ y : ι → ℝ, (fderiv ℝ h y) (Pi.single i 1) ∂(Measure.pi fun _ : ι => gaussianReal 0 1) = ∫ y : {j // j ≠ i} → ℝ, ∫ x : ℝ, (fderiv ℝ h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x)) (Pi.single i 1) ∂(gaussianReal 0 1) ∂(Measure.pi fun _ : {j // j ≠ i} => gaussianReal 0 1) := by
+  have h_rhs : ∫ y : ι → ℝ, (fderiv ℝ h y) (Pi.single i 1) ∂(Measure.pi fun _ : ι => gaussianReal 0 1) = ∫ y : {j // j ≠ i} → ℝ, ∫ x : ℝ, (fderiv ℝ h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x)) (Pi.single i 1) ∂(gaussianReal 0 1) ∂(Measure.pi fun _ : {j // j ≠ i} => gaussianReal 0 1) := by
     have h_split : Measure.pi (fun _ : ι => gaussianReal 0 1) = Measure.map (fun p : ℝ × ({j // j ≠ i} → ℝ) => Function.update (fun j => if h : j = i then 0 else p.2 ⟨j,h⟩) i p.1) (gaussianReal 0 1 |> Measure.prod <| Measure.pi fun _ : {j // j ≠ i} => gaussianReal 0 1) := by
       rw [ MeasureTheory.Measure.pi_eq ];
       intro s hs;
@@ -706,7 +724,17 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
         · rw [Finset.prod_eq_mul_prod_sdiff_singleton_of_mem (Finset.mem_univ i)]
           simp +decide [MeasureTheory.Measure.prod_prod]
           refine' congr rfl ( Finset.prod_bij ( fun j _ => j ) _ _ _ _ ) <;> simp +decide;
-        · grind;
+        · ext p
+          simp only [Set.mem_preimage, Set.mem_univ_pi, Set.mem_prod]
+          constructor
+          · intro hp
+            refine ⟨by simpa using hp i, fun j => ?_⟩
+            simpa [Function.update_of_ne j.2, j.2] using hp j
+          · rintro ⟨h1, h2⟩ j
+            by_cases hj : j = i
+            · subst hj
+              simpa using h1
+            · simpa [Function.update_of_ne hj, hj] using h2 ⟨j, hj⟩
       · refine' measurable_pi_lambda _ _;
         intro j; by_cases hj : j = i <;> simp +decide [ hj, Function.update_apply ] ;
         · exact measurable_fst;
@@ -735,7 +763,10 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
       · exact measurable_pi_apply _ |> Measurable.comp <| measurable_snd;
     · convert h_integrable.2.aestronglyMeasurable using 1;
       exact h_split.symm;
-  aesop
+  rw [h_lhs, h_rhs]
+  congr 1
+  funext y
+  exact h_slice y
 
 /-
 The `i`-th coordinate of the gradient equals the partial derivative in direction `i`.

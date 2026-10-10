@@ -1,5 +1,5 @@
 import Mathlib.Algebra.Lie.OfAssociative
-import Mathlib.Data.Real.StarOrdered
+import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Order.CompletePartialOrder
 import Mathlib.Probability.Distributions.Gaussian.Real
 import Mathlib.Topology.Algebra.Module.ModuleTopology
@@ -7,7 +7,7 @@ import Mathlib.Topology.EMetricSpace.Paracompact
 import Mathlib.Topology.Separation.CompletelyRegular
 import Mathlib.Algebra.Order.Ring.Star
 import Mathlib.Analysis.InnerProductSpace.Adjoint
-import Mathlib.Data.Real.CompleteField
+import Mathlib.Algebra.Order.Archimedean.Real.Hom
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.Calculus.Deriv.Polynomial
 import Mathlib.Analysis.Calculus.ContDiff.Operations
@@ -116,7 +116,7 @@ lemma gaussian_ibp {ι : Type*} [Fintype ι] (g : EuclideanSpace ℝ ι → ℝ)
   -- integral and the per-coordinate identity.
   simp +decide only [inner];
   simp +decide only [Finset.sum_mul];
-  rw [ MeasureTheory.integral_finset_sum, MeasureTheory.integral_finset_sum ];
+  rw [ MeasureTheory.integral_finsetSum, MeasureTheory.integral_finsetSum ];
   · simp_all +decide [ mul_assoc, MeasureTheory.integral_const_mul ];
     exact Finset.sum_congr rfl fun i _ => by rw [ show ( fun w => w.ofLp i * ( v.ofLp i * g w ) ) = fun w => v.ofLp i * ( w.ofLp i * g w ) by ext; ring, show ( fun w => ( gradient g w ).ofLp i * v.ofLp i ) = fun w => v.ofLp i * ( gradient g w ).ofLp i by ext; ring, MeasureTheory.integral_const_mul, MeasureTheory.integral_const_mul, hcoord i ] ;
   · simp_all +decide [ inner, Finset.mul_sum _ _ _ ];
@@ -284,7 +284,9 @@ lemma gaussian_path_ftc (g : EuclideanSpace ℝ ι → ℝ) (hg : ContDiff ℝ 1
     simpa only [ContinuousLinearMap.comp_apply,
       ContinuousLinearMap.toSpanSingleton_apply, one_smul,
       InnerProductSpace.toDual_apply_apply] using hderiv
-  aesop
+  simp only [h_grad] at h_ftc
+  rw [h_ftc]
+  ring
 
 /-
 Integrability of the change-of-variables covariance integrand
@@ -483,7 +485,6 @@ lemma gaussian_cov_per_theta (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL :
 Joint integrability of the covariance integrand over `((a,b), θ)` where `θ` ranges over
 the finite interval `Ioc 0 (π/2)`.  Used for the Fubini swap.
 -/
-set_option maxHeartbeats 1000000 in
 lemma integrable_cov_joint (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s : ℝ) :
     Integrable (fun q : (EuclideanSpace ℝ ι × EuclideanSpace ℝ ι) × ℝ =>

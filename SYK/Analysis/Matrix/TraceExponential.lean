@@ -1164,8 +1164,8 @@ theorem changeOrigin_coef_bound [Nonempty n] (D : Matrix n n 𝕜)
   simp only [ContinuousMultilinearMap.apply_apply] at hsumw
   refine hsumw.norm_le_of_bounded (hS.mul_left (‖a‖ * (∏ i, ‖w i‖) / (k ! : ℝ))) fun l => ?_
   -- bound on each term
-  rw [FormalMultilinearSeries.changeOriginSeries, ContinuousMultilinearMap.sum_apply,
-    ContinuousMultilinearMap.sum_apply]
+  rw [FormalMultilinearSeries.changeOriginSeries, sum_apply,
+    sum_apply]
   have hterm : ∀ s : {s : Finset (Fin (k + l)) // s.card = l},
       ‖P.changeOriginSeriesTerm k l s s.2 (fun _ => D) w‖ ≤
         ‖a‖ * ((k + l)! : ℝ)⁻¹ * ((∏ i, ‖w i‖) * ‖normalizedTrace (D ^ l)‖) := by
@@ -1175,7 +1175,7 @@ theorem changeOrigin_coef_bound [Nonempty n] (D : Matrix n n 𝕜)
     rw [FormalMultilinearSeries.changeOriginSeriesTerm, ContinuousMultilinearMap.curryFinFinset_apply]
     rw [hP, ContinuousLinearMap.compFormalMultilinearSeries_apply,
       ContinuousLinearMap.compContinuousMultilinearMap_coe, Function.comp_apply]
-    simp only [NormedSpace.expSeries, ContinuousMultilinearMap.smul_apply,
+    simp only [NormedSpace.expSeries, smul_apply,
       ContinuousMultilinearMap.mkPiAlgebraFin_apply, map_smul, hL,
       normalizedTraceCLM_apply, smul_eq_mul, smul_eq_mul,
       norm_mul, norm_mul, norm_inv, RCLike.norm_natCast, mul_assoc]
