@@ -63,7 +63,7 @@ Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-
 The conditional CLT is integrated into `Main.lean`. For `partition_clt`, `log_partition_clt`, `partition_and_log_partition_clt` and the three standard-family theorems in `StandardModel.lean`, `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`; `hFE : AnnealedInput q S` remains an explicit hypothesis. After modifying a Lean file, check it from the shared workspace root:
 
 ```bash
-lake env lean SYK_CLT/SYK/CLT/path/to/File.lean
+lake lean SYK_CLT/SYK/CLT/path/to/File.lean
 ```
 
 Use `lake build SYK` for the mathematical library and `lake build SYKBlueprint` for the mathematics together with the Blueprint. Inspect the principal theorem types and `#print axioms` as described in [the repository guide](../../README.md#building-and-testing). The LaTeX manuscript and Lean formalization have separate verification requirements; successful verification of one does not establish the correctness of the other.
