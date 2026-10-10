@@ -85,8 +85,7 @@ and $`\beta\ell_q'(\beta)>0` for nonzero real $`\beta`.
 
 The conditional CLTs receive these assertions as an explicit assumption
 for `S`. Constructing an instance for a concrete family is outside the
-conditional CLT proof. The current plan defers the proof of the proposition
-itself.
+conditional CLT proof and the agreed formalization scope.
 :::
 
 :::theorem "clt_conditional_annealed_limit" (parent := "central_limit_theorem") (uses := "gaussian_annealed_input") (lean := "SYK.CLT.annealedFreeEnergy_tendsto, SYK.CLT.annealedDerivative_tendsto, SYK.CLT.secondChaosCoefficient_tendsto, SYK.CLT.Setting.secondChaosScaledCoefficient_tendsto")
@@ -105,7 +104,8 @@ The Lean convexity lemma gives locally uniform convergence of derivatives
 when locally uniform convergence of differentiable convex functions to a
 $`C^1` limit is already known. The manuscript's `lem:convex-derivatives`
 also derives locally uniform convergence of the functions from pointwise
-convergence. That first step remains unformalized and is deferred.
+convergence. That first step remains unformalized and is outside the agreed
+formalization scope.
 :::
 
 :::theorem "clt_conditional_nondegeneracy" (parent := "central_limit_theorem") (uses := "clt_conditional_annealed_limit") (lean := "SYK.CLT.exists_small_temperature_sign, SYK.CLT.exists_small_temperature_variance_pos")
