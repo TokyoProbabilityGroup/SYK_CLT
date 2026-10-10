@@ -2,7 +2,7 @@
 
 ## 目的
 
-共有 SYK 模型のうち物理的なギブス状態を扱う層と、模型に依存しないガウス集中不等式の基盤部分を接続し、通常のトレースで定義した SYK 分配関数の対数に対する集中不等式を証明する。`DensityMatrix`・`MajoranaBound`・`Main` に評価を分け、MGF・上下・両側の裾を供給する。残件は [全体計画](../../EDITING_PLAN.md)、過去の検証根拠は [作業履歴](../../WORK_HISTORY.md#super-w05) を参照する。
+共有 SYK 模型のうち物理的なギブス状態を扱う層と、模型に依存しないガウス集中不等式の基盤部分を接続し、通常のトレースで定義した SYK 分配関数の対数に対する集中不等式を証明する。評価は `DensityMatrix`、`MajoranaBound`、`Main` の3つのファイルに分け、MGF と、上側・下側・両側の裾の評価を供給する。残件は [全体計画](../../EDITING_PLAN.md)、過去の検証根拠は [作業履歴](../../WORK_HISTORY.md#super-w05) を参照する。
 
 ## 依存関係
 
@@ -32,11 +32,11 @@ flowchart TD
 
 共有ガウス基盤と SYK に固有の部分の境界は次のとおりである。
 
-`CouplingSpace`、`couplingSpace_card`、`standardGaussianMeasure` は `Model.GaussianDisorder` に置く。汎用測度は `../Probability/GaussianConcentration/StandardGaussian.lean` に置き、模型の測度をその有限添字型への特殊化として定義する。同一性を述べる `standardGaussianMeasure_eq_onEuclidean` は Model 側に置き、汎用部分から Model への依存と `N, q` への特殊化を除いた。
+`CouplingSpace`、`couplingSpace_card`、`standardGaussianMeasure` は `Model.GaussianDisorder` に置く。汎用測度は `../Probability/GaussianConcentration/StandardGaussian.lean` に置き、模型の測度をその有限添字型への特殊化として定義する。同一性を述べる `standardGaussianMeasure_eq_onEuclidean` は Model 側に置く。汎用部分は Model に依存せず、`N, q` への特殊化も含まない。
 
 残る基盤部分では、座標を添字付ける任意の有限型 `ι` だけについて量化し、中心となる結果をモーメント母関数の評価 `HasSubgaussianMGF` として述べる。上側・下側・両側の裾の評価は、mathlib の劣ガウス確率変数に関する API から導く。
 
-`L > 0` の既存証明を保持し、`L = 0` では関数が定数であることから別に処理する。公開 MGF 定理は `L ≥ 0` でパラメータ `L^2` を与える。正の `L` に対する裾評価と、零の場合に裾事象の測度が零である定理を分け、分母に `L^2` を含む表示へ零を代入しない。
+`L > 0` の場合の既存の証明を保ち、`L = 0` の場合は、関数が定数であることから別に処理する。公開 MGF 定理は、`L ≥ 0` に対してパラメータ `L^2` を与える。正の `L` に対する裾の評価と、零の場合に裾の事象の測度が零になる定理は、分けて述べる。分母に `L^2` を含む表示に、零を代入しない。
 
 ## 共通ガウス集中不等式の定数
 
@@ -61,15 +61,15 @@ L = β / sqrt q,
 
 `X = log Z - E[log Z]` とすると、モーメント母関数の評価とは、すべての実数 `s` に対する `E[exp(s X)] <= exp(s^2 β^2 / (2q))` を指す。劣ガウス性のパラメータ `β^2/q` は分散そのものではなく上界の定数である。`β > 0`、`t > 0` では上下それぞれの裾に `exp(-q t^2/(2β^2))`、両側の裾にその2倍を得る。`β = 0` では `X = 0` を直接使い、この分母を持つ式には代入しない。
 
-標準スケールとハミルトニアンは `Model.GaussianDisorder` に置き、一般スケール `𝒥` は基本 API に含めない。公開 MGF・上下・両側の裾評価は、標準ガウス座標に対するリプシッツ性を内部で証明する。`logPartitionLipschitzConstant` は単一の公開リプシッツ定数であり、有限サイズの途中計算用定数は非公開とする。通常のトレースと規格化トレースの差が中心化で消える理由は `../Model/ARCHITECTURE.md` を参照する。
+標準スケールとハミルトニアンは `Model.GaussianDisorder` に置き、一般スケール `𝒥` は基本 API に含めない。公開の MGF と、上側・下側・両側の裾の評価は、標準ガウス座標に対するリプシッツ性を内部で証明する。`logPartitionLipschitzConstant` は単一の公開リプシッツ定数であり、有限サイズの途中計算用定数は非公開とする。通常のトレースと規格化トレースの差が中心化で消える理由は `../Model/ARCHITECTURE.md` を参照する。
 
 複素数 `z` に対する分配関数の整関数性や対数微分は、`Model` の解析部分で扱う。この証明には正の実数値を取る分配関数が必要なので、複素逆温度に対して非零性を仮定する API は経由しない。
 
-抽象的なマヨラナ系に対する二乗和評価と対数分配関数の評価には、標準行列表現やトレース直交性を要求しない。必要な入力は共有の行列解析、標準ハミルトニアン、汎用ガウス集中である。旧配置と削除済み API の経緯は [作業履歴](../../WORK_HISTORY.md#super-legacy) を参照する。
+抽象的なマヨラナ系に対する二乗和評価と対数分配関数の評価には、標準行列表現やトレース直交性を要求しない。必要な入力は、共有の行列解析、標準ハミルトニアン、汎用のガウス集中の3つである。旧配置と削除済み API の経緯は [作業履歴](../../WORK_HISTORY.md#super-legacy) を参照する。
 
 ## 公開定理と有限サイズの評価
 
-`Main.lean` の公開定理は `SYK.logPartition_hasSubgaussianMGF`、`logPartition_upper_tail_standardGaussian`、`logPartition_lower_tail_standardGaussian`、`logPartition_two_sided_tail_standardGaussian` である。入力は `P : SYK.Params`、非空有限行列表現の `MajoranaSystem`、`β : ℝ≥0`。裾の指数表示は追加で `β ≠ 0`・`t > 0` を仮定する。逆温度ゼロの場合は `logPartition_tail_of_beta_zero`、`logPartition_centered_of_beta_zero` と上下の対応定理で処理し、MGF はこの場合も含む。
+`Main.lean` の公開定理は `SYK.logPartition_hasSubgaussianMGF`、`logPartition_upper_tail_standardGaussian`、`logPartition_lower_tail_standardGaussian`、`logPartition_two_sided_tail_standardGaussian` である。入力は `P : SYK.Params`、非空有限行列表現の `MajoranaSystem`、`β : ℝ≥0` である。裾の指数表示には、追加で `β ≠ 0` と `t > 0` を仮定する。逆温度ゼロの場合は、`logPartition_tail_of_beta_zero`、`logPartition_centered_of_beta_zero` と、上側・下側の対応する定理で処理する。MGF はこの場合も含む。
 
 `SYK.syk_sum_sq_expectation_le` は任意の密度行列 `ρ` について次を証明する。
 
