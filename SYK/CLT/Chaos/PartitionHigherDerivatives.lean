@@ -6,7 +6,8 @@ import SYK.CLT.Chaos.PartitionSymmetry
 
 The checked iterated trace-exponential derivative bound is transported to
 `Setting.Z`, including its coupling scale, real part, smoothness, and Gaussian
-growth. Entry points: `Setting.abs_partialMulti_Z_le`,
+growth (`eq:Z-derivative-bound`). The Duhamel simplex representation of the manuscript's
+proof is not formalized. Entry points: `Setting.abs_partialMulti_Z_le`,
 `Setting.hermite_coefficient_Z_eq_integral_partialMulti`, and
 `Setting.abs_inner_hermiteLp_YGaussianLp_le`.
 -/

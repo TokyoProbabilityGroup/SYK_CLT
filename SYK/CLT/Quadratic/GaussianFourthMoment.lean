@@ -1,6 +1,12 @@
 import SYK.CLT.Quadratic.GaussianQuadraticObservable
 
-/-! # Fourth moments of centered Gaussian squares -/
+/-!
+# Fourth moments of centered Gaussian squares
+
+The variance-one centered square has fourth moment `15`
+(`centeredGaussianSquare_fourth_moment`) and lies in `L⁴`
+(`centeredGaussianSquare_memLp_four`, `centeredGaussianSquares_sum_memLp_four`).
+-/
 
 open MeasureTheory ProbabilityTheory
 

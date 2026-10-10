@@ -1,7 +1,15 @@
 import SYK.CLT.Quadratic.GaussianFourthMoment
 import SYK.CLT.Basic
 
-/-! # Fourth moments of independent finite sums -/
+/-!
+# Fourth moments of independent finite sums
+
+For independent summands the fourth moment of the unnormalized sum of `n` centered squares is
+`3 n² + 12 n` (`centeredGaussianSquares_sum_fourth_moment`), so the normalized sum has fourth
+moment `3 + 12/n` (`normalizedGaussianSquares_fourth_moment`) and the uniform bound `15`
+(`normalizedGaussianSquares_fourth_moment_le`, `Setting.normalizedQuadraticSum_fourth_moment_le`).
+This path does not import the quadratic CLT.
+-/
 
 open MeasureTheory ProbabilityTheory
 

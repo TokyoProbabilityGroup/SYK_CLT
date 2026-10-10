@@ -19,6 +19,13 @@ import SYK.CLT.Chaos.CliffordSignParity
 
 Finite sign averages and the exponential moment estimate associated with
 `lem:Rademacher-encoding` in the CLT manuscript.
+
+`radE` is the uniform average over Boolean vectors, `sgnSum` the sum of signs, and `chaos` the
+Rademacher chaos of degree `q`, the elementary symmetric polynomial in the signs.
+`even_sum_rademacher_moment` is the finite-sum identity `eq:even-sum-Rademacher-moment`.
+Newton's identities evaluate the chaos through the sign sum, and together with an exponential
+moment bound for independent signs this gives `rademacher_encoding`: for even `q ≥ 4` and
+`0 ≤ t ≤ c_q N^{-(q-1)}`, `𝔼 |S_{N,q}|³ exp (t |S_{N,q}|) ≤ C_q N^{3q/2}`.
 -/
 
 open Finset Real

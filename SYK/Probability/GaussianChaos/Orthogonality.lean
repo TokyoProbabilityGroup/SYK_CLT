@@ -13,6 +13,11 @@ product Gaussian integral yields the orthogonality and exact norm in
 `eq: chaos` of the CLT manuscript.
 Entry points: `hermiteMulti_orthogonality`, `inner_hermiteLp`,
 `hermiteFiniteProjection_eq_starProjection`.
+
+The expansions `hasSum_hermiteCoefficients` and `hasSum_hermiteDegreeProjection` assume `L²`
+completeness of the Hermite family. The versions that do not assume it are
+`hasSum_hermiteCoefficients_unconditional` and `hasSum_hermiteDegreeProjection_unconditional`
+in `SYK.Probability.GaussianChaos.PolynomialDensity`.
 -/
 
 open MeasureTheory

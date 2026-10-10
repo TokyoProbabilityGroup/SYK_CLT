@@ -10,6 +10,13 @@ import Mathlib.Topology.UniformSpace.LocallyUniformConvergence
 Local uniform convergence of differentiable convex functions gives uniform
 convergence of their derivatives on compact sets under the stated regularity
 of the limit. Entry point: `convex_convergence_deriv_tendstoUniformlyOn`.
+
+The hypotheses are convexity and differentiability on an open set `I`, local uniform
+convergence of the functions, differentiability of the limit and continuity of its derivative;
+the conclusion is uniform convergence of the derivatives on every compact `K ⊆ I`. Deriving
+the local uniform convergence of the functions from pointwise convergence, as stated in
+`lem:convex-derivatives`, is not part of this file. The conditional CLT receives it as a
+field of `AnnealedInput`.
 -/
 
 open Filter Metric

@@ -7,7 +7,9 @@ import SYK.CLT.Chaos.Rademacher
 Hermite orthogonality, the all-order partition derivative estimate, and the
 Rademacher counting identity bound each homogeneous projection and its
 infinite tail. Entry points: `Setting.norm_sq_hermiteDegreeProjection_le_rademacher_moment`
-and `Setting.tsum_higherChaosProjection_le_exp_moment`.
+and `Setting.tsum_higherChaosProjection_le_exp_moment`. Inside the high-temperature radius,
+`Setting.tsum_higherChaosProjection_le_power` and `Setting.higherChaosProjection_isLittleO`
+give the power bound and the little-o statement of `prop:higher-chaos-closure`.
 -/
 
 open MeasureTheory Filter Asymptotics

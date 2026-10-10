@@ -8,8 +8,12 @@ The general integration-by-parts theorem and `SYK.Probability.GaussianChaos.Basi
 separately defined Hermite functions. This module identifies their
 normalizations and measures and transfers the coefficient formula without
 depending on the Majorana sign-parity theorem.
+The growth hypothesis is the manuscript's: only the partial derivatives `η ≤ α` are bounded.
 Entry points: `hermiteMulti_eq_signParity`, `gaussianCouplings_eq_pi`,
-`hermite_coefficient_ibp`. Orthogonality and completeness are downstream.
+`hermite_coefficient_ibp`, `hermite_coefficient_integrable`. The module also shows that
+Hermite products of positive degree have mean zero (`integral_hermiteMulti_eq_zero`) and are
+integrable against each other (`integrable_hermiteMulti_mul`). Orthogonality and completeness
+are downstream.
 -/
 
 open MeasureTheory ProbabilityTheory

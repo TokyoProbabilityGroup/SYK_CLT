@@ -28,6 +28,15 @@ Let `μ = standardGaussianMeasureOnEuclidean ι` and, for a `C¹` function `F` w
 `Cov = ∫₀^{π/2} sin θ · (∫∫ ⟪∇G x, ∇F (cos θ • x - sin θ • y)⟫ dμ dμ) dθ`
 via rotation invariance of `μ.prod μ` and the Gaussian integration-by-parts lemma
 `gaussian_ibp`.  The bound then follows from Cauchy–Schwarz and `∫₀^{π/2} sin = 1`.
+
+The module also proves the multi-index Gaussian Hermite integration by parts used by the CLT
+(`lem:Gaussian-Hermite-IBP`): for `f` of class `C^{|α|}` whose partial derivatives `∂^η f`,
+`η ≤ α`, grow at most exponentially, `hermiteMulti_ibp_of_expGrowth` identifies the Hermite
+coefficient with the expectation of `∂^α f`, and `hermiteMulti_ibp_integrable` gives
+integrability of both sides. These are general statements: they supply no derivative bounds
+for the SYK partition function and do not apply the formula to `Z_N`; that specialization is
+in `SYK/CLT/Chaos/PartitionHigherDerivatives.lean`. The one-coordinate Stein identities are
+`gaussianReal_stein` and `pi_gaussian_stein_coord` in `StandardGaussian.lean`.
 -/
 
 open MeasureTheory ProbabilityTheory

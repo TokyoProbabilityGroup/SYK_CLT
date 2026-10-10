@@ -33,7 +33,10 @@ noncomputable section
 /-!
 # Matrix exponential and normalized trace bounds
 
-The spectral estimates used below are in `SingularValues`. Main entry points:
+The spectral estimates used below are in `SingularValues`. The file contains the radial chain
+rule and the Duhamel formula for the first derivative of the exponential, the normalized
+Schatten norms, and the trace bounds for words together with the Taylor coefficients of
+`τ ∘ exp`. Main entry points:
 `SYK.MatrixAnalysis.Matrix.normalizedTrace`, `SYK.MatrixAnalysis.Matrix.normalizedSchattenNorm`,
 `SYK.MatrixAnalysis.Matrix.word_trace_bound`.
 -/

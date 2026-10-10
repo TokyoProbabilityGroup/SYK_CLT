@@ -12,9 +12,14 @@ open MeasureTheory
 /-!
 # Directional derivatives of the normalized trace exponential
 
+The iterated directional derivatives at a Hermitian base point are bounded by the product of
+the operator norms of the directions times `‖traceExp A‖`. The connection to the scale, real
+part and Gaussian growth of `Setting.Z` is made in
+`SYK/CLT/Chaos/PartitionHigherDerivatives.lean`.
 Main entry points: `SYK.MatrixAnalysis.Matrix.contDiff_traceExp`,
 `SYK.MatrixAnalysis.Matrix.traceExp`,
-`SYK.MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound`.
+`SYK.MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound`,
+`SYK.MatrixAnalysis.Matrix.iterDirectionalFDeriv_traceExp_bound_of_norm_le_one`.
 -/
 
 namespace SYK.MatrixAnalysis
