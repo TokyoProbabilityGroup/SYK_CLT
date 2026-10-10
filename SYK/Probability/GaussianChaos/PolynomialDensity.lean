@@ -224,9 +224,6 @@ noncomputable def gaussianPositiveMeasurePi {ι : Type*} [Fintype ι]
 theorem gaussianPositiveMeasurePi_finite {ι : Type*} [Fintype ι]
     (f : Lp ℝ 2 (gaussianCouplings ι)) :
     IsFiniteMeasure (gaussianPositiveMeasurePi f) := by
-  letI : IsProbabilityMeasure (gaussianCouplings ι) := by
-    change IsProbabilityMeasure (Measure.pi fun _ : ι => gaussianReal 0 1)
-    infer_instance
   apply isFiniteMeasure_withDensity_ofReal
   exact ((Lp.memLp f).integrable (by norm_num)).2
 
@@ -340,9 +337,6 @@ theorem gaussianLpPi_eq_zero_of_dual_moments_zero {ι : Type*} [Fintype ι]
     (horth : ∀ (L : StrongDual ℝ (ι → ℝ)) (n : ℕ),
       ∫ g, f g * (L g) ^ n ∂gaussianCouplings ι = 0) :
     f = 0 := by
-  letI : IsProbabilityMeasure (gaussianCouplings ι) := by
-    change IsProbabilityMeasure (Measure.pi fun _ : ι => gaussianReal 0 1)
-    infer_instance
   have hmeasure := gaussianPositiveMeasurePi_eq_neg_of_dual_moments f horth
   have hmeas : AEMeasurable (fun g : ι → ℝ => ENNReal.ofReal (f g))
       (gaussianCouplings ι) := (Lp.memLp f).aestronglyMeasurable.aemeasurable.ennreal_ofReal

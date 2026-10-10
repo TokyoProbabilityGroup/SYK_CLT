@@ -9,11 +9,6 @@ open SYK.GaussianChaos
 
 namespace SYK.CLT
 
-local instance (ι : Type*) [Fintype ι] :
-    IsProbabilityMeasure (gaussianCouplings ι) := by
-  unfold gaussianCouplings
-  infer_instance
-
 private theorem integral_Lp_sq_eq_norm_sq
     {Ω : Type*} [MeasurableSpace Ω] {μ : Measure Ω}
     (R : Lp ℝ 2 μ) :

@@ -16,10 +16,6 @@ open scoped Matrix.Norms.Operator
 
 namespace SYK.CLT
 
-local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
-  unfold standardGaussianMeasure
-  infer_instance
-
 /-- The partition-function part of `thm:partition-clt` at nonzero inverse temperature.
 The joint theorem below additionally supplies the logarithmic CLT. -/
 theorem partition_clt {q : ℕ}

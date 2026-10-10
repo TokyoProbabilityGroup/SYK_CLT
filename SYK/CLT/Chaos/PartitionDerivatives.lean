@@ -21,10 +21,6 @@ open SYK.GaussianChaos
 
 namespace SYK.CLT
 
-local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
-  unfold standardGaussianMeasure
-  infer_instance
-
 /-- The shared Hamiltonian, viewed with the matrix operator norm used by `Tool`. -/
 noncomputable def Setting.disorderMatrix {q : ℕ} (S : Setting q) (n : ℕ) :
     CouplingSpace (S.N n) q →L[ℝ] Matrix (S.d n) (S.d n) ℂ :=

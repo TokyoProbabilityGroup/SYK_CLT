@@ -44,7 +44,7 @@ partitionFunction z H = Matrix.trace (exp (-z • H))
 | 逆温度 | `Params` から分離し、解析には `z : ℂ`、物理的な結果には `β : ℝ≥0` を明示的に渡す。 |
 | 分配関数 | `partitionFunction` は `z : ℂ` と通常のトレースを使う。規格化が必要な利用側は `normalizedTrace` から局所的に定義する。`partitionFunction 0 H = Fintype.card d`。CLT 側の規格化分配関数は零逆温度で1となり、標準表現と原稿の対応は `SYK.CLT.partitionFunction_standard` で照合済み。 |
 | 複素解析 | 整関数性・複素微分・非零点での `logDeriv` の公式、および固定した自己共役行列の実軸近傍での局所非零性・主値対数の正則性は検証済み。正確な範囲は「複素逆温度を扱う定理の仮定」を参照する。 |
-| ガウス型相互作用 | 係数空間、標準ガウス測度、`couplingScale P` と `normalizedHamiltonian P M g` は `Model.GaussianDisorder` に置く。標準座標 `g_A` と実係数 `J_A = couplingScale P * g_A` を区別する。 |
+| ガウス型相互作用 | 係数空間、標準ガウス測度、`couplingScale P` と `normalizedHamiltonian P M g` は `Model.GaussianDisorder` に置く。標準座標 `g_A` と実係数 `J_A = couplingScale P * g_A` を区別する。`standardGaussianMeasure` が確率測度であることは大域インスタンスとして与える。 |
 | 標準行列表現 | `StandardRepresentation` に Jordan–Wigner 表現を構成し、`StandardBasis (N/2)` の次元、生成子の基本関係、同じ偶数次数の相互作用演算子族の規格化トレース直交性を検証済み。抽象的な `MajoranaSystem` に仮定は追加していない。 |
 
 実装と検証の詳しい経緯は [作業履歴](../../WORK_HISTORY.md) を参照する。

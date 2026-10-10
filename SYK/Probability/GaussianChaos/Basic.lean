@@ -33,6 +33,11 @@ noncomputable def hermiteMulti {ι : Type*} [Fintype ι] (α : ι → ℕ) (g : 
 noncomputable def gaussianCouplings (ι : Type*) [Fintype ι] : Measure (ι → ℝ) :=
   Measure.pi fun _ => gaussianReal 0 1
 
+instance gaussianCouplings_isProbability (ι : Type*) [Fintype ι] :
+    IsProbabilityMeasure (gaussianCouplings ι) := by
+  unfold gaussianCouplings
+  infer_instance
+
 theorem hermite_aeval_neg (n : ℕ) (x : ℝ) :
     Polynomial.aeval (-x) (Polynomial.hermite n) =
       (-1) ^ n * Polynomial.aeval x (Polynomial.hermite n) := by

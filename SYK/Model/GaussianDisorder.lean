@@ -34,6 +34,11 @@ noncomputable def standardGaussianMeasure (N q : ℕ) :
   GaussianConcentration.standardGaussianMeasureOnEuclidean
     ({s : Finset (Fin N) // s.card = q})
 
+instance standardGaussianMeasure_isProbability (N q : ℕ) :
+    IsProbabilityMeasure (standardGaussianMeasure N q) := by
+  unfold standardGaussianMeasure
+  infer_instance
+
 /-- The coupling-space measure is definitionally the generic finite-dimensional
 standard Gaussian measure. -/
 @[simp]

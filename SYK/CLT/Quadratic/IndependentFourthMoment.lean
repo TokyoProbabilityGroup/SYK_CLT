@@ -171,10 +171,6 @@ section GaussianSums
 
 variable {ι : Type*} [Fintype ι]
 
-local instance : IsProbabilityMeasure (gaussianCouplings ι) := by
-  unfold gaussianCouplings
-  infer_instance
-
 private noncomputable def centeredSquareSum (s : Finset ι) (g : ι → ℝ) : ℝ :=
   ∑ i ∈ s, centeredGaussianSquare (g i)
 

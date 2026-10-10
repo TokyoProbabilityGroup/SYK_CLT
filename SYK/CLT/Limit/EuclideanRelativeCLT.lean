@@ -14,14 +14,6 @@ open SYK.GaussianChaos
 
 namespace SYK.CLT
 
-local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
-  unfold standardGaussianMeasure
-  infer_instance
-
-local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (gaussianCouplings ι) := by
-  unfold gaussianCouplings
-  infer_instance
-
 theorem Setting.relativeFluctuation_memLp {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     MemLp (S.relativeFluctuation β n) 2

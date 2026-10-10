@@ -15,10 +15,6 @@ open scoped Topology NNReal Matrix.Norms.Operator
 
 namespace SYK.CLT
 
-local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
-  unfold standardGaussianMeasure
-  infer_instance
-
 /-! ## Finite models -/
 
 section FiniteModel

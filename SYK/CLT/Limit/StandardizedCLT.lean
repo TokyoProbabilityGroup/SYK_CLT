@@ -10,10 +10,6 @@ open SYK.Probability
 
 namespace SYK.CLT
 
-local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
-  unfold standardGaussianMeasure
-  infer_instance
-
 theorem Setting.standardizedFluctuation_eq_multiplier {q : ℕ} (S : Setting q)
     (β : ℝ) (hβ : β ≠ 0) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :

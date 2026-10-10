@@ -13,10 +13,6 @@ open scoped Topology
 
 namespace SYK.CLT
 
-local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
-  unfold standardGaussianMeasure
-  infer_instance
-
 theorem log_linear_error_nonneg {y : ℝ} (hy : 0 < y) :
     0 ≤ y - 1 - Real.log y := by
   linarith [Real.log_le_sub_one_of_pos hy]

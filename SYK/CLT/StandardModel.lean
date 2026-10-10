@@ -15,10 +15,6 @@ open scoped Topology NNReal Matrix.Norms.Operator
 
 namespace SYK.CLT
 
-local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
-  unfold standardGaussianMeasure
-  infer_instance
-
 /-- Standard matrix representations at every admissible even size. -/
 def standardSetting (q : ℕ) (hq : Even q) (hq4 : 4 ≤ q) : Setting q where
   q_even := hq

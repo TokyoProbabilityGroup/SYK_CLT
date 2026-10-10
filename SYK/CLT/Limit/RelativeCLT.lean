@@ -15,10 +15,6 @@ open SYK.GaussianChaos SYK.Probability
 
 namespace SYK.CLT
 
-local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (gaussianCouplings ι) := by
-  unfold gaussianCouplings
-  infer_instance
-
 theorem Setting.scaled_higherChaosRemainderLp_ae {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     (S.fluctuationScale n • S.higherChaosRemainderLp β n :

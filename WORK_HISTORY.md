@@ -4,6 +4,14 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="instance-consolidation-2026-10-10"></a>
+
+## 確率測度インスタンスの集約（2026-10-10）
+
+CLT の16ファイルに重複していた `IsProbabilityMeasure` の局所インスタンス（`standardGaussianMeasure` 版・`gaussianCouplings` 版、計20個）と `PolynomialDensity` の `letI` 2か所を削除し、定義の隣に大域インスタンス `standardGaussianMeasure_isProbability`（`Model/GaussianDisorder`）と `SYK.GaussianChaos.gaussianCouplings_isProbability`（`Probability/GaussianChaos/Basic`）を1つずつ置いた。`Prop` の型クラスなので他のインスタンスとは衝突しない。
+
+検証：`lake build SYK`（警告541件、変更前と同数）が成功した。変更前後の全宣言を比較し、差は追加した2件と、削除した局所インスタンスの自動生成名だけで、他の宣言の型は変わっていない。主要定理は通常公理のみ。
+
 <a id="blueprint-package-2026-10-09"></a>
 
 ## Blueprint の独立パッケージ化（2026-10-09）

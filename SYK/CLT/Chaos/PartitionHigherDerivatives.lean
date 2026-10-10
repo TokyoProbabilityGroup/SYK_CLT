@@ -18,10 +18,6 @@ open SYK.GaussianChaos
 
 namespace SYK.CLT
 
-local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (gaussianCouplings ι) := by
-  unfold gaussianCouplings
-  infer_instance
-
 theorem partialList_cons_perm_append {ι : Type*} (i : ι) (l : List ι) :
     (i :: l).Perm (l ++ [i]) := by
   induction l with

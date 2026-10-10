@@ -24,11 +24,6 @@ private instance (N q : ℕ) : Measure.IsOpenPosMeasure
   apply (PiLp.continuous_toLp 2 _).isOpenPosMeasure_map
   exact WithLp.toLp_surjective 2
 
-private instance (N q : ℕ) : IsProbabilityMeasure
-    (standardGaussianMeasure N q) := by
-  unfold standardGaussianMeasure
-  infer_instance
-
 theorem Setting.varianceZ_pos_of_ne_zero {q : ℕ} (S : Setting q)
     (β : ℝ) (hβ : β ≠ 0) (n : ℕ) : 0 < S.varianceZ β n := by
   have hzero : S.Z β n 0 = 1 :=

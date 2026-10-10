@@ -14,10 +14,6 @@ open SYK.GaussianChaos
 
 namespace SYK.CLT
 
-local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (gaussianCouplings ι) := by
-  unfold gaussianCouplings
-  infer_instance
-
 theorem inner_hermiteLp_single_two {ι : Type*} [Fintype ι]
     [DecidableEq ι] (i j : ι) :
     ⟪hermiteLp (Pi.single i 2), hermiteLp (Pi.single j 2)⟫_ℝ =

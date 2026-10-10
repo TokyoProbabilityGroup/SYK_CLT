@@ -15,10 +15,6 @@ open SYK.GaussianChaos
 
 namespace SYK.CLT
 
-local instance (ι : Type*) [Fintype ι] : IsProbabilityMeasure (gaussianCouplings ι) := by
-  unfold gaussianCouplings
-  infer_instance
-
 theorem multiIndices_degree_zero {ι : Type*} [Fintype ι] :
     multiIndices_degree (ι := ι) 0 = {0} := by
   classical

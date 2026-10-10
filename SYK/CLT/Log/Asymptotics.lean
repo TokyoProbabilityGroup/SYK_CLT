@@ -13,10 +13,6 @@ open SYK.GaussianChaos SYK.Probability
 
 namespace SYK.CLT
 
-local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
-  unfold standardGaussianMeasure
-  infer_instance
-
 theorem Setting.fluctuationScale_tendsto_atTop {q : ℕ} (S : Setting q) :
     Tendsto S.fluctuationScale atTop atTop := by
   have hN : Tendsto (fun n => (S.N n : ℝ)) atTop atTop :=

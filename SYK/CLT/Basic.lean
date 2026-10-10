@@ -33,10 +33,6 @@ open scoped Matrix.Norms.Operator
 
 namespace SYK.CLT
 
-local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
-  unfold standardGaussianMeasure
-  infer_instance
-
 /-! ## Large-system setting -/
 
 /-- A family of general matrix Majorana systems at fixed even order `q ≥ 4`.

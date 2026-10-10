@@ -67,10 +67,6 @@ theorem Setting.centeredGaussianSquares_charFun_tendsto (t : ℝ) :
   simp_rw [charFun_centeredGaussianSquares]
   simpa [charFun_gaussianReal, Function.comp_def, neg_div] using ht
 
-local instance (N q : ℕ) : IsProbabilityMeasure (standardGaussianMeasure N q) := by
-  unfold standardGaussianMeasure
-  infer_instance
-
 /-- The quadratic Gaussian sum converges to a standard normal law. -/
 theorem Setting.normalizedQuadraticSum_clt {q : ℕ} (S : Setting q) :
     TendstoInDistribution
