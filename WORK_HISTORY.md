@@ -4,6 +4,22 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="blueprint-workflow-split-2026-10-10"></a>
+
+## 検証 CI と Pages 公開の分離（2026-10-10）
+
+研究者の依頼により、下記の公開準備で統合した workflow を分離した。`lean_action_ci.yml` は `Lean Action CI` として数学・Blueprint のビルドと参照検査だけを行う。新設の `blueprint-pages.yml` は `Blueprint Pages` として独立に同じビルド・検査を行い、成功した HTML を公開する。Pages の操作と公開権限は公開 workflow にのみ置き、両者の concurrency group を分けた。検証 CI は古い実行をキャンセルし、公開 workflow は実行中の公開をキャンセルしない。公開手順と全体計画も分離後のファイル名に合わせた。
+
+検証：両ファイルの build・生成・check のステップが文字列として一致すること、検証 CI に Pages 操作・書込権限がないこと、公開の main 条件2か所、build への依存、artifact パス、各 workflow 自身の起動条件、手動実行、更新文書の相対リンク先の存在をスクリプトで確認した。YAML 構文の parser による検査、Actions 実行、初回公開は未実施。数学・Blueprint の Lean ソースは変更していないため Lean の再検査は行っていない。公開完了は全体計画の `BLUEPRINT-PAGES` に引き続き残す。
+
+<a id="blueprint-pages-preparation-2026-10-10"></a>
+
+## GitHub Pages 公開の準備（2026-10-10）
+
+公開依頼に基づき既存の `lean_action_ci.yml` を `Blueprint Pages` に拡張した。親ワークスペースでの数学・Blueprint ビルド、HTML 生成、`vbp check` を保持し、成功後に HTML のみを Pages artifact として転送する。公開は `main` に限定し、`pages: write` と `id-token: write` は後続の deploy job のみに付与した。Lake 設定・manifest・toolchain・workflow の変更も起動条件に加えた。操作手順は [Blueprint の公開案内](Blueprint/README.md) に置いた。数学のソース・主張・依存の版は変更していない。
+
+検証：設定の処理順、公開条件、artifact のパスと GitHub 公式の Pages 権限要件を照合した。既存 HTML の `base` 要素を解決してローカル参照2309件のパス存在を確認し、欠落0件、ルート絶対パス0件だった。これは既存成果物のパス検査であり、新規生成・アンカー・検索の実動作の検査ではない。YAML parser は環境に存在せず構文の自動検査は未実施。Git は設定ファイルへのアクセスを拒否され、親 `AGENTS.md` も権限付きの再試行後に読めなかった。`lake`・`gh` は利用できず、Lean 再ビルド、Git の差分確認、GitHub 設定変更、push、Actions と公開 URL の検証は未実施。残件と完了条件は全体計画の `BLUEPRINT-PAGES` に記録した。
+
 <a id="repo-rename-2026-10-10"></a>
 
 ## リポジトリ名の変更（2026-10-10）

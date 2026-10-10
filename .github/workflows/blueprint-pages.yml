@@ -1,0 +1,74 @@
+name: Blueprint Pages
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**.lean'
+      - '**/lakefile.toml'
+      - '**/lake-manifest.json'
+      - '**/lean-toolchain'
+      - '.github/workflows/blueprint-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v5
+        with:
+          path: SYK_CLT
+
+      - name: Materialize workspace root
+        run: |
+          set -euo pipefail
+          cp SYK_CLT/workspace/lakefile.toml      ./lakefile.toml
+          cp SYK_CLT/workspace/lake-manifest.json ./lake-manifest.json
+          cp SYK_CLT/workspace/lean-toolchain     ./lean-toolchain
+          ls -la
+
+      - uses: leanprover/lean-action@v1
+        # The parent workspace has no default targets; build the Blueprint package,
+        # which also checks the complete mathematical library.
+        with:
+          build-args: SYKBlueprint
+          use-github-cache: false
+
+      - name: Build Blueprint site
+        run: lake lean SYK_CLT/Blueprint/SYKBlueprintMain.lean -- --run SYK_CLT/Blueprint/SYKBlueprintMain.lean --output SYK_CLT/_out/site
+
+      - name: Check Blueprint output
+        run: lake exe vbp check --site SYK_CLT/_out/site
+
+      - name: Upload GitHub Pages artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: SYK_CLT/_out/site/html-multi
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
