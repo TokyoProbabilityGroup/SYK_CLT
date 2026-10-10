@@ -4,6 +4,23 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="hermite-unify-2026-10-11"></a>
+
+## Hermite 積の定義の一本化と `HermiteIBP` の移動（2026-10-11、`MAINT-HERMITE` の B-1）
+
+多変数 Hermite 積が、`SYK.GaussianConcentration.hermiteMulti`（生成作用素 `g_i - ∂_i` の反復 `hermiteList (multiIndexList α)`）と `SYK.GaussianChaos.hermiteMulti`（積 `∏ He_{α_i}(g_i)`）の二つの定義で並存し、`CoefficientIBP` の `hermiteMulti_eq_signParity` が両者をつないでいた。前者を削除し、積の形の `hermiteMulti` に一本化した。`HermiteIBP.lean` は `GaussianConcentration/` から `GaussianChaos/` へ移し、名前空間を `SYK.GaussianChaos` に変え、`GaussianChaos.Basic` を `import` する。
+
+宣言の変更：
+
+- 改名：`HermiteIBP` の公開宣言 39 件（自動生成の補題を除く。削除した 2 件は含まない）の名前空間を `SYK.GaussianConcentration` から `SYK.GaussianChaos` に変えた（名前の末尾は変えていない）。
+- 削除：`GaussianConcentration.hermiteMulti`、`hermiteMulti_eq_prod`（`hermiteList_multiIndexList : hermiteList (multiIndexList α) = hermiteMulti α` に置き換え）、`CoefficientIBP` の `hermiteMulti_eq_signParity`（一本化で自明な主張になる）。
+- 追加：`continuous_hermiteMulti`（`HermiteIBP`・`CoefficientIBP`・`Orthogonality` の 3 箇所で使う）。
+- 型の変更：`hermiteMulti_exp_bound` と `integrable_hermiteMulti_mul_of_expGrowth` から、不要になった `[DecidableEq ι]` を外した（仮定が弱まるだけ）。`hermiteMulti_pair_ibp` などの `hermiteMulti` は積の形を指すようになった（関数として等しい）。
+
+利用側（`CoefficientIBP`・`Orthogonality`・`PartitionDerivatives`・`PartitionHigherDerivatives`）は `import` と修飾を更新した。Blueprint の `clt_gaussian_hermite_ibp` の宣言の参照と本文、CLT の README・構造文書の依存図、`Smooth`・`Orthogonality` の冒頭の説明も更新した。
+
+検証：変更したファイルを `lake lean` で個別に検査し、`lake build SYK` と `lake build SYKBlueprint` が成功した（警告は依存パッケージ由来の 2 件だけ）。Blueprint の HTML を再生成し、`vbp check` は `ok=true`・`errors=[]` だった。移動した宣言の型を、名前空間の対応を当てはめて変更前と比べ、差が上の削除・追加・`[DecidableEq ι]` の除去だけであることを確認した。`SYK.Probability.GaussianConcentration.*` に残る宣言の名前・型は変わっていない。`hermite_coefficient_ibp`・`hermiteMulti_ibp_of_expGrowth`・`hermiteMulti_pair_ibp`・`hermiteMulti_orthogonality`・`log_partition_clt`・`standard_log_partition_clt`・`standard_partition_clt`・`logPartition_hasSubgaussianMGF` は通常公理のみに依存する。
+
 <a id="blueprint-lint-2026-10-11"></a>
 
 ## Blueprint の警告の解消（2026-10-11）

@@ -15,8 +15,8 @@ via rotation invariance of `μ.prod μ` and the Gaussian integration-by-parts le
 
 The Lipschitz case, obtained by mollification, is in `Lipschitz.lean`. The multi-index
 Gaussian Hermite integration by parts (`lem:Gaussian-Hermite-IBP`) is independent of this
-file and is in `HermiteIBP.lean`; the one-coordinate Stein identities are `gaussianReal_stein`
-and `pi_gaussian_stein_coord` in `StandardGaussian.lean`.
+file and is in `SYK/Probability/GaussianChaos/HermiteIBP.lean`; the one-coordinate Stein
+identities are `gaussianReal_stein` and `pi_gaussian_stein_coord` in `StandardGaussian.lean`.
 -/
 
 open MeasureTheory ProbabilityTheory

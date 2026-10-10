@@ -1,7 +1,7 @@
 import SYK.Analysis.Matrix.TraceExpDerivatives
 import SYK.CLT.Basic
 import SYK.Probability.GaussianChaos.Basic
-import SYK.Probability.GaussianConcentration.HermiteIBP
+import SYK.Probability.GaussianChaos.HermiteIBP
 import Mathlib.Analysis.Calculus.ParametricIntegral
 
 /-!
@@ -207,12 +207,12 @@ theorem Setting.Z_contDiff_pi {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
 
 theorem Setting.coordDeriv_Z_eq {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (I : InteractionIndex (S.N n) q) (g : InteractionIndex (S.N n) q → ℝ) :
-    GaussianConcentration.coordDeriv I (fun x => S.Z β n (WithLp.toLp 2 x)) g =
+    coordDeriv I (fun x => S.Z β n (WithLp.toLp 2 x)) g =
       fderiv ℝ (S.Z β n) (WithLp.toLp 2 g) (PiLp.single 2 I 1) := by
   let e := (PiLp.continuousLinearEquiv 2 ℝ (fun _ : InteractionIndex (S.N n) q => ℝ)).symm
   have h := ((S.Z_contDiff_couplings β n).differentiable (by simp) (e g)).hasFDerivAt.comp g
     e.hasFDerivAt
-  rw [GaussianConcentration.coordDeriv_eq_fderiv I ((S.Z_contDiff_pi β n).of_le (by simp))]
+  rw [coordDeriv_eq_fderiv I ((S.Z_contDiff_pi β n).of_le (by simp))]
   change (fderiv ℝ (S.Z β n ∘ e) g) (Pi.single I 1) = _
   rw [h.fderiv]
   rfl
@@ -223,7 +223,7 @@ theorem Setting.Z_coord_exp_bounds {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ
       (∀ g : InteractionIndex (S.N n) q → ℝ,
         |S.Z β n (WithLp.toLp 2 g)| ≤ C * Real.exp (c * ‖WithLp.toLp 2 g‖)) ∧
       (∀ (I : InteractionIndex (S.N n) q) (g : InteractionIndex (S.N n) q → ℝ),
-        |GaussianConcentration.coordDeriv I (fun x => S.Z β n (WithLp.toLp 2 x)) g| ≤
+        |coordDeriv I (fun x => S.Z β n (WithLp.toLp 2 x)) g| ≤
           C * Real.exp (c * ‖WithLp.toLp 2 g‖)) := by
   obtain ⟨c, hc, hb⟩ := S.exists_Z_exp_bound_all_beta n
   let K := |β| * ‖S.disorderMatrix n‖
@@ -255,14 +255,14 @@ theorem Setting.integral_Z_mul_sq_sub_one_ibp {q : ℕ} (S : Setting q)
       S.Z β n (WithLp.toLp 2 g) * (g I ^ 2 - 1)
         ∂gaussianCouplings (InteractionIndex (S.N n) q)) =
     ∫ g : InteractionIndex (S.N n) q → ℝ,
-      g I * GaussianConcentration.coordDeriv I (fun x => S.Z β n (WithLp.toLp 2 x)) g
+      g I * coordDeriv I (fun x => S.Z β n (WithLp.toLp 2 x)) g
         ∂gaussianCouplings (InteractionIndex (S.N n) q) := by
   let F := fun g : InteractionIndex (S.N n) q → ℝ => S.Z β n (WithLp.toLp 2 g)
   obtain ⟨C, c, hC, hc, hF, hd⟩ := S.Z_coord_exp_bounds β n
-  have hcoord : GaussianConcentration.coordDeriv I (fun g : InteractionIndex (S.N n) q → ℝ => g I) =
+  have hcoord : coordDeriv I (fun g : InteractionIndex (S.N n) q → ℝ => g I) =
       fun _ => 1 := by
     funext g
-    simp [GaussianConcentration.coordDeriv]
+    simp [coordDeriv]
   have hnorm (g : InteractionIndex (S.N n) q → ℝ) :
       |g I| ≤ Real.exp ‖WithLp.toLp 2 g‖ :=
     (PiLp.norm_apply_le (WithLp.toLp 2 g) I).trans
@@ -275,7 +275,7 @@ theorem Setting.integral_Z_mul_sq_sub_one_ibp {q : ℕ} (S : Setting q)
       _ ≤ Real.exp ‖WithLp.toLp 2 g‖ * (C * Real.exp (c * ‖WithLp.toLp 2 g‖)) :=
         mul_le_mul (hnorm g) hx (abs_nonneg _) (Real.exp_nonneg _)
       _ = _ := by rw [mul_left_comm, ← Real.exp_add]; congr 2; ring
-  have h := GaussianConcentration.creation_ibp_of_expProductBounds I
+  have h := creation_ibp_of_expProductBounds I
     (fun g : InteractionIndex (S.N n) q → ℝ => g I) F
     (by fun_prop) ((S.Z_contDiff_pi β n).of_le (by simp)) C (c + 1)
     (by positivity) hC (fun g => hprod g _ (hF g))
@@ -284,10 +284,10 @@ theorem Setting.integral_Z_mul_sq_sub_one_ibp {q : ℕ} (S : Setting q)
       exact (hF g).trans (by gcongr; linarith))
     (fun g => hprod g _ (hd I g))
   have heq : (fun g : InteractionIndex (S.N n) q → ℝ =>
-      GaussianConcentration.creation I (fun x => x I) g * F g) =
+      creation I (fun x => x I) g * F g) =
       fun g => F g * (g I ^ 2 - 1) := by
     funext g
-    simp only [GaussianConcentration.creation, hcoord]
+    simp only [creation, hcoord]
     ring
   rw [heq] at h
   exact h
@@ -304,15 +304,15 @@ theorem Setting.sum_integral_Z_mul_sq_sub_one {q : ℕ} (S : Setting q)
   let F := fun g : InteractionIndex (S.N n) q → ℝ => S.Z β n (WithLp.toLp 2 g)
   obtain ⟨C, c, hC, hc, _, hd⟩ := S.Z_coord_exp_bounds β n
   have hi (I : InteractionIndex (S.N n) q) :
-      Integrable (fun g => g I * GaussianConcentration.coordDeriv I F g)
+      Integrable (fun g => g I * coordDeriv I F g)
         (gaussianCouplings (InteractionIndex (S.N n) q)) := by
-    have hcont : Continuous (GaussianConcentration.coordDeriv I F) :=
-      (GaussianConcentration.contDiff_coordDeriv_succ I 0
+    have hcont : Continuous (coordDeriv I F) :=
+      (contDiff_coordDeriv_succ I 0
         ((S.Z_contDiff_pi β n).of_le (by simp))).continuous
-    exact GaussianConcentration.integrable_coord_mul_of_euclidean_expBound _ hcont I C c hc hC
+    exact integrable_coord_mul_of_euclidean_expBound _ hcont I C c hc hC
       (hd I)
   have hrad (g : InteractionIndex (S.N n) q → ℝ) :
-      (∑ I, g I * GaussianConcentration.coordDeriv I F g) =
+      (∑ I, g I * coordDeriv I F g) =
         β * deriv (fun b => S.Z b n (WithLp.toLp 2 g)) β := by
     simp only [F, S.coordDeriv_Z_eq]
     rw [← S.fderiv_Z_self_eq_beta_deriv]
@@ -325,7 +325,7 @@ theorem Setting.sum_integral_Z_mul_sq_sub_one {q : ℕ} (S : Setting q)
       _ = _ := congrArg (fderiv ℝ (S.Z β n) (WithLp.toLp 2 g)) hg
   simp_rw [S.integral_Z_mul_sq_sub_one_ibp]
   rw [← integral_finsetSum _ (fun I _ => hi I)]
-  change (∫ g, ∑ I, g I * GaussianConcentration.coordDeriv I F g
+  change (∫ g, ∑ I, g I * coordDeriv I F g
     ∂gaussianCouplings (InteractionIndex (S.N n) q)) = _
   simp_rw [hrad]
   rw [integral_const_mul, (S.meanZ_hasDerivAt β n).deriv]

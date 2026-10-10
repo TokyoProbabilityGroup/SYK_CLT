@@ -2,6 +2,7 @@ import Mathlib.Analysis.Calculus.Deriv.Polynomial
 import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 import Mathlib.RingTheory.Polynomial.Hermite.Basic
 import SYK.Probability.GaussianConcentration.StandardGaussian
+import SYK.Probability.GaussianChaos.Basic
 
 /-!
 # Iterated Gaussian integration by parts
@@ -9,16 +10,17 @@ import SYK.Probability.GaussianConcentration.StandardGaussian
 The theorem `hermiteMulti_ibp_of_expGrowth` proves the general identity in
 `lem:Gaussian-Hermite-IBP` of `Paper/sections/gaussian-chaos.tex`, with
 exactly its `C^{|α|}` regularity and exponential Euclidean-growth assumptions
-for the partial derivatives `η ≤ α`. The creation-operator polynomials agree
-with the product of probabilists' Hermite polynomials. Derivative order
-independence, the intermediate product bounds, and integrability are proved
-here; `ExpIBPChain` is only an internal sufficient condition for iteration.
+for the partial derivatives `η ≤ α`. Iterating the creation operator
+`g_i - ∂_i` along `multiIndexList α` gives the product `hermiteMulti α` of
+probabilists' Hermite polynomials (`hermiteList_multiIndexList`). Derivative
+order independence, the intermediate product bounds, and integrability are
+proved here; `ExpIBPChain` is only an internal sufficient condition for iteration.
 Applying the lemma to a concrete function such as `Z_N` is left to the users of this module.
 -/
 
 open MeasureTheory ProbabilityTheory
 
-namespace SYK.GaussianConcentration
+namespace SYK.GaussianChaos
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
@@ -402,9 +404,6 @@ theorem multiIndexList_length (α : ι → ℕ) :
   classical
   simp [multiIndexList, List.length_flatMap]
 
-noncomputable def hermiteMulti (α : ι → ℕ) : (ι → ℝ) → ℝ :=
-  hermiteList (multiIndexList α)
-
 noncomputable def partialMulti (α : ι → ℕ)
     (f : (ι → ℝ) → ℝ) : (ι → ℝ) → ℝ :=
   partialList (multiIndexList α) f
@@ -552,25 +551,34 @@ private theorem hermiteList_flatMap_replicate (α : ι → ℕ) (l : List ι)
         (l.flatMap (fun j => List.replicate (α j) j)) hnot g,
         ih hnodup g]
 
-/-- The creation-operator Hermite polynomial is the usual product of
-probabilists' Hermite polynomials. -/
-theorem hermiteMulti_eq_prod (α : ι → ℕ) (g : ι → ℝ) :
-    hermiteMulti α g =
-      ∏ i : ι, Polynomial.aeval (g i) (Polynomial.hermite (α i)) := by
+/-- Iterating the creation operators along `multiIndexList α` gives the product
+`hermiteMulti α` of probabilists' Hermite polynomials. -/
+theorem hermiteList_multiIndexList (α : ι → ℕ) :
+    hermiteList (multiIndexList α) = hermiteMulti α := by
   classical
+  funext g
   unfold hermiteMulti multiIndexList
   rw [hermiteList_flatMap_replicate α Finset.univ.toList
     (Finset.nodup_toList Finset.univ)]
   simp
 
+omit [DecidableEq ι] in
+/-- The multi-index Hermite product is continuous. -/
+theorem continuous_hermiteMulti (α : ι → ℕ) : Continuous (hermiteMulti α) := by
+  classical
+  rw [← hermiteList_multiIndexList]
+  exact (contDiff_hermiteList (multiIndexList α)).continuous
+
+omit [DecidableEq ι] in
 /-- The multi-index Hermite function itself has exponential growth. -/
 theorem hermiteMulti_exp_bound (α : ι → ℕ) :
     ∃ C c : ℝ, 0 ≤ C ∧ 0 ≤ c ∧ ∀ g : ι → ℝ,
       |hermiteMulti α g| ≤
         C * Real.exp (c * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖) := by
   obtain ⟨C, c, hC, hc, hb⟩ := hermite_product_exp_bound α Finset.univ
-  exact ⟨C, c, hC, hc, fun g => by simpa [hermiteMulti_eq_prod] using hb g⟩
+  exact ⟨C, c, hC, hc, fun g => by simpa [hermiteMulti] using hb g⟩
 
+omit [DecidableEq ι] in
 /-- The left-hand side of the Hermite IBP formula is integrable under the
 manuscript's exponential bound on `f`. -/
 theorem integrable_hermiteMulti_mul_of_expGrowth (α : ι → ℕ)
@@ -595,8 +603,7 @@ theorem integrable_hermiteMulti_mul_of_expGrowth (α : ι → ℕ)
           ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖) := by
         rw [add_mul, Real.exp_add]
         ring
-  exact integrable_of_euclidean_expBound _
-    ((contDiff_hermiteList (multiIndexList α)).continuous.mul hf)
+  exact integrable_of_euclidean_expBound _ ((continuous_hermiteMulti α).mul hf)
     (Ch * Cf) (ch + Cf) (by positivity) (by positivity) hb
 
 /-- The exponential-growth chain yields the multi-index formula with the
@@ -611,7 +618,7 @@ theorem hermiteMulti_ibp_of_expChain (α : ι → ℕ)
         ∂(Measure.pi fun _ : ι => gaussianReal 0 1) := by
   have horder : ContDiff ℝ (multiIndexList α).length f := by
     simpa only [multiIndexList_length] using hfSmooth
-  simpa only [← hermiteMulti_eq_prod, hermiteMulti, partialMulti] using
+  simpa only [hermiteList_multiIndexList, hermiteMulti, partialMulti] using
     hermiteList_ibp_of_expChain (multiIndexList α) horder hf
 
 /-- Coordinate derivatives commute for a twice continuously differentiable function. -/
@@ -841,7 +848,7 @@ theorem hermiteMulti_ibp_integrable (α : ι → ℕ)
     apply (contDiff_partialList (multiIndexList α) 0 _).continuous
     simpa [multiIndexList_length] using hf
   constructor
-  · simpa only [← hermiteMulti_eq_prod] using
+  · simpa only [hermiteMulti] using
       integrable_hermiteMulti_mul_of_expGrowth α hf.continuous C₀ hC₀.le h₀
   · exact integrable_of_euclidean_expBound _ hd C C hC.le hC.le hb
 
@@ -860,8 +867,9 @@ theorem hermiteMulti_pair_ibp (α β : ι → ℕ) :
       ∂(Measure.pi fun _ : ι => gaussianReal 0 1)) =
       ∫ g, partialMulti α (hermiteMulti β) g
         ∂(Measure.pi fun _ : ι => gaussianReal 0 1) := by
-  have hβ : PolyFunction (hermiteMulti β) :=
-    polyFunction_hermiteList (multiIndexList β)
+  have hβ : PolyFunction (hermiteMulti β) := by
+    rw [← hermiteList_multiIndexList]
+    exact polyFunction_hermiteList (multiIndexList β)
   have hdiff : ContDiff ℝ (↑(∑ i : ι, α i)) (hermiteMulti β) :=
     hβ.smooth.of_le (by simp)
   have hgrowth : ∀ η : ι → ℕ, η ≤ α → ∃ D : ℝ, 0 < D ∧ ∀ g,
@@ -876,7 +884,7 @@ theorem hermiteMulti_pair_ibp (α β : ι → ℕ) :
     simpa only [partialMulti] using
       expBound_enlarge hC (by dsimp [D]; linarith [le_max_left C c])
         (by dsimp [D]; linarith [le_max_right C c]) hb
-  simpa only [← hermiteMulti_eq_prod] using
+  simpa only [hermiteMulti] using
     hermiteMulti_ibp_of_expGrowth α hdiff hgrowth
 
-end SYK.GaussianConcentration
+end SYK.GaussianChaos

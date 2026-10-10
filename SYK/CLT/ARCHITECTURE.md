@@ -89,9 +89,10 @@
 
 ```mermaid
 flowchart TD
-    basic["GaussianChaos/Basic"] --> chaos["GaussianChaos/CoefficientIBP"]
+    basic["GaussianChaos/Basic"] --> hermiteibp["GaussianChaos/HermiteIBP"]
+    hermiteibp --> chaos["GaussianChaos/CoefficientIBP"]
     basic --> parity["CliffordSignParity"]
-    hermiteibp["共有 HermiteIBP"] --> chaos
+    gaussian["共有 StandardGaussian"] --> hermiteibp
     model["共有 Model"] --> parity
     chaos --> orth["GaussianChaos/Orthogonality"]
     orth --> prelim["PartitionSymmetry"]
@@ -260,7 +261,7 @@ flowchart TD
 
 ガウス–エルミート部分積分には、共有基盤の `gaussianReal_stein` と `pi_gaussian_stein_coord` を用いる。流用候補の調査と採否は [作業履歴](../../WORK_HISTORY.md#clt-f01-completion-2026-09-27) を参照する。
 
-原稿の `lem:Gaussian-Hermite-IBP` は `f ∈ C^{|α|}` を仮定し、成分ごとに `η ≤ α` を満たす各偏導関数について、ある `C_η > 0` による `|∂G^η f(G)| ≤ C_η exp(C_η ‖G‖)` を要求する。この一般の部分は、同じ仮定のまま、共有の `HermiteIBP.lean` で証明した。共有の `pi_gaussian_stein_coord` は、選択した座標だけの成長評価を使い、偏導順序の交換と Hermite 因子の成長評価から、反復の入力を導く。両辺の可積分性も `hermiteMulti_ibp_integrable` で証明済みである。`Z_N` の正則性と成長評価、およびこの公式の特殊化は、`PartitionHigherDerivatives.lean` で証明した。有限射影、有限積ガウス $L^2$ の完全性、無限次数和の収束も証明済みである。原稿の `eq: chaos` は、研究者の確認に従い、ガウス $L^2$ の等式として解釈する。
+原稿の `lem:Gaussian-Hermite-IBP` は `f ∈ C^{|α|}` を仮定し、成分ごとに `η ≤ α` を満たす各偏導関数について、ある `C_η > 0` による `|∂G^η f(G)| ≤ C_η exp(C_η ‖G‖)` を要求する。この一般の部分は、同じ仮定のまま、`GaussianChaos/HermiteIBP.lean` で証明した。共有の `pi_gaussian_stein_coord` は、選択した座標だけの成長評価を使い、偏導順序の交換と Hermite 因子の成長評価から、反復の入力を導く。両辺の可積分性も `hermiteMulti_ibp_integrable` で証明済みである。`Z_N` の正則性と成長評価、およびこの公式の特殊化は、`PartitionHigherDerivatives.lean` で証明した。有限射影、有限積ガウス $L^2$ の完全性、無限次数和の収束も証明済みである。原稿の `eq: chaos` は、研究者の確認に従い、ガウス $L^2$ の等式として解釈する。
 
 模型から独立したガウス基盤は、利用側を import しない。Model が CLT を import する依存も作らない。`SuperConcentration` は既存の独立した成果として維持し、新しい対数 CLT の必須入力にはしない。現行の `Main.lean` は外部入力の証明を import せず、アニール入力を `AnnealedInput q S` として受け取る。
 

@@ -117,7 +117,7 @@ limiting variance. These are verified conditional Lean results.
 They do not imply positive variance at every finite size.
 :::
 
-:::theorem "clt_gaussian_hermite_ibp" (parent := "central_limit_theorem") (lean := "SYK.GaussianConcentration.hermiteMulti_ibp_of_expGrowth, SYK.GaussianConcentration.hermiteMulti_ibp_integrable, SYK.GaussianConcentration.hermiteMulti_pair_ibp, SYK.GaussianConcentration.hermiteMulti_eq_prod, SYK.GaussianConcentration.partialList_perm, SYK.GaussianChaos.hermite_coefficient_ibp, SYK.GaussianChaos.integral_hermiteMulti_eq_zero")
+:::theorem "clt_gaussian_hermite_ibp" (parent := "central_limit_theorem") (lean := "SYK.GaussianChaos.hermiteMulti_ibp_of_expGrowth, SYK.GaussianChaos.hermiteMulti_ibp_integrable, SYK.GaussianChaos.hermiteMulti_pair_ibp, SYK.GaussianChaos.hermiteList_multiIndexList, SYK.GaussianChaos.partialList_perm, SYK.GaussianChaos.hermite_coefficient_ibp, SYK.GaussianChaos.integral_hermiteMulti_eq_zero")
 The general identity in `lem:Gaussian-Hermite-IBP` is proved for any finite
 coordinate set and independent standard Gaussian coordinates. Let
 $`\alpha` be a nonnegative integer multi-index and let
@@ -141,8 +141,9 @@ assumption on any other derivative is required. The identity and both
 integrability statements have Lean proofs without `sorryAx`, also for
 zero order and an empty coordinate set.
 
-The checked bridge to the sign-parity module identifies its Hermite
-normalization and Gaussian measure with those above. It also proves that
+The iterated creation operators give the same Hermite products as the
+sign-parity module, and its coupling law is the product Gaussian measure
+above. The coefficient module also proves that
 Hermite functions of positive total degree have mean zero and that
 pairwise Hermite products are integrable. The orthogonality and finite
 projection results in `eq: chaos` are recorded in the next node.
