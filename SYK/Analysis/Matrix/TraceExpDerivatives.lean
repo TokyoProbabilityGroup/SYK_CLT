@@ -56,6 +56,12 @@ theorem iterDirectionalFDeriv_eq_iteratedFDeriv (f : E → F) (hf : ContDiff ℝ
 
 end DirectionalDerivative
 
+/-- The real normed-space structure on matrices obtained by restricting scalars, used by the
+real Fréchet derivatives below. -/
+noncomputable local instance Matrix.realNormedSpace {𝕜 n : Type*} [RCLike 𝕜] [Fintype n]
+    [DecidableEq n] : NormedSpace ℝ (Matrix n n 𝕜) :=
+  NormedSpace.restrictScalars ℝ 𝕜 (Matrix n n 𝕜)
+
 namespace Matrix
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
@@ -69,9 +75,6 @@ end Matrix
 namespace DerivAux
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
-
-noncomputable local instance : NormedSpace ℝ (Matrix n n 𝕜) :=
-  NormedSpace.restrictScalars ℝ 𝕜 (Matrix n n 𝕜)
 
 private local instance : SMul ℝ (Matrix n n 𝕜) :=
   (NormedSpace.toModule (𝕜 := ℝ) (E := Matrix n n 𝕜)).toDistribMulAction.toMulAction.toSMul
@@ -133,7 +136,7 @@ private theorem iteratedFDeriv_traceExp_bound_hermitian [Nonempty n] (A : Matrix
       Matrix.normalizedSchattenNorm l D ^ l = ‖Matrix.normalizedTrace (D ^ l)‖ := fun l hl => by
     rw [hDtr, Matrix.normalizedSchattenNorm_conjDiag_pow A hA ν hν l hl]
   have htE : ‖Matrix.traceExp A‖ = (∑ j, Real.exp (hA.eigenvalues j)) / Fintype.card n := by
-    have h := ExpAux.trace_exp A hA 1
+    have h := Matrix.trace_exp_smul_of_isHermitian A hA 1
     rw [one_smul] at h
     simp only [one_mul] at h
     rw [Matrix.traceExp, Matrix.normalizedTrace, h, ← RCLike.ofReal_sum, ← RCLike.ofReal_natCast,
@@ -205,9 +208,6 @@ end DerivAux
 namespace Matrix
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
-
-noncomputable local instance : NormedSpace ℝ (Matrix n n 𝕜) :=
-  NormedSpace.restrictScalars ℝ 𝕜 (Matrix n n 𝕜)
 
 /--
 General higher-derivative estimate for a Hermitian base point.

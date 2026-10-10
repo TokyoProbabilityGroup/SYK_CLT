@@ -34,8 +34,8 @@ noncomputable section
 
 This file develops singular-value estimates from the spectral theorem: min-max
 bounds, von Neumann's trace inequality, and Schatten-Hölder. Main entry points:
-`SYK.MatrixAnalysis.SingularAux.singularValues_of_positive`,
-`SYK.MatrixAnalysis.SingularAux.schatten_holder`.
+`SYK.MatrixAnalysis.LinearMap.singularValues_of_positive`,
+`SYK.MatrixAnalysis.LinearMap.schatten_holder`.
 -/
 
 namespace SYK.MatrixAnalysis
@@ -44,7 +44,7 @@ section InfrastructureA
 
 open scoped InnerProductSpace
 
-namespace SingularAux
+namespace LinearMap
 
 variable {𝕜 E : Type*} [RCLike 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E]
@@ -171,7 +171,7 @@ theorem eigenvalues_eq_of_basis (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) {n :
     simp only
     omega
 
-end SingularAux
+end LinearMap
 
 end InfrastructureA
 
@@ -179,7 +179,7 @@ section InfrastructureB
 
 open scoped InnerProductSpace
 
-namespace SingularAux
+namespace LinearMap
 
 variable {𝕜 E : Type*} [RCLike 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E]
@@ -364,7 +364,7 @@ private theorem sum_norm_inner_wv_le (T : E →ₗ[𝕜] E) (v : E) :
   rw [hsplit]
   exact hB
 
-end SingularAux
+end LinearMap
 
 end InfrastructureB
 
@@ -372,7 +372,7 @@ section InfrastructureC
 
 open Finset
 
-namespace SingularAux
+namespace LinearMap
 
 /-- Abel summation: decreasing nonnegative weights against sequences with nonnegative partial
 sums. -/
@@ -528,7 +528,7 @@ private theorem sum_mul_rpow_le (s : Finset ℕ) (a b : ℕ → ℝ) (ha : ∀ i
   have hreal := NNReal.coe_le_coe.mpr hroot
   simpa only [NNReal.coe_rpow, NNReal.coe_sum, NNReal.coe_mul] using hreal
 
-end SingularAux
+end LinearMap
 
 end InfrastructureC
 
@@ -537,7 +537,7 @@ section InfrastructureD
 open scoped InnerProductSpace
 open Finset
 
-namespace SingularAux
+namespace LinearMap
 
 /-- Rearrangement, `Fin` version. -/
 private theorem rearrangement_fin (n : ℕ) (s t : Fin n → ℝ) (hs : Antitone s) (ht : Antitone t)
@@ -646,7 +646,7 @@ private theorem norm_trace_comp_le (X Y : E →ₗ[𝕜] E) :
         simp only [mul_add, add_div, Finset.sum_add_distrib, Finset.sum_div, mul_div_assoc]
     _ ≤ ∑ i : Fin n, sX i * sY i := by linarith
 
-end SingularAux
+end LinearMap
 
 end InfrastructureD
 
@@ -655,7 +655,7 @@ section InfrastructureE
 open scoped InnerProductSpace
 open Finset
 
-namespace SingularAux
+namespace LinearMap
 
 variable {𝕜 E : Type*} [RCLike 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E]
@@ -801,7 +801,7 @@ theorem schatten_comp_left_le (T S : E →ₗ[𝕜] E) (C : ℝ) (hC0 : 0 ≤ C)
   exact Real.rpow_le_rpow ((T ∘ₗ S).singularValues_nonneg i)
     ((sv_comp_left_le T S C hC0 hC i).trans_eq (mul_comm _ _)) hp.le
 
-end SingularAux
+end LinearMap
 
 end InfrastructureE
 
@@ -810,7 +810,7 @@ section InfrastructureF
 open scoped InnerProductSpace
 open Finset
 
-namespace SingularAux
+namespace LinearMap
 
 variable {𝕜 E : Type*} [RCLike 𝕜]
   [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E]
@@ -855,20 +855,20 @@ theorem sum_eigenvalues_eq_of_basis (T : E →ₗ[𝕜] E) (hT : T.IsSymmetric) 
   rw [heig]
   exact Equiv.sum_comp τ (fun j => f (ν j))
 
-end SingularAux
+end LinearMap
 
-namespace SingularAux
+section MatrixEigenbasis
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 
 /-- A matrix diagonalized by the eigenvector unitary of a Hermitian matrix acts diagonally on the
 corresponding eigenbasis. -/
-theorem toEuclideanLin_conj_diagonal_apply (H : Matrix n n 𝕜) (hH : H.IsHermitian)
+theorem Matrix.toEuclideanLin_conj_diagonal_apply (H : Matrix n n 𝕜) (hH : H.IsHermitian)
     (ν : n → ℝ) (j : n) :
     Matrix.toEuclideanLin ((↑hH.eigenvectorUnitary : Matrix n n 𝕜) *
         Matrix.diagonal (fun i => (ν i : 𝕜)) * star (↑hH.eigenvectorUnitary : Matrix n n 𝕜))
       (hH.eigenvectorBasis j) = (ν j : 𝕜) • hH.eigenvectorBasis j := by
-  open Matrix in
+  open _root_.Matrix in
   have h : ((↑hH.eigenvectorUnitary : Matrix n n 𝕜) *
         Matrix.diagonal (fun i => (ν i : 𝕜)) * star (↑hH.eigenvectorUnitary : Matrix n n 𝕜)) *ᵥ
       ⇑(hH.eigenvectorBasis j) = (ν j : 𝕜) • ⇑(hH.eigenvectorBasis j) := by
@@ -883,7 +883,7 @@ theorem toEuclideanLin_conj_diagonal_apply (H : Matrix n n 𝕜) (hH : H.IsHermi
   rw [h]
   rfl
 
-end SingularAux
+end MatrixEigenbasis
 
 end InfrastructureF
 

@@ -4,6 +4,14 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="aux-names-2026-10-10"></a>
+
+## 公開のまま残る `*Aux` 名の整理（2026-10-10）
+
+`SingularAux` の公開補題8件を `SYK.MatrixAnalysis.LinearMap`（線形写像の特異値・Schatten の補題）へ、行列についての `toEuclideanLin_conj_diagonal_apply` と `ExpAux.trace_exp`（`trace_exp_smul_of_isHermitian` に改名）を `SYK.MatrixAnalysis.Matrix` へ移した。`SVDAux.sv` と、その型に現れる3補題（`normalizedSchattenNorm_eq_sum`・`sum_sv_conjDiag`・`sum_sv_rpow_nonneg`）はファイル内でしか使われないので `private` にした。`TraceExpDerivatives` で重複していた2つの `NormedSpace ℝ (Matrix n n 𝕜)` の局所インスタンスは、名前付きの `Matrix.realNormedSpace` 1つにまとめた。
+
+検証：`lake build SYK`（警告541件、変更前と同数）が成功した。変更前後の全宣言を、改名の対応を当てはめて比較し、型が一致した（インスタンスの名前の差を除く）。公開から private への変更は上の5件（自動生成の `congr_simp` を含む）だけだった。
+
 <a id="instance-consolidation-2026-10-10"></a>
 
 ## 確率測度インスタンスの集約（2026-10-10）
