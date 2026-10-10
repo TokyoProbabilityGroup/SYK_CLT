@@ -4,7 +4,7 @@
 
 `SYK/Probability/GaussianConcentration/` 以下に適用する。ワークスペースと [リポジトリの規則](../../../AGENTS.md) も適用する。このディレクトリは、SYK 模型から独立した共通の基盤として、有限次元ユークリッド空間上のガウス集中不等式を提供する。
 
-横断的な残件は [全体計画](../../../EDITING_PLAN.md)、このディレクトリの保守課題は [詳細計画](EDITING_PLAN.md) を確認する。完了済み作業の検証経緯は、必要なときに [作業履歴](../../../WORK_HISTORY.md#gaussian-foundation) を参照する。
+横断的な残件は [全体計画](../../../EDITING_PLAN.md) を確認する。完了済み作業の検証経緯は、必要なときに [作業履歴](../../../WORK_HISTORY.md#gaussian-foundation) を参照する。
 
 ## 独立性と公開 API
 

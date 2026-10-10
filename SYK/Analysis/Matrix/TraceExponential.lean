@@ -757,7 +757,8 @@ theorem changeOrigin_coef_bound [Nonempty n] (D : Matrix n n 𝕜)
     intro s
     have hl : (sᶜ : Finset (Fin (k + l))).card = k := by
       rw [Finset.card_compl, Fintype.card_fin, s.2, Nat.add_sub_cancel]
-    rw [FormalMultilinearSeries.changeOriginSeriesTerm, ContinuousMultilinearMap.curryFinFinset_apply]
+    rw [FormalMultilinearSeries.changeOriginSeriesTerm,
+      ContinuousMultilinearMap.curryFinFinset_apply]
     rw [hP, ContinuousLinearMap.compFormalMultilinearSeries_apply,
       ContinuousLinearMap.compContinuousMultilinearMap_coe, Function.comp_apply]
     simp only [NormedSpace.expSeries, smul_apply,

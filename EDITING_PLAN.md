@@ -6,30 +6,9 @@
 
 | 作業ID | 課題 | 状態・着手条件 | 担当・統合 |
 | --- | --- | --- | --- |
-| `MAINT-LINT` | linter の警告（519件、うちガウス基盤に506件）の解消 | 独立した保守課題。定理文が変わる9件は承認が要る。探索タクティク・非推奨 API・`maxHeartbeats` は整理済み | 未割当 |
 | `BLUEPRINT-PAGES` | GitHub Pages での Blueprint 公開 | 検証 CI と独立した公開 workflow を準備済み。研究者による main への反映、Pages の Source 設定、初回 build・deploy と公開 URL の確認待ち | 研究者が反映・確認 |
 | 公開の経路 | `lakefile.toml` のメタデータ、README の利用手順（`require` で使う方法）、親の雛形なしでの `SYK`・`SYKBlueprint` 単体のビルドの CI | 保留。ライセンスと引用情報は [README](README.md#licensing-and-citation)、[LICENSE](LICENSE)、[原稿の著作権表示](Paper/COPYRIGHT.md)、[CITATION.cff](CITATION.cff) に設定済み。残る公開手順は別課題とする | 未割当 |
 
-CLT は `hFE : AnnealedInput` を明示的に仮定する形で仕様を確定した。条件付き CLT と標準模型族への適用は検証済みであり、入力の構築と `prop:annealed-free-energy` 自体の証明は作業範囲に含めない。数学的仕様は [CLT の構造文書](SYK/CLT/ARCHITECTURE.md)、ガウス基盤の残件と完了条件は [ガウス基盤の計画](SYK/Probability/GaussianConcentration/EDITING_PLAN.md) に記す。
+CLT は `hFE : AnnealedInput` を明示的に仮定する形で仕様を確定した。条件付き CLT と標準模型族への適用は検証済みであり、入力の構築と `prop:annealed-free-energy` 自体の証明は作業範囲に含めない。数学的仕様は [CLT の構造文書](SYK/CLT/ARCHITECTURE.md) に記す。保守課題（行列解析の副名前空間、未使用宣言、linter の警告）はすべて完了した（[作業履歴](WORK_HISTORY.md#lint-2026-10-10)）。
 
 `BLUEPRINT-PAGES` は `blueprint-pages.yml` を検証専用の `lean_action_ci.yml` から分離した。両者は親ワークスペースを使って独立にビルドし、公開 workflow は `lake build SYKBlueprint`、HTML 生成、`vbp check` の成功後に `SYK_CLT/_out/site/html-multi` を公開する設定を準備した。旧案の単体パッケージ方式には切り替えない。現行設定は [公開 workflow](.github/workflows/blueprint-pages.yml) を参照する。`Blueprint/README.md` は研究者向けの作業手順書であり、公開ファイルには含めない。その不在は公開前の残務として扱わない。完了条件は main での build・deploy の成功と公開ページの章・グラフ・検索・宣言リンクの確認。実行環境の制限により GitHub 側の状態は未確認である。Pages の URL はリポジトリ名 `SYK_CLT` に依存する。
-
-## 保守課題
-
-宣言の比較と走査の方法は [検証の補助](AGENTS.md#検証の補助) に記す。
-
-### `MAINT-LINT`：linter の警告
-
-| linter | 件数 | 解決方法 |
-| --- | --- | --- |
-| `style.longLine` | 257 | 改行する |
-| `style.refine`（`refine'`） | 121 | `refine` に改め、ゴールにする `_` を `?_` にする |
-| `flexible`（後に続く柔軟な `simp`） | 80 | `simp?` の提案から `simp only [...]` に固定する |
-| `style.multiGoal` | 34 | `·` でゴールを分ける |
-| `unusedSimpArgs` | 25 | 示された引数を削除する |
-| `unusedDecidableInType`・`unusedFintypeInType` | 9 | `omit [...] in` で外す。定理文の仮定が減るので承認が要る |
-| `unusedVariables`、`style.show`、`unnecessarySimpa` | 5 | 個別に直す |
-
-種類別の件数は `5772de4` の時点の値である。`MAINT-UNUSED` の削除後も合計519件で、ファイル別では `StandardGaussian` が257件、`Smooth` が174件、`Lipschitz` が75件、残り13件は行列解析・CLT・Model の数ファイルにある。ガウス基盤の部分の詳細は [ガウス基盤の計画](SYK/Probability/GaussianConcentration/EDITING_PLAN.md) に記す。1ファイルを1コミットの単位とし、機械的なもの（`longLine`、`unusedSimpArgs`、`refine'`）から先に行う。完了条件は、変更したファイルの個別検査と `lake build SYK` が成功し、宣言の型が完全に一致し（承認した仮定の削除を除く）、警告の件数が減ったことを確かめることである。
-
-`MAINT-LINT` はほかと独立に進められる。保守課題のうち、行列解析の副名前空間の廃止（`MAINT-NAMESPACE`・`MAINT-ROOT`）と使われていない宣言の削除（`MAINT-UNUSED`）は完了した（[副名前空間](WORK_HISTORY.md#matrix-namespace-2026-10-10)、[未使用宣言](WORK_HISTORY.md#unused-declarations-2026-10-10)）。

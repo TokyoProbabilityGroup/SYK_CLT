@@ -4,6 +4,32 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="lint-2026-10-10"></a>
+
+## linter の警告の解消（2026-10-10）
+
+`MAINT-LINT` を行った。まず、行列解析・CLT・Model の数ファイルの警告 12 件を直した。長い行の折り返し 9 件（`SingularValues`・`TraceExponential`・`PartitionDerivatives`）、`show` から `change` への置換 1 件（`TraceExpDerivatives`）、後続のタクティクが使う柔軟な `simp` の `simp only [...]` への固定 2 件（`PartitionSymmetry`・`Rademacher`）である。ビルドのログに出る `Try this` の提案は、複数の場所を同時に直すときに不完全なことがあった。そのため、提案は編集後の `lake env lean` で毎回確かめる。
+
+`FiniteDimensionalGibbs` の `density_variance_nonneg` の未使用 `[DecidableEq d]`（1件）は、定理の仮定が減るので承認を待っている。
+
+続いて `Lipschitz`（75件）を解消した。長い行 29 件の折り返し、`refine'` 18 件の `refine` への書き換え（解決される穴は `_` のまま、ゴールになる穴だけ `?_` にした）、柔軟な `simp`・`simp_all` 20 件の `only` への固定、未使用の引数 1 件、不要な `simpa` 1 件、`multiGoal` 5 件である。`multiGoal` は、後から `refine fun a => ...` で与えていた暗黙の関数（`integral_mono_of_nonneg` の `g`、`tendsto_integral_of_dominated_convergence` の `bound`）を、最初の `refine` の引数として渡すことで解消した。折り返しの検査は、`lake env lean` にも lakefile の `leanOptions`（linter の設定）を渡さないと警告が出ないので、`-Dweak.linter.mathlibStandardSet=true` などを明示して行った。
+
+続いて `StandardGaussian`（257件）を解消した。長い行 129 件の折り返しと、長すぎるインラインの `by` ブロック 14 件の展開、`refine'` 58 件の `refine` への書き換え、柔軟な `simp`・`simp_all` の `only` への固定、未使用の引数 15 件の削除、`multiGoal` 16 件の解消である。`Integrable.mono'` の暗黙の関数 `g` は、後から `refine fun x => ...` で与えるのをやめて、`(g := ...)` として最初の `refine` に渡した。`by_cases ... <;> simp` の5箇所は、同じファイルの別の箇所と同じ `simpa [hj] using ...` の形に揃えた。`simp?` の提案は `<;>` で複数のゴールに適用されると分岐ごとに異なるので、両方の補題の和集合を使った。
+
+`StandardGaussian` に残る3件は、承認が要る：`integrable_abs_coord_mul_exp_c_sum_abs_pi` の未使用 `[DecidableEq ι]`、`pi_gaussian_stein_coord` の未使用の仮定 `hc : 0 ≤ c`・`hC : 0 ≤ C`。
+
+最後に `Smooth`（174件）を解消した。同じ方法で、長い行の折り返しと `by` ブロックの展開 160件ほど、`refine'` 41件の書き換え、柔軟な `simp`・`simp_all` 12件の固定、未使用の引数 13件の削除を行った。`multiGoal` は、`on_goal 1 => rw [...]` と `ring_nf` を `·` の中へ移す形で解消した。`refine'` の穴のうち、`norm_add_le`・`LinearIsometryEquiv.continuous`・`Real.abs_sin_le_one` などの引数は単一化で決まるので `_` のままにした。`?_` にすると、ゴールが増えるか、解けずに `whnf` の計算量の上限に達した。
+
+残る警告 11 件は、未使用の仮定を外す変更なので、研究者の承認を得て解消した。
+
+- 未使用の `[DecidableEq ι]`（`integrable_abs_coord_mul_exp_c_sum_abs_pi`・`euclidean_norm_le_sum_abs`・`hermite_product_exp_bound`・`integrable_of_euclidean_expBound`・`integrable_coord_mul_of_euclidean_expBound`）と `[DecidableEq d]`（`density_variance_nonneg`）を外した。後者は証明に `classical` を加えた。
+- `pi_gaussian_stein_coord` と、それに仮定を渡すだけの `coord_stein_of_expGrowth` から、未使用の `hc : 0 ≤ c`・`hC : 0 ≤ C` を外した。論文の `lem:Gaussian-Hermite-IBP` に対応する `hermiteMulti_ibp_of_expGrowth`（`0 < C` を持つ）は変えていない。呼び出し側の `coord_stein_of_euclidean_expGrowth` は、この 2 つの仮定を自分の証明で使うので残している。
+- `Smooth` の private 補題 3 件（`PolyFunction.deriv_closed`・`polyFunction_hermiteList`・`polyFunction_partialList`）の未使用の `[Fintype ι]` は、証明が使うので `[Finite ι]` に弱め、証明の中で `Fintype.ofFinite` を使う形にした。
+
+以上で `MAINT-LINT` は完了し、linter の警告は 0 件である。ガウス基盤の保守計画（`GaussianConcentration/EDITING_PLAN.md`）は課題がなくなったので削除した。
+
+検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 0 件になった。Blueprint の生成と `vbp check` も成功した。変更前後の全 742 宣言を比べると、型が変わったのは上の仮定の削除だけで、名前・可視性・種類・モジュールは完全に一致する。主要 4 定理は通常公理のみに依存する。
+
 <a id="clt-scope-fixed-2026-10-10"></a>
 
 ## 条件付き CLT の仕様確定（2026-10-10）

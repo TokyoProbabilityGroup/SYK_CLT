@@ -304,7 +304,9 @@ lemma radE_exp (N : ℕ) (θ : ℝ) :
     intro ε; rw [mul_sum, exp_sum]
   simp_rw [this]
   rw [← Fintype.prod_sum (fun (_ : Fin N) b => exp (θ * rad b))]
-  simp [rad, cosh_eq, Finset.prod_const]
+  simp only [Fintype.univ_bool, rad, mul_ite, mul_one, mul_neg, mem_singleton, Bool.true_eq_false,
+    not_false_eq_true, sum_insert, ↓reduceIte, sum_singleton, Bool.false_eq_true, prod_const,
+    card_univ, Fintype.card_fin, cosh_eq]
   rw [← inv_pow, ← mul_pow]
   congr 1
   ring

@@ -345,7 +345,8 @@ private theorem sum_norm_inner_wv_le (T : E →ₗ[𝕜] E) (v : E) :
   have hB := hon.sum_inner_products_le v (s := Finset.univ)
   have hsplit : ∑ a, ‖⟪wv T a, v⟫_𝕜‖ ^ 2 =
       ∑ a : S, ‖⟪wv T a, v⟫_𝕜‖ ^ 2 := by
-    rw [← Fintype.sum_subtype_add_sum_subtype (fun a : Fin (Module.finrank 𝕜 E) => T.singularValues a ≠ 0)]
+    rw [← Fintype.sum_subtype_add_sum_subtype
+      (fun a : Fin (Module.finrank 𝕜 E) => T.singularValues a ≠ 0)]
     have h0 : ∑ a : {a : Fin (Module.finrank 𝕜 E) // ¬ T.singularValues a ≠ 0},
         ‖⟪wv T a, v⟫_𝕜‖ ^ 2 = 0 := by
       refine Finset.sum_eq_zero fun a _ => ?_
@@ -686,7 +687,8 @@ private theorem norm_kyFan_le (X : E →ₗ[𝕜] E) (k : ℕ) (v : E) : ‖kyFa
 
 private theorem trace_kyFan_comp (X : E →ₗ[𝕜] E) (k : ℕ) :
     LinearMap.trace 𝕜 E (kyFan X k ∘ₗ X) =
-      ∑ j : Fin (Module.finrank 𝕜 E), if (j : ℕ) < k then ((X.singularValues j : ℝ) : 𝕜) else 0 := by
+      ∑ j : Fin (Module.finrank 𝕜 E),
+        if (j : ℕ) < k then ((X.singularValues j : ℝ) : 𝕜) else 0 := by
   rw [LinearMap.trace_eq_sum_inner _ (bas X)]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [LinearMap.comp_apply, inner_kyFan]
