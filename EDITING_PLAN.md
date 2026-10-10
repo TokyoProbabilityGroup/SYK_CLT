@@ -9,7 +9,7 @@
 | `CLT-CONVEX` | 各点収束から関数・導関数の局所一様収束を導く | 保留。再開時に対象と検証範囲を指定する | 未割当 |
 | `CLT-EXTERNAL` | 引用元と `AnnealedInput` の構築に必要な外部入力の調査 | 保留。参照原稿・引用元の版を定めて読み取り調査する | 未割当 |
 | `CLT-ANNEALED` | 明示した外部入力から `AnnealedInput` を構築する | 保留。上記調査後に外部仮定の採否・正確な型・編集範囲を確定する | 未割当 |
-| `MAINT-LINT` | linter の警告（507件、うちガウス基盤に506件）の解消 | 独立した保守課題。定理文が変わる9件は承認が要る。探索タクティク・非推奨 API・`maxHeartbeats` は整理済み | 未割当 |
+| `MAINT-LINT` | linter の警告（432件、うちガウス基盤に431件）の解消 | 独立した保守課題。定理文が変わる9件は承認が要る。探索タクティク・非推奨 API・`maxHeartbeats` は整理済み | 未割当 |
 | 公開の経路 | LICENSE と `lakefile.toml` のメタデータ、README の利用手順（`require` で使う方法）、親の雛形なしでの `SYK`・`SYKBlueprint` 単体のビルドの CI、GitHub Pages での Blueprint 公開 | 保留。ライセンスの種類と公開範囲を共同研究者と決めてから着手する | 未割当 |
 
 数学的仕様と完了条件は [CLT の計画](SYK/CLT/EDITING_PLAN.md) と [ガウス基盤の計画](SYK/Probability/GaussianConcentration/EDITING_PLAN.md) に記す。条件付き CLT と標準模型族への適用は検証済みだが、`hFE : AnnealedInput` の構築と `prop:annealed-free-energy` 自体の証明は未完了である。
@@ -34,6 +34,6 @@
 | `unusedDecidableInType`・`unusedFintypeInType` | 9 | `omit [...] in` で外す。定理文の仮定が減るので承認が要る |
 | `unusedVariables`、`style.show`、`unnecessarySimpa` | 5 | 個別に直す |
 
-種類別の件数は `5772de4` の時点の値である。行列解析・CLT・Model の数ファイルの警告は、承認が要る `FiniteDimensionalGibbs` の1件を除いて解消した。現在は合計507件で、`StandardGaussian` が257件、`Smooth` が174件、`Lipschitz` が75件、`FiniteDimensionalGibbs` が1件である。ガウス基盤の部分の詳細は [ガウス基盤の計画](SYK/Probability/GaussianConcentration/EDITING_PLAN.md) に記す。1ファイルを1コミットの単位とし、機械的なもの（`longLine`、`unusedSimpArgs`、`refine'`）から先に行う。完了条件は、変更したファイルの個別検査と `lake build SYK` が成功し、宣言の型が完全に一致し（承認した仮定の削除を除く）、警告の件数が減ったことを確かめることである。
+種類別の件数は `5772de4` の時点の値である。行列解析・CLT・Model の数ファイルの警告は、承認が要る `FiniteDimensionalGibbs` の1件を除いて解消した。`Lipschitz` も解消した。現在は合計432件で、`StandardGaussian` が257件、`Smooth` が174件、`FiniteDimensionalGibbs` が1件（承認待ち）である。ガウス基盤の部分の詳細は [ガウス基盤の計画](SYK/Probability/GaussianConcentration/EDITING_PLAN.md) に記す。1ファイルを1コミットの単位とし、機械的なもの（`longLine`、`unusedSimpArgs`、`refine'`）から先に行う。完了条件は、変更したファイルの個別検査と `lake build SYK` が成功し、宣言の型が完全に一致し（承認した仮定の削除を除く）、警告の件数が減ったことを確かめることである。
 
 `MAINT-LINT` はほかと独立に進められる。保守課題のうち、行列解析の副名前空間の廃止（`MAINT-NAMESPACE`・`MAINT-ROOT`）と使われていない宣言の削除（`MAINT-UNUSED`）は完了した（[副名前空間](WORK_HISTORY.md#matrix-namespace-2026-10-10)、[未使用宣言](WORK_HISTORY.md#unused-declarations-2026-10-10)）。

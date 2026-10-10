@@ -12,7 +12,9 @@
 
 `FiniteDimensionalGibbs` の `density_variance_nonneg` の未使用 `[DecidableEq d]`（1件）は、定理の仮定が減るので承認を待っている。
 
-検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 507 件に減った。変更前後の全 742 宣言の型・可視性・種類・モジュールは完全に一致し、主要 4 定理は通常公理のみに依存する。
+続いて `Lipschitz`（75件）を解消した。長い行 29 件の折り返し、`refine'` 18 件の `refine` への書き換え（解決される穴は `_` のまま、ゴールになる穴だけ `?_` にした）、柔軟な `simp`・`simp_all` 20 件の `only` への固定、未使用の引数 1 件、不要な `simpa` 1 件、`multiGoal` 5 件である。`multiGoal` は、後から `refine fun a => ...` で与えていた暗黙の関数（`integral_mono_of_nonneg` の `g`、`tendsto_integral_of_dominated_convergence` の `bound`）を、最初の `refine` の引数として渡すことで解消した。折り返しの検査は、`lake env lean` にも lakefile の `leanOptions`（linter の設定）を渡さないと警告が出ないので、`-Dweak.linter.mathlibStandardSet=true` などを明示して行った。
+
+検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 432 件に減った。変更前後の全 742 宣言の型・可視性・種類・モジュールは完全に一致し、主要 4 定理は通常公理のみに依存する。
 
 <a id="repo-rename-2026-10-10"></a>
 
