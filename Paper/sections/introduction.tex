@@ -6,22 +6,20 @@
 
 \section*{Research process with AI and Lean}
 
-Over the past year or so, the use of AI in mathematical research, including its combination with Lean, has grown rapidly.
-The authors had been studying the Sachdev--Ye--Kitaev (SYK) model together in a seminar, during which the question of establishing a central limit theorem (CLT) for its free energy arose.
+In the past year, AI has been used more and more in mathematical research, often together with the Lean proof assistant \cite{GGTW2025}.   
+We had been studying the Sachdev--Ye--Kitaev (SYK) model together in a seminar, during which we became  interested in establishing  a central limit theorem (CLT) for its free energy. 
 We decided to investigate this problem as a case study of a mathematical research workflow involving AI and Lean.
 
 We first attempted to prove the CLT for the free energy directly through discussions with AI (ChatGPT 5.5 Pro), but these initial attempts did not lead to a proof.
 We then proposed studying the CLT for the partition function itself, rather than directly for the free energy.
-After suggesting this alternative approach to AI and continuing the discussion, we obtained proofs of the CLTs for the partition function and, consequently, the free energy.
-The authors subsequently examined the AI-generated proof carefully and worked on verifying and refining it.
-In particular, the initial proof of a key estimate relied on a technically involved analytic argument.
-Through further discussions with AI (ChatGPT 5.6 Pro), we eventually developed a simpler combinatorial argument, which is the approach adopted in Section~\ref{sec:Rademacher-remainder} to control the higher-order chaos terms.
-After verifying and refining the mathematical arguments, the authors reorganized the presentation of the paper to make the proofs more accessible to human readers.
-In parallel, we worked on formalizing the refined proofs in Lean.
-Our approach was to have AI generate Lean code and then have the authors examine the resulting code.
+After suggesting this alternative approach to AI and continuing the discussion, we obtained proofs of the CLTs for the partition function and, consequently, the free energy. 
+We subsequently examined the AI-generated proof carefully and worked on verifying and refining it.
+In particular, the initial proof of a key estimate relied on a complicated analytic argument. 
+Through further discussions with AI (ChatGPT 5.6 Pro), we finally developed a simpler combinatorial argument, which is the approach adopted in Section~\ref{sec:Rademacher-remainder} to control the higher-order chaos terms.
+We then reorganized the paper so that the proofs are more accessible to human readers. In parallel, we formalized the refined proofs in Lean: the AI generated the code, and we reviewed it.
 
-We believe that the workflow illustrated in Figure~\ref{fig:workflow} may be particularly useful for master's and PhD students beginning to conduct mathematical research with AI.
-Moreover, refining a mathematical proof before formalizing it in Lean can help produce simpler and better-structured code, avoiding the unnecessary complexity that may arise from directly formalizing an unrefined proof.
+We expect that the workflow illustrated in Figure~\ref{fig:workflow} will be useful particularly for master's and PhD students beginning mathematical research with AI. Moreover, the process of examining and discussing AI-generated arguments may itself help researchers deepen their mathematical understanding.  
+From a practical perspective, refining a mathematical proof before formalizing it in Lean can help produce simpler and better-structured code. 
 
 
 \begin{figure}[t]

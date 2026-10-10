@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | `MAINT-LINT` | linter の警告（519件、うちガウス基盤に506件）の解消 | 独立した保守課題。定理文が変わる9件は承認が要る。探索タクティク・非推奨 API・`maxHeartbeats` は整理済み | 未割当 |
 | `BLUEPRINT-PAGES` | GitHub Pages での Blueprint 公開 | 検証 CI と独立した公開 workflow を準備済み。研究者による main への反映、Pages の Source 設定、初回 build・deploy と公開 URL の確認待ち | 研究者が反映・確認 |
-| 公開の経路 | LICENSE と `lakefile.toml` のメタデータ、README の利用手順（`require` で使う方法）、親の雛形なしでの `SYK`・`SYKBlueprint` 単体のビルドの CI | 保留。ライセンスの種類と公開範囲を共同研究者と決めてから着手する | 未割当 |
+| 公開の経路 | `lakefile.toml` のメタデータ、README の利用手順（`require` で使う方法）、親の雛形なしでの `SYK`・`SYKBlueprint` 単体のビルドの CI | 保留。ライセンスと引用情報は [README](README.md#licensing-and-citation)、[LICENSE](LICENSE)、[原稿の著作権表示](Paper/COPYRIGHT.md)、[CITATION.cff](CITATION.cff) に設定済み。残る公開手順は別課題とする | 未割当 |
 
 CLT は `hFE : AnnealedInput` を明示的に仮定する形で仕様を確定した。条件付き CLT と標準模型族への適用は検証済みであり、入力の構築と `prop:annealed-free-energy` 自体の証明は作業範囲に含めない。数学的仕様は [CLT の構造文書](SYK/CLT/ARCHITECTURE.md)、ガウス基盤の残件と完了条件は [ガウス基盤の計画](SYK/Probability/GaussianConcentration/EDITING_PLAN.md) に記す。
 
