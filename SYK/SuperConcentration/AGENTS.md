@@ -2,7 +2,7 @@
 
 ## 適用範囲と参照先
 
-`SYK/SuperConcentration/` 以下に適用し、ワークスペースと [リポジトリの規則](../../AGENTS.md) も守る。課題に関係する [全体計画](../../EDITING_PLAN.md)、[構造文書](ARCHITECTURE.md)、[模型規約](../Model/ARCHITECTURE.md#固定する模型規約) と Lean ソースを確認する。Model やガウス基盤を編集する場合はそれぞれの規則も適用する。
+`SYK/SuperConcentration/` 以下に適用する。ワークスペースと [リポジトリの規則](../../AGENTS.md) も適用する。課題に関係する [全体計画](../../EDITING_PLAN.md)、[構造文書](ARCHITECTURE.md)、[模型規約](../Model/ARCHITECTURE.md#固定する模型規約) と Lean ソースを確認する。Model やガウス基盤を編集する場合はそれぞれの規則も適用する。
 
 ## 数学と依存の境界
 

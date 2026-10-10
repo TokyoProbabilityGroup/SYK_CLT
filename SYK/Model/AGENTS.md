@@ -2,7 +2,7 @@
 
 ## 適用範囲と参照先
 
-`SYK/Model/` 以下に適用し、ワークスペースと [リポジトリの規則](../../AGENTS.md) を追加して守る。変更に関係する [全体計画](../../EDITING_PLAN.md)、[構造文書](ARCHITECTURE.md)、`../../Notes/note.tex`、利用側の Lean 宣言を確認する。CLT の規格化に関係する場合は `../../Paper/sections/introduction.tex` の `subsec:SYK-model` も照合する。
+`SYK/Model/` 以下に適用する。ワークスペースと [リポジトリの規則](../../AGENTS.md) も適用する。変更に関係する [全体計画](../../EDITING_PLAN.md)、[構造文書](ARCHITECTURE.md)、`../../Notes/note.tex`、利用側の Lean 宣言を確認する。CLT の規格化に関係する場合は `../../Paper/sections/introduction.tex` の `subsec:SYK-model` も照合する。
 
 一般有限模型の規約は講義ノート、CLT 固有の条件・規格化は論文、実装の正確な型・証明項は Lean ソースを参照する。不一致は報告する。大きな `N` のダイアグラム、Schwinger–Dyson 方程式、共形極限、Schwarzian 有効理論などの発見的議論を有限 `N` の定理の根拠に使わない。
 
