@@ -18,7 +18,11 @@
 
 `StandardGaussian` に残る3件は、承認が要る：`integrable_abs_coord_mul_exp_c_sum_abs_pi` の未使用 `[DecidableEq ι]`、`pi_gaussian_stein_coord` の未使用の仮定 `hc : 0 ≤ c`・`hC : 0 ≤ C`。
 
-検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 178 件に減った。変更前後の全 742 宣言の型・可視性・種類・モジュールは完全に一致し、主要 4 定理は通常公理のみに依存する。
+最後に `Smooth`（174件）を解消した。同じ方法で、長い行の折り返しと `by` ブロックの展開 160件ほど、`refine'` 41件の書き換え、柔軟な `simp`・`simp_all` 12件の固定、未使用の引数 13件の削除を行った。`multiGoal` は、`on_goal 1 => rw [...]` と `ring_nf` を `·` の中へ移す形で解消した。`refine'` の穴のうち、`norm_add_le`・`LinearIsometryEquiv.continuous`・`Real.abs_sin_le_one` などの引数は単一化で決まるので `_` のままにした。`?_` にすると、ゴールが増えるか、解けずに `whnf` の計算量の上限に達した。
+
+残る警告は、承認が要る11件である（`EDITING_PLAN.md` の一覧）。
+
+検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 11 件に減った。変更前後の全 742 宣言の型・可視性・種類・モジュールは完全に一致し、主要 4 定理は通常公理のみに依存する。
 
 <a id="repo-rename-2026-10-10"></a>
 
