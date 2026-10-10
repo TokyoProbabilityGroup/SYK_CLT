@@ -11,7 +11,7 @@ This directory contains the Lean formalization work for the central limit theore
 - `../../Paper/CLT_SYK.tex`: manuscript root containing the shared preamble, front matter, and references.
 - `../../Paper/sections/`: independently compilable top-level manuscript sections; together with the root file, these are the source of truth for the paper theorem statements.
 - `ARCHITECTURE.md` (Japanese): current mathematical API, proof dependencies, and manuscript correspondence.
-- `EDITING_PLAN.md` (Japanese): remaining convex-convergence, external-input, and annealed-input tasks.
+- `EDITING_PLAN.md` (Japanese): current task status and the scope of the conditional CLT.
 - `AGENTS.md` (Japanese): topic-specific instructions for coding agents.
 
 The internal planning documents are written in Japanese for collaboration between the researcher and coding agents. Public mathematical artifacts, including this README, the manuscript, and Lean source files, are written in English.
@@ -40,9 +40,9 @@ The opening docstring of each module also states its main declarations and assum
 
 For fixed even $q \ge 4$, conditional on `hFE : AnnealedInput q S`, the theorems supply a common radius $\beta_q>0$ for real inverse temperatures $0<|\beta|<\beta_q$. The relative fluctuations $N^{q/2-1}(Z_N/\mathbb E Z_N-1)$ and centered logarithmic fluctuations $N^{q/2-1}(\log Z_N-\mathbb E\log Z_N)$ converge in distribution to centered Gaussians with variance $(q!/2)\beta^2(\ell_q'(\beta))^2$. Here $\ell_q$ is the limit supplied by `hFE`; the standardized partition-function fluctuations converge to a centered Gaussian with variance $1$.
 
-These conditional results in `Main.lean` are Lean-checked. `StandardModel.lean` applies them to the standard family `N=q+2*n`. The finite-model and Gaussian-chaos results, and the explicit logarithmic mean-error estimate, are also implemented. The annealed proposition and construction of `hFE` remain open.
+These conditional results in `Main.lean` are Lean-checked. `StandardModel.lean` applies them to the standard family `N=q+2*n`. The finite-model and Gaussian-chaos results, and the explicit logarithmic mean-error estimate, are also implemented. The annealed proposition and construction of `hFE` remain unformalized and are outside the agreed formalization scope.
 
-The theorem statements are in `Main.lean` for an abstract family and in `StandardModel.lean` for the standard family; `AnnealedInput` is declared in `Basic.lean`. The CLT chapter of the [Blueprint](../../Blueprint/SYKBlueprint/CLT.lean) explains the statements, normalization, and the boundary between formalized and assumed parts. Three tasks remain: local uniform convergence of convex functions from pointwise convergence, a survey of the external input, and the construction of `AnnealedInput` from an explicit external input. Gaussian integration by parts and moment calculations are distinct from assuming the annealed limit.
+The theorem statements are in `Main.lean` for an abstract family and in `StandardModel.lean` for the standard family; `AnnealedInput` is declared in `Basic.lean`. The CLT chapter of the [Blueprint](../../Blueprint/SYKBlueprint/CLT.lean) explains the statements, normalization, and the boundary between formalized and assumed parts. Gaussian integration by parts and moment calculations are distinct from assuming the annealed limit.
 
 ## Verification
 
