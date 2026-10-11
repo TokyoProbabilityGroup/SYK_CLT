@@ -11,7 +11,6 @@ This directory contains the Lean formalization work for the central limit theore
 - `../../Paper/CLT_SYK.tex`: manuscript root containing the shared preamble, front matter, and references.
 - `../../Paper/sections/`: independently compilable top-level manuscript sections; together with the root file, these are the source of truth for the paper theorem statements.
 - `ARCHITECTURE.md` (Japanese): current mathematical API, proof dependencies, and manuscript correspondence.
-- `EDITING_PLAN.md` (Japanese): current task status and the scope of the conditional CLT.
 - `AGENTS.md` (Japanese): topic-specific instructions for coding agents.
 
 The internal planning documents are written in Japanese for collaboration between the researcher and coding agents. Public mathematical artifacts, including this README, the manuscript, and Lean source files, are written in English.

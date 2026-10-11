@@ -20,4 +20,4 @@
 
 モジュールは `SYK.Probability.GaussianConcentration.*`、宣言は名前空間 `SYK.GaussianConcentration` に置く。
 
-Lean ファイルを変更したら、各ファイルを依存先から順に `lake lean` で検査する。`lake lean` は依存を先にビルドするので、`lake build +<module>:olean` による成果物の生成は要らない。Lean 実装の完了時には `lake build SYK` も実行し、公開 MGF の正確な型とパラメータを照合する。
+Lean ファイルを変更したら、各ファイルを依存先から順に個別に検査する。Lean 実装の完了時には `lake build SYK` も実行し、公開 MGF の正確な型とパラメータを照合する。

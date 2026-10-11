@@ -1,392 +1,244 @@
 # SYK の作業履歴
 
-数学的な判断、重要な検査、現在の実装を理解するための不具合対処を記録する。旧パス・コマンド・未完了状態は当時の事実であり、現行手順は [README](README.md)、残件は [全体計画](EDITING_PLAN.md) を参照する。細かな作業票・差分・過去の文書は Git 履歴で確認できる。
+数学的・設計上の判断とその理由、当時ぶつかった問題とその解決のうち現在の実装を理解するのに必要なもの、重要な検査の結果を記録する。変更したファイルや宣言の一覧、件数、行数、コマンドなど、Git 履歴で確認できる詳細は書かない。旧パス・旧名称・当時の未完了の状態は当時の事実として残し、用語は現行の表現にそろえる。現行手順は [README](README.md)、残件は [全体計画](EDITING_PLAN.md) を参照する。
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
-<a id="stdgaussian-2026-10-11"></a>
+<a id="docs-audit-2026-10-11"></a>
 
-## mathlib のガウス測度 API の利用（2026-10-11）
+## 文書の点検と修正（2026-10-11）
 
-`standardGaussianMeasureOnEuclidean` の定義を mathlib の `stdGaussian (EuclideanSpace ℝ ι)` に置き換えるかを調べ、研究者の決定により置き換えないことにした。理由は [SuperConcentration の構造文書](SYK/SuperConcentration/ARCHITECTURE.md#汎用的な基盤部分の分離) に記す。代わりに、等式 `map_pi_eq_stdGaussian` を経由して、証明の中で mathlib の補題を使う。
+文書が実装・原稿と食い違い、役割も混ざっていた。原稿はすでに `4≤q≤N` を明記しているのに、CLT の構造文書は「`N≥q` の明示を提案している」としていた。全体計画には完了済みの作業が溜まり、「アニール命題の証明と入力の構築は範囲に含めない」が6か所以上で繰り返され、`lake lean` の説明は AGENTS に3重にあった。同じ定理を「共同定理」「結合定理」と2通りに呼んでいた。各内容を役割どおりの文書の1か所に置き、課題のない `SYK/CLT/EDITING_PLAN.md` を削除した。研究者の方針により、この作業履歴も、Git から辿れる詳細を削り、問題と解決・判断の理由・検証の結果に絞って書き直した。
 
-- `integrable_exp_mul_norm`（約 57 行から約 15 行）：Fernique の定理 `IsGaussian.exists_integrable_exp_sq` で `exp (C ‖x‖²)` の可積分性を得て、平方完成 `c ‖x‖ ≤ C ‖x‖² + c² / (4C)` で抑える。
-- `isGaussian_pi_gaussianReal`（約 20 行から約 8 行）：`map_pi_eq_stdGaussian` で積測度を `stdGaussian` の連続線形同型による像として表し、mathlib のインスタンスを使う。
+研究者の指示で、修正後に別のモデルが監査した。作業履歴をまとめたときに、検証の範囲を段階をまたいで一般化しすぎていたこと（宣言の比較範囲と Blueprint の警告件数）と、「期待値の誤差」という言い換えが Lean の評価する量 `E[log Y_N]` とずれていたことが見つかり、直した。複数の項目をまとめるときは段階ごとの検証範囲を混ぜず、言い換えは Lean が評価する量と照合する。範囲外の記述の集約では、除外項目の欠落も主張の強さの変化もなかった。
 
-定理文は変えていない。
+また、AGENTS の宣言比較の手順は「private を含む」としながら `isInternalDetail` の名前を除く条件を併記していたが、private 宣言の内部名（`_private` で始まる）はすべて `isInternalDetail` に該当するので、両立しなかった。「private 宣言は import 側の環境に現れない」という記述も、実際には SYK のファイルの冒頭が `module` ではなく `import` であるため成り立たず、private 宣言も import 側の環境に入っていた。手順を、`isPrivateName` で private 宣言を別に拾う形と、「private 宣言は宣言のあるファイルの中でしか使えない」という正しい理由に直した。
 
-検証：`StandardGaussian` を `lake lean` で検査し、エラーと警告はなかった。`lake build SYK` と `lake build SYKBlueprint` が成功した（警告は依存パッケージ由来の 2 件だけ）。`SYK` の全 711 宣言の名前・モジュール・型は変更の前後で同一である。2 つの対象、`product_standardGaussian_hasSubgaussianMGF` と主要定理は通常公理のみに依存する。
+<a id="gaussian-refactor-2026-10-11"></a>
 
-<a id="tidy-long-proofs-2026-10-11"></a>
+## ガウス基盤と Hermite 部分積分の再編（2026-10-11）
 
-## 長い自動生成の証明の短縮（2026-10-11、`MAINT-TIDY` の D-3）
+`Smooth.lean` は、共分散の補間による共分散評価と、多重指数のガウス・Hermite 部分積分（`lem:Gaussian-Hermite-IBP`）の二つのファイルを連結したものだった。後者は前者の宣言を使わず、利用側も分かれていた（前者は集中評価、後者は CLT）。そこで後者を `HermiteIBP.lean` に分けた。
 
-`StandardGaussian.lean` の 2 つの証明を、mathlib の補題を使う形に置き換えた（ファイル全体で 167 行削除・50 行追加）。定理文は変えていない。
+多変数 Hermite 積には、生成作用素 `g_i - ∂_i` の反復による `GaussianConcentration.hermiteMulti` と、積 `∏ He_{α_i}(g_i)` による `GaussianChaos.hermiteMulti` の二つの定義があり、両者をつなぐ補題が要っていた。原稿の `H_α` の定義そのものである積の形に一本化し、生成作用素の構成は証明の内部（`hermiteList`）に残して `hermiteList_multiIndexList` で結んだ。話題に合わせて `HermiteIBP` を `GaussianChaos/` に移し、名前空間を `SYK.GaussianChaos` にした。`lem:Gaussian-Hermite-IBP` に当たる定理も、積の式と `Measure.pi` で述べる版と、`hermiteMulti` と `gaussianCouplings` で述べる言い換えの2組あった。研究者の決定により、CLT の証明と原稿対応表が使う後者（`hermite_coefficient_ibp`・`hermite_coefficient_integrable`）を残した。
 
-- `pi_gaussian_stein_coord`（約 197 行から約 75 行）：積測度を第 `i` 座標と残りに分ける測度の等式と、同じ可測性の議論が、左辺用と右辺用に重複して書かれていた。これを private 補題 `integral_pi_eq_integral_slice`（第 `i` 座標で切るフビニ）にまとめた。この補題は mathlib の `measurePreserving_piEquivPiSubtypeProd` と `measurePreserving_piUnique` で座標を分け、`integral_prod_symm` を使う。一次元の Stein の恒等式を各断面に適用する部分は変えていない。
-- `standardGaussianMeasureOnEuclidean_integral_id`（約 46 行から 2 行）：mathlib の `map_pi_eq_stdGaussian`（`standardGaussianMeasureOnEuclidean` の定義が `stdGaussian (EuclideanSpace ℝ ι)` に等しい）と `integral_id_stdGaussian` から導く。このため `Mathlib.Probability.Distributions.Gaussian.Multivariate` を `import` した。
+`standardGaussianMeasureOnEuclidean` の定義を mathlib の `stdGaussian` に置き換えるかも調べ、研究者の決定により置き換えないことにした。理由は [SuperConcentration の構造文書](SYK/SuperConcentration/ARCHITECTURE.md#汎用的な基盤部分の分離) に記す。
 
-検証：`StandardGaussian` を `lake lean` で検査し、エラーと警告はなかった。`lake build SYK` と `lake build SYKBlueprint` が成功した（警告は依存パッケージ由来の 2 件だけ）。`SYK` の全 711 宣言の名前・モジュール・型は変更の前後で同一である。`pi_gaussian_stein_coord`・`standardGaussianMeasureOnEuclidean_integral_id`・`gaussian_cov_bound_smooth` と主要定理は通常公理のみに依存する。
+型の変更：一本化で `hermiteMulti` が `DecidableEq` を要しなくなり、補助定理2つから `[DecidableEq ι]` を外した（仮定が弱まるだけで、原稿の主張に当たる定理ではない）。原稿の主張に当たる `hermite_coefficient_ibp` の仮定と結論は変わらない。
 
-<a id="tidy-exp-abs-2026-10-11"></a>
+検証：分割では、元のファイルの前半・後半と分割後の二つのファイルを比べ、宣言の本文が一致することを確認した。一本化と主定理の整理では、変更前後の宣言の型を名前の対応を当てはめて比べ、差が意図した削除・追加・`[DecidableEq ι]` の除去だけであることを確認した（private を除く）。`lake build SYK`・`lake build SYKBlueprint`・HTML 生成・`vbp check` が成功し、主要定理は通常公理のみに依存する。
 
-## `integrable_exp_abs_gaussianReal` の短縮と `partialMulti` の説明（2026-10-11、`MAINT-TIDY` の D-2）
+<a id="gaussian-proofs-2026-10-11"></a>
 
-`integrable_exp_abs_gaussianReal`（`exp (c |y|)` の標準ガウスでの可積分性）の証明を、mathlib の `integrable_exp_mul_gaussianReal`（`exp (t y)` の可積分性）を `t = c`・`t = -c` で使い、`exp (c|y|) ≤ exp (c y) + exp (-c y)` で抑える約 14 行の証明に置き換えた（約 25 行から短縮）。`partialMulti` に docstring を加えた。定理文は変えていない。
+## ガウス基盤の長い証明の整理（2026-10-11）
 
-検証：`StandardGaussian`・`HermiteIBP` を `lake lean` で検査し、エラーと警告はなかった。`lake build SYK` と `lake build SYKBlueprint` が成功し、`SYK` の全 711 宣言の名前・モジュール・型は変更の前後で同一である。主要定理は通常公理のみに依存する。
+ガウス基盤には自動生成の長い証明が残り、`maxHeartbeats` の引き上げを要するものや、壊れやすい書き方があった。定理文を変えずに、mathlib の補題を使う短い証明に置き換えた。
 
-<a id="tidy-decide-2026-10-11"></a>
+- 一次元の Stein の恒等式 `gaussianReal_stein`：`integral_gaussianReal_eq_integral_smul` で密度による積分に直し、`ℝ` 上の部分積分 `integral_mul_deriv_eq_deriv_mul_of_integrable` を `u = g`、`v = φ`（`φ' = -x φ`）に使う。`maxHeartbeats` の引き上げが不要になった。
+- 座標ごとの Stein の恒等式 `pi_gaussian_stein_coord`：積測度を第 `i` 座標と残りに分ける議論が左辺と右辺で重複していた。`measurePreserving_piEquivPiSubtypeProd` と `measurePreserving_piUnique` による第 `i` 座標で切るフビニ（private 補題）にまとめた。`{j // j = i}` の上の積測度に二つの `Fintype` インスタンスが現れて型が合わなかったので、`Fintype` が部分単一であることを `convert` で使って吸収した。
+- 平均 0、ガウス性、`exp (c ‖x‖)` の可積分性：mathlib の `map_pi_eq_stdGaussian`（このためには `Gaussian.Multivariate` の `import` が要る）と `integral_id_stdGaussian`、Fernique の定理 `IsGaussian.exists_integrable_exp_sq` と平方完成 `c t ≤ C t² + c²/(4C)` から導いた。
 
-## `simp +decide` の整理（2026-10-11、`MAINT-TIDY` の D-1）
+`ring` は `first | ring1 | try_this ring_nf` のマクロなので、目標を閉じられないと `ring_nf` に退避して info を出す。機械的に `ring_nf` へ置換しても挙動は同じだが、後続のタクティクが `ring_nf` の途中の正規形に依存する箇所では、mathlib の更新で壊れやすいまま固定してしまう。そこで `ring_nf` が目標を閉じる箇所だけを置換し、ほかは構造的な書き換え（`exp` の積への展開を先に行い `congr 1; ring` とする、など）を先に行う形にした。整理後、`ring` に関する info は出ない。`simp +decide` の `+decide` は、全箇所で外してもエラーにならなかったので、すべて外した。
 
-自動生成の証明に残っていた `simp +decide`・`simp_all +decide` 44 箇所（`StandardGaussian` 19、`Smooth` 18、`Lipschitz` 5、`SuperConcentration/Main` 2）から `+decide` を外した。各ファイルで全箇所を外して検査し、エラーが出た箇所だけ戻す手順をとったが、戻す必要のある箇所はなかった。空の補題リストの `simp [  ]` 5 箇所は `simp` にした。
-
-検証：4 ファイルを `lake lean` で検査し、エラーと警告はなかった。`lake build SYK` と `lake build SYKBlueprint` が成功した（警告は依存パッケージ由来の 2 件だけ）。`SYK` の全 711 宣言の名前・モジュール・型は変更の前後で同一である。主要定理は通常公理のみに依存する。
-
-<a id="hermite-dedup-2026-10-11"></a>
-
-## Hermite 部分積分の主定理の一本化（2026-10-11、`MAINT-HERMITE` の B-2）
-
-`lem:Gaussian-Hermite-IBP` に当たる定理が、`HermiteIBP` の `hermiteMulti_ibp_of_expGrowth`・`hermiteMulti_ibp_integrable`（積の式と `Measure.pi` で述べる）と、それを言い換えた `CoefficientIBP` の `hermite_coefficient_ibp`・`hermite_coefficient_integrable`（`hermiteMulti` と `gaussianCouplings` で述べる）の 2 組あった。研究者の決定に従い後者の名前と型を残し、`HermiteIBP` で直接証明するようにして、前者を削除した。`hermiteMulti_pair_ibp` は `hermite_coefficient_ibp` から導く。`CoefficientIBP` には、平均 0（`integral_hermiteMulti_eq_zero`）、積の可積分性（`integrable_hermiteMulti_mul`）と、まだ使われている `gaussianCouplings_eq_pi` が残る。Blueprint の `clt_gaussian_hermite_ibp` の宣言の参照と CLT の構造文書も更新した。
-
-検証：変更したファイルを `lake lean` で個別に検査し、`lake build SYK` と `lake build SYKBlueprint` が成功した（警告は依存パッケージ由来の 2 件だけ）。Blueprint の HTML を再生成し、`vbp check` は `ok=true`・`errors=[]` だった。`SYK` の全 713 宣言の名前・モジュール・型を B-1 の後と比べ、差は削除した 2 件と、`hermite_coefficient_ibp`・`hermite_coefficient_integrable` のモジュールが `HermiteIBP` に移ったことだけで、型は同一だった。主要定理は通常公理のみに依存する。
-
-<a id="hermite-unify-2026-10-11"></a>
-
-## Hermite 積の定義の一本化と `HermiteIBP` の移動（2026-10-11、`MAINT-HERMITE` の B-1）
-
-多変数 Hermite 積が、`SYK.GaussianConcentration.hermiteMulti`（生成作用素 `g_i - ∂_i` の反復 `hermiteList (multiIndexList α)`）と `SYK.GaussianChaos.hermiteMulti`（積 `∏ He_{α_i}(g_i)`）の二つの定義で並存し、`CoefficientIBP` の `hermiteMulti_eq_signParity` が両者をつないでいた。前者を削除し、積の形の `hermiteMulti` に一本化した。`HermiteIBP.lean` は `GaussianConcentration/` から `GaussianChaos/` へ移し、名前空間を `SYK.GaussianChaos` に変え、`GaussianChaos.Basic` を `import` する。
-
-宣言の変更：
-
-- 改名：`HermiteIBP` の公開宣言 39 件（自動生成の補題を除く。削除した 2 件は含まない）の名前空間を `SYK.GaussianConcentration` から `SYK.GaussianChaos` に変えた（名前の末尾は変えていない）。
-- 削除：`GaussianConcentration.hermiteMulti`、`hermiteMulti_eq_prod`（`hermiteList_multiIndexList : hermiteList (multiIndexList α) = hermiteMulti α` に置き換え）、`CoefficientIBP` の `hermiteMulti_eq_signParity`（一本化で自明な主張になる）。
-- 追加：`continuous_hermiteMulti`（`HermiteIBP`・`CoefficientIBP`・`Orthogonality` の 3 箇所で使う）。
-- 型の変更：`hermiteMulti_exp_bound` と `integrable_hermiteMulti_mul_of_expGrowth` から、不要になった `[DecidableEq ι]` を外した（仮定が弱まるだけ）。`hermiteMulti_pair_ibp` などの `hermiteMulti` は積の形を指すようになった（関数として等しい）。
-
-利用側（`CoefficientIBP`・`Orthogonality`・`PartitionDerivatives`・`PartitionHigherDerivatives`）は `import` と修飾を更新した。Blueprint の `clt_gaussian_hermite_ibp` の宣言の参照と本文、CLT の README・構造文書の依存図、`Smooth`・`Orthogonality` の冒頭の説明も更新した。
-
-検証：変更したファイルを `lake lean` で個別に検査し、`lake build SYK` と `lake build SYKBlueprint` が成功した（警告は依存パッケージ由来の 2 件だけ）。Blueprint の HTML を再生成し、`vbp check` は `ok=true`・`errors=[]` だった。移動した宣言の型を、名前空間の対応を当てはめて変更前と比べ、差が上の削除・追加・`[DecidableEq ι]` の除去だけであることを確認した。`SYK.Probability.GaussianConcentration.*` に残る宣言の名前・型は変わっていない。`hermite_coefficient_ibp`・`hermiteMulti_ibp_of_expGrowth`・`hermiteMulti_pair_ibp`・`hermiteMulti_orthogonality`・`log_partition_clt`・`standard_log_partition_clt`・`standard_partition_clt`・`logPartition_hasSubgaussianMGF` は通常公理のみに依存する。
+検証：各段階で、宣言の名前・モジュール・型を前後で書き出して比べ、同一だった（private を除く。最初の2段階はガウス基盤のモジュールだけ、以降は `SYK` 全体を比べた）。`lake build SYK`・`lake build SYKBlueprint` が成功し、対象の定理と主要定理は通常公理のみに依存する。
 
 <a id="blueprint-lint-2026-10-11"></a>
 
 ## Blueprint の警告の解消（2026-10-11）
 
-`lake build SYKBlueprint` の警告 78 件を 2 件（依存パッケージ VersoBlueprint の universe 警告）にした。`Blueprint/SYKBlueprint/CLT.lean` に、`Model.lean`・`GaussianConcentration.lean` と同じ `set_option linter.mathlibStandardSet false` を加え、Verso の本文への書式 linter の警告 61 件を解消した。Verso の「宣言に docstring がない」警告 15 件は、`SYK.Params`・`SYK.MajoranaSystem`・`SYK.CLT.AnnealedInput` の各フィールドに docstring を加えて解消した（定理文・型・仮定は変えていない）。
+`lake build SYKBlueprint` の警告の大半は、CLT 章だけに他の章にある `set_option linter.mathlibStandardSet false` がなく、mathlib の書式 linter が Verso の英文の本文に掛かったものだった。残りは Verso が出す「宣言に docstring がない」警告で、こちらは `set_option` では消えないので、`Params`・`MajoranaSystem`・`AnnealedInput` の各フィールドに docstring を付けた。
 
-検証：`lake build SYK` と `lake build SYKBlueprint` が成功し、警告は上の 2 件だけである。Blueprint の HTML を再生成し、`vbp check` は `ok=true`・`errors=[]` だった。HTML 生成時に `CLT.lean:25` の `$`q\ge4`` の数式変換に失敗する info が 1 件出る（本文の数式の書式で、今回の変更とは無関係）。
-
-<a id="ring-cleanup-2026-10-11"></a>
-
-## `ring` の `ring_nf` への退避の整理（2026-10-11）
-
-`ring` が目標を閉じられず `ring_nf` に退避していた info 7 件（`gaussianReal_stein` の書き直しで消えた 13 件を除く）を整理した。`ring_nf` が目標を閉じる 1 件（`StandardGaussian`）は `ring_nf` に置換した。残りは、`ring_nf` の途中の正規形に後続のタクティクが依存していたので、置換せずに書き方を変えた。`Smooth`・`Lipschitz` の `exp (a) = exp (b) * exp (c)` の形の 4 件は `rw [← Real.exp_add]; congr 1; ring` とし、1 件は `mul_add`・`Real.exp_add` で展開してから `ring` とした。`Smooth` の回転の変数変換の 1 件は、`F` の引数を先に `rw [show …]` で書き換えて、不要な `ring` を 2 つ削除した。ゴールを変えていなかった 1 件の `ring` は削除した。
-
-検証：`StandardGaussian`・`Smooth`・`Lipschitz` を `lake lean` で検査し、エラー・警告・info は 0 件だった。`lake build SYK` と `lake build SYKBlueprint` が成功した。`SYK.Probability.GaussianConcentration.*` の全宣言の名前・モジュール・型を変更の前後で書き出して比べ、一致した。主要定理は通常公理のみに依存する。
-
-<a id="stein-proof-2026-10-11"></a>
-
-## `gaussianReal_stein` の証明の書き直し（2026-10-11）
-
-`StandardGaussian.lean` の一次元 Stein の恒等式 `gaussianReal_stein` の証明（約 350 行）を、mathlib の `integral_gaussianReal_eq_integral_smul`（密度による積分の表示）と `integral_mul_deriv_eq_deriv_mul_of_integrable`（`ℝ` 上の部分積分）を使う約 60 行の証明に置き換えた。`u = g`、`v = φ`（標準ガウス密度）とし、`φ' = -x φ` を使う。補助補題として、密度の微分 `hasDerivAt_gaussianPDFReal_zero_one` と、ガウス測度での可積分性を密度つきのルベーグ可積分性へ移す `integrable_gaussianPDFReal_mul` を private で加えた。可積分性は既存の `integrable_exp_abs_gaussianReal` から導くので、この補題を宣言を変えずに `gaussianReal_stein` の前へ移した。`set_option maxHeartbeats 400000` は不要になり削除した。`ring` が `ring_nf` に退避する info 13 件もこれで消えた。
-
-検証：`StandardGaussian.lean` を `lake lean` で検査し、エラーと警告はなく、残る info は対象外の `ring` の 1 件だけだった。`lake build SYK` と `lake build SYKBlueprint` が成功した。`SYK.Probability.GaussianConcentration.*` の公開宣言（private を除く 641 行）の名前・モジュール・型を変更の前後で書き出し、完全に一致することを確認した。`gaussianReal_stein`・`pi_gaussian_stein_coord`・`log_partition_clt`・`standard_log_partition_clt`・`logPartition_hasSubgaussianMGF` は通常公理のみに依存する。
-
-<a id="smooth-split-2026-10-11"></a>
-
-## `Smooth.lean` の分割（2026-10-11）
-
-`SYK/Probability/GaussianConcentration/Smooth.lean` は、共分散の補間による滑らかな場合の共分散評価と、多重指数のガウス・エルミート部分積分（`lem:Gaussian-Hermite-IBP`）を一つのファイルに連結していた。後者は前者の宣言を使わず、`StandardGaussian.lean` の `pi_gaussian_stein_coord` だけに依存する。そこで後者を `HermiteIBP.lean` へ移した。宣言の本文・名前・名前空間（`SYK.GaussianConcentration`）は変えていない。利用側は、共分散評価を使う `Lipschitz` が `Smooth` を、Hermite 部分積分を使う `GaussianChaos/CoefficientIBP` と `CLT/Chaos/PartitionDerivatives` が `HermiteIBP` を `import` する。`Smooth` の不要な Mathlib の `import` 16 件と、`HermiteIBP` の不要な `open scoped` も外した。
-
-検証：元のファイルの前半・後半と、現在の `Smooth.lean`・`HermiteIBP.lean` を比べ、宣言の本文が一致し、差は `import`・`open`・冒頭の説明だけであることを確認した。変更した 5 ファイルを `lake lean` で個別に検査し、`lake build SYK` と `lake build SYKBlueprint` が成功した。`log_partition_clt`・`standard_log_partition_clt`・`logPartition_hasSubgaussianMGF`・`hermiteMulti_ibp_of_expGrowth`・`gaussian_cov_bound_smooth` は通常公理のみに依存する。Blueprint の HTML 生成と `vbp check` は実施していない（章の本文と参照する宣言は変更していない）。
-
-<a id="lint-2026-10-10"></a>
-
-## linter の警告の解消（2026-10-10）
-
-`MAINT-LINT` を行った。まず、行列解析・CLT・Model の数ファイルの警告 12 件を直した。長い行の折り返し 9 件（`SingularValues`・`TraceExponential`・`PartitionDerivatives`）、`show` から `change` への置換 1 件（`TraceExpDerivatives`）、後続のタクティクが使う柔軟な `simp` の `simp only [...]` への固定 2 件（`PartitionSymmetry`・`Rademacher`）である。ビルドのログに出る `Try this` の提案は、複数の場所を同時に直すときに不完全なことがあった。そのため、提案は編集後の `lake env lean` で毎回確かめる。
-
-`FiniteDimensionalGibbs` の `density_variance_nonneg` の未使用 `[DecidableEq d]`（1件）は、定理の仮定が減るので承認を待っている。
-
-続いて `Lipschitz`（75件）を解消した。長い行 29 件の折り返し、`refine'` 18 件の `refine` への書き換え（解決される穴は `_` のまま、ゴールになる穴だけ `?_` にした）、柔軟な `simp`・`simp_all` 20 件の `only` への固定、未使用の引数 1 件、不要な `simpa` 1 件、`multiGoal` 5 件である。`multiGoal` は、後から `refine fun a => ...` で与えていた暗黙の関数（`integral_mono_of_nonneg` の `g`、`tendsto_integral_of_dominated_convergence` の `bound`）を、最初の `refine` の引数として渡すことで解消した。折り返しの検査は、`lake env lean` にも lakefile の `leanOptions`（linter の設定）を渡さないと警告が出ないので、`-Dweak.linter.mathlibStandardSet=true` などを明示して行った。
-
-続いて `StandardGaussian`（257件）を解消した。長い行 129 件の折り返しと、長すぎるインラインの `by` ブロック 14 件の展開、`refine'` 58 件の `refine` への書き換え、柔軟な `simp`・`simp_all` の `only` への固定、未使用の引数 15 件の削除、`multiGoal` 16 件の解消である。`Integrable.mono'` の暗黙の関数 `g` は、後から `refine fun x => ...` で与えるのをやめて、`(g := ...)` として最初の `refine` に渡した。`by_cases ... <;> simp` の5箇所は、同じファイルの別の箇所と同じ `simpa [hj] using ...` の形に揃えた。`simp?` の提案は `<;>` で複数のゴールに適用されると分岐ごとに異なるので、両方の補題の和集合を使った。
-
-`StandardGaussian` に残る3件は、承認が要る：`integrable_abs_coord_mul_exp_c_sum_abs_pi` の未使用 `[DecidableEq ι]`、`pi_gaussian_stein_coord` の未使用の仮定 `hc : 0 ≤ c`・`hC : 0 ≤ C`。
-
-最後に `Smooth`（174件）を解消した。同じ方法で、長い行の折り返しと `by` ブロックの展開 160件ほど、`refine'` 41件の書き換え、柔軟な `simp`・`simp_all` 12件の固定、未使用の引数 13件の削除を行った。`multiGoal` は、`on_goal 1 => rw [...]` と `ring_nf` を `·` の中へ移す形で解消した。`refine'` の穴のうち、`norm_add_le`・`LinearIsometryEquiv.continuous`・`Real.abs_sin_le_one` などの引数は単一化で決まるので `_` のままにした。`?_` にすると、ゴールが増えるか、解けずに `whnf` の計算量の上限に達した。
-
-残る警告 11 件は、未使用の仮定を外す変更なので、研究者の承認を得て解消した。
-
-- 未使用の `[DecidableEq ι]`（`integrable_abs_coord_mul_exp_c_sum_abs_pi`・`euclidean_norm_le_sum_abs`・`hermite_product_exp_bound`・`integrable_of_euclidean_expBound`・`integrable_coord_mul_of_euclidean_expBound`）と `[DecidableEq d]`（`density_variance_nonneg`）を外した。後者は証明に `classical` を加えた。
-- `pi_gaussian_stein_coord` と、それに仮定を渡すだけの `coord_stein_of_expGrowth` から、未使用の `hc : 0 ≤ c`・`hC : 0 ≤ C` を外した。論文の `lem:Gaussian-Hermite-IBP` に対応する `hermiteMulti_ibp_of_expGrowth`（`0 < C` を持つ）は変えていない。呼び出し側の `coord_stein_of_euclidean_expGrowth` は、この 2 つの仮定を自分の証明で使うので残している。
-- `Smooth` の private 補題 3 件（`PolyFunction.deriv_closed`・`polyFunction_hermiteList`・`polyFunction_partialList`）の未使用の `[Fintype ι]` は、証明が使うので `[Finite ι]` に弱め、証明の中で `Fintype.ofFinite` を使う形にした。
-
-以上で `MAINT-LINT` は完了し、linter の警告は 0 件である。ガウス基盤の保守計画（`GaussianConcentration/EDITING_PLAN.md`）は課題がなくなったので削除した。
-
-検証：`lake build SYKBlueprint` が成功し、警告は 519 件から 0 件になった。Blueprint の生成と `vbp check` も成功した。変更前後の全 742 宣言を比べると、型が変わったのは上の仮定の削除だけで、名前・可視性・種類・モジュールは完全に一致する。主要 4 定理は通常公理のみに依存する。
-
-<a id="clt-scope-fixed-2026-10-10"></a>
-
-## 条件付き CLT の仕様確定（2026-10-10）
-
-研究者の決定により、`AnnealedInput` を明示的に仮定する条件付き CLT と標準模型族への条件付き適用を確定仕様とし、凸収束補題の補完・外部入力の再調査・アニール入力の構築の3課題を計画から削除した。構造文書、CLT の案内と Blueprint の範囲説明も同期した。入力の構築とアニール命題自体は未形式化のままであり、課題の削除を証明の完了とは扱わない。数学の Lean 宣言・仮定・証明は変更していない。
-
-検証：変更文書の相対リンク35件のファイル・アンカー、計画からの3課題の削除、廃止した節への参照が残っていないことを確認した。原稿の該当ラベルと Lean の明示的な入力も確認した。エージェント環境では elan 設定ファイルへの書込権限によりビルドできなかったが、その後、研究者が手元のターミナルで案内した検査を実施し、完了を報告した。`lake build SYKBlueprint`、Blueprint の CLT 章と両入口の Lean 検査、HTML 再生成、`vbp check` を完了し、`ok=true`・`errors=[]` を確認した（研究者の実行報告に基づく）。GitHub Actions の実行と Pages 公開の確認は、このローカル検証には含まない。
-
-<a id="blueprint-workflow-split-2026-10-10"></a>
-
-## 検証 CI と Pages 公開の分離（2026-10-10）
-
-研究者の依頼により、下記の公開準備で統合した workflow を分離した。`lean_action_ci.yml` は `Lean Action CI` として数学・Blueprint のビルドと参照検査だけを行う。新設の `blueprint-pages.yml` は `Blueprint Pages` として独立に同じビルド・検査を行い、成功した HTML を公開する。Pages の操作と公開権限は公開 workflow にのみ置き、両者の concurrency group を分けた。検証 CI は古い実行をキャンセルし、公開 workflow は実行中の公開をキャンセルしない。公開手順と全体計画も分離後のファイル名に合わせた。
-
-検証：両ファイルの build・生成・check のステップが文字列として一致すること、検証 CI に Pages 操作・書込権限がないこと、公開の main 条件2か所、build への依存、artifact パス、各 workflow 自身の起動条件、手動実行、更新文書の相対リンク先の存在をスクリプトで確認した。YAML 構文の parser による検査、Actions 実行、初回公開は未実施。数学・Blueprint の Lean ソースは変更していないため Lean の再検査は行っていない。公開完了は全体計画の `BLUEPRINT-PAGES` に引き続き残す。
-
-<a id="blueprint-pages-preparation-2026-10-10"></a>
-
-## GitHub Pages 公開の準備（2026-10-10）
-
-公開依頼に基づき既存の `lean_action_ci.yml` を `Blueprint Pages` に拡張した。親ワークスペースでの数学・Blueprint ビルド、HTML 生成、`vbp check` を保持し、成功後に HTML のみを Pages artifact として転送する。公開は `main` に限定し、`pages: write` と `id-token: write` は後続の deploy job のみに付与した。Lake 設定・manifest・toolchain・workflow の変更も起動条件に加えた。操作手順は当時 `Blueprint/README.md` に置いた。その後、研究者向けの作業手順書として公開ファイルには含めない方針とした。数学のソース・主張・依存の版は変更していない。
-
-検証：設定の処理順、公開条件、artifact のパスと GitHub 公式の Pages 権限要件を照合した。既存 HTML の `base` 要素を解決してローカル参照2309件のパス存在を確認し、欠落0件、ルート絶対パス0件だった。これは既存成果物のパス検査であり、新規生成・アンカー・検索の実動作の検査ではない。YAML parser は環境に存在せず構文の自動検査は未実施。Git は設定ファイルへのアクセスを拒否され、親 `AGENTS.md` も権限付きの再試行後に読めなかった。`lake`・`gh` は利用できず、Lean 再ビルド、Git の差分確認、GitHub 設定変更、push、Actions と公開 URL の検証は未実施。残件と完了条件は全体計画の `BLUEPRINT-PAGES` に記録した。
+検証：警告は依存パッケージ VersoBlueprint の2件だけになり、`vbp check` は `ok=true`・`errors=[]` だった。HTML 生成時に CLT 章の `$`q\ge4`` の数式変換に失敗する info が1件出る（本文の数式の書式の問題で今回の変更とは無関係と判断したが、変更前の状態では確認していない）。
 
 <a id="lake-lean-2026-10-11"></a>
 
 ## 個別検査のコマンドの整理（2026-10-11）
 
-文書にあった個別検査のコマンド `lake env lean <file>` を `lake lean <file>` に改めた。`lake env lean` は環境変数を設定するだけで、依存をビルドせず、`lakefile.toml` の `leanOptions` も渡さない。このため、古い成果物による偽のエラーが出たり、linter の警告が出なかったりした。`lake lean` は依存を先にビルドし、そのファイルが属するライブラリの `leanOptions` を適用する。ワークスペースのライブラリに属さないファイルには、ルートパッケージの設定が使われる。全モジュールを import する補助スクリプトは、特定のファイルの検査ではないので、`lake env lean --stdin` のままにした。
+それまで個別検査に使っていた `lake env lean <file>` は、環境変数を設定するだけで、依存をビルドせず、`lakefile.toml` の `leanOptions` も渡さない。このため、古い成果物による偽のエラーが出たり、linter の警告が出なかったりした。依存を先にビルドし、そのファイルが属するライブラリの `leanOptions` を適用する `lake lean <file>` に改めた。実際、ワークスペースのルートから `lake lean` を実行すると 100 文字の linter が働き、`lake env lean` では働かなかった。全モジュールを import する補助スクリプトは、特定のファイルの検査ではないので `lake env lean --stdin` のままにした。
 
-実測：ワークスペースのルートから `lake lean` を実行すると、`SYK_CLT/SYK/...` のファイルにも 100 文字の linter が働いた。`lake env lean` では働かなかった。オプションの一覧を表示するファイルでは、`SYK_CLT/` で実行したときだけ `maxSynthPendingDepth=3` などが付いた。
+<a id="lint-2026-10-10"></a>
+
+## linter の警告の解消（2026-10-10）
+
+数学ライブラリの linter の警告をすべて解消した。作業で分かったことは次のとおり。
+
+- ビルドのログに出る `Try this` の提案は、複数の場所を同時に直すときに不完全なことがある。提案は編集のたびに確かめる。
+- `refine'` を `refine` に直すとき、単一化で決まる穴は `_` のまま残し、ゴールになる穴だけを `?_` にする。単一化で決まる引数（`norm_add_le`・`Real.abs_sin_le_one` の引数など）を `?_` にすると、ゴールが増えるか、解けずに `whnf` の計算量の上限に達した。
+- `multiGoal` の警告は、後から `refine fun x => ...` で与えていた暗黙の関数（`Integrable.mono'` の `g` など）を、最初の `refine` に `(g := ...)` として渡すと解消できる。
+- `simp?` の提案は、`<;>` で複数のゴールに適用されると分岐ごとに異なるので、両方の補題の和集合を使う。
+
+未使用の仮定（`[DecidableEq ι]`、`pi_gaussian_stein_coord` の `0 ≤ c`・`0 ≤ C` など）を外す変更は定理文を変えるので、研究者の承認を得てから行った。当時の `hermiteMulti_ibp_of_expGrowth`（原稿の補題に当たり、`0 < C` を持つ）は変えなかった。証明が `Fintype` を使う private 補題は、仮定を `[Finite ι]` に弱め、証明の中で `Fintype.ofFinite` を使った。
+
+検証：数学ライブラリの警告は0件になった。変更前後で型が変わったのは、上の仮定の除去だけだった。主要定理は通常公理のみに依存する。当時 Blueprint の警告も0件と記録したが、後に CLT 章の書式の警告が見つかった（[Blueprint の警告の解消](#blueprint-lint-2026-10-11)）。
+
+<a id="clt-scope-fixed-2026-10-10"></a>
+
+## 条件付き CLT の仕様確定（2026-10-10）
+
+研究者の決定により、`AnnealedInput` を明示的に仮定する条件付き CLT と、標準模型族への条件付き適用を確定仕様とした。凸収束補題の補完、外部入力の再調査、アニール入力の構築は、計画から外した。課題を外したことを、証明の完了とは扱わない。
+
+検証：エージェントの環境では elan の設定ファイルへの書き込み権限がなくビルドできなかったので、研究者が手元で `lake build SYKBlueprint`・HTML 生成・`vbp check` を実行し、成功を確認した。
+
+<a id="blueprint-workflow-split-2026-10-10"></a>
+<a id="blueprint-pages-preparation-2026-10-10"></a>
+
+## GitHub Pages 公開の準備と検証 CI の分離（2026-10-10）
+
+Blueprint を GitHub Pages で公開するため、最初は既存の検証 CI を公開用に拡張したが、研究者の依頼で検証と公開の workflow を分けた。Pages の操作と書き込み権限は公開 workflow の deploy job だけに置き、公開は `main` に限った。二つの workflow の concurrency group を分け、検証 CI は古い実行を取り消すが、公開 workflow は実行中の公開を取り消さない。操作手順は研究者向けの手順書とし、公開ファイルには含めない。
+
+検証：両 workflow の build・生成・check の手順が一致すること、検証 CI に Pages の操作と書き込み権限がないことをスクリプトで確認した。既存の HTML のローカル参照は欠落がなかった。環境に YAML の parser・`lake`・`gh` がなく、Git の設定にもアクセスできなかったので、YAML の構文検査、Actions の実行、公開は未確認である（全体計画の `BLUEPRINT-PAGES`）。
 
 <a id="repo-rename-2026-10-10"></a>
 
 ## リポジトリ名の変更（2026-10-10）
 
-研究者が GitHub のリポジトリ名を `SYK` から `SYK_CLT` に変更し、ローカルのディレクトリも `SYK_CLT/` にした。Lake のパッケージ名 `SYK`・`SYKBlueprint`、Lean のライブラリ名、宣言の名前空間は変えていない。変わるのはディレクトリ名だけである。
-
-ワークスペースのルートの `lakefile.toml` と `lake-manifest.json`（`SYK` と `SYKBlueprint` の `path`・`dir`）、雛形 `workspace/` の同じ 2 ファイル、CI（`actions/checkout` の `path` と雛形のコピー・生成のパス）、`workspace/README.md`、トピック別の説明 3 か所を `SYK_CLT` に合わせた。この文書より前の記述にある旧パスと旧コマンドは、当時の事実として残している。
-
-検証：ワークスペースのルートからの `lake build SYKBlueprint` が再ビルドなしで成功した（約3秒）。
+研究者が GitHub のリポジトリ名とローカルのディレクトリ名を `SYK` から `SYK_CLT` に変えた。Lake のパッケージ名 `SYK`・`SYKBlueprint`、ライブラリ名、宣言の名前空間は変えず、ワークスペースの設定と CI のパスだけを合わせた。これより前の記録の旧パスは当時の事実として残す。変更後、ワークスペースのルートからのビルドは再ビルドなしで成功した。
 
 <a id="editor-root-2026-10-10"></a>
 
 ## エディタのプロジェクトルートと依存キャッシュの共有（2026-10-10）
 
-VS Code の InfoView が動かない原因を調べた。Lean 拡張（v0.0.240）は、開いたファイルから親へたどり、最初に見つかった `lean-toolchain` のあるディレクトリをプロジェクトのルートとして `lake serve` を起動する。`SYK/lean-toolchain` があるので `SYK/` がルートとなり、親の共有キャッシュを使わず `SYK/.lake/packages` に mathlib 等のソース（692MB）を複製していた。`SYK/Blueprint/` は `lakefile.toml` はあるが `lean-toolchain` がないため、拡張がエラーを出してサーバーを起動しなかった。ワークスペースのルートからのビルドは、この間も共有キャッシュを使い、重複を作っていない。
+VS Code の InfoView が動かなかった。Lean 拡張は、開いたファイルから親へたどって最初に見つかった `lean-toolchain` のディレクトリをプロジェクトのルートとして `lake serve` を起動する。このため `SYK/` がルートになり、親の共有キャッシュを使わずに `SYK/.lake/packages` に mathlib などのソースを複製していた。`Blueprint/` は `lean-toolchain` がないため、サーバーが起動しなかった。ワークスペースのルートからのビルドは、この間も共有キャッシュを使っていた。
 
-研究者の承認のもとで、`SYK/lakefile.toml` と `SYK/Blueprint/lakefile.toml` に `packagesDir`（親の `.lake/packages`）を設定し、両方の `lake-manifest.json` の `packagesDir` を合わせた。`SYK/Blueprint/lean-toolchain` を追加した（ルートの規則が禁じる「明示的な指示なしの `lean-toolchain` の追加」に当たるので、承認を得た）。依存のリビジョンと Lean のバージョンは変えていない。
+研究者の承認を得て、二つのパッケージの `lakefile.toml` と `lake-manifest.json` に親の `.lake/packages` を指す `packagesDir` を設定し、`Blueprint/lean-toolchain` を追加した（明示的な指示なしの `lean-toolchain` の追加を禁じる規則の例外として承認を得た）。依存のリビジョンと Lean のバージョンは変えていない。
 
-検証：`SYK/` と `SYK/Blueprint/` をそれぞれルートにして `lake env printenv LEAN_PATH`・`lake build` を実行し、依存が親の `.lake/packages` から解決され、複製も再ビルドも起きないことを確認した（約1秒）。ワークスペースのルートからの `lake build SYKBlueprint` も変更前と同じである。VS Code での InfoView の動作は、手元で確認する必要がある。
+検証：両パッケージをそれぞれルートにしてビルドし、依存が親のキャッシュから解決され、複製も再ビルドも起きないことを確認した。VS Code での動作は手元で確認する必要がある。
 
 <a id="unused-declarations-2026-10-10"></a>
 
 ## 使われていない宣言の削除（2026-10-10）
 
-`MAINT-UNUSED` の第3分類を処理した。研究者の方針は、Lean コードで使われておらず削除できる宣言は基本的に削除し、ライブラリを小さく保つことである。削除前のソースは `d5972da` にあり、以下の結果はそこから復元できる。
+研究者の方針は、Lean コードで使われておらず削除できる宣言は基本的に削除し、ライブラリを小さく保つことである。原稿に対応する補題でも、Lean の証明経路で使わなければ削除の対象とした。今でも数学的に有益なものと、復元元のコミットは次のとおり。
 
-今でも数学的に有益で、必要になれば復元を検討するもの：
+- **一次の Duhamel 公式**（`d5972da`）：完備ノルム代数での `D exp(X)[V] = ∫₀¹ exp(sX) V exp((1-s)X) ds` と、トレースの巡回性による `τ(exp(sA) B exp((1-s)A)) = τ(B exp A)`。原稿の `eq:iterated-Duhamel-formula` の `k=1` の場合に当たるが、Lean の高階微分評価は冪級数と Schatten 評価を使い、この経路を通らない。
+- **回転したガウスの射影**（`d5972da`）：`(μ⊗μ)` を回転して第1成分へ射影すると `μ` になる。同じ回転の測度保存は `rotation_measurePreserving` に残る。
+- **Schatten ノルムの反例**（`d5972da`）：規格化 Schatten ノルムが `p` について減少するという以前の誤った主張を、`diag(1,0)` で否定していた。
+- **抽象的な部分積分の枠組み**（`d5972da`）：仮の述語を入力とする反復部分積分。具体的な仮定で述べる版に置き換わっていた。
+- **一般の有限模型での奇数 Hermite 係数の消滅**（`89d0f69`）：規格化しない `Tr exp(−βH(g))` に対する版。原稿の `lem: parity rule lemma` に当たるのは規格化した `Setting.integral_Z_mul_hermite_eq_zero` で、CLT はそちらを使う。
+- **規格化 Schatten ノルムの単調性と Gibbs 因子の厳密式**（`89d0f69`）：冪平均の不等式による非減少性と、`‖exp(−tβH)‖_{1/t} = (tr exp(−βH))^t`。
+- **Lipschitz 定数が 0 の場合の裾**（`89d0f69`）：正の偏差の事象の確率が 0 であること。`β = 0` の中心化と両側の裾は残っている。
 
-- **一次の Duhamel 公式**（`TraceExponential` の `Duhamel` 名前空間全体）。`fderiv_exp_apply` は、完備ノルム代数で `D exp(X)[V] = ∫₀¹ exp(sX) V exp((1-s)X) ds` を示していた。補助の `kernel`・`exp_sub_exp_eq_integral`・`continuous_duhamelIntegral`・`hasFDerivAt_exp`・`hasFDerivAt_exp_affine` も一緒に削除した。`normalizedTrace_duhamel_kernel` は、トレースの巡回性により `τ(exp(sA) B exp((1-s)A)) = τ(B exp A)` を示していた。これらは原稿の `eq:iterated-Duhamel-formula` の `k=1` の場合に当たる。ただし Lean の高階微分評価は冪級数と Schatten 評価を使うので、この経路を通らない。
-- **ガウスの回転不変性の射影**（`Smooth` の `map_rotation_fst`）。`(μ⊗μ)` を回転して第1成分へ射影すると `μ` になる、つまり `cos θ·a + sin θ·b` が標準ガウスに従うことを示していた。同じ回転の測度保存は `rotation_measurePreserving` に残っている。
-- **Schatten ノルムの反例**（`not_normalizedSchattenNorm_antitone`・`normalizedSchattenNorm_antitone_counterexample`・`normalizedSchattenNorm_diag_one_zero` と private の `diagOneZero` 系）。規格化 Schatten ノルムが `p` について減少するという以前の誤った主張を、`diag(1,0)` で否定していた。正しい単調増加は `normalizedSchattenNorm_monotone` にある。
-- **抽象的な部分積分の枠組み**（`Smooth` の `IBPFamily`・`hermiteList_ibp`・`hermiteMulti_ibp`・`hermiteMulti_ibp_prod`）。仮の `Good` 述語を入力とする反復部分積分だった。具体的な仮定で述べる `hermiteMulti_ibp_of_expGrowth` に置き換わっていた。
+このほか、途中段階の補題と、以前から使われていなかった private 宣言も削除した（同じコミットから復元できる）。
 
-途中段階として削除したもの：`coord_stein_of_manuscript_growth`（`hermiteMulti_ibp_of_expGrowth` の一次の場合）、`hermiteList_replicate`・`creation_hermite`、`gaussian_cov_sinH_intervalIntegrable`、`gradient_coord_eq`（`toLp` 版の `gradient_toLp_coord_eq_fderiv` が使われている）、`integrable_abs_mul_exp_abs_gaussianReal`、`Radial.hasFDerivAt_radial`（Euler の恒等式。原稿に対応する主張はない）、`normalizedTrace_mul_comm`（`normalizedTrace_duhamel_kernel` だけが使っていた）。
+未使用の宣言の走査で分かったことは次のとおり。private 宣言は宣言のあるファイルの中でしか使えないので、そのファイルの中の出現で調べる。また、`rfl` で閉じる補題を `simp`・`dsimp` が使うと、定数が証明項に残らない。実際に `gaussianCouplings_eq_pi` と `matrixTraceCLM_apply` は走査で未使用と判定されたが、`simp only` が使っていたので残した。削除の候補は、削除後にビルドして確かめる。
 
-以前からどこにも使われていなかった private 宣言も削除した：`charpoly_exp_smul`・`roots_charpoly_exp_smul`・`charpoly_toEuclideanLin`・`exp_smul_posDef`・`charpoly_adjoint_comp_self_of_positive`・`trace_exp_re_pos`（`TraceExponential`）、`eigenvalues_eigenbasis_eq`・`eig_nonneg`（`SingularValues`）。モジュール機能を有効にしているため、private 宣言は import 側の環境に現れない。そこで、宣言のあるファイル内の出現で調べ、ドット記法で使われるものを除いた。
-
-検証：`lake build SYKBlueprint` が成功し、警告は531件から519件に減った。Blueprint の生成と `vbp check` も成功した。変更前後の全宣言を比較し、残った759件は名前・可視性・種類・モジュール・型が完全に一致した。差は上の削除分（構造体の自動生成宣言を含む）だけである。主要定理は通常公理のみに依存する。孤立する宣言がなくなるまで、公開宣言の Lean の走査と private 宣言の検査を繰り返した。
-
-### 参照のない小さな宣言の削除
-
-研究者の判断で、参照がなく API として残す利益も小さい次の宣言を削除した。削除前のソースはコミット `89d0f69` にある。
-
-今でも数学的に有益なもの：
-
-- **一般の有限模型での奇数 Hermite 係数の消滅**（`CliffordSignParity` の `expectation_partitionFunction_mul_hermite_eq_zero`）。規格化しない `Tr exp(−βH(g))` と係数 `σ_N` を掛けない結合 `g` に対し、`N` が偶数で `α` が奇数なら `𝔼[Z·H_α]=0` を示していた。原稿の `lem: parity rule lemma` の `eq:odd-coefficient-zero` に当たるのは規格化した `Setting.Z` に対する `Setting.integral_Z_mul_hermite_eq_zero` で、CLT はそちらを使う。削除した版は同じ証明（頂点の符号反転 `hermiteMulti_vertex_flip` とゲージ不変性 `partitionFunction_sign_gauge`）の別の組み立てで、原稿に対応する主張はない。
-- **規格化 Schatten ノルムの単調性と Gibbs 因子の厳密式**（`normalizedSchattenNorm_monotone`・`powerMean_mono`、`normalizedSchattenNorm_exp_hermitian`）。前者は規格化 Schatten ノルムが `p` について非減少であること（冪平均の不等式）、後者は `‖exp(−tβH)‖_{1/t} = (tr exp(−βH))^t` である。CLT の高階微分評価は冪級数と語の評価を使うので通らない。
-- **ゼロ Lipschitz 定数の裾**（`product_standardGaussian_upper_tail_zero`・`product_standardGaussian_lower_tail_zero`、`logPartition_upper_tail_of_beta_zero`・`logPartition_lower_tail_of_beta_zero`）。Lipschitz 定数が 0 なら、正の偏差の事象の確率は 0 であることを示していた。`β = 0` の中心化と両側の裾の主張は `logPartition_centered_of_beta_zero` などに残る。
-
-そのほかに削除したもの：`gibbsState` とその `gibbsState_eq_expectation_thermalDensity`・`realLogPartitionFunction`（`FiniteDimensionalGibbs`）、`expectation_eq_ofReal_re`、`normalizedTrace_add`・`normalizedTrace_zero`、`Schatten.normalizedNorm_nonneg`、`polynomial_eval_mem_hermite_span` と補助の `polynomialEvalLinear`、`iterDirectionalFDeriv_traceExp_bound_of_norm_le_one`、private の `sum_sv_exp`・`sum_eigenvalues_exp_smul`・`singularValues_fin_of_positive`。
-
-走査は `rfl` で閉じる補題の `simp`・`dsimp` 経由の使用を検出できない。実際に `gaussianCouplings_eq_pi` と `matrixTraceCLM_apply` は走査で未使用と判定されたが、`simp only` が使っていたため、削除をやめて残した。この 2 件は、使われているので削除しない。
-
-検証：`lake build SYKBlueprint` が成功し、警告は 519 件のまま変わらない。Blueprint の生成と `vbp check` も成功した。変更前後の全宣言の比較で、残った 742 件は型を含めて一致し、差は上の 17 件の削除だけである。主要定理は通常公理のみに依存する。
+検証：変更前後の全宣言を比べ、差は削除した宣言（自動生成の宣言を含む）だけだった。孤立する宣言がなくなるまで走査を繰り返した。主要定理は通常公理のみに依存する。
 
 <a id="matrix-namespace-2026-10-10"></a>
 
 ## 行列解析の副名前空間の廃止（2026-10-10）
 
-`MAINT-NAMESPACE` と `MAINT-ROOT` を行った。`SYK.MatrixAnalysis.Matrix`（53件）と `SYK.MatrixAnalysis.LinearMap`（7件）の宣言を `SYK.MatrixAnalysis` の直下へ移した。mathlib の `Matrix`・`LinearMap` と同名の副名前空間があると、宣言を誤認しやすく、`open _root_.Matrix` も必要になっていたためである。`normalizedTrace` は改名せず、Model の `SYK.normalizedTrace` とは別の定義であることを docstring に書いた。
+`SYK.MatrixAnalysis.Matrix` と `SYK.MatrixAnalysis.LinearMap` の宣言を `SYK.MatrixAnalysis` の直下へ移した。mathlib の `Matrix`・`LinearMap` と同名の副名前空間があると、宣言を取り違えやすく、`open _root_.Matrix` も必要になっていたためである。`_root_` を使う宣言は通常の位置で宣言し直し、private な局所インスタンスの適用範囲は変えなかった。行列解析の `normalizedTrace` は、Model の `SYK.normalizedTrace` とは別の定義であることを docstring に書き、改名しなかった。
 
-`_root_` を使っていた2件は通常の位置で宣言した。
-
-- `trace_exp_smul_of_isHermitian` は `ExpAux` の外へ出した。
-- `contDiff_traceExp` は、`DerivAux` の private な局所インスタンス3つと一緒に `section RealScalars` に置いた。インスタンスの適用範囲は変更前と同じで、後続の定理文には及ばない。
-
-旧名前空間の区画は名前のない `section` に置き換え、`variable` の適用範囲を保った。外部の利用箇所は `CLT/Chaos/PartitionDerivatives.lean` と `PartitionHigherDerivatives.lean` だけだった。
-
-検証：`lake build SYKBlueprint` が成功し、警告は531件で変更前と同数だった。Blueprint の生成と `vbp check` も成功した。変更前後の全798宣言を、改名の対応を当てはめて比較し、名前・可視性・種類・モジュール・型が完全に一致した。主要定理（`log_partition_clt`・`standard_log_partition_clt`・`standard_partition_clt`・`logPartition_hasSubgaussianMGF`）は通常公理のみに依存する。
+検証：変更前後の全宣言を、名前の対応を当てはめて比べ、型が一致した。主要定理は通常公理のみに依存する。
 
 <a id="docs-cleanup-2026-10-10"></a>
 
 ## 文書の整理（2026-10-10）
 
-全体計画にあった手順（原稿の改訂と実装の同期、共同作業と別環境への引き継ぎ、Blueprint の更新の規則）を `AGENTS.md` へ移し、CLT の構造文書から履歴の記述とエージェントへの指示を除いた。補題の索引は各モジュールの docstring に一本化し、構造文書には探し方の案内だけを残した。話題別の README（CLT・SuperConcentration・`workspace/`）から日本語の内部文書へのリンクを外し、定理文の所在と公理依存を英語で書いた。CLT とガウス基盤の `AGENTS.md` は、Model・SuperConcentration と同じ簡潔な形にそろえた。日本語の文書は、名詞の連なりと長い文を開いて読みやすくした。規則の効力と数学の内容は変えていない。
-
-検証：Lean の変更は docstring のコメントだけで、11ファイルの個別検査と `lake build SYK` が成功した（警告531件、変更前と同数）。主要10定理（CLT 6、集中評価 4）は通常公理のみ。全 `.md` の相対リンクと見出しアンカーの検査で不備は0件だった。ルートの `README.md` は人間が管理するので編集しておらず、28行目に日本語の構造文書へのリンクが残る。
+全体計画にあった手順（原稿の改訂と実装の同期、引き継ぎ、Blueprint の更新）を `AGENTS.md` へ移し、CLT の構造文書から履歴とエージェントへの指示を除いた。補題の索引は各モジュールの docstring に一本化した。話題別の README は英語にし、日本語の内部文書へのリンクを外した。ルートの `README.md` は人間が管理するので編集していない。規則の効力と数学の内容は変えていない。Lean の変更は docstring だけで、ビルドは成功し、相対リンクとアンカーの不備はなかった。
 
 <a id="gaussian-maintenance-2026-10-10"></a>
 
 ## ガウス基盤の探索タクティク・非推奨 API の整理（2026-10-10）
 
-`Probability/GaussianConcentration/` の `aesop`・`grind` 12か所（`grind +suggestions` を含む）を、ゴールを確認したうえで明示的な証明に置き換えた。符号反転不変性は mathlib の `gaussianReal_map_neg`、台の包含は `Function.support_mul_subset_left`、`L.toNNReal` は `Real.coe_toNNReal'` を使い、`Function.update` の計算と直積集合の等式は場合分けで示した。`pi_gaussian_stein_coord` の外側の3つの `have h_split` は、最後の合成で参照するため `h_slice`・`h_lhs`・`h_rhs` と名付けた。
-
-非推奨 API 8件（`integral_finset_sum`、`ContinuousMultilinearMap.sum_apply`・`smul_apply`、`ContinuousLinearMap.smul_apply`、非推奨の import 2件）を新しい名前に直した。`maxHeartbeats` は、`Smooth` の引き上げを削除し、`gaussianReal_stein` は 4000000 から 400000（既定値の2倍）に下げて理由のコメントを付けた。
-
-検証：`lake build SYK` が成功し、警告は541件から531件に減った（非推奨8件と `maxHeartbeats` の2件）。変更前後の全宣言の型・可視性・モジュールは完全に一致した。主要定理は通常公理のみ。書式の警告は残っている。
+ガウス基盤の `aesop`・`grind` を、ゴールを確かめたうえで明示的な証明に置き換えた。符号反転の不変性には mathlib の `gaussianReal_map_neg` が使えた。非推奨の API は新しい名前に直した。`maxHeartbeats` の引き上げは、`Smooth` では不要だったので削除し、`gaussianReal_stein` では既定値の2倍まで下げて理由のコメントを付けた（後に証明の書き直しで不要になった）。変更前後で全宣言の型は一致し、主要定理は通常公理のみに依存する。
 
 <a id="aux-names-2026-10-10"></a>
 
 ## 公開のまま残る `*Aux` 名の整理（2026-10-10）
 
-`SingularAux` の公開補題8件を `SYK.MatrixAnalysis.LinearMap`（線形写像の特異値・Schatten の補題）へ、行列についての `toEuclideanLin_conj_diagonal_apply` と `ExpAux.trace_exp`（`trace_exp_smul_of_isHermitian` に改名）を `SYK.MatrixAnalysis.Matrix` へ移した。`SVDAux.sv` と、その型に現れる3補題（`normalizedSchattenNorm_eq_sum`・`sum_sv_conjDiag`・`sum_sv_rpow_nonneg`）はファイル内でしか使われないので `private` にした。`TraceExpDerivatives` で重複していた2つの `NormedSpace ℝ (Matrix n n 𝕜)` の局所インスタンスは、名前付きの `Matrix.realNormedSpace` 1つにまとめた。
-
-検証：`lake build SYK`（警告541件、変更前と同数）が成功した。変更前後の全宣言を、改名の対応を当てはめて比較し、型が一致した（インスタンスの名前の差を除く）。公開から private への変更は上の5件（自動生成の `congr_simp` を含む）だけだった。
+公開のまま残っていた `*Aux` 名前空間の補題を、内容に合う名前空間へ移すか、ファイルの中でしか使われないものは `private` にした。重複していた `NormedSpace ℝ (Matrix n n 𝕜)` の局所インスタンスは、名前付きの1つにまとめた。変更前後で型は一致した（インスタンスの名前の差を除く）。
 
 <a id="instance-consolidation-2026-10-10"></a>
 
 ## 確率測度インスタンスの集約（2026-10-10）
 
-CLT の16ファイルに重複していた `IsProbabilityMeasure` の局所インスタンス（`standardGaussianMeasure` 版・`gaussianCouplings` 版、計20個）と `PolynomialDensity` の `letI` 2か所を削除し、定義の隣に大域インスタンス `standardGaussianMeasure_isProbability`（`Model/GaussianDisorder`）と `SYK.GaussianChaos.gaussianCouplings_isProbability`（`Probability/GaussianChaos/Basic`）を1つずつ置いた。`Prop` の型クラスなので他のインスタンスとは衝突しない。
-
-検証：`lake build SYK`（警告541件、変更前と同数）が成功した。変更前後の全宣言を比較し、差は追加した2件と、削除した局所インスタンスの自動生成名だけで、他の宣言の型は変わっていない。主要定理は通常公理のみ。
+CLT の多くのファイルが `IsProbabilityMeasure` の同じ局所インスタンスを持っていた。定義の隣に大域インスタンス（`standardGaussianMeasure_isProbability`、`gaussianCouplings_isProbability`）を1つずつ置き、局所インスタンスを削除した。`Prop` の型クラスなので、他のインスタンスとは衝突しない。変更前後で、他の宣言の型は変わっていない。
 
 <a id="blueprint-package-2026-10-09"></a>
 
 ## Blueprint の独立パッケージ化（2026-10-09）
 
-Kamijima の承認した計画に基づき、Claude が実施した。Blueprint を、リポジトリ内の独立した Lake パッケージ `SYKBlueprint`（`Blueprint/`）にした。モジュール名は `Blueprint.*` から `SYKBlueprint.*` へ変えた。配置は Verso Blueprint の雛形と参照例（`FLTBlueprint` など）に合わせ、文書の最上位 `SYKBlueprint.lean`、生成入口 `SYKBlueprintMain.lean`（`vbp build` が `{パッケージ名}Main.lean` を探す）、章 `SYKBlueprint/*.lean` とした。パッケージは自身の `lakefile.toml`（`SYK` へのパス依存、Verso Blueprint v4.32.0、`needs = ["SYK/SYK:leanArts"]`）と `lake-manifest.json`（親と同じリビジョン）を持つ。
+Blueprint を、リポジトリ内の独立した Lake パッケージ `SYKBlueprint`（`Blueprint/`）にした。配置は Verso Blueprint の雛形と参照例に合わせた（`vbp build` は `{パッケージ名}Main.lean` を生成入口として探す）。`needs = ["SYK/SYK:leanArts"]` で数学全体も検査する。親のワークスペースは `SYK` と `SYKBlueprint` を `require` するだけで既定の対象を持たないので、全体の検査は `lake build SYKBlueprint` と明示する。依存のリビジョンは変えていない。
 
-親ワークスペースの `lakefile.toml` は `SYK` と `SYKBlueprint` の `require` だけを持ち、独自のターゲットも既定対象も持たない。そのため全体の検査は `lake build SYKBlueprint` と明示する（CI は `build-args: SYKBlueprint`）。`lake update SYKBlueprint` はネットワークを使わずに完了し、全パッケージのリビジョンは変更前と一致した。親の雛形（`workspace/`）、ルートの `AGENTS.md`、各 README・`AGENTS.md`・CI の生成パスを合わせて更新した。
-
-検証：`lake build SYK`、`lake build SYKBlueprint`、HTML 生成と `vbp check`（`errors=[]`、`ok=true`）が成功した。`SYK/Blueprint/.lake/packages` は作られず、依存の取得は親の `.lake/packages` に共有されている。GitHub 上の CI と、リポジトリ単体（親の雛形なし）での `Blueprint/` のビルドは未確認である。ルートの `AGENTS.md` の全体ビルドの記述は、親に既定対象がなくなったため、各プロジェクトの規則が定める対象を実行する書き方に改めた。
+検証：`lake build SYK`・`lake build SYKBlueprint`・HTML 生成・`vbp check` が成功し、依存は親のキャッシュから取得された。GitHub 上の CI と、親の雛形なしでの単体のビルドは未確認である。
 
 <a id="import-cleanup-2026-10-09"></a>
 
 ## import の整理と公開前の文書修正（2026-10-09）
 
-Kamijima の承認した方針で Claude が実施した。定理文・証明本体は変えていない。
-
-- import：宣言レベルの参照から、各モジュールが実際に使う SYK モジュールを求めた。使っていない import を外し、外したことで届かなくなった依存だけを直接 import に足した（11モジュール）。実際に使っている既存の import は残した。import の最長の鎖は22段から17段になった。
-- 冒頭の説明がなかった6モジュール（`Model` の3つ、`StandardGaussian`、`SecondChaosAsymptotic`、`GaussianQuadraticCLT`）に英語のモジュール docstring を追加した。
-- 古い記述の修正：旧作業ID（F02・F04・F05・W06・Z01）、存在しない `ModelParameters`、公開用 README の「Codex」、未参照のアンカーを直した。前回の記録にあった「CI は Lean 以外の変更でも起動する」は実際の設定と合っていなかったので、実際の起動条件（main への push で `**.lean` が変わったとき）に訂正した。CI の設定自体は変えていない。
-
-検証：`lake build SYK`（警告541件、変更前と同数）、親の `lake build`、HTML 生成と `vbp check`（`errors=[]`）が成功した。変更前後の全宣言の型を比較し、差は `local instance` の自動生成名の番号の振り直しだけだった。
+宣言の参照から、各モジュールが実際に使う SYK のモジュールを求めた。使っていない import を外し、外したことで届かなくなった依存だけを直接の import に足した。これで import の最長の鎖が短くなった。冒頭の説明がなかったモジュールに英語の docstring を加え、古い記述を直した。そのうち「CI は Lean 以外の変更でも起動する」という以前の記録は実際の設定と合っていなかったので、実際の起動条件（`main` への push で `.lean` が変わったとき）に訂正した。変更前後で型の差は、局所インスタンスの自動生成名の番号の振り直しだけだった。
 
 <a id="gaussian-ibp-removal-2026-10-08"></a>
 
 ## 未使用の `GaussianIBP.lean` の削除（2026-10-08）
 
-`SYK/Probability/GaussianIBP.lean`（6589行）を削除した。どのモジュールからも import されず、Blueprint も import するだけで宣言を参照していなかった。一次元の Stein の補題と有限次元 Hilbert 空間上の共分散つき部分積分を含んでいた（冒頭の説明と名前空間 `PhysLean.Probability.GaussianIBP` が PhysLean の同名ファイルを参照していたが、由来とライセンスは未確認）。SYK の証明が使う指数増大つきの標準ガウス・多重指数 Hermite の部分積分は共有 `GaussianConcentration` が与えており、分配関数 `Z_N` は多項式増大の仮定を満たさないため、このファイルでは置き換えられない（前者は任意分散・多項式増大・一次のみ、後者は分散1・指数増大・高階）。警告74件と、`mathlib` の `ProbabilityTheory` 名前空間への宣言追加も解消した。必要なら `git show 3f36dc9:SYK/Probability/GaussianIBP.lean` で取り出せる。
+`SYK/Probability/GaussianIBP.lean` は、どのモジュールからも使われていなかった。一次元の Stein の補題と、有限次元 Hilbert 空間上の共分散つき部分積分を含んでいた。冒頭の説明が PhysLean の同名ファイルを参照していたが、由来とライセンスは確認できなかった。SYK の証明が使う部分積分（分散1、指数増大、高階）の代わりにはならない。このファイルは任意の分散・多項式増大・一次だけを扱い、分配関数 `Z_N` は多項式増大の仮定を満たさないためである。削除で、mathlib の `ProbabilityTheory` 名前空間への宣言の追加も解消した。必要なら `git show 3f36dc9:SYK/Probability/GaussianIBP.lean` で取り出せる。
 
 <a id="api-naming-2026-10-08"></a>
 
 ## 公開前の名前空間・モジュール名の整理（2026-10-08）
 
-Kamijima の承認した計画に基づき、Claude が実施した。開始リビジョンは `3f36dc9`。リポジトリの公開に備え、宣言の名前空間・モジュールのパス・可視性だけを変え、定理文の数学的内容は変えていない。互換用の別名や旧パスは作っていない。
+リポジトリの公開に備え、宣言の名前空間・モジュールのパス・可視性だけを変え、定理文の数学的な内容は変えなかった。名前空間はファイルの配置ではなく数学的な話題で決め（対応は [AGENTS.md](AGENTS.md#公開-api-の変更)）、互換用の別名や旧パスは作らなかった。他のモジュールから使われない `*Aux` の補題は `private` にした。
 
-- モジュールの改名：`Analysis/Matrix/TraceExponential`、`Probability/GaussianChaos/{Basic,CoefficientIBP,Orthogonality,HermiteDensity,PolynomialDensity}`、`CLT/Log/{Taylor,EventBound,Asymptotics}`。汎用補題の `LpDistributionTransfer` は `Probability/` へ移し、CLT への import を mathlib の1モジュールに置き換えた。docstring の「`L¹` or `L²`」の脱字も直した。
-- 名前空間：ガウスカオス層を `SYK.GaussianChaos`、`Probability/` 直下を `SYK.Probability`、凸関数列を `SYK.Analysis`、行列解析を `SYK.MatrixAnalysis`（`SingularAux`・`ExpAux`・`SVDAux` はその下）へ移した。対応は [AGENTS.md](AGENTS.md#公開-api-の変更) に記す。
-- 他のモジュールから使われず、公開のまま残す宣言の型にも現れない `*Aux` の補題63件を `private` にした（自動生成の `congr_simp` 2件も伴って private になった）。`DerivAux.contDiff_tE` は `SYK.MatrixAnalysis.Matrix.contDiff_traceExp`、`iteratedFDeriv_tE_bound_hermitian` は private の `iteratedFDeriv_traceExp_bound_hermitian` に改名した。
-- Blueprint の宣言参照と import、CLT の ARCHITECTURE・README、関係する docstring を更新した。
-
-検証：変更前後の全1258宣言を名前の対応に沿って比較し、型が文字列として一致した。公開から private への変更は上記の65件だけだった。`lake build SYK`（警告615件、変更前と同数）、親の `lake build`、HTML 生成と `vbp check`（`errors=[]`）が成功した。抽象・標準模型の CLT、`Setting.integral_log_Y_isBigO`、集中評価の裾と MGF、行列微分評価、Hermite 完全性などの主要定理は通常公理のみで、変更前と一致した。`hFE : AnnealedInput` は引き続き明示的な仮定である。
-
-文脈を引き継がない読み取り専用のサブエージェントが、変更前の記録から名前の対応と private 化の規則を独自に再計算して監査した。型・可視性・差分の範囲・公理依存・ビルドに問題はなかった。ARCHITECTURE の旧モジュール名1件、名前空間の表の不足1件、AGENTS.md の文言（自動生成補題の扱い）1件の指摘を反映した。
-
-残した課題：公開のまま残る `*Aux` 名、どこからも使われない公開補題、import の鎖の解消、局所インスタンスの集約、文書の役割の再配置、LICENSE、リポジトリ名の変更。旧モジュール名の olean がローカルキャッシュに残るため、キャッシュのない環境（CI など）でのビルド確認が望ましい。コミットは作成していない。
+検証：変更前後の全宣言を名前の対応に沿って比べ、型が文字列として一致した。文脈を引き継がないサブエージェントが、変更前の記録から名前の対応と private 化の規則を独自に計算し直して監査し、問題はなかった。旧モジュール名の `olean` がローカルのキャッシュに残るので、キャッシュのない環境（CI など）でもビルドを確かめるのが望ましい。
 
 <a id="repo-layout-2026-10-07"></a>
 
 ## 数学パッケージと文書の配置変更（2026-10-07）
 
-Kamijima が担当・統合し、承認済みの構成変更を実施した。数学を `SYK/{Analysis,Probability,Model,SuperConcentration,CLT}/`、論文を `Paper/`、ノートを `Notes/`、4章と本文・生成入口を `Blueprint/` に集約した。旧 `Preliminaries` は `PartitionSymmetry` とした。独立した Rademacher 模型の `Annealed_FE` と対応章、旧設計資料を削除し、ガウス模型の `AnnealedInput` の説明を CLT 章へ移した。
+数学を `SYK/{Analysis,Probability,Model,SuperConcentration,CLT}/`、論文を `Paper/`、ノートを `Notes/`、Blueprint の章と生成入口を `Blueprint/` に集めた。独立した Rademacher 模型の `Annealed_FE` とその章、旧設計資料を削除し、ガウス模型の `AnnealedInput` の説明を CLT 章へ移した。パッケージ名 `SYK` と公開宣言の名前・型・仮定・規格化・属性は保った。
 
-子パッケージ名 `SYK` と公開宣言の名前・型・仮定・規格化・属性を保持した。子は mathlib、親 `ResearchWorkspace` はローカル SYK と Verso Blueprint に依存する。親の既定 `Blueprint` は `needs = ["SYK/SYK:leanArts"]` で数学全体も検査する。依存のリビジョンを保持し、CI は生成入口と論文のパスだけを変更した。
-
-数学52ファイルと Blueprint の6ファイルの個別 `lake env lean`、`lake build SYK`、親の `lake build` は成功した。主要25宣言の `#print`・`#print axioms` は開始版と一致し、通常公理のみだった。数学本文は承認した import・参照コメントの置換以外不変、論文5 TeX と Notes の TeX・追跡 PDF はバイト一致した。
-
-`lake lean SYK/Blueprint/Build.lean -- --run SYK/Blueprint/Build.lean --output SYK/_out/site --pdf` と `lake exe vbp check --site SYK/_out/site` は成功し、参照検査は `errors=[]`・`ok=true` だった。論文全体・4単独節・Notes の `latexmk` 検査も成功した。全体論文は警告なし、単独節には他節の参照・引用警告、Notes と任意 PDF には組版警告が残る。数学の既存 linter・非推奨警告と Blueprint の書式・依存側 universe 警告も残る。`sorry` 警告はなかったが、ガウス CLT の `hFE : AnnealedInput` は未構築の入力である。更新後の GitHub CI は未実行で、設定と対応するローカルコマンドを確認した。構成変更の独立した監査は実施していない。
+検証：主要定理の `#print`・`#print axioms` は変更前と一致し、通常公理のみだった。論文とノートの TeX は変更前とバイト単位で一致した。HTML 生成・`vbp check`・`latexmk` も成功した。構成変更の独立した監査は行っていない。
 
 <a id="verso-restore-2026-10-07"></a>
 
-## Verso の検証復帰（2026-10-07）
+## Verso の検証の再開（2026-10-07）
 
-Kamijima が担当・統合した。保存した Verso Blueprint `v4.32.0` と依存リビジョンを復帰し、章のビルド、HTML 生成、`vbp check`、CI の生成・参照検査を有効にした。CI の起動条件（main への push で `**.lean` が変わったとき）は変えていない。
-
-任意 PDF の検査は、章の表示数式終端に残る `$$`、旧 `\rm`、余分な inline `$` で失敗した。旧 `Chapters/AnnealedFE.lean` と `Chapters/CLT.lean` の表示構文だけを直し、数式内容・宣言参照・証明状態を保った。
-
-全5章・本文・生成入口の個別 Lean 検査と最終 `lake build` が成功した。旧入口 `lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site`、`lake exe vbp check --site SYK/_out/site` と任意 PDF も成功した。主要25宣言の型・定義・公理出力は前回と一致した。抽象・標準模型の CLT は通常公理のみで `hFE` を仮定し、当時の Annealed_FE 章が参照する2主定理は既存の `sorryAx` に依存していた。生成成功をその証明完成と扱っていない。この独立模型は後の配置変更で削除した。
-
-既存の linter・書式・universe・組版警告が残った。読み取り監査後に統合を完了した。GitHub 上の更新後 CI は未確認であり、ローカルコマンドの成功とは区別した。
+休止していた Verso Blueprint の検証（章のビルド、HTML 生成、`vbp check`、CI での生成と参照検査）を再開した。任意の PDF の生成は、章に残っていた表示数式の終端の `$$`、旧式の `\rm`、余分なインラインの `$` で失敗したので、表示の構文だけを直し、数式の内容・宣言の参照・証明の状態は変えなかった。当時の `Annealed_FE` 章が参照する定理は `sorryAx` に依存していたので、生成の成功をその証明の完成とは扱わなかった。
 
 <a id="clt-cleanup-2026-10-06"></a>
 
 ## 証明の共有と読解案内の整理（2026-10-06–07）
 
-Kamijima が担当・統合した。特異値の平方・単調性は mathlib の補題、有限和 Hölder は非負実数の有限和不等式と正の `1/r` 乗を使う証明に整理した。零を許す列と `0<r` の仮定を保持した。短縮案では `0<r` が未使用になったため、仮定の数学的役割が見える後者の証明を採用した。
+有限和の Hölder の不等式は、短い証明では仮定 `0<r` が使われなくなった。仮定の数学的な役割が読める証明（非負実数の有限和の不等式と正の `1/r` 乗による）を採った。零を許す列は正値に強めていない。`Main` は分配関数の CLT を先に証明し、`partition_and_log_partition_clt` が対数の CLT と組み合わせて共通の半径を取り、個別の対数 CLT はそこから射影する構造にした。
 
-`Main` は分配 CLT を先に証明し、結合定理が下位の対数 CLT と共通半径で結び、個別対数 CLT は射影する構造にした。二次観測量の可測性2補題と Hermite2 評価を実際の利用側で共有した。四次モーメントは各項の可積分性を確認して有限和を積分する。行列トレース指数は `MatrixAnalysis.Matrix.traceExp` に集約し、`DerivAux.contDiff_tE` と `iteratedFDeriv_tE_bound_hermitian` の公開名を保った。
-
-変更・直接利用側の15ファイルの `lake env lean` と、当時の **`lake build CLT`** が成功した。開始時の主要22宣言は、行列微分2補題の承認済み定義置換を除き型・定義が一致した。両定義の展開式の一致は `rfl` でも検査した。共有補題を含む25宣言の公理依存は通常公理のみだった。論文5ファイルは開始版と一致し、温度 `0<|β|<βq`、尺度 `N^(q/2-1)`、分散 `(q!/2)β²(ℓ_q'(β))²` と標準化分散1を保持した。既存警告の内訳は変わらず、読み取り監査後に統合した。`hFE` は明示的な仮定として残る。
+検証：主要な宣言の型・定義は変更前と一致し（承認済みの行列微分の2補題の定義の置換を除く。両定義の一致は `rfl` でも検査した）、公理依存は通常公理のみだった。温度 `0<|β|<βq`、尺度 `N^(q/2-1)`、分散 `(q!/2)β²(ℓ_q'(β))²` は保たれた。
 
 <a id="clt-refactor-2026-10-06"></a>
 
 ## 有限補題と漸近 CLT の分離（2026-10-06）
 
-Kamijima が担当・統合した。汎用 Hermite 積と測度対称性を `GaussianHermiteBasic`、有限のガウス変数二乗の観測量と法則対応を `GaussianQuadraticObservable` に移した。これにより Hermite 展開から模型固有の符号ゲージ、四次モーメントから二次 CLT・係数漸近への依存を除いた。
-
-有限行列解析の実際の外部利用は `PartitionDerivatives` だけだったため Model への先行移設を採用しなかった。2種類の規格化トレースは、`ℂ` と一般 `RCLike`、非空型の仮定、定義式が異なるため保った。移設12公開宣言の型・定義と証明ブロック・属性を比較し、名前・規格化を保持した。
-
-新規・変更・直接利用側の13ファイルの個別検査と `lake build CLT` が成功した。主要24宣言の公理依存は通常公理のみ。原稿の温度・尺度・分散・残る `hFE` を照合し、読み取り監査後に統合した。
+汎用の Hermite 積と測度の対称性、有限個のガウス変数二乗の観測量を独立したモジュールに移した。これで Hermite 展開から模型固有の符号ゲージへの依存と、四次モーメントから二次 CLT・係数の漸近への依存がなくなった。有限行列解析の実際の外部の利用者は `PartitionDerivatives` だけだったので、Model への移設は行わなかった。二つの規格化トレースは、スカラー（`ℂ` と一般の `RCLike`）、非空型の仮定、定義式が異なるので統合しなかった。移した宣言の型・定義・属性は保たれ、主要定理は通常公理のみに依存する。
 
 <a id="clt-log-apply-completion-2026-10-05"></a>
 
-## 対数の期待誤差と標準模型族（2026-10-05–06）
+## `E[log Y_N]` の評価と標準模型族（2026-10-05–06）
 
-Noda が担当・統合した。`Setting.cubed_scale_Y_lt_half_bounded` と `Setting.integral_log_Y_isBigO` により、`a=q/2-1`、非零の小さい固定実逆温度で `N^(3a) P(Y_N<1/2)` の終局的有界性と `E[log Y_N]=O(N^(-2a))` を証明した。二次・四次モーメント、高次剰余、分散漸近、`Z_N≥1` と `log E Z_N=O(N)` を使い、分布収束からモーメントを推論していない。自然数べきの逆数による指数は偶数 `q≥4` で原稿と一致し、温度についての定数の一様性は主張しない。
+`a=q/2-1` とし、非零の小さい実逆温度で、`N^(3a) P(Y_N<1/2)` の終局的な有界性と `E[log Y_N]=O(N^(-2a))` を証明した。二次・四次モーメント、高次の剰余、分散の漸近、`Z_N≥1`、`log E Z_N=O(N)` を使い、分布収束からモーメントを推論していない。自然数べきの逆数で書いた指数は偶数 `q≥4` で原稿と一致し、定数の温度についての一様性は主張しない。
 
-`StandardModel.lean` は `N n=q+2*n`、標準表現の模型族を構成し、全偶数 `N≥q` との一意な対応と `2^(-N/2) Tr` の規格化を接続した。3つの公開定理はその族に対する `AnnealedInput` を仮定し、相対・標準化・対数 CLT を適用する。標準表現を抽象 `Main` の証明依存へ追加していない。
+`StandardModel.lean` は `N n = q + 2 * n` の標準表現の模型族を構成し、偶数 `N≥q` との一対一の対応と `2^(-N/2) Tr` の規格化を接続した。標準表現は抽象的な `Main` の証明の依存に入れていない。命題自体、入力の構築、表現独立性は成果に含めない。
 
-初回は指定環境・依存成果物がなく検査できなかった。環境更新後、Lean 4.32.2（Windows）で必要な依存をビルドし、実数指数と自然数指数の変換、確率測度のインスタンスと依存型を修正した。`lake env lean SYK/CLT/Lemmas/LogAsymptotics.lean`、`SYK/CLT/StandardModel.lean`、`SYK/CLT/Main.lean` と `lake build CLT` が成功した。新規8宣言と結合 CLT の公理依存は通常公理のみで、型・仮定・原稿のラベルを照合した。変更モジュールに新規警告はなく、上流の既存警告は残った。Blueprint の93宣言を `#check` し、本文と依存を更新した。命題自体・入力構築・表現独立性は成果に含めない。
+当初は指定の環境に依存の成果物がなく検査できなかった。環境の更新後（Windows、Lean 4.32.2）、実数の指数と自然数の指数の変換、確率測度のインスタンス、依存型を直して検査が通った。新しい宣言と主要定理は通常公理のみに依存する。
 
 <a id="clt-input-2026-10-04"></a>
 
 ## アニール入力の整理（2026-10-04）
 
-Kamijima が担当・統合した。開始版 `f87e0a064cd527bd58f7354eed32c83cbd33cfee` の原稿 `prop:annealed-free-energy` と照合し、`AnnealedInput q S` から旧証明本文の追加6評価フィールドを削除した。残る内容は `ℓ`、偶性・凸性・`C¹` 正則性、圧力と導関数の全実軸での局所一様収束、非零の逆温度での `βℓ_q'(β)>0` である。削除した評価を別の仮定として残していない。
-
-`Setting` と3主定理の結論、有限モーメント・高次剰余、尺度・温度・中心化・分散を保持した。`Basic` と直接利用側の個別検査、`lake build CLT`、主要型・公理依存の確認が成功した。主 CLT は通常公理のみだが、一つの一般表現族 `S` に対し命題文の内容を仮定する。原稿の標準模型族についての命題や、一般表現への外部極限定理の適用可能性を証明したとは扱わない。
+原稿の `prop:annealed-free-energy` の命題文と照合し、`AnnealedInput` から、旧証明本文に由来する追加の評価フィールド6つを削除した。残る内容は `ℓ`、偶性・凸性・`C¹` 級の正則性、圧力と導関数の全実軸での局所一様収束、非零の逆温度での `βℓ_q'(β)>0` である。削除した評価を、別の仮定として残してはいない。主 CLT は通常公理のみに依存するが、一つの一般表現族 `S` について命題文の内容を仮定している。原稿の標準模型族についての命題や、一般表現への外部の極限定理の適用可能性を証明したとは扱わない。
 
 <a id="clt-audit-2026-10-04"></a>
 
 ## 現行原稿全体との照合（2026-10-04）
 
-`6b36c7c96be98f81f49f82a03b8189ae51a5ca76` の原稿全4節を、研究者の指定に従い赤字を採用案として照合した。温度・中心化・規格化・尺度・分散・剰余の次数は維持されていた。一般の符号付き置換と Duhamel 積分表示は、Lean の個別対称性・高階微分評価と同一視しない。凸収束の Lean 定理は関数の局所一様収束を仮定するため、各点収束からの導出は未形式化のままだった。
-
-原稿5ファイルと数学の証明項を保ち、説明を同期した。関係11ファイルの個別検査、`lake build CLT`、主要9宣言の公理確認と章参照85宣言の `#check` は成功した。主結果は通常公理のみで当時の追加6フィールドを含む `AnnealedInput` を仮定していた。これは後続の入力整理で解消した。
-
-一時出力の論文全体 `latexmk` は成功し、赤青併記では参照が解決した。赤字だけを採用する読み方では `eq:even-multi-index` の参照1件が未解決になり、原稿担当へ修正を委ねた。引用原文の再監査とアニール命題の証明は行っていない。
+研究者の指定に従い、原稿の赤字を採用案として全4節を照合した。温度・中心化・規格化・尺度・分散・剰余の次数は保たれていた。原稿の一般の符号付き置換と Duhamel 積分表示は、Lean の個別の対称性と高階微分評価とは同一視しない。凸収束の Lean の定理は関数の局所一様収束を仮定しており、各点収束からの導出は未形式化である。赤字だけを採用する読み方では `eq:even-multi-index` の参照が1件未解決になり、原稿の担当者に修正を委ねた。
 
 <a id="z01-local-zero-free-2026-09-28"></a>
 
-## 固定有限行列の局所非零円板（2026-09-28–29）
+## 固定した有限行列の局所的な非零円板（2026-09-28–29）
 
-現行 CLT が複素対数や `N`・標本一様の非零領域を必要としないことを確認し、研究者は固定 `H` の局所円板を選択した。非空有限次元の自己共役行列と各実 `β` について、連続性から半径 `ε(H,β)>0` の複素円板で `Re Z_H(z)>0`、非零性、主値 `Complex.log ∘ Z_H` の正則性を証明した。外部結果・ノルム上界を追加せず、半径の一様性や複素平面全体の非零性は主張していない。
-
-`lake -f SYK/workspace/lakefile.toml env lean SYK/Model/FiniteDimensionalGibbs.lean`、同設定の `build Model SuperConcentration CLT` と既定ビルドが成功し、5新定理は通常公理のみだった。9月29日の統合後の `lake build` も成功した。
+現行の CLT が、複素対数や、`N`・標本に一様な非零領域を必要としないことを確認した。研究者は固定した `H` についての局所的な円板を選んだ。非空有限次元の自己共役行列と各実数 `β` について、連続性から、半径 `ε(H,β)>0` の複素円板で `Re Z_H(z)>0`、非零性、主値 `Complex.log ∘ Z_H` の正則性を証明した。外部の結果やノルムの上界は使っていない。半径の一様性や、複素平面全体での非零性は主張しない。新しい定理は通常公理のみに依存する。
 
 <a id="clt-integration-audit-2026-09-29"></a>
 <a id="clt-nonzero-temperature-2026-09-28"></a>
@@ -394,121 +246,109 @@ Kamijima が担当・統合した。開始版 `f87e0a064cd527bd58f7354eed32c83cb
 
 ## 条件付き CLT の統合と温度・外部入力の判断（2026-09-28–29）
 
-F03 の Rademacher 評価、F04 の任意階微分、F05 の高次剰余を統合した。F06 は二次係数の漸近、ガウス変数二乗和の CLT、残差の `L²` 消失と有限サイズ分散の正値性から相対・標準化 CLT を証明した。F07 は一様四次モーメント、小確率事象、`Z_N≥1` と対数の局所近似により中心化誤差の尺度付き `L¹` 消失と対数 CLT を証明し、共同定理の `sorry` を除去した。
+Rademacher 評価、任意階の微分評価、高次の剰余を統合した。相対・標準化 CLT は、二次係数の漸近、ガウス変数二乗和の CLT、残差の `L²` での消失、有限サイズの分散の正値性から証明した。対数 CLT は、一様な四次モーメント、小確率の事象、`Z_N≥1`、対数の局所近似による中心化の誤差の尺度付き `L¹` での消失から証明し、`partition_and_log_partition_clt` の `sorry` を除いた。
 
-`lake env lean SYK/CLT/Lemmas/LogAsymptotics.lean`、`lake build SYK.CLT.Main`、`lake build CLT`、既定ビルドが成功し、主要4 CLT の公理依存は通常公理のみだった。初期の相対・対数 CLT は逆温度ゼロの退化例も含んでいたが、研究者の指示で主・中間 CLT をすべて `0<|β|<βq` に統一した。零分散で標準化できない点を原稿と照合し、有限模型の逆温度ゼロでの恒等式と全実軸の解析・係数評価は保持した。変更後の `lake -f SYK/workspace/lakefile.toml build CLT` と主要8 CLT の公理確認も成功した。
+当初の相対・対数 CLT は `β = 0` の退化した場合も含んでいた。零分散では標準化できないことを原稿と照合し、研究者の指示で主・中間の CLT をすべて `0<|β|<βq` に統一した。有限模型の `β = 0` での恒等式と、全実軸での解析・係数評価は保った。
 
-R04-A では標本ごとの概収束の記述を除き、当時の `thm: input` を期待クエンチ・アニール圧力の決定論的共通極限へ修正した。F08 は概収束の形式化対象がなくなり、新規 Lean 宣言なしで仕様確定を完了した。その後の現行原稿はアニール圧力の極限と極限関数の微分可能性だけを述べる。いずれの段階も `AnnealedInput` の構築や外部定理自体の Lean 証明を意味しない。原稿の `latexmk` 検査は成功し、当時の最終ログに未解決引用・参照や組版警告はなかった。
+外部入力については、当時の `thm: input` から標本ごとの概収束の記述を除き、クエンチ圧力の期待値とアニール圧力の決定論的な共通極限に直した。これで概収束の形式化の対象はなくなった。その後の原稿は、アニール圧力の極限と極限関数の微分可能性だけを述べる。いずれの段階も、`AnnealedInput` の構築や外部定理の Lean による証明を意味しない。
 
-9月29日に統合版 `c20e415` を `lake -f SYK/workspace/lakefile.toml build CLT` と既定ビルドで再検査した。主要 CLT は通常公理のみで、実温度、尺度、極限分散、3つの結論と共通半径を原稿に照合した。既存の linter・非推奨警告と明示的な `hFE` は残った。
+検証：統合版で、主要な CLT は通常公理のみに依存した。実温度、尺度、極限分散、三つの結論と共通の半径を原稿と照合した。
 
 <a id="clt-abstract-input-2026-09-27"></a>
 
 ## 有限模型と抽象入力の分離（2026-09-27）
 
-有限模型を `FiniteModel.lean` に分離し、一般の `Params` と非空有限行列表現のモーメントを証明した。標準表現との規格化照合は `Normalization.lean` へ移し、抽象 `Main` の依存から外した。3主定理の入力を `{q : ℕ} (S : Setting q) (hFE : AnnealedInput q S)` にそろえ、`S` と重複する偶数性・`4 ≤ q` の引数を除いた。全フィールド・結論・規格化を保持した。
-
-個別検査と `lake -f lakefile.toml build CLT` は成功した。初回の共有キャッシュの権限不足・成果物欠落は権限付き再実行と必要依存の再構築で解消した。有限模型と入力からの漸近結果は通常公理のみだったが、当時の最終 CLT には既存 `sorryAx` が残った。相対・対数ゆらぎの逆温度ゼロを除いた改訂中の原稿との差を当時は明示し、後続の統一で解消した。
+有限模型を `FiniteModel.lean` に分け、一般の `Params` と非空有限行列表現でモーメントを証明した。標準表現との規格化の照合は `Normalization.lean` に移し、抽象的な `Main` の依存から外した。主定理の入力を `{q : ℕ} (S : Setting q) (hFE : AnnealedInput q S)` にそろえ、`S` と重複する偶数性と `4 ≤ q` の引数を除いた。初回の検査は共有キャッシュの権限不足と成果物の欠落で失敗したが、権限付きの再実行と依存の再構築で解消した。
 
 <a id="clt-r01-r05-audit-2026-09-27"></a>
 
 ## 原稿と引用元の数学的監査（2026-09-27）
 
-[He2026 v3](https://arxiv.org/abs/2607.18998v3) の Theorem 1.1、Theorem 2.5、Proposition 3.3 を原文照合した。ハミルトニアンの変換 `H̃_N=2^(-q/2)H_N`、`s=2^(q/2)|β|`、規格化トレース、正の Lehmann 表現、二次モーメント `2^(2-q)s²`、圧力微分公式を確認した。He の固定した正の逆温度における期待クエンチ・アニール圧力の極限は、全実軸の標本ごとの概収束を直接裏付けない。[GPSZ2026 v1](https://arxiv.org/abs/2605.02768v1) もその主張をそのまま供給しなかった。負の逆温度でのガウス対称性・逆温度ゼロ・原稿内の正則性導出を引用と区別した。
+[He2026 v3](https://arxiv.org/abs/2607.18998v3) の Theorem 1.1、Theorem 2.5、Proposition 3.3 を原文と照合した。ハミルトニアンの変換 `H̃_N=2^(-q/2)H_N`、`s=2^(q/2)|β|`、規格化トレース、正の Lehmann 表現、二次モーメント `2^(2-q)s²`、圧力の微分公式を確認した。He の、固定した正の逆温度でのクエンチ圧力の期待値とアニール圧力の極限は、全実軸での標本ごとの概収束を直接は裏付けない。[GPSZ2026 v1](https://arxiv.org/abs/2605.02768v1) もその主張をそのまま与えない。負の逆温度でのガウス対称性、`β = 0`、原稿内の正則性の導出は、引用と区別した。
 
-Hermite の規格化、`η≤α` の成長仮定、Duhamel と規格化 Schatten Hölder、Rademacher 符号化、Newton/Hoeffding を照合した。高階微分の `r!` と単体体積 `1/r!` は相殺する。対角二次係数の同一性はサイト置換・ガウス符号対称性によるもので、原稿に理由を補った。凸性による各点収束からの局所一様収束は非形式的に確認したが、その段階で Lean 証明済みとは扱っていない。
-
-`E(g²-1)²=2`、`E(g²-1)⁴=60` から規格化和の四次モーメント `3+12/M_N≤15` を得る対数誤差の議論を明記した。`P(Y_N<1/2)=O(N^(-3a))` と `Z_N≥1` による二事象分割は `-E log Y_N=O(N^(-2a))` を与える。原稿の軽微な誤記修正後、`latexmk` は警告・未解決参照なしで成功した。
+Hermite の規格化、`η≤α` の成長仮定、Duhamel と規格化 Schatten の Hölder、Rademacher 符号化、Newton・Hoeffding の不等式も照合した。高階微分の `r!` と単体の体積 `1/r!` は相殺する。対角の二次係数の一致はサイトの置換とガウスの符号対称性によるもので、原稿にその理由を補った。`E(g²-1)²=2`、`E(g²-1)⁴=60` から規格化和の四次モーメント `3+12/M_N≤15` を得て、`P(Y_N<1/2)=O(N^(-3a))` と `Z_N≥1` による二つの事象への分割が `-E log Y_N=O(N^(-2a))` を与えることを原稿に明記した。凸性による各点収束からの局所一様収束は非形式的に確認したが、Lean で証明済みとは扱っていない。
 
 <a id="clt-f02-completion"></a>
 
 ## 一次・二次カオスの同定（2026-09-27）
 
-符号付き頂点転置と固定濃度集合の推移性から対角係数の同一性を証明した。一次微分の指数評価、ガウス部分積分、放射方向微分、局所的な可積分支配による期待値との微分交換を接続し、全実 `β` で一次射影零と二次射影を同定した。係数 `1/(2M_N)`、`H₂(x)=x²-1`、分散1の測度、実表現次元の規格化を照合し、標準表現やアニール入力を追加要求しなかった。
-
-当時の5ファイルの個別検査と `lake -f lakefile.toml --old build CLT` は成功し、主要8定理は通常公理のみ。既定ビルドも成功したが、その環境の対象は別研究の `RSATMain` であり、配布設定全体の検証と同一視していない。最終 CLT は当時まだ未完成だった。
+符号付きの頂点の転置と、固定濃度の集合への推移性から、対角係数の一致を証明した。一次微分の指数評価、ガウス部分積分、放射方向の微分、局所的な可積分支配による期待値との微分の交換を接続し、全実数 `β` で一次射影が零であることと二次射影を同定した。係数 `1/(2M_N)`、`H₂(x)=x²-1`、分散1の測度、実表現の次元による規格化を照合し、標準表現やアニール入力を追加で要求しなかった。当時の既定のビルド対象は別研究の `RSATMain` だったので、対象を明示して検査した。
 
 <a id="clt-f01-completion-2026-09-27"></a>
 
-## ガウス部分積分と `L²` 完全性（2026-09-26–27）
+## ガウス部分積分と `L²` での完全性（2026-09-26–27）
 
-一般のガウス–エルミート部分積分を共有 `Smooth.lean` に置いた。仮定は `C^{|α|}` と各 `η≤α` の偏導関数のユークリッドノルムに関する指数増大で、仮の `IBPFamily`・`ExpIBPChain` や余分な正則性を公開入力に残していない。空の有限型と `α=0` も扱い、両辺の可積分性を証明した。`Z_N` への適用は当時の F04 に分けた。
+一般のガウス・Hermite 部分積分を共有のガウス基盤に置いた（当時は `Smooth.lean`、現在は `GaussianChaos/HermiteIBP.lean`）。仮定は `C^{|α|}` 級と、各 `η≤α` の偏導関数のユークリッドノルムについての指数増大で、仮の述語や余分な正則性を公開の入力に残していない。空の有限型と `α=0` も扱い、両辺の可積分性を証明した。
 
-SpinGlass `dc1d3820af6e443c09bd1177ec3e409cf0640d5c` の指数増大・Stein 補題を流用候補として調べた。先方は Lean/mathlib `4.34.0-rc2`、こちらは `4.32.2` で、原稿の分散1の入力は既存の `gaussianReal_stein` と `pi_gaussian_stein_coord` で満たせたため移植しなかった。移植後の保守性を比較した記録はなく、旧スカラー部分積分 API は別に残した。
+SpinGlass（`dc1d3820af6e443c09bd1177ec3e409cf0640d5c`）の指数増大つき Stein の補題を流用の候補として調べた。先方は Lean・mathlib `4.34.0-rc2`、こちらは `4.32.2` で、原稿の分散1の入力は既存の `gaussianReal_stein` と `pi_gaussian_stein_coord` で満たせたので、移植しなかった。
 
-Hermite の直交性・階乗ノルムと有限射影を証明した後、指数モーメントによる有限測度の一意性と特性関数の一意性から有限積ガウスの多項式稠密性を証明した。`hermiteOrthonormal_dense` と2つの無条件 `HasSum` が、任意の実 `L²` クラスについて展開と次数和の収束を与える。研究者は原稿 `eq: chaos` を `L²` 等式として読むことを確認した。条件付き `HasSum` だけを完全性と扱っていない。
-
-個別 Lean 検査、`lake -f lakefile.toml --old build Model SuperConcentration CLT`、同時 import と主要公理確認は成功した。対象は通常公理のみで未検証の仮定なし。古い親設定での `lake build SYK` は休止中 Blueprint の import と整合せず失敗したため、当時は関連ライブラリを指定して検査した。既存警告と当時未完成の最終 CLT は区別して報告した。
+Hermite の直交性と階乗のノルム、有限射影を証明した後、指数モーメントによる有限測度の一意性と特性関数の一意性から、有限積ガウスでの多項式の稠密性を証明した。研究者の確認により、原稿の `eq: chaos` を `L²` の等式として読む。条件付きの `HasSum` だけを完全性とは扱わない。当時の親の設定では、休止中の Blueprint の import と整合せず `lake build SYK` が失敗したので、関連するライブラリを指定して検査した。
 
 <a id="clt-w06"></a>
 <a id="merge-f01-2026-09-27"></a>
 
-## 有限模型の基盤と統合障害（2026-09-24–27）
+## 有限模型の基盤と統合時の障害（2026-09-24–27）
 
-9月24日の検査では有限模型の恒等式・条件付きアニール補題・凸導関数補題・共有集中結果は通常公理のみ、`partition_moments` と最終 CLT、独立 Annealed_FE の主結果は `sorryAx` に依存していた。旧 `AnnealedInput` は解析性・共通半径・逆温度ゼロの近傍での展開も仮定しており、公理依存だけでその構築を証明済みとはしなかった。
+反交換関係とトレースの巡回性によるトレース零、固有値への Jensen による `Z≥1`、指数支配によるモーメントと対数の可積分性、`Y` の正値性・期待値1・二乗可積分性、正しい対数の中心化、`β = 0` での恒等式、標準表現との規格化を証明した。有限模型の公開定理は通常公理のみに依存し、`AnnealedInput` と最終の CLT を使わない。当時の旧 `AnnealedInput` は解析性や共通の半径も仮定しており、公理依存だけでその構築を証明済みとはしなかった。
 
-W06 で反交換関係・巡回トレースによるトレース零、固有値への Jensen による `Z≥1`、指数支配によるモーメントと対数の可積分性、`Y` の正値性・期待値1・二乗可積分性、正しい対数中心化、逆温度ゼロでの恒等式、標準表現との規格化を完成した。有限模型の公開30定理は通常公理のみで `AnnealedInput` と最終 CLT を使わない。
+統合の途中で次の障害があった。
 
-初回 Main の `incompatible header` は依存再構築で解消した。関連 `lake build CLT` は旧 `Tool.lean` の `unknown module prefix 'RequestProject'` で失敗した。本文・Blueprint・Lean の参照を調べ、未使用だった Tool を依頼に従って削除した後、`lake build CLT` と Main 個別検査が成功し W06 を完了した。後に Tool を現行 mathlib の特異値・Schatten・トレース指数微分の補助として再実装し、`lake -f SYK/workspace/lakefile.toml env lean SYK/CLT/Lemmas/Tool.lean` と `build CLT` が成功した。有限模型の完成とは分けて記録した。
-
-統合版 `84bfde3` は個別ビルドに成功しても、Main と `CliffordSignParity` の同時 import が `SYK.partitionFunction.eq_1` の衝突で失敗した。9月27日に重複定義を除き共有の通常トレースの分配関数を直接使う形に修正し、個別検査・`lake build CLT`・同時 import が成功した。規格化除算、スケール、実部、積測度からユークリッド測度への移送は別に F02 で照合した。
+- `incompatible header`：依存の再構築で解消した。
+- 旧 `Tool.lean` の `unknown module prefix 'RequestProject'`：本文・Blueprint・Lean から参照されていないことを確かめ、依頼に従って削除した。後に、現行 mathlib の特異値・Schatten・トレース指数関数の微分の補助として再実装した。
+- 統合版で、`Main` と `CliffordSignParity` を同時に import すると `SYK.partitionFunction.eq_1` が衝突した。個別のビルドは成功していたので、同時の import の検査で初めて見つかった。重複した定義を除き、共有の通常トレースの分配関数を直接使う形にして解消した。
 
 <a id="main-statements-2026-09-18"></a>
 
-## CLT 定理文の初期導入（2026-09-18）
+## CLT の定理文の初期導入（2026-09-18）
 
-一般 `MajoranaSystem` の設定と主定理を、ユーザーが明示的に `sorry` を許可した依頼に従って追加した。実表現次元による規格化、`Setting q`、サイズ別の測度、分布収束、共通半径と分散を明示した。`lake env lean SYK/CLT/Main.lean` と `lake build CLT` は成功したが、当時の主定理は `sorryAx` に依存していた。この記録は新たな未検証仮定の導入許可ではなく、後の証明完成と区別する。
+一般の `MajoranaSystem` の設定と主定理の定理文を、研究者が明示的に `sorry` を許可した依頼に従って追加した。実表現の次元による規格化、`Setting q`、サイズごとの測度、分布収束、共通の半径と分散を明示した。当時の主定理は `sorryAx` に依存していた。この記録は、新たな未検証の仮定の導入を許可するものではない。
 
 <a id="model-w01"></a>
 
-## 共有模型・解析の再設計と検証（2026-09-07–08）
+## 共有模型と解析の再設計（2026-09-07–08）
 
-逆温度を `Params` から除き、解析は `z : ℂ`、物理的結果は `β : ℝ≥0` の明示引数とした。通常トレースの分配関数と必要な規格化トレースを分け、密度行列・ギブス解析を Model へ集約した。反交換族の評価は集中側に置き循環を避けた。`lake build Model SuperConcentration` と主要公理確認が成功し、通常公理のみだった。
+逆温度を `Params` から除き、解析は `z : ℂ`、物理的な結果は `β : ℝ≥0` を明示の引数とした。通常トレースの分配関数と、必要な場合の規格化トレースを分けた。反交換族の評価は集中評価の側に置き、循環を避けた。`Z_H(z)=Tr(exp(-zH))` の複素微分、全点での解析性、非零点での対数微分を証明し、この一般的な結果には自己共役性や対数の枝の存在を要求しなかった。主要定理は通常公理のみに依存する。
 
-W01 は `Z_H(z)=Tr(exp(-zH))` の複素微分、全点の解析性、非零点での対数微分を仕上げた。自己共役性や対数の枝の存在をこの一般結果へ要求しない。`lake env lean SYK/Model/FiniteDimensionalGibbs.lean`、関連ビルド、4主要定理の公理確認と Model 章の個別検査が成功した。既存の未使用仮定・書式・docstring 警告が残った。
-
-移行対象外の `Annealed_FE/main_result.lean` が旧 `Params.β`・`Params.β_nonneg` を参照したため、当初の全体 `lake build` と `lake exe vbp build` は失敗し、`vbp check` は manifest 不在だった。9月8日に独立2ライブラリを一時除外した後、関連・既定ビルドと生成・参照検査が成功した。既定対象から除いても他ファイルの import 経由の検査を除けるとは限らず、9月24日の Main は独立 Annealed_FE を依存に持っていた。
+移行の対象外だった `Annealed_FE` が旧 `Params.β` を参照していたため、全体のビルドと Blueprint の生成が失敗した。一時的にそのライブラリを既定の対象から除いて検査したが、既定の対象から除いても、他のファイルの import を経由した検査からは除けるとは限らない。
 
 <a id="gaussian-foundation"></a>
 
-## 独立したガウス基盤と Windows の生成対処（2026-09-11–12）
+## 独立したガウス基盤と Windows での生成の対処（2026-09-11–12）
 
-ガウス基盤を任意有限型上の3ファイル、名前空間 `SYK.GaussianConcentration` に分離した。MGF は `L≥0` のパラメータ `Real.toNNReal (L²)`、正の `L` の裾は `exp(-t²/(2L²))` とその2倍、`L=0` は定数性から別に処理する。個別検査・`olean` 生成・主要公理確認が成功し、通常公理のみだった。
+ガウス基盤を、任意の有限型の上の独立したモジュール群（名前空間 `SYK.GaussianConcentration`）に分けた。MGF のパラメータは `L≥0` に対して `Real.toNNReal (L²)` とし、正の `L` の裾は `exp(-t²/(2L²))` とその2倍、`L=0` は定数性から別に扱う。主要定理は通常公理のみに依存する。
 
-共同研究環境の親 `lakefile.lean` が配布用 TOML より優先し、旧 mathlib と未登録 Verso のため初回 `lake build SYK` は失敗した。他研究の設定を保ち、承認後に Lean/mathlib を4.32.2、Verso を4.32.0へ整合させ、`lake build Model SuperConcentration` と `lake build SYK` が成功した。
+共同研究の環境では、親の `lakefile.lean` が配布用の TOML より優先され、古い mathlib と未登録の Verso のためにビルドが失敗した。他の研究の設定を保ったまま、承認を得て Lean・mathlib を 4.32.2、Verso を 4.32.0 にそろえた。
 
-Verso 4.32.0 は Windows で同梱検索資産の相対接頭辞を残し、出力先外へのパスを生成した。このため旧 `BlueprintMain.lean` に Windows 限定の準備・コピーを追加し、直接生成と `lake exe vbp check --site SYK/_out/site` が成功した。この対処は現行 `Blueprint/Build.lean` に保持されている。汎用基盤の既存 linter・非推奨警告は残り、局所的な `aesop`・`grind` の整理は現在も保守課題である。
+Verso 4.32.0 は Windows で、同梱の検索用ファイルの名前に相対パスの接頭辞を残し、出力先の外へのパスを作った。生成入口に Windows 限定の準備とコピーを加えて回避した。この対処は現行の `Blueprint/SYKBlueprintMain.lean` に残っている。
 
 <a id="super-w03"></a>
 <a id="super-w04"></a>
 <a id="super-w05"></a>
 
-## 標準ハミルトニアン・表現・集中結果（2026-09-18）
+## 標準ハミルトニアン・標準表現・集中評価（2026-09-18）
 
-W03 は `σ_N²=(q-1)!/N^(q-1)` の標準ハミルトニアンを Model に共有し、集中側の一般スケール `𝒥` の引数・重複定義を除いた。係数の分散と標準ガウス座標で測るリプシッツ性を区別した。Model と集中側の個別検査・`lake build Model SuperConcentration`・主要公理確認が成功した。既定ビルドと当時の Blueprint 生成・参照検査も成功した。
+`σ_N²=(q-1)!/N^(q-1)` の標準ハミルトニアンを Model で共有し、集中評価の側の一般スケール `𝒥` の引数と重複した定義を除いた。係数の分散と、標準ガウス座標で測るリプシッツ性を区別した。
 
-W04 は Jordan–Wigner 表現、次元 `2^(N/2)`、生成子の関係式、同じ偶数次数の相互作用の規格化トレース直交性を証明した。Pauli Y の符号・テンソル順・0始まりとノートの1始まりの対応を照合した。固定次数の直交性には既約性の追加仮定を要さず、異なる次数の族まで主張しない。語・二乗・交換の補題を Model に共有し、個別検査・関連ビルド・主要公理確認が成功した。
+Jordan–Wigner 表現について、次元 `2^(N/2)`、生成子の関係式、同じ偶数次数の相互作用の規格化トレースによる直交性を証明した。Pauli Y の符号、テンソル積の順序、零始まりのラベルとノートの1始まりのラベルの対応を照合した。固定次数の直交性には既約性の追加の仮定は要らず、異なる次数の族については主張しない。
 
-W05 は密度行列・有限サイズ二乗和を `DensityMatrix` と `MajoranaBound` に分け、公開 MGF と上下・両側裾、逆温度ゼロの中心化と裾を完成した。有限二乗和 `choose(N,q-1)/q`、標準座標のリプシッツ定数 `β/√q`、MGF パラメータ `β²/q` を保持し、裾の分母を持つ式は `β≠0`・`t>0` に限定した。初回 Main の古い GaussianDisorder 成果物による識別子エラーは共有模型の再構築で解消した。
-
-3変更ファイルと集中章の個別 Lean 検査、`lake build Model SuperConcentration` と `lake build Model SuperConcentration CLT` が成功し、主要15定理は通常公理のみだった。親の既定対象は別研究の `RSATMain` だったため対象を明示して検査した。新規数学警告はなく、汎用基盤の既存警告は残った。
+密度行列の評価と有限サイズの二乗和を分け、公開の MGF、上側・下側・両側の裾、`β = 0` での中心化と裾を証明した。有限の二乗和 `choose(N,q-1)/q`、標準座標でのリプシッツ定数 `β/√q`、MGF のパラメータ `β²/q` を保ち、裾の分母を持つ式は `β≠0`・`t>0` に限った。初回の検査は古い成果物による識別子のエラーで失敗し、共有模型の再構築で解消した。主要定理は通常公理のみに依存する。
 
 <a id="super-legacy"></a>
 
-旧設計資料の `N^(q/2)` スケール、定数の存在だけを述べる評価、上側裾に `sorry` が残るとの記述は、上記の検証済み結果と一致しない。資料は後の配置整理で削除し、現行 API の根拠にはしていない。
+旧設計資料の `N^(q/2)` のスケール、定数の存在だけを述べる評価、上側の裾に `sorry` が残るという記述は、上の検証済みの結果と一致しない。資料は後の配置の整理で削除し、現行の API の根拠にはしていない。
 
 <a id="workspace-migration"></a>
 
 ## 生成入口と共有ワークスペース（2026-09-11）
 
-生成入口を旧 `BlueprintMain.lean` に置き、数学の集約 import を廃した。`lake build`、`lake env lean SYK/BlueprintMain.lean`、`lake lean SYK/BlueprintMain.lean -- --run SYK/BlueprintMain.lean --output SYK/_out/site`、`lake exe vbp check --site SYK/_out/site` が成功した。直接生成を採用した理由は当時の `vbp build` がルート直下の入口しか探索しないためである。GitHub CI、任意 PDF、サーバー起動はこの検査に含めなかった。
+Blueprint の生成入口を作り、数学の集約 import を廃した。`vbp build` ではなく生成入口を直接実行する方式を採ったのは、当時の `vbp build` がルート直下の入口しか探さなかったためである。
 
 <a id="chapters-records"></a>
 
-## Verso 休止中の検証範囲（2026-09-18–2026-10-06）
+## Verso の休止中の検証範囲（2026-09-18–2026-10-06）
 
-この期間は共有の休止方針により、原則として章・生成入口の Lean 検査、HTML/PDF 生成、`vbp check` を実施しなかった。主張・宣言・依存はソース上で照合し、必要な宣言には Verso を import しない `#check` を用いた。9月18日の章の個別検査成功など、記録された例外はその課題の範囲の検査である。休止中の照合を生成・参照検査の成功と扱っていない。休止中の章更新を含む復帰検証は [10月7日の記録](#verso-restore-2026-10-07) に集約した。
+この期間は共有の休止の方針により、原則として章と生成入口の Lean 検査、HTML・PDF の生成、`vbp check` を行わなかった。主張・宣言・依存はソース上で照合し、必要な宣言には Verso を import しない `#check` を使った。休止中の照合を、生成・参照検査の成功とは扱わない。休止中の章の更新を含む検証は、[検証の再開](#verso-restore-2026-10-07) で行った。
 
 <a id="w-completion-notes"></a>
 
-W01–W06、R01–R05、F01–F08、Z01 の完了はそれぞれ上記の範囲についての記録である。原稿全体の全表示の形式化、外部定理の Lean 証明、`AnnealedInput` の構築を意味しない。現行の対応と境界は [CLT の構造文書](SYK/CLT/ARCHITECTURE.md#現行原稿の主張) を参照する。
+W01–W06、R01–R05、F01–F08、Z01 の完了は、それぞれ上の範囲についての記録である。原稿全体のすべての表示の形式化、外部定理の Lean による証明、`AnnealedInput` の構築を意味しない。現行の対応と境界は [CLT の構造文書](SYK/CLT/ARCHITECTURE.md#現行原稿の主張) を参照する。

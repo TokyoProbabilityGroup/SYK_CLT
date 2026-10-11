@@ -36,7 +36,7 @@ flowchart TD
 
 汎用測度 `standardGaussianMeasureOnEuclidean ι` は、標準ガウスの積測度を `toLp 2` で移したものとして定義し、mathlib の `stdGaussian (EuclideanSpace ℝ ι)` には置き換えない（研究者の決定、2026-10-11）。両者は `map_pi_eq_stdGaussian` で等しい。この形を保つ理由は次のとおりである。
 
-- 座標ごとの Stein の恒等式、Hermite 展開、CLT の `gaussianCouplings` は積測度の形で進む。`stdGaussian` を定義にすると、定義を展開する箇所（`StandardGaussian` の 3 箇所、CLT の `normalizedQuadraticSum_law` と `FiniteVariancePositivity`）で毎回書き換えが要る。
+- 座標ごとの Stein の恒等式、Hermite 展開、CLT の `gaussianCouplings` は積測度の形で進む。`stdGaussian` を定義にすると、定義が積測度の像であることに依存する箇所（`Smooth` の `gaussian_ibp_coord`、CLT の `normalizedQuadraticSum_law` と `FiniteVariancePositivity`）で、毎回書き換えが要る。
 - 定理文は名前で述べているので、置き換えても文面は簡単にならない。得られるのは確率測度・`IsGaussian` のインスタンスの証明の省略（数行）だけである。
 - [模型規約](../Model/ARCHITECTURE.md) は、係数の測度を独立な標準ガウスの積として記述している。
 - mathlib の `Multivariate` は新しい API なので、定義の土台にするより証明の中で局所的に使う方が、mathlib の更新の影響を抑えられる。
@@ -78,7 +78,7 @@ L = β / sqrt q,
 
 ## 公開定理と有限サイズの評価
 
-`Main.lean` の公開定理は `SYK.logPartition_hasSubgaussianMGF`、`logPartition_upper_tail_standardGaussian`、`logPartition_lower_tail_standardGaussian`、`logPartition_two_sided_tail_standardGaussian` である。入力は `P : SYK.Params`、非空有限行列表現の `MajoranaSystem`、`β : ℝ≥0` である。裾の指数表示には、追加で `β ≠ 0` と `t > 0` を仮定する。逆温度ゼロの場合は、`logPartition_tail_of_beta_zero`、`logPartition_centered_of_beta_zero` と、上側・下側の対応する定理で処理する。MGF はこの場合も含む。
+`Main.lean` の公開定理は `SYK.logPartition_hasSubgaussianMGF`、`logPartition_upper_tail_standardGaussian`、`logPartition_lower_tail_standardGaussian`、`logPartition_two_sided_tail_standardGaussian` である。入力は `P : SYK.Params`、非空有限行列表現の `MajoranaSystem`、`β : ℝ≥0` である。裾の指数表示には、追加で `β ≠ 0` と `t > 0` を仮定する。`β = 0` の場合は、`logPartition_tail_of_beta_zero`、`logPartition_centered_of_beta_zero` と、上側・下側の対応する定理で処理する。MGF はこの場合も含む。
 
 `SYK.syk_sum_sq_expectation_le` は任意の密度行列 `ρ` について次を証明する。
 
