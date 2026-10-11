@@ -4,14 +4,12 @@ import SYK.Probability.GaussianChaos.Basic
 /-!
 # Gaussian Hermite coefficients for finite product Gaussians
 
-This module restates the general integration-by-parts theorem of
-`SYK.Probability.GaussianChaos.HermiteIBP` with the coupling law `gaussianCouplings`,
-without depending on the Majorana sign-parity theorem.
-The growth hypothesis is the manuscript's: only the partial derivatives `η ≤ α` are bounded.
-Entry points: `gaussianCouplings_eq_pi`, `hermite_coefficient_ibp`,
-`hermite_coefficient_integrable`. The module also shows that Hermite products of positive
-degree have mean zero (`integral_hermiteMulti_eq_zero`) and are integrable against each other
-(`integrable_hermiteMulti_mul`). Orthogonality and completeness are downstream.
+Consequences of the Hermite integration by parts `hermite_coefficient_ibp` of
+`SYK.Probability.GaussianChaos.HermiteIBP` for the coupling law `gaussianCouplings`,
+without depending on the Majorana sign-parity theorem: Hermite products of positive degree
+have mean zero (`integral_hermiteMulti_eq_zero`) and are integrable against each other
+(`integrable_hermiteMulti_mul`). `gaussianCouplings_eq_pi` unfolds the coupling law to the
+product measure. Orthogonality and completeness are downstream.
 -/
 
 open MeasureTheory ProbabilityTheory
@@ -25,32 +23,6 @@ omit [DecidableEq ι] in
 the couplings used in the sign-parity theorem. -/
 theorem gaussianCouplings_eq_pi :
     gaussianCouplings ι = Measure.pi (fun _ : ι => gaussianReal 0 1) := rfl
-
-/-- `lem:Gaussian-Hermite-IBP` in the notation used by the sign-parity result.
-The bounds concern exactly the partial derivatives `η ≤ α`. -/
-theorem hermite_coefficient_ibp (α : ι → ℕ)
-    {f : (ι → ℝ) → ℝ}
-    (hf : ContDiff ℝ (↑(∑ i : ι, α i)) f)
-    (hgrowth : ∀ η : ι → ℕ, η ≤ α → ∃ C : ℝ, 0 < C ∧ ∀ g,
-      |partialMulti η f g| ≤
-        C * Real.exp (C * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖)) :
-    (∫ g, hermiteMulti α g * f g ∂gaussianCouplings ι) =
-      ∫ g, partialMulti α f g ∂gaussianCouplings ι := by
-  simpa only [hermiteMulti, gaussianCouplings] using
-    hermiteMulti_ibp_of_expGrowth α hf hgrowth
-
-/-- Both sides of the Hermite coefficient identity are integrable under the
-manuscript's regularity and growth hypotheses. -/
-theorem hermite_coefficient_integrable (α : ι → ℕ)
-    {f : (ι → ℝ) → ℝ}
-    (hf : ContDiff ℝ (↑(∑ i : ι, α i)) f)
-    (hgrowth : ∀ η : ι → ℕ, η ≤ α → ∃ C : ℝ, 0 < C ∧ ∀ g,
-      |partialMulti η f g| ≤
-        C * Real.exp (C * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖)) :
-    Integrable (fun g => hermiteMulti α g * f g) (gaussianCouplings ι) ∧
-      Integrable (partialMulti α f) (gaussianCouplings ι) := by
-  simpa only [hermiteMulti, gaussianCouplings] using
-    hermiteMulti_ibp_integrable α hf hgrowth
 
 omit [Fintype ι] in
 private theorem partialList_zero (l : List ι) :

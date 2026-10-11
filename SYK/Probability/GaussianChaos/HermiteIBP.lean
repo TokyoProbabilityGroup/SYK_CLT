@@ -7,7 +7,7 @@ import SYK.Probability.GaussianChaos.Basic
 /-!
 # Iterated Gaussian integration by parts
 
-The theorem `hermiteMulti_ibp_of_expGrowth` proves the general identity in
+The theorem `hermite_coefficient_ibp` proves the general identity in
 `lem:Gaussian-Hermite-IBP` of `Paper/sections/gaussian-chaos.tex`, with
 exactly its `C^{|α|}` regularity and exponential Euclidean-growth assumptions
 for the partial derivatives `η ≤ α`. Iterating the creation operator
@@ -803,14 +803,15 @@ private theorem expIBPChain_of_prefix_bounds (l : List ι) {f : (ι → ℝ) →
 
 /-- `lem:Gaussian-Hermite-IBP`: only the partial derivatives indexed by
 `η ≤ α` need exponential growth, and finite smoothness of order `|α|` suffices. -/
-theorem hermiteMulti_ibp_of_expGrowth (α : ι → ℕ)
+theorem hermite_coefficient_ibp (α : ι → ℕ)
     {f : (ι → ℝ) → ℝ}
     (hf : ContDiff ℝ (↑(∑ i : ι, α i)) f)
     (hgrowth : ∀ η : ι → ℕ, η ≤ α → ∃ C : ℝ, 0 < C ∧ ∀ g,
-      |partialMulti η f g| ≤ C * Real.exp (C * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖)) :
-    (∫ g, (∏ i : ι, Polynomial.aeval (g i) (Polynomial.hermite (α i))) * f g
-      ∂(Measure.pi fun _ : ι => gaussianReal 0 1)) =
-      ∫ g, partialMulti α f g ∂(Measure.pi fun _ : ι => gaussianReal 0 1) := by
+      |partialMulti η f g| ≤
+        C * Real.exp (C * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖)) :
+    (∫ g, hermiteMulti α g * f g ∂gaussianCouplings ι) =
+      ∫ g, partialMulti α f g ∂gaussianCouplings ι := by
+  simp only [hermiteMulti, gaussianCouplings]
   apply hermiteMulti_ibp_of_expChain α hf
   apply expIBPChain_of_prefix_bounds
   intro p hp
@@ -826,14 +827,14 @@ theorem hermiteMulti_ibp_of_expGrowth (α : ι → ℕ)
 
 /-- Both expectations in `lem:Gaussian-Hermite-IBP` are genuine integrals
 under the manuscript's assumptions, including when `α = 0`. -/
-theorem hermiteMulti_ibp_integrable (α : ι → ℕ)
+theorem hermite_coefficient_integrable (α : ι → ℕ)
     {f : (ι → ℝ) → ℝ}
     (hf : ContDiff ℝ (↑(∑ i : ι, α i)) f)
     (hgrowth : ∀ η : ι → ℕ, η ≤ α → ∃ C : ℝ, 0 < C ∧ ∀ g,
-      |partialMulti η f g| ≤ C * Real.exp (C * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖)) :
-    Integrable (fun g => (∏ i : ι, Polynomial.aeval (g i) (Polynomial.hermite (α i))) * f g)
-      (Measure.pi fun _ : ι => gaussianReal 0 1) ∧
-    Integrable (partialMulti α f) (Measure.pi fun _ : ι => gaussianReal 0 1) := by
+      |partialMulti η f g| ≤
+        C * Real.exp (C * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖)) :
+    Integrable (fun g => hermiteMulti α g * f g) (gaussianCouplings ι) ∧
+      Integrable (partialMulti α f) (gaussianCouplings ι) := by
   obtain ⟨C₀, hC₀, h₀⟩ := hgrowth 0 (by simp)
   have hzero : partialMulti (0 : ι → ℕ) f = f := by
     have hnil : ∀ l : List ι, l.flatMap (fun _ => ([] : List ι)) = [] := by
@@ -847,10 +848,8 @@ theorem hermiteMulti_ibp_integrable (α : ι → ℕ)
   have hd : Continuous (partialMulti α f) := by
     apply (contDiff_partialList (multiIndexList α) 0 _).continuous
     simpa [multiIndexList_length] using hf
-  constructor
-  · simpa only [hermiteMulti] using
-      integrable_hermiteMulti_mul_of_expGrowth α hf.continuous C₀ hC₀.le h₀
-  · exact integrable_of_euclidean_expBound _ hd C C hC.le hC.le hb
+  exact ⟨integrable_hermiteMulti_mul_of_expGrowth α hf.continuous C₀ hC₀.le h₀,
+    integrable_of_euclidean_expBound _ hd C C hC.le hC.le hb⟩
 
 omit [Fintype ι] in
 private theorem polyFunction_partialList [Finite ι] (l : List ι) {f : (ι → ℝ) → ℝ}
@@ -884,7 +883,6 @@ theorem hermiteMulti_pair_ibp (α β : ι → ℕ) :
     simpa only [partialMulti] using
       expBound_enlarge hC (by dsimp [D]; linarith [le_max_left C c])
         (by dsimp [D]; linarith [le_max_right C c]) hb
-  simpa only [hermiteMulti] using
-    hermiteMulti_ibp_of_expGrowth α hdiff hgrowth
+  exact hermite_coefficient_ibp α hdiff hgrowth
 
 end SYK.GaussianChaos

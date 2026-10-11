@@ -4,6 +4,14 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="hermite-dedup-2026-10-11"></a>
+
+## Hermite 部分積分の主定理の一本化（2026-10-11、`MAINT-HERMITE` の B-2）
+
+`lem:Gaussian-Hermite-IBP` に当たる定理が、`HermiteIBP` の `hermiteMulti_ibp_of_expGrowth`・`hermiteMulti_ibp_integrable`（積の式と `Measure.pi` で述べる）と、それを言い換えた `CoefficientIBP` の `hermite_coefficient_ibp`・`hermite_coefficient_integrable`（`hermiteMulti` と `gaussianCouplings` で述べる）の 2 組あった。研究者の決定に従い後者の名前と型を残し、`HermiteIBP` で直接証明するようにして、前者を削除した。`hermiteMulti_pair_ibp` は `hermite_coefficient_ibp` から導く。`CoefficientIBP` には、平均 0（`integral_hermiteMulti_eq_zero`）、積の可積分性（`integrable_hermiteMulti_mul`）と、まだ使われている `gaussianCouplings_eq_pi` が残る。Blueprint の `clt_gaussian_hermite_ibp` の宣言の参照と CLT の構造文書も更新した。
+
+検証：変更したファイルを `lake lean` で個別に検査し、`lake build SYK` と `lake build SYKBlueprint` が成功した（警告は依存パッケージ由来の 2 件だけ）。Blueprint の HTML を再生成し、`vbp check` は `ok=true`・`errors=[]` だった。`SYK` の全 713 宣言の名前・モジュール・型を B-1 の後と比べ、差は削除した 2 件と、`hermite_coefficient_ibp`・`hermite_coefficient_integrable` のモジュールが `HermiteIBP` に移ったことだけで、型は同一だった。主要定理は通常公理のみに依存する。
+
 <a id="hermite-unify-2026-10-11"></a>
 
 ## Hermite 積の定義の一本化と `HermiteIBP` の移動（2026-10-11、`MAINT-HERMITE` の B-1）

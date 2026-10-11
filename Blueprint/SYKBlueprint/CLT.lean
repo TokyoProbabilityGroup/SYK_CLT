@@ -117,7 +117,7 @@ limiting variance. These are verified conditional Lean results.
 They do not imply positive variance at every finite size.
 :::
 
-:::theorem "clt_gaussian_hermite_ibp" (parent := "central_limit_theorem") (lean := "SYK.GaussianChaos.hermiteMulti_ibp_of_expGrowth, SYK.GaussianChaos.hermiteMulti_ibp_integrable, SYK.GaussianChaos.hermiteMulti_pair_ibp, SYK.GaussianChaos.hermiteList_multiIndexList, SYK.GaussianChaos.partialList_perm, SYK.GaussianChaos.hermite_coefficient_ibp, SYK.GaussianChaos.integral_hermiteMulti_eq_zero")
+:::theorem "clt_gaussian_hermite_ibp" (parent := "central_limit_theorem") (lean := "SYK.GaussianChaos.hermite_coefficient_ibp, SYK.GaussianChaos.hermite_coefficient_integrable, SYK.GaussianChaos.hermiteMulti_pair_ibp, SYK.GaussianChaos.hermiteList_multiIndexList, SYK.GaussianChaos.partialList_perm, SYK.GaussianChaos.integral_hermiteMulti_eq_zero")
 The general identity in `lem:Gaussian-Hermite-IBP` is proved for any finite
 coordinate set and independent standard Gaussian coordinates. Let
 $`\alpha` be a nonnegative integer multi-index and let
