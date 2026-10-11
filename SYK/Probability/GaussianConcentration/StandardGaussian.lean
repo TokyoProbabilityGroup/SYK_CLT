@@ -32,7 +32,12 @@ namespace SYK.GaussianConcentration
 
 /-- One standard Gaussian measure for every finite Euclidean coordinate type.
 This is the product of standard one-dimensional Gaussians pushed forward to the
-Euclidean (`L²`) structure on the coordinate space. -/
+Euclidean (`L²`) structure on the coordinate space.
+
+It equals mathlib's `stdGaussian (EuclideanSpace ℝ ι)` by `map_pi_eq_stdGaussian`. The product
+form is kept as the definition on purpose: the coordinatewise Stein identity, the Hermite
+expansion and the CLT work in this form, so proofs use `stdGaussian` lemmas only through that
+equation. See `SYK/SuperConcentration/ARCHITECTURE.md`. -/
 noncomputable def standardGaussianMeasureOnEuclidean
     (ι : Type*) [Fintype ι] :
     Measure (EuclideanSpace ℝ ι) :=
@@ -49,23 +54,14 @@ instance standardGaussianMeasureOnEuclidean_isProbability
 /-- The finite product of standard real Gaussians is a Gaussian measure. -/
 instance isGaussian_pi_gaussianReal {ι : Type*} [Fintype ι] :
     IsGaussian (Measure.pi fun _ : ι => gaussianReal 0 1) := by
-  classical
-  have hindep : iIndepFun (fun (i : ι) (ω : ι → ℝ) => ω i)
-      (Measure.pi fun _ : ι => gaussianReal 0 1) := by
-    have := iIndepFun_pi (X := fun (_ : ι) (x : ℝ) => x)
-      (μ := fun _ : ι => gaussianReal 0 1) (fun _ => measurable_id.aemeasurable)
-    simpa using this
-  have hlaw : ∀ i : ι, HasGaussianLaw (fun ω : ι → ℝ => ω i)
-      (Measure.pi fun _ : ι => gaussianReal 0 1) := by
-    intro i
-    have h0 : (Measure.pi fun _ : ι => gaussianReal 0 1).map (Function.eval i)
-        = gaussianReal 0 1 := (measurePreserving_eval (fun _ : ι => gaussianReal 0 1) i).map_eq
-    have : IsGaussian ((Measure.pi fun _ : ι => gaussianReal 0 1).map (fun ω => ω i)) := by
-      rw [show (fun ω : ι → ℝ => ω i) = Function.eval i from rfl, h0]; infer_instance
-    exact IsGaussian.hasGaussianLaw
-  have h2 : IsGaussian ((Measure.pi fun _ : ι => gaussianReal 0 1).map (fun ω i => ω i)) :=
-    (hindep.hasGaussianLaw hlaw).isGaussian_map
-  simpa using h2
+  -- Transport `stdGaussian` back along the identification `toLp 2` (`map_pi_eq_stdGaussian`).
+  have h : (Measure.pi fun _ : ι => gaussianReal 0 1) =
+      (stdGaussian (EuclideanSpace ℝ ι)).map
+        (PiLp.continuousLinearEquiv 2 ℝ (fun _ : ι => ℝ)) := by
+    rw [← map_pi_eq_stdGaussian, Measure.map_map (by fun_prop) (by fun_prop)]
+    exact Measure.map_id.symm
+  rw [h]
+  infer_instance
 
 /-- The standard Euclidean Gaussian measure is a Gaussian measure. -/
 instance standardGaussianMeasureOnEuclidean_isGaussian {ι : Type*} [Fintype ι] :
@@ -121,58 +117,23 @@ $\mathbb P(|F(X)-\mathbb E F(X)| > t)
   \le 2\exp(-t^2/(2L^2))$.
 
 Exponential-of-norm functions are integrable against the standard Euclidean Gaussian.
-This follows from the fact that a standard Gaussian has finite exponential moments of its
-Euclidean norm.
+By Fernique's theorem, `exp (C ‖x‖²)` is integrable for some `C > 0`, and completing the
+square gives `c ‖x‖ ≤ C ‖x‖² + c² / (4C)`.
 -/
 theorem integrable_exp_mul_norm {ι : Type*} [Fintype ι] (c : ℝ) :
     Integrable (fun x : EuclideanSpace ℝ ι => Real.exp (c * ‖x‖))
       (standardGaussianMeasureOnEuclidean ι) := by
-  unfold standardGaussianMeasureOnEuclidean;
-  rw [ MeasureTheory.integrable_map_measure ];
-  · refine MeasureTheory.Integrable.mono' (g := fun x => ∏ i, Real.exp ( |c| * |x i| )) ?_ ?_ ?_;
-    · have h_integrable : ∀ i : ι, MeasureTheory.Integrable (fun x : ℝ => Real.exp (|c| * |x|))
-        (gaussianReal 0 1) := by
-        intro i
-        have h_integrable : MeasureTheory.Integrable (fun x : ℝ => Real.exp (|c| * |x|))
-          (gaussianReal 0 1) := by
-          have h_mgf : ∀ s : ℝ, MeasureTheory.Integrable (fun x : ℝ => Real.exp (s * x))
-            (gaussianReal 0 1) := by
-            intro s
-            have h_integrable : ∫ x, Real.exp (s * x) ∂(gaussianReal 0 1) = Real.exp (s^2 / 2) := by
-              have := @ProbabilityTheory.mgf_gaussianReal;
-              convert @this ℝ _ ( gaussianReal 0 1 ) 0 1 ( fun x => x ) _ s using 1 <;>
-                norm_num [mgf, mul_comm]
-            exact ( by contrapose! h_integrable; rw [ MeasureTheory.integral_undef h_integrable ] ;
-                        positivity )
-          refine MeasureTheory.Integrable.mono' ( h_mgf |c| |> fun h => h.add ( h_mgf ( -|c| ) ) )
-            ?_ ?_;
-          · exact Continuous.aestronglyMeasurable ( by continuity );
-          · filter_upwards [ ] with x using by
-              norm_num
-              cases abs_cases x <;> simp only [mul_neg, le_add_iff_nonneg_left,
-                le_add_iff_nonneg_right, *] <;> positivity
-        exact h_integrable;
-      have h_prod_integrable : ∀ {f : ι → ℝ → ℝ}, (∀ i,
-        MeasureTheory.Integrable (fun x => f i x) (gaussianReal 0 1)) → MeasureTheory.Integrable
-        (fun x : ι → ℝ => ∏ i, f i (x i)) (Measure.pi fun _ => gaussianReal 0 1) := by
-        exact fun {f} a => Integrable.fintype_prod a;
-      exact h_prod_integrable h_integrable;
-    · fun_prop (disch := norm_num);
-    · simp only [EuclideanSpace.norm_eq, Real.norm_eq_abs, sq_abs, Function.comp_apply,
-        Real.abs_exp, ← Real.exp_sum, Real.exp_le_exp];
-      refine Filter.Eventually.of_forall fun x => ?_;
-      -- Apply the triangle inequality to the sum.
-      have h_triangle : Real.sqrt (∑ i, x i ^ 2) ≤ ∑ i, |x i| := by
-        exact Real.sqrt_le_iff.mpr
-          ⟨ by
-            exact Finset.sum_nonneg fun _ _ => abs_nonneg _ , by
-              simpa [ sq, Finset.sum_mul _ _ _ ] using Finset.sum_le_sum fun i ( hi : i ∈
-                Finset.univ ) => mul_le_mul_of_nonneg_left ( Finset.single_le_sum ( fun i _ =>
-                abs_nonneg ( x i ) ) hi ) ( abs_nonneg ( x i ) ) ⟩;
-      rw [ ← Finset.mul_sum _ _ _ ];
-      cases abs_cases c <;> nlinarith [ Real.sqrt_nonneg ( ∑ i, x i ^ 2 ) ];
-  · fun_prop;
-  · fun_prop
+  obtain ⟨C, hC, hint⟩ := IsGaussian.exists_integrable_exp_sq
+    (standardGaussianMeasureOnEuclidean ι)
+  refine (hint.const_mul (Real.exp (c ^ 2 / (4 * C)))).mono' (by fun_prop)
+    (ae_of_all _ fun x => ?_)
+  rw [Real.norm_of_nonneg (Real.exp_nonneg _), ← Real.exp_add]
+  refine Real.exp_le_exp.mpr ?_
+  have h : 0 ≤ C * (‖x‖ - c / (2 * C)) ^ 2 := by positivity
+  have hC' : C ≠ 0 := hC.ne'
+  calc c * ‖x‖ = C * ‖x‖ ^ 2 + c ^ 2 / (4 * C) - C * (‖x‖ - c / (2 * C)) ^ 2 := by
+        field_simp; ring
+    _ ≤ c ^ 2 / (4 * C) + C * ‖x‖ ^ 2 := by linarith
 
 /-
 Real-analysis Grönwall-type core of the Herbst argument.  If `Φ` is differentiable,

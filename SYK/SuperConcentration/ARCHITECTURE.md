@@ -34,6 +34,15 @@ flowchart TD
 
 `CouplingSpace`、`couplingSpace_card`、`standardGaussianMeasure` は `Model.GaussianDisorder` に置く。汎用測度は `../Probability/GaussianConcentration/StandardGaussian.lean` に置き、模型の測度をその有限添字型への特殊化として定義する。同一性を述べる `standardGaussianMeasure_eq_onEuclidean` は Model 側に置く。汎用部分は Model に依存せず、`N, q` への特殊化も含まない。
 
+汎用測度 `standardGaussianMeasureOnEuclidean ι` は、標準ガウスの積測度を `toLp 2` で移したものとして定義し、mathlib の `stdGaussian (EuclideanSpace ℝ ι)` には置き換えない（研究者の決定、2026-10-11）。両者は `map_pi_eq_stdGaussian` で等しい。この形を保つ理由は次のとおりである。
+
+- 座標ごとの Stein の恒等式、Hermite 展開、CLT の `gaussianCouplings` は積測度の形で進む。`stdGaussian` を定義にすると、定義を展開する箇所（`StandardGaussian` の 3 箇所、CLT の `normalizedQuadraticSum_law` と `FiniteVariancePositivity`）で毎回書き換えが要る。
+- 定理文は名前で述べているので、置き換えても文面は簡単にならない。得られるのは確率測度・`IsGaussian` のインスタンスの証明の省略（数行）だけである。
+- [模型規約](../Model/ARCHITECTURE.md) は、係数の測度を独立な標準ガウスの積として記述している。
+- mathlib の `Multivariate` は新しい API なので、定義の土台にするより証明の中で局所的に使う方が、mathlib の更新の影響を抑えられる。
+
+mathlib の補題は、この等式を経由して証明の中で使う（`isGaussian_pi_gaussianReal`、`standardGaussianMeasureOnEuclidean_integral_id`）。`integrable_exp_mul_norm` は、`IsGaussian` から Fernique の定理を直接使う。
+
 残る基盤部分では、座標を添字付ける任意の有限型 `ι` だけについて量化し、中心となる結果をモーメント母関数の評価 `HasSubgaussianMGF` として述べる。上側・下側・両側の裾の評価は、mathlib の劣ガウス確率変数に関する API から導く。
 
 `L > 0` の場合の既存の証明を保ち、`L = 0` の場合は、関数が定数であることから別に処理する。公開 MGF 定理は、`L ≥ 0` に対してパラメータ `L^2` を与える。正の `L` に対する裾の評価と、零の場合に裾の事象の測度が零になる定理は、分けて述べる。分母に `L^2` を含む表示に、零を代入しない。

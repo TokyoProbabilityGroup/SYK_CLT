@@ -4,6 +4,19 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="stdgaussian-2026-10-11"></a>
+
+## mathlib のガウス測度 API の利用（2026-10-11）
+
+`standardGaussianMeasureOnEuclidean` の定義を mathlib の `stdGaussian (EuclideanSpace ℝ ι)` に置き換えるかを調べ、研究者の決定により置き換えないことにした。理由は [SuperConcentration の構造文書](SYK/SuperConcentration/ARCHITECTURE.md#汎用的な基盤部分の分離) に記す。代わりに、等式 `map_pi_eq_stdGaussian` を経由して、証明の中で mathlib の補題を使う。
+
+- `integrable_exp_mul_norm`（約 57 行から約 15 行）：Fernique の定理 `IsGaussian.exists_integrable_exp_sq` で `exp (C ‖x‖²)` の可積分性を得て、平方完成 `c ‖x‖ ≤ C ‖x‖² + c² / (4C)` で抑える。
+- `isGaussian_pi_gaussianReal`（約 20 行から約 8 行）：`map_pi_eq_stdGaussian` で積測度を `stdGaussian` の連続線形同型による像として表し、mathlib のインスタンスを使う。
+
+定理文は変えていない。
+
+検証：`StandardGaussian` を `lake lean` で検査し、エラーと警告はなかった。`lake build SYK` と `lake build SYKBlueprint` が成功した（警告は依存パッケージ由来の 2 件だけ）。`SYK` の全 711 宣言の名前・モジュール・型は変更の前後で同一である。2 つの対象、`product_standardGaussian_hasSubgaussianMGF` と主要定理は通常公理のみに依存する。
+
 <a id="tidy-long-proofs-2026-10-11"></a>
 
 ## 長い自動生成の証明の短縮（2026-10-11、`MAINT-TIDY` の D-3）
