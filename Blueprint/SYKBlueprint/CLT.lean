@@ -24,12 +24,14 @@ open Informal
 
 :::group "central_limit_theorem"
 Gaussian SYK partition-function and log-partition fluctuations at fixed even
-$`q\ge4`. The manuscript is `Paper/CLT_SYK.tex` with its four included
-sections. The proof of `thm:free-energy-clt` is in `main-results.tex`.
+q ≥ 4.
+:::
+
+The manuscript is `Paper/CLT_SYK.tex` with its four included sections. The
+proof of `thm:free-energy-clt` is in `main-results.tex`.
 
 Finite-model results, conditional consequences of an external annealed input,
 and the external expected-pressure statement have different status below.
-:::
 
 :::definition "clt_partition_function" (parent := "central_limit_theorem") (uses := "scaled_syk_hamiltonian") (lean := "SYK.CLT.partitionFunction, SYK.CLT.realPartitionFunction, SYK.CLT.Setting")
 Fix even $`q\ge4`. For each even $`N\ge q`, choose a nonempty finite

@@ -44,11 +44,13 @@
 
 <a id="blueprint-lint-2026-10-11"></a>
 
-## Blueprint の警告の解消（2026-10-11）
+## Blueprint の警告の解消と group の表示の修正（2026-10-11）
 
 `lake build SYKBlueprint` の警告の大半は、CLT 章だけに他の章にある `set_option linter.mathlibStandardSet false` がなく、mathlib の書式 linter が Verso の英文の本文に掛かったものだった。残りは Verso が出す「宣言に docstring がない」警告で、こちらは `set_option` では消えないので、`Params`・`MajoranaSystem`・`AnnealedInput` の各フィールドに docstring を付けた。
 
-検証：警告は依存パッケージ VersoBlueprint の2件だけになり、`vbp check` は `ok=true`・`errors=[]` だった。HTML 生成時に CLT 章の `$`q\ge4`` の数式変換に失敗する info が1件出る（本文の数式の書式の問題で今回の変更とは無関係と判断したが、変更前の状態では確認していない）。
+検証：警告は依存パッケージ VersoBlueprint の2件だけになり、`vbp check` は `ok=true`・`errors=[]` だった。
+
+HTML 生成時に、CLT 章の冒頭の group に書いたインラインの数式 `$`q\ge4`` の変換に失敗する info が出ていた。Verso Blueprint は group の本文を章の本文には表示せず、要約ページ・依存グラフ・各命題の見出しのラベルに使うプレーンテキストに変換するが、インラインの数式の変換は登録されていない。このため、CLT 章のすべての命題のラベルで数式が `<missing>` に置き換えられていた。また、group に書いていた説明（CLT 章の原稿の所在と各結果の状態、SuperConcentration 章の宣言の役割分担）は、章の本文に一度も表示されていなかった。group の本文を数式を含まない短い題名にし、説明は通常の本文へ移して解消した。生成した HTML に `<missing>` はなく、`vbp check` は `ok=true` だった。Model・GaussianConcentration 章の group は、もともと1文の題名だけである。
 
 <a id="lake-lean-2026-10-11"></a>
 
