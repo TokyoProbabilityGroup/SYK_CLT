@@ -11,7 +11,6 @@ This directory contains the Lean formalization work for the central limit theore
 - `../../Paper/CLT_SYK.tex`: manuscript root containing the shared preamble, front matter, and references.
 - `../../Paper/sections/`: independently compilable top-level manuscript sections; together with the root file, these are the source of truth for the paper theorem statements.
 - `ARCHITECTURE.md` (Japanese): current mathematical API, proof dependencies, and manuscript correspondence.
-- `EDITING_PLAN.md` (Japanese): current task status and the scope of the conditional CLT.
 - `AGENTS.md` (Japanese): topic-specific instructions for coding agents.
 
 The internal planning documents are written in Japanese for collaboration between the researcher and coding agents. Public mathematical artifacts, including this README, the manuscript, and Lean source files, are written in English.
@@ -24,13 +23,13 @@ The principal import paths are:
 
 | Task | Modules to inspect in order |
 | --- | --- |
-| Gaussian Hermite coefficients and completeness | `GaussianChaos/Basic` → `GaussianChaos/CoefficientIBP` → `GaussianChaos/Orthogonality` → `GaussianChaos/HermiteDensity` and `GaussianMomentDetermination` → `GaussianChaos/PolynomialDensity` |
+| Gaussian Hermite coefficients and completeness | `GaussianChaos/Basic` → `GaussianChaos/HermiteIBP` → `GaussianChaos/CoefficientIBP` → `GaussianChaos/Orthogonality` → `GaussianChaos/HermiteDensity` and `GaussianMomentDetermination` → `GaussianChaos/PolynomialDensity` |
 | Singular values and matrix derivatives | `SingularValues` → `TraceExponential` → `TraceExpDerivatives` |
 | Finite SYK second chaos | `Basic`, `CliffordSignParity`, `GaussianChaos/Orthogonality` → `PartitionSymmetry`; `TraceExpDerivatives` → `PartitionDerivatives`; both → `SecondChaos` |
 | Independent estimates | `Rademacher` or `ConvexDerivatives` |
 | Quadratic Gaussian moments and CLT | `GaussianQuadraticObservable` → `GaussianFourthMoment` → `IndependentFourthMoment`; `GaussianQuadraticObservable` and `SecondChaosAsymptotic` → `GaussianQuadraticCLT` |
 
-`PartitionSymmetry` imports `Basic` for `Setting`, `Z`, and `Y`. The general Gaussian Hermite integration-by-parts API used by the active CLT modules is in `../Probability/GaussianConcentration/Smooth.lean`.
+`PartitionSymmetry` imports `Basic` for `Setting`, `Z`, and `Y`. The general Gaussian Hermite integration-by-parts API used by the active CLT modules is in `../Probability/GaussianChaos/HermiteIBP.lean`.
 
 `GaussianChaos/Basic` contains the finite product Gaussian measure, Hermite products, and their sign/permutation identities. `GaussianChaos/CoefficientIBP` uses these without importing the model-specific `CliffordSignParity`. Finite quadratic observables and their first two moments are in `GaussianQuadraticObservable`; fourth-moment estimates do not import the quadratic CLT.
 
@@ -63,7 +62,7 @@ Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-
 The conditional CLT is integrated into `Main.lean`. For `partition_clt`, `log_partition_clt`, `partition_and_log_partition_clt` and the three standard-family theorems in `StandardModel.lean`, `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`; `hFE : AnnealedInput q S` remains an explicit hypothesis. After modifying a Lean file, check it from the shared workspace root:
 
 ```bash
-lake env lean SYK_CLT/SYK/CLT/path/to/File.lean
+lake lean SYK_CLT/SYK/CLT/path/to/File.lean
 ```
 
 Use `lake build SYK` for the mathematical library and `lake build SYKBlueprint` for the mathematics together with the Blueprint. Inspect the principal theorem types and `#print axioms` as described in [the repository guide](../../README.md#building-and-testing). The LaTeX manuscript and Lean formalization have separate verification requirements; successful verification of one does not establish the correctness of the other.

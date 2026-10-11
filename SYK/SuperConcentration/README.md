@@ -29,7 +29,7 @@ From the shared workspace root:
 
 ```bash
 lake build SYK
-lake env lean SYK_CLT/SYK/SuperConcentration/Main.lean
+lake lean SYK_CLT/SYK/SuperConcentration/Main.lean
 ```
 
 Downstream Lean files can import the result with:

@@ -49,10 +49,10 @@ Review existing parent files before overwriting them. Projects in the parent wor
 ```bash
 lake build SYKBlueprint
 lake build SYK
-lake env lean SYK_CLT/SYK/CLT/Main.lean
+lake lean SYK_CLT/SYK/CLT/Main.lean
 ```
 
-`lake build SYKBlueprint` checks mathematics and Blueprint; `lake build SYK` checks mathematics only. [The workspace guide](workspace/README.md#template-files-and-targets) explains the targets and dependency configuration.
+`lake build SYKBlueprint` checks mathematics and Blueprint; `lake build SYK` checks mathematics only; `lake lean <file>` builds the imports of one file and checks it with the package's `leanOptions` (linters included), unlike `lake env lean`, which only sets up the environment. [The workspace guide](workspace/README.md#template-files-and-targets) explains the targets and dependency configuration.
 
 The CLTs are Lean-checked conditional on `AnnealedInput`; constructing that input remains separate. Build success alone does not establish agreement between the formal statements and every manuscript claim. After changing a Lean file, check it individually before the final workspace build.
 

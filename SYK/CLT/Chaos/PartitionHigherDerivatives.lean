@@ -29,32 +29,32 @@ theorem partialList_cons_perm_append {ι : Type*} (i : ι) (l : List ι) :
 theorem contDiff_partialList_top
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (l : List ι) {f : (ι → ℝ) → ℝ} (hf : ContDiff ℝ ⊤ f) :
-    ContDiff ℝ ⊤ (GaussianConcentration.partialList l f) := by
+    ContDiff ℝ ⊤ (partialList l f) := by
   induction l generalizing f with
-  | nil => simpa [GaussianConcentration.partialList] using hf
+  | nil => simpa [partialList] using hf
   | cons i l ih =>
-      simpa [GaussianConcentration.partialList] using
-        ih (GaussianConcentration.contDiff_coordDeriv i hf)
+      simpa [partialList] using
+        ih (contDiff_coordDeriv i hf)
 
 open MatrixAnalysis.DirectionalDerivative in
 theorem partialList_eq_iterDirectionalFDeriv
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (l : List ι) {f : (ι → ℝ) → ℝ} (hf : ContDiff ℝ ⊤ f) :
-    GaussianConcentration.partialList l f =
+    partialList l f =
       iterDirectionalFDeriv f (l.map fun i => Pi.single i 1) := by
   induction l generalizing f with
   | nil => rfl
   | cons i l ih =>
       have hperm : (i :: l).Perm (l ++ [i]) := by
         exact partialList_cons_perm_append i l
-      rw [GaussianConcentration.partialList_perm hperm
-        (hf.of_le (by simp)), GaussianConcentration.partialList_append]
-      simp only [GaussianConcentration.partialList, List.map_cons,
+      rw [partialList_perm hperm
+        (hf.of_le (by simp)), partialList_append]
+      simp only [partialList, List.map_cons,
         iterDirectionalFDeriv]
-      have hsmooth : ContDiff ℝ ⊤ (GaussianConcentration.partialList l f) :=
+      have hsmooth : ContDiff ℝ ⊤ (partialList l f) :=
         contDiff_partialList_top l hf
       funext x
-      rw [GaussianConcentration.coordDeriv_eq_fderiv i (hsmooth.of_le (by norm_num)),
+      rw [coordDeriv_eq_fderiv i (hsmooth.of_le (by norm_num)),
         ih hf]
 
 open MatrixAnalysis.DirectionalDerivative in
@@ -206,7 +206,7 @@ theorem Setting.abs_iterDirectionalFDeriv_Z_le {q : ℕ} (S : Setting q)
 theorem Setting.abs_partialList_Z_le {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (l : List (InteractionIndex (S.N n) q))
     (g : InteractionIndex (S.N n) q → ℝ) :
-    |GaussianConcentration.partialList l
+    |partialList l
         (fun x => S.Z β n (WithLp.toLp 2 x)) g| ≤
       (|β| * couplingScale (S.params n)) ^ l.length *
         S.Z β n (WithLp.toLp 2 g) := by
@@ -242,18 +242,18 @@ theorem Setting.abs_partialList_Z_le {q : ℕ} (S : Setting q)
 theorem Setting.abs_partialMulti_Z_le {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (α : InteractionIndex (S.N n) q → ℕ)
     (g : InteractionIndex (S.N n) q → ℝ) :
-    |GaussianConcentration.partialMulti α
+    |partialMulti α
         (fun x => S.Z β n (WithLp.toLp 2 x)) g| ≤
       (|β| * couplingScale (S.params n)) ^ (∑ I, α I) *
         S.Z β n (WithLp.toLp 2 g) := by
-  unfold GaussianConcentration.partialMulti
-  simpa only [GaussianConcentration.multiIndexList_length] using
-    S.abs_partialList_Z_le β n (GaussianConcentration.multiIndexList α) g
+  unfold partialMulti
+  simpa only [multiIndexList_length] using
+    S.abs_partialList_Z_le β n (multiIndexList α) g
 
 theorem Setting.partialMulti_Z_exp_growth {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (α : InteractionIndex (S.N n) q → ℕ) :
     ∃ C : ℝ, 0 < C ∧ ∀ g : InteractionIndex (S.N n) q → ℝ,
-      |GaussianConcentration.partialMulti α
+      |partialMulti α
           (fun x => S.Z β n (WithLp.toLp 2 x)) g| ≤
         C * Real.exp (C * ‖WithLp.toLp 2 g‖) := by
   obtain ⟨c, hc, hZ⟩ := S.exists_Z_exp_bound_all_beta n
@@ -280,7 +280,7 @@ theorem Setting.hermite_coefficient_Z_eq_integral_partialMulti
     (α : InteractionIndex (S.N n) q → ℕ) :
     (∫ g, hermiteMulti α g * S.Z β n (WithLp.toLp 2 g)
       ∂gaussianCouplings (InteractionIndex (S.N n) q)) =
-      ∫ g, GaussianConcentration.partialMulti α
+      ∫ g, partialMulti α
         (fun x => S.Z β n (WithLp.toLp 2 x)) g
       ∂gaussianCouplings (InteractionIndex (S.N n) q) := by
   apply hermite_coefficient_ibp α
@@ -309,7 +309,7 @@ theorem Setting.abs_integral_Z_mul_hermite_le
     S.Z β n (WithLp.toLp 2 g)
   have hgrowth : ∀ η : InteractionIndex (S.N n) q → ℕ, η ≤ α →
       ∃ C : ℝ, 0 < C ∧ ∀ g,
-        |GaussianConcentration.partialMulti η F g| ≤
+        |partialMulti η F g| ≤
           C * Real.exp (C * ‖WithLp.toLp 2 g‖) := by
     intro η _
     exact S.partialMulti_Z_exp_growth β n η
@@ -331,7 +331,7 @@ theorem Setting.abs_integral_Z_mul_hermite_le
       (gaussianCouplings (InteractionIndex (S.N n) q)) :=
     (S.ZGaussian_memLp β n).integrable (by norm_num)
   calc
-    _ ≤ ∫ g, |GaussianConcentration.partialMulti α F g|
+    _ ≤ ∫ g, |partialMulti α F g|
         ∂gaussianCouplings (InteractionIndex (S.N n) q) := abs_integral_le_integral_abs
     _ ≤ ∫ g, A * F g
         ∂gaussianCouplings (InteractionIndex (S.N n) q) := by

@@ -250,15 +250,22 @@ an even convex `C¹` limit, locally uniform pressure and derivative convergence
 on the whole real line, and the sign at every nonzero inverse temperature.
 The proposition itself and construction of this input are not proved here. -/
 structure AnnealedInput (q : ℕ) (S : Setting q) where
+  /-- The limiting annealed pressure `ℓ_q`. -/
   ℓ : ℝ → ℝ
+  /-- `ℓ_q` is even. -/
   even : ∀ β : ℝ, ℓ (-β) = ℓ β
+  /-- `ℓ_q` is convex on the real line. -/
   convex : ConvexOn ℝ Set.univ ℓ
+  /-- `ℓ_q` is continuously differentiable. -/
   contDiff_one : ContDiff ℝ 1 ℓ
+  /-- The annealed free energies converge to `ℓ_q` locally uniformly on `ℝ`. -/
   pressure_limit : TendstoLocallyUniformlyOn
     (fun n β ↦ S.annealedFreeEnergy β n) ℓ atTop Set.univ
+  /-- The normalized derivatives of `log E Z` converge to `ℓ_q'` locally uniformly on `ℝ`. -/
   derivative_limit : TendstoLocallyUniformlyOn
     (fun n β ↦ deriv (fun b ↦ Real.log (S.meanZ b n)) β / (S.N n : ℝ))
     (deriv ℓ) atTop Set.univ
+  /-- `β ℓ_q'(β) > 0` for every nonzero inverse temperature `β`. -/
   sign : ∀ β : ℝ, β ≠ 0 → 0 < β * deriv ℓ β
 
 /-- Annealed pressure convergence follows from the permitted input. -/

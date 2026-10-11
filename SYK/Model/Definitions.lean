@@ -15,10 +15,15 @@ namespace SYK
 
 /-- Parameters of an SYK model. -/
 structure Params where
+  /-- The number of Majorana operators. -/
   N : ℕ
+  /-- The interaction order. -/
   q : ℕ
+  /-- The interaction order is even. -/
   q_even : Even q
+  /-- The interaction order is positive. -/
   q_pos : 0 < q
+  /-- An interaction involves at most all `N` operators. -/
   q_le_N : q ≤ N
 
 /-- A label for a `q`-body interaction is a `q`-element subset of the fermion labels. -/

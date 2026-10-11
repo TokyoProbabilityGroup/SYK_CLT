@@ -15,12 +15,12 @@ open Informal
 The model-specific argument that turns the algebraic relations of Majorana
 interaction operators into concentration of the finite-dimensional SYK
 log-partition function.
+:::
 
 The checked declarations use the standard Hamiltonian shared by Model and
 measure Lipschitz constants in the standard Gaussian coordinates. The
 density-matrix estimate lives in `DensityMatrix`, the finite-size Majorana
 bound in `MajoranaBound`, and the MGF and tail applications in `Main`.
-:::
 
 :::definition "syk_log_partition" (parent := "superconcentration") (uses := "partition_function, scaled_syk_hamiltonian") (lean := "SYK.logPartition")
 For $`\beta \in \mathbb{R}_{\ge 0}`, define the real log-partition function by
