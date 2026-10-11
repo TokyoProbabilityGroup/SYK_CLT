@@ -1,7 +1,7 @@
 import Verso
 import VersoManual
 import VersoBlueprint
-import SYK.CLT.Main
+import SYK.Main
 import SYK.CLT.Normalization
 import SYK.CLT.StandardModel
 import SYK.Analysis.ConvexDerivatives
@@ -30,10 +30,20 @@ q ≥ 4.
 The manuscript is `Paper/CLT_SYK.tex` with its four included sections. The
 proof of `thm:free-energy-clt` is in `main-results.tex`.
 
+`SYK/Main.lean` gives standalone model and annealed-input definitions in
+`SYK.CLT.GaussianSYK`, followed by a joint CLT theorem and its two projections. Its Majorana
+relations, Hamiltonian, probability law, observables, and hypotheses use
+only mathlib and definitions in that file. Other SYK declarations occur
+only inside its joint proof, which identifies this model with the
+abstract family used by the supporting results below. The joint theorem
+asserts the existence of a common positive radius for both CLTs.
+These results assume `AnnealedInput`; its convergence, regularity, and sign
+assertions are not established there for the concrete Gaussian SYK model.
+
 Finite-model results, conditional consequences of an external annealed input,
 and the external expected-pressure statement have different status below.
 
-:::definition "clt_partition_function" (parent := "central_limit_theorem") (uses := "scaled_syk_hamiltonian") (lean := "SYK.CLT.partitionFunction, SYK.CLT.realPartitionFunction, SYK.CLT.Setting")
+:::definition "clt_partition_function" (parent := "central_limit_theorem") (uses := "scaled_syk_hamiltonian") (lean := "SYK.CLT.partitionFunction, SYK.CLT.realPartitionFunction, SYK.CLT.Setting, SYK.CLT.GaussianSYK.MajoranaOperators, SYK.CLT.GaussianSYK.Model, SYK.CLT.GaussianSYK.disorderLaw, SYK.CLT.GaussianSYK.Model.H, SYK.CLT.GaussianSYK.Model.Z, SYK.CLT.GaussianSYK.Model.varianceZ")
 Fix even $`q\ge4`. For each even $`N\ge q`, choose a nonempty finite
 matrix Majorana representation of dimension $`d_N`. The Gaussian coordinates
 $`g_I` are independent and standard normal, and
@@ -80,7 +90,7 @@ integrability controls the square, while $`1\le Z_N` bounds the
 logarithm between zero and $`C\|g\|`.
 :::
 
-:::definition "gaussian_annealed_input" (parent := "central_limit_theorem") (lean := "SYK.CLT.AnnealedInput")
+:::definition "gaussian_annealed_input" (parent := "central_limit_theorem") (lean := "SYK.CLT.AnnealedInput, SYK.CLT.GaussianSYK.AnnealedInput")
 For one Gaussian model family `S : Setting q`, this structure contains
 the convergence, regularity, and sign assertions of
 `prop:annealed-free-energy`: an even convex $`C^1` limit on the whole real
@@ -408,7 +418,7 @@ Gaussian limit. The partition-function theorem is checked independently
 of the logarithmic transfer.
 :::
 
-:::theorem "partition_function_clt" (parent := "central_limit_theorem") (uses := "clt_second_chaos_and_remainder, clt_gaussian_quadratic_sum, clt_conditional_nondegeneracy") (lean := "SYK.CLT.partition_clt")
+:::theorem "partition_function_clt" (parent := "central_limit_theorem") (uses := "clt_second_chaos_and_remainder, clt_gaussian_quadratic_sum, clt_conditional_nondegeneracy") (lean := "SYK.CLT.partition_clt, SYK.CLT.GaussianSYK.syk_partition_clt")
 Assume `S : Setting q` and `hFE : AnnealedInput q S`. The Lean statements
 choose $`0<\beta_q` so that, for real
 $`0<|\beta|<\beta_q`, the annealed pressure converges to $`\ell(\beta)` and
@@ -476,7 +486,7 @@ $`\log\mathbb E Z_N`. Lean proves the required vanishing scaled
 mean error and centered $`L^1` error under `hFE`.
 :::
 
-:::theorem "log_partition_clt" (parent := "central_limit_theorem") (uses := "partition_function_clt, clt_log_centering_error") (lean := "SYK.CLT.log_partition_clt, SYK.CLT.partition_and_log_partition_clt")
+:::theorem "log_partition_clt" (parent := "central_limit_theorem") (uses := "partition_function_clt, clt_log_centering_error") (lean := "SYK.CLT.log_partition_clt, SYK.CLT.partition_and_log_partition_clt, SYK.CLT.GaussianSYK.syk_partition_and_log_partition_clt, SYK.CLT.GaussianSYK.syk_log_partition_clt")
 Under the same `hFE`, $`\beta_q`, and real $`0<|\beta|<\beta_q`, the
 conclusion is
 
@@ -492,6 +502,10 @@ logarithmic CLT and the joint theorem without `sorryAx`, conditional on
 `hFE`. The joint theorem combines the independently proved partition theorem
 with the lower-level logarithmic CLT, taking a common smaller positive radius.
 The individual logarithmic theorem projects this joint conclusion.
+The joint theorem `SYK.CLT.GaussianSYK.syk_partition_and_log_partition_clt`
+in `SYK/Main.lean` also existentially quantifies one positive radius for
+both CLT assertions. Its individual partition and log-partition theorems
+are projections of this conclusion.
 :::
 
 :::theorem "clt_standard_model_application" (parent := "central_limit_theorem") (uses := "partition_function_clt, log_partition_clt") (lean := "SYK.CLT.standardSetting, SYK.CLT.standardSetting_size_iff, SYK.CLT.standardSetting_Z, SYK.CLT.standard_partition_and_log_partition_clt, SYK.CLT.standard_partition_clt, SYK.CLT.standard_log_partition_clt")

@@ -4,6 +4,7 @@ This directory contains the Lean formalization work for the central limit theore
 
 ## Current contents
 
+- [`../Main.lean`](../Main.lean): standalone definitions of the Gaussian SYK model and `AnnealedInput`, followed by a joint existential CLT theorem and its two individual projections, in `SYK.CLT.GaussianSYK`. Majorana matrices, their adjoint and anticommutation relations, the product Gaussian law, Hamiltonian, normalized partition function, expectations, and variances are defined directly. Only the joint proof uses other SYK declarations. It proves that one positive temperature radius supports both CLTs. The model, assumptions, and CLT predicates check with mathlib alone. All CLTs assume `AnnealedInput`; this file does not construct that input for the concrete model.
 - `FiniteModel.lean`: abstract finite Majorana partition functions, trace bounds, and Gaussian moment and logarithm estimates, with inputs `Params` and `MajoranaSystem`.
 - `Basic.lean`: the asymptotic family API `Setting q` and the assumed annealed input `AnnealedInput q S`. `Main.lean` states the conditional CLTs.
 - `StandardModel.lean`: the standard family of sizes `q + 2 * n`, its trace normalization, and the three conditional CLTs.
