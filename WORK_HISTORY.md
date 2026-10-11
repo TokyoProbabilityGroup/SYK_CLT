@@ -4,6 +4,14 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="tidy-exp-abs-2026-10-11"></a>
+
+## `integrable_exp_abs_gaussianReal` の短縮と `partialMulti` の説明（2026-10-11、`MAINT-TIDY` の D-2）
+
+`integrable_exp_abs_gaussianReal`（`exp (c |y|)` の標準ガウスでの可積分性）の証明を、mathlib の `integrable_exp_mul_gaussianReal`（`exp (t y)` の可積分性）を `t = c`・`t = -c` で使い、`exp (c|y|) ≤ exp (c y) + exp (-c y)` で抑える約 14 行の証明に置き換えた（約 25 行から短縮）。`partialMulti` に docstring を加えた。定理文は変えていない。
+
+検証：`StandardGaussian`・`HermiteIBP` を `lake lean` で検査し、エラーと警告はなかった。`lake build SYK` と `lake build SYKBlueprint` が成功し、`SYK` の全 711 宣言の名前・モジュール・型は変更の前後で同一である。主要定理は通常公理のみに依存する。
+
 <a id="tidy-decide-2026-10-11"></a>
 
 ## `simp +decide` の整理（2026-10-11、`MAINT-TIDY` の D-1）

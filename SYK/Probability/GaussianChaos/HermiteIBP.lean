@@ -404,6 +404,9 @@ theorem multiIndexList_length (α : ι → ℕ) :
   classical
   simp [multiIndexList, List.length_flatMap]
 
+/-- The multi-index partial derivative `∂^α f`: coordinate derivatives iterated along
+`multiIndexList α`. For `f` of class `C^{|α|}` the order of differentiation does not matter
+(`partialList_perm`). -/
 noncomputable def partialMulti (α : ι → ℕ)
     (f : (ι → ℝ) → ℝ) : (ι → ℝ) → ℝ :=
   partialList (multiIndexList α) f

@@ -321,30 +321,19 @@ lemma herbst_of_cov_bound {ι : Type*} [Fintype ι]
   · apply_rules [ ProbabilityTheory.mgf_pos ];
     exact integrable_exp_smul_lipschitz F L hL hLip t
 
-/-
-`exp (c |y|)` is integrable against the one-dimensional standard Gaussian.
--/
+/-- `exp (c |y|)` is integrable against the one-dimensional standard Gaussian. -/
 lemma integrable_exp_abs_gaussianReal (c : ℝ) :
     Integrable (fun y : ℝ => Real.exp (c * |y|)) (gaussianReal 0 1) := by
-  have h_integrable : MeasureTheory.Integrable (fun y => Real.exp (c * y)) (gaussianReal 0 1) ∧
-    MeasureTheory.Integrable (fun y => Real.exp (-c * y)) (gaussianReal 0 1) := by
-    constructor;
-    · have h_integrable : ∫ y, Real.exp (c * y) ∂(gaussianReal 0 1) = Real.exp (c^2 / 2) := by
-        have := @ProbabilityTheory.mgf_gaussianReal;
-        convert @this ℝ _ ( gaussianReal 0 1 ) 0 1 ( fun x => x ) _ c using 1 <;> norm_num [ mgf ];
-      exact ( by contrapose! h_integrable; rw [ MeasureTheory.integral_undef h_integrable ] ;
-                  positivity );
-    · have := @ProbabilityTheory.mgf_gaussianReal;
-      specialize @this ℝ _ ( gaussianReal 0 1 ) 0 1 ( fun x => x ) ; norm_num at this;
-      contrapose! this;
-      use -c; simp_all only [neg_mul, mgf, even_two, Even.neg_pow, ne_eq];
-      rw [ MeasureTheory.integral_undef this ] ; positivity;
-  refine MeasureTheory.Integrable.mono' ( h_integrable.1.add h_integrable.2 ) ?_ ?_;
-  · exact Continuous.aestronglyMeasurable ( by continuity );
-  · filter_upwards [ ] with x using by
-      rw [ Real.norm_of_nonneg ( Real.exp_nonneg _ ) ]
-      cases abs_cases x <;> simp only [neg_mul, mul_neg, Pi.add_apply,
-        le_add_iff_nonneg_left, le_add_iff_nonneg_right, *] <;> positivity
+  refine ((integrable_exp_mul_gaussianReal c).add
+    (integrable_exp_mul_gaussianReal (-c))).mono' (by fun_prop) (ae_of_all _ fun x => ?_)
+  rw [Real.norm_of_nonneg (Real.exp_nonneg _)]
+  cases abs_cases x with
+  | inl h =>
+      rw [h.1]
+      exact le_add_of_nonneg_right (Real.exp_nonneg _)
+  | inr h =>
+      rw [h.1, mul_neg, ← neg_mul]
+      exact le_add_of_nonneg_left (Real.exp_nonneg _)
 
 /-- The standard Gaussian density satisfies `φ' = -x φ`. -/
 private lemma hasDerivAt_gaussianPDFReal_zero_one (x : ℝ) :
