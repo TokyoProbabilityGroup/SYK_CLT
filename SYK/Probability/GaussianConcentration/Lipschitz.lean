@@ -50,7 +50,7 @@ lemma exists_smooth_lipschitz_approx {ι : Type*} [Fintype ι]
         · intro n;
           refine LipschitzWith.of_dist_le_mul ?_;
           intro x y;
-          simp +decide only [convolution_def, ContinuousLinearMap.lsmul_apply, smul_eq_mul,
+          simp only [convolution_def, ContinuousLinearMap.lsmul_apply, smul_eq_mul,
             Real.coe_toNNReal'];
           rw [ dist_eq_norm, ← MeasureTheory.integral_sub ];
           · refine le_trans ( MeasureTheory.norm_integral_le_integral_norm _ ) ( le_trans
@@ -61,7 +61,7 @@ lemma exists_smooth_lipschitz_approx {ι : Type*} [Fintype ι]
             · filter_upwards [ ] with a;
               rw [ ← mul_sub, norm_mul, Real.norm_of_nonneg ( by exact ( ψ n ).nonneg_normed _ ) ];
               exact mul_le_mul_of_nonneg_left ( hLip.dist_le_mul _ _ )
-                ( by exact ( ψ n ).nonneg_normed _ ) |> le_trans <| by simp +decide
+                ( by exact ( ψ n ).nonneg_normed _ ) |> le_trans <| by simp
                                                                         [ dist_eq_norm ] ;
             · rw [ MeasureTheory.integral_mul_const, ( ψ n ).integral_normed ]
               simp only [one_mul, Real.coe_toNNReal', le_refl]
@@ -83,14 +83,14 @@ lemma exists_smooth_lipschitz_approx {ι : Type*} [Fintype ι]
             intro t ht
             have h_bound : |F (x - t)| ≤ |F 0| + L * ‖x - t‖ := by
               have := hLip.dist_le_mul ( x - t ) 0;
-              simp_all +decide only [one_div, Metric.mem_ball, dist_eq_norm, sub_zero,
+              simp_all only [one_div, Metric.mem_ball, dist_eq_norm, sub_zero,
                 Real.norm_eq_abs, Real.coe_toNNReal', sup_of_le_left, ge_iff_le];
               exact abs_le.mpr ⟨ by cases abs_cases ( F 0 ) <;> linarith [ abs_le.mp this ],
                                      by cases abs_cases ( F 0 ) <;> linarith [ abs_le.mp this ] ⟩;
             have h_bound : ‖x - t‖ ≤ ‖x‖ + ‖t‖ := by
               exact norm_sub_le x t;
             have h_bound : ‖t‖ ≤ 1 := by
-              simp_all +decide only [one_div, Metric.mem_ball, dist_zero_right];
+              simp_all only [one_div, Metric.mem_ball, dist_zero_right];
               exact ht.le.trans ( by rw [ div_le_iff₀ ] <;> linarith );
             nlinarith [ abs_nonneg ( F 0 ), abs_nonneg ( F ( x - t ) ) ];
           have h_integral_bound : ∫ t, |(ψ n).normed volume t * F (x - t)| ∂volume ≤ ∫ t,
@@ -183,7 +183,7 @@ lemma tendsto_integrals_of_approx {ι : Type*} [Fintype ι]
               rw [ add_mul, one_mul, Real.exp_add ]
               nlinarith [ Real.add_one_le_exp ( |s| * L * ‖x‖ ), Real.add_one_le_exp ‖x‖,
                 norm_nonneg x, show 0 ≤ |s| * L * ‖x‖ by positivity ]
-        simp_all +decide only [mul_assoc, add_mul];
+        simp_all only [mul_assoc, add_mul];
         refine MeasureTheory.Integrable.add ?_ ?_;
         · have h_integrable : Integrable (fun x => Real.exp (|s| * L * ‖x‖))
             (standardGaussianMeasureOnEuclidean ι) := by

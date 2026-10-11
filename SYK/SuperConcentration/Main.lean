@@ -170,7 +170,7 @@ theorem abs_beta_expectation_normHam_sq_le_exact
     have h := syk_sum_sq_expectation_le P.q_pos P.q_even M ρ hρ
     refine le_trans ?_ h
     exact Finset.sum_le_sum fun i _ => by
-      simp +decide [Complex.normSq, Complex.sq_norm]
+      simp [Complex.normSq, Complex.sq_norm]
       nlinarith only
   have hdot : S ^ 2 ≤ ‖V‖ ^ 2 * Q := by
     have hsum_nonneg : 0 ≤ ∑ I : InteractionIndex P.N P.q, V I ^ 2 :=
@@ -249,7 +249,7 @@ theorem logPartition_line_deriv_eq
         (normalizedHamiltonian P M V)).re) s := by
   convert hasDerivAt_logPartition_line P β M J V s using 1
   unfold expectation thermalDensity
-  simp +decide [Matrix.trace_smul]
+  simp [Matrix.trace_smul]
   ring_nf
   rw [Matrix.trace_mul_comm]
 

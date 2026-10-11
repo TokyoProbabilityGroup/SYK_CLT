@@ -148,7 +148,7 @@ theorem integrable_exp_mul_norm {ι : Type*} [Fintype ι] (c : ℝ) :
           · exact Continuous.aestronglyMeasurable ( by continuity );
           · filter_upwards [ ] with x using by
               norm_num
-              cases abs_cases x <;> simp +decide only [mul_neg, le_add_iff_nonneg_left,
+              cases abs_cases x <;> simp only [mul_neg, le_add_iff_nonneg_left,
                 le_add_iff_nonneg_right, *] <;> positivity
         exact h_integrable;
       have h_prod_integrable : ∀ {f : ι → ℝ → ℝ}, (∀ i,
@@ -157,7 +157,7 @@ theorem integrable_exp_mul_norm {ι : Type*} [Fintype ι] (c : ℝ) :
         exact fun {f} a => Integrable.fintype_prod a;
       exact h_prod_integrable h_integrable;
     · fun_prop (disch := norm_num);
-    · simp +decide only [EuclideanSpace.norm_eq, Real.norm_eq_abs, sq_abs, Function.comp_apply,
+    · simp only [EuclideanSpace.norm_eq, Real.norm_eq_abs, sq_abs, Function.comp_apply,
         Real.abs_exp, ← Real.exp_sum, Real.exp_le_exp];
       refine Filter.Eventually.of_forall fun x => ?_;
       -- Apply the triangle inequality to the sum.
@@ -249,7 +249,7 @@ lemma integrable_exp_smul_lipschitz {ι : Type*} [Fintype ι]
       have hx := hLip.dist_le_mul x 0
       rw [show (L.toNNReal : ℝ) = L by exact Real.coe_toNNReal L hL.le] at hx
       simpa only [Real.dist_eq, dist_zero_right] using hx
-    simp +decide only [Real.norm_eq_abs, Real.abs_exp, ← Real.exp_add, Real.exp_le_exp];
+    simp only [Real.norm_eq_abs, Real.abs_exp, ← Real.exp_add, Real.exp_le_exp];
     filter_upwards [ ] with x using by cases abs_cases s <;> cases abs_cases ( F 0 ) <;> nlinarith
                                         [ abs_le.mp ( h_bound x ) ] ;
 
@@ -310,13 +310,13 @@ lemma herbst_of_cov_bound {ι : Type*} [Fintype ι]
           ( by positivity ) ( by simpa only [ mul_comm ] using hcov s );
       · refine ne_of_gt ( ?_ );
         rw [ MeasureTheory.integral_pos_iff_support_of_nonneg_ae ];
-        · simp +decide [ Function.support, Real.exp_ne_zero ];
+        · simp [ Function.support, Real.exp_ne_zero ];
         · exact Filter.Eventually.of_forall fun x => Real.exp_nonneg _;
         · exact integrable_exp_smul_lipschitz F L hL hLip s;
   convert Real.exp_le_exp.mpr ( show Φ t - ( ∫ x, F x ∂standardGaussianMeasureOnEuclidean ι ) * t ≤
     L ^ 2 * t ^ 2 / 2 from by linarith ) using 1;
   rw [ Real.exp_sub, Real.exp_log ];
-  · simp +decide only [mgf, mul_sub, Real.exp_sub];
+  · simp only [mgf, mul_sub, Real.exp_sub];
     rw [ MeasureTheory.integral_div, mul_comm ];
   · apply_rules [ ProbabilityTheory.mgf_pos ];
     exact integrable_exp_smul_lipschitz F L hL hLip t
@@ -337,13 +337,13 @@ lemma integrable_exp_abs_gaussianReal (c : ℝ) :
     · have := @ProbabilityTheory.mgf_gaussianReal;
       specialize @this ℝ _ ( gaussianReal 0 1 ) 0 1 ( fun x => x ) ; norm_num at this;
       contrapose! this;
-      use -c; simp_all +decide only [neg_mul, mgf, even_two, Even.neg_pow, ne_eq];
+      use -c; simp_all only [neg_mul, mgf, even_two, Even.neg_pow, ne_eq];
       rw [ MeasureTheory.integral_undef this ] ; positivity;
   refine MeasureTheory.Integrable.mono' ( h_integrable.1.add h_integrable.2 ) ?_ ?_;
   · exact Continuous.aestronglyMeasurable ( by continuity );
   · filter_upwards [ ] with x using by
       rw [ Real.norm_of_nonneg ( Real.exp_nonneg _ ) ]
-      cases abs_cases x <;> simp +decide only [neg_mul, mul_neg, Pi.add_apply,
+      cases abs_cases x <;> simp only [neg_mul, mul_neg, Pi.add_apply,
         le_add_iff_nonneg_left, le_add_iff_nonneg_right, *] <;> positivity
 
 /-- The standard Gaussian density satisfies `φ' = -x φ`. -/
@@ -434,10 +434,10 @@ lemma standardGaussianMeasureOnEuclidean_integral_id {ι : Type*} [Fintype ι] :
         _ : ι => gaussianReal 0 1) = Measure.pi fun _ : ι => gaussianReal 0 1 := by
         refine ( MeasureTheory.Measure.pi_eq ?_ ).symm;
         intro s hs; rw [ MeasureTheory.Measure.map_apply ];
-        · simp +decide only [Set.preimage, Set.mem_pi, Set.mem_univ, forall_const];
+        · simp only [Set.preimage, Set.mem_pi, Set.mem_univ, forall_const];
           convert MeasureTheory.Measure.pi_pi _ _ using 1;
           · rw [ show { x : ι → ℝ | ∀ i, -x i ∈ s i } = ( Set.pi Set.univ fun i => ( fun x => -x )
-              ⁻¹' s i ) by ext; simp +decide [  ] ];
+              ⁻¹' s i ) by ext; simp ];
             rw [ MeasureTheory.Measure.pi_pi, MeasureTheory.Measure.pi_pi ];
             exact Finset.prod_congr rfl fun i _ =>
               by rw [ ← MeasureTheory.Measure.map_apply ( measurable_neg ) ( hs i ),
@@ -554,9 +554,9 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
       have h_sum : ∑ j, |(Function.update Yb i x) j| = |x| + ∑ j, |y j| := by
         rw [Finset.sum_eq_add_sum_sdiff_singleton_of_mem (Finset.mem_univ i)];
         refine congr_arg₂ ( · + · ) ?_ ?_;
-        · simp +decide [  ];
+        · simp;
         · refine Finset.sum_bij ( fun j hj => ⟨ j, by simpa using hj ⟩ ) ?_ ?_ ?_ ?_ <;>
-            simp +decide [ Function.update_apply ]
+            simp [ Function.update_apply ]
           simp +contextual [Yb]
       exact ⟨by simpa only [h_sum] using hhb (Function.update Yb i x),
         by simpa only [h_sum] using hdb (Function.update Yb i x)⟩
@@ -579,8 +579,8 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
           then 0 else p.2 ⟨ j, h ⟩ ) i p.1 ) ⁻¹' Set.univ.pi s = ( s i ) ×ˢ ( Set.pi Set.univ fun j
           : { j // j ≠ i } => s j ) from ?_ ];
         · rw [Finset.prod_eq_mul_prod_sdiff_singleton_of_mem (Finset.mem_univ i)]
-          simp +decide only [ne_eq, Measure.prod_prod, Measure.pi_pi]
-          refine congr rfl ( Finset.prod_bij ( fun j _ => j ) ?_ ?_ ?_ ?_ ) <;> simp +decide;
+          simp only [ne_eq, Measure.prod_prod, Measure.pi_pi]
+          refine congr rfl ( Finset.prod_bij ( fun j _ => j ) ?_ ?_ ?_ ?_ ) <;> simp;
         · ext p
           simp only [Set.mem_preimage, Set.mem_univ_pi, Set.mem_prod]
           constructor
@@ -602,7 +602,7 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
       · exact MeasurableSet.univ_pi hs;
     rw [ h_split, MeasureTheory.integral_map ];
     · erw [ MeasureTheory.integral_prod_symm ];
-      · simp +decide [  ];
+      · simp;
       · convert h_integrable.1 using 1;
         rw [ h_split ];
         rw [ MeasureTheory.integrable_map_measure ];
@@ -639,8 +639,8 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
           then 0 else p.2 ⟨ j, h ⟩ ) i p.1 ) ⁻¹' Set.univ.pi s = ( s i ) ×ˢ ( Set.pi Set.univ fun j
           : { j // j ≠ i } => s j ) from ?_ ];
         · rw [Finset.prod_eq_mul_prod_sdiff_singleton_of_mem (Finset.mem_univ i)]
-          simp +decide only [ne_eq, Measure.prod_prod, Measure.pi_pi]
-          refine congr rfl ( Finset.prod_bij ( fun j _ => j ) ?_ ?_ ?_ ?_ ) <;> simp +decide;
+          simp only [ne_eq, Measure.prod_prod, Measure.pi_pi]
+          refine congr rfl ( Finset.prod_bij ( fun j _ => j ) ?_ ?_ ?_ ?_ ) <;> simp;
         · ext p
           simp only [Set.mem_preimage, Set.mem_univ_pi, Set.mem_prod]
           constructor
@@ -712,7 +712,7 @@ lemma gradient_toLp_coord_eq_fderiv {ι : Type*} [Fintype ι] [DecidableEq ι]
   · refine ⟨ ?_, hasFDerivAt_iff_tendsto.mpr ?_ ⟩
     · exact ( ContinuousLinearEquiv.toContinuousLinearMap ( ContinuousLinearEquiv.symm
         ( EuclideanSpace.equiv ι ℝ ) ) )
-    · simp +decide [  ]
+    · simp
 
 /-
 The value and gradient of `g` are integrable against the standard Gaussian when they have
@@ -734,7 +734,7 @@ lemma gaussian_ibp_integrable {ι : Type*} [Fintype ι] (g : EuclideanSpace ℝ 
       refine le_trans ( norm_mul_le _ _ ) ?_;
       refine le_trans ( mul_le_mul_of_nonneg_right ( show ‖w.ofLp i‖ ≤ ‖w‖ from ?_ )
         ( norm_nonneg _ ) ) ?_;
-      · simp +decide only [Real.norm_eq_abs, EuclideanSpace.norm_eq, sq_abs];
+      · simp only [Real.norm_eq_abs, EuclideanSpace.norm_eq, sq_abs];
         exact Real.abs_le_sqrt ( Finset.single_le_sum ( fun i _ => sq_nonneg ( w.ofLp i ) )
           ( Finset.mem_univ i ) );
       · refine le_trans ( mul_le_mul_of_nonneg_left ( hgb w ) ( norm_nonneg _ ) ) ?_;
@@ -752,7 +752,7 @@ lemma gaussian_ibp_integrable {ι : Type*} [Fintype ι] (g : EuclideanSpace ℝ 
         exact Continuous.comp ( LinearIsometryEquiv.continuous _ ) ( this one_ne_zero );
       fun_prop;
     · refine Filter.Eventually.of_forall fun w => le_trans ?_ ( hgradb w );
-      simp +decide only [Real.norm_eq_abs, EuclideanSpace.norm_eq, sq_abs];
+      simp only [Real.norm_eq_abs, EuclideanSpace.norm_eq, sq_abs];
       exact Real.abs_le_sqrt ( Finset.single_le_sum ( fun i _ => sq_nonneg ( ( gradient g w ).ofLp
         i ) ) ( Finset.mem_univ i ) )
 

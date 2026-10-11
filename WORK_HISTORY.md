@@ -4,6 +4,14 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="tidy-decide-2026-10-11"></a>
+
+## `simp +decide` の整理（2026-10-11、`MAINT-TIDY` の D-1）
+
+自動生成の証明に残っていた `simp +decide`・`simp_all +decide` 44 箇所（`StandardGaussian` 19、`Smooth` 18、`Lipschitz` 5、`SuperConcentration/Main` 2）から `+decide` を外した。各ファイルで全箇所を外して検査し、エラーが出た箇所だけ戻す手順をとったが、戻す必要のある箇所はなかった。空の補題リストの `simp [  ]` 5 箇所は `simp` にした。
+
+検証：4 ファイルを `lake lean` で検査し、エラーと警告はなかった。`lake build SYK` と `lake build SYKBlueprint` が成功した（警告は依存パッケージ由来の 2 件だけ）。`SYK` の全 711 宣言の名前・モジュール・型は変更の前後で同一である。主要定理は通常公理のみに依存する。
+
 <a id="hermite-dedup-2026-10-11"></a>
 
 ## Hermite 部分積分の主定理の一本化（2026-10-11、`MAINT-HERMITE` の B-2）

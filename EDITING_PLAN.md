@@ -6,6 +6,7 @@
 
 | 作業ID | 課題 | 状態・着手条件 | 担当・統合 |
 | --- | --- | --- | --- |
+| `MAINT-TIDY` | 自動生成風の証明の整理（定理文は変えない）。D-1：`simp +decide`・`simp_all +decide`（ガウス集中 3 ファイルと `SuperConcentration/Main`、44 箇所）から不要な `+decide` を外す。D-2：`integrable_exp_abs_gaussianReal` を mathlib の `integrable_exp_mul_gaussianReal` で短くし、`partialMulti` に docstring を付ける。D-3：`pi_gaussian_stein_coord`（197 行）・`standardGaussianMeasureOnEuclidean_integral_id`（46 行）を短くできるか試作で調べ、効果があれば置き換える | D-1 完了（[作業履歴](WORK_HISTORY.md#tidy-decide-2026-10-11)）、D-2 は研究者のコミット後に着手。完了条件：各小項目で `lake build SYK`・`lake build SYKBlueprint` が成功し、全宣言の型が変わらず、主要定理が通常公理のみに依存する | エージェント（統合は研究者） |
 | `BLUEPRINT-PAGES` | GitHub Pages での Blueprint 公開 | 検証 CI と独立した公開 workflow を準備済み。研究者による main への反映、Pages の Source 設定、初回 build・deploy と公開 URL の確認待ち | 研究者が反映・確認 |
 | 公開の経路 | `lakefile.toml` のメタデータ、README の利用手順（`require` で使う方法）、親の雛形なしでの `SYK`・`SYKBlueprint` 単体のビルドの CI | 保留。ライセンスと引用情報は [README](README.md#licensing-and-citation)、[LICENSE](LICENSE)、[原稿の著作権表示](Paper/COPYRIGHT.md)、[CITATION.cff](CITATION.cff) に設定済み。残る公開手順は別課題とする | 未割当 |
 
