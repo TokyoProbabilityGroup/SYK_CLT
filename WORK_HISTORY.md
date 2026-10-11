@@ -4,6 +4,17 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="tidy-long-proofs-2026-10-11"></a>
+
+## 長い自動生成の証明の短縮（2026-10-11、`MAINT-TIDY` の D-3）
+
+`StandardGaussian.lean` の 2 つの証明を、mathlib の補題を使う形に置き換えた（ファイル全体で 167 行削除・50 行追加）。定理文は変えていない。
+
+- `pi_gaussian_stein_coord`（約 197 行から約 75 行）：積測度を第 `i` 座標と残りに分ける測度の等式と、同じ可測性の議論が、左辺用と右辺用に重複して書かれていた。これを private 補題 `integral_pi_eq_integral_slice`（第 `i` 座標で切るフビニ）にまとめた。この補題は mathlib の `measurePreserving_piEquivPiSubtypeProd` と `measurePreserving_piUnique` で座標を分け、`integral_prod_symm` を使う。一次元の Stein の恒等式を各断面に適用する部分は変えていない。
+- `standardGaussianMeasureOnEuclidean_integral_id`（約 46 行から 2 行）：mathlib の `map_pi_eq_stdGaussian`（`standardGaussianMeasureOnEuclidean` の定義が `stdGaussian (EuclideanSpace ℝ ι)` に等しい）と `integral_id_stdGaussian` から導く。このため `Mathlib.Probability.Distributions.Gaussian.Multivariate` を `import` した。
+
+検証：`StandardGaussian` を `lake lean` で検査し、エラーと警告はなかった。`lake build SYK` と `lake build SYKBlueprint` が成功した（警告は依存パッケージ由来の 2 件だけ）。`SYK` の全 711 宣言の名前・モジュール・型は変更の前後で同一である。`pi_gaussian_stein_coord`・`standardGaussianMeasureOnEuclidean_integral_id`・`gaussian_cov_bound_smooth` と主要定理は通常公理のみに依存する。
+
 <a id="tidy-exp-abs-2026-10-11"></a>
 
 ## `integrable_exp_abs_gaussianReal` の短縮と `partialMulti` の説明（2026-10-11、`MAINT-TIDY` の D-2）

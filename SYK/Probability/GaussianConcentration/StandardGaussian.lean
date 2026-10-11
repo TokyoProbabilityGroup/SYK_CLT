@@ -4,6 +4,7 @@ import Mathlib.Analysis.Convex.Deriv
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.IntegrationByParts
 import Mathlib.MeasureTheory.Integral.Pi
 import Mathlib.Probability.Distributions.Gaussian.HasGaussianLaw.Independence
+import Mathlib.Probability.Distributions.Gaussian.Multivariate
 import Mathlib.Probability.Distributions.Gaussian.Real
 import Mathlib.Tactic.FunProp
 import Mathlib.Tactic.Linarith
@@ -408,46 +409,8 @@ The standard Euclidean Gaussian measure is centered: its mean is `0`.
 -/
 lemma standardGaussianMeasureOnEuclidean_integral_id {ι : Type*} [Fintype ι] :
     (standardGaussianMeasureOnEuclidean ι)[id] = (0 : EuclideanSpace ℝ ι) := by
-  by_contra h_nonzero;
-  -- The measure `standardGaussianMeasureOnEuclidean ι` is symmetric around `0`, meaning it is equal
-  -- to its pushforward by the negation map.
-  have h_symm : standardGaussianMeasureOnEuclidean ι = MeasureTheory.Measure.map (fun x => -x)
-    (standardGaussianMeasureOnEuclidean ι) := by
-    unfold standardGaussianMeasureOnEuclidean;
-    rw [ MeasureTheory.Measure.map_map ];
-    · have h_gauss_symm : ∀ (μ : MeasureTheory.Measure ℝ),
-        μ = gaussianReal 0 1 → MeasureTheory.Measure.map (fun x => -x) μ = μ := by
-        intro μ hμ
-        rw [hμ, gaussianReal_map_neg, neg_zero]
-      have h_gauss_symm : MeasureTheory.Measure.map (fun x : ι → ℝ => fun i => -x i) (Measure.pi fun
-        _ : ι => gaussianReal 0 1) = Measure.pi fun _ : ι => gaussianReal 0 1 := by
-        refine ( MeasureTheory.Measure.pi_eq ?_ ).symm;
-        intro s hs; rw [ MeasureTheory.Measure.map_apply ];
-        · simp only [Set.preimage, Set.mem_pi, Set.mem_univ, forall_const];
-          convert MeasureTheory.Measure.pi_pi _ _ using 1;
-          · rw [ show { x : ι → ℝ | ∀ i, -x i ∈ s i } = ( Set.pi Set.univ fun i => ( fun x => -x )
-              ⁻¹' s i ) by ext; simp ];
-            rw [ MeasureTheory.Measure.pi_pi, MeasureTheory.Measure.pi_pi ];
-            exact Finset.prod_congr rfl fun i _ =>
-              by rw [ ← MeasureTheory.Measure.map_apply ( measurable_neg ) ( hs i ),
-                  h_gauss_symm _ rfl ] ;
-          · exact fun i => by infer_instance;
-        · exact measurable_pi_lambda _ fun _ => measurable_neg.comp ( measurable_pi_apply _ );
-        · exact MeasurableSet.univ_pi hs;
-      convert congr_arg ( MeasureTheory.Measure.map ( WithLp.toLp 2 ) ) h_gauss_symm.symm using 1;
-      rw [ MeasureTheory.Measure.map_map ];
-      · congr! 1;
-      · exact WithLp.measurable_toLp 2 _;
-      · exact measurable_pi_lambda _ fun _ => measurable_neg.comp ( measurable_pi_apply _ );
-    · exact measurable_id.neg;
-    · fun_prop;
-  apply_fun ( fun μ => ∫ x, x ∂μ ) at h_symm;
-  rw [ MeasureTheory.integral_map ] at h_symm;
-  · rw [ MeasureTheory.integral_neg ] at h_symm;
-    exact h_nonzero ( by ext; have := congr_arg ( fun x => x ‹_› ) h_symm; norm_num at *;
-                          linarith );
-  · exact measurable_id.neg.aemeasurable;
-  · exact measurable_id.aestronglyMeasurable
+  rw [standardGaussianMeasureOnEuclidean, map_pi_eq_stdGaussian]
+  exact integral_id_stdGaussian
 
 /-- `exp (c ∑ⱼ |yⱼ|)` is integrable against the product standard Gaussian. -/
 lemma integrable_exp_c_sum_abs_pi {ι : Type*} [Fintype ι] (c : ℝ) :
@@ -479,6 +442,43 @@ lemma integrable_abs_coord_mul_exp_c_sum_abs_pi {ι : Type*} [Fintype ι]
             exact Real.exp_le_exp.mpr ( by
               cases abs_cases c <;> cases abs_cases ( y i ) <;> nlinarith [ Real.exp_pos |y i|,
                 Finset.single_le_sum ( fun a _ => abs_nonneg ( y a ) ) ( Finset.mem_univ i ) ] ) )
+
+/-- Fubini along the coordinate `i` of the product standard Gaussian: integrate the `i`-th
+coordinate first, with the other coordinates fixed. -/
+private lemma integral_pi_eq_integral_slice {ι : Type*} [Fintype ι] [DecidableEq ι] (i : ι)
+    {F : (ι → ℝ) → ℝ} (hF : Integrable F (Measure.pi fun _ : ι => gaussianReal 0 1)) :
+    ∫ y, F y ∂(Measure.pi fun _ : ι => gaussianReal 0 1) =
+      ∫ y : {j // ¬j = i} → ℝ, ∫ x : ℝ, F (fun j => if h : j = i then x else y ⟨j, h⟩)
+        ∂(gaussianReal 0 1) ∂(Measure.pi fun _ : {j // ¬j = i} => gaussianReal 0 1) := by
+  -- Split off the coordinate `i` with `piEquivPiSubtypeProd`; the factor indexed by
+  -- `{j // j = i}` is identified with `ℝ` by `piUnique`.
+  let e : ℝ × ({j // ¬j = i} → ℝ) ≃ᵐ (ι → ℝ) :=
+    ((MeasurableEquiv.piUnique (fun _ : {j // j = i} => ℝ)).symm.prodCongr
+      (MeasurableEquiv.refl _)).trans
+      (MeasurableEquiv.piEquivPiSubtypeProd (fun _ : ι => ℝ) (· = i)).symm
+  have he : MeasurePreserving e
+      ((gaussianReal 0 1).prod (Measure.pi fun _ : {j // ¬j = i} => gaussianReal 0 1))
+      (Measure.pi fun _ : ι => gaussianReal 0 1) := by
+    have h1 := ((measurePreserving_piUnique (fun _ : {j // j = i} => gaussianReal 0 1)).symm _).prod
+      (MeasurePreserving.id (Measure.pi fun _ : {j // ¬j = i} => gaussianReal 0 1))
+    have h2 :=
+      (measurePreserving_piEquivPiSubtypeProd (fun _ : ι => gaussianReal 0 1) (· = i)).symm _
+    -- `convert` identifies the two `Fintype` instances on `{j // j = i}`.
+    exact h2.comp (by convert h1; rfl)
+  have happly : ∀ p : ℝ × ({j // ¬j = i} → ℝ),
+      e p = fun j => if h : j = i then p.1 else p.2 ⟨j, h⟩ := by
+    intro p
+    funext j
+    change (Equiv.piEquivPiSubtypeProd (· = i) (fun _ => ℝ)).symm
+      (uniqueElim p.1, p.2) j = _
+    rw [Equiv.piEquivPiSubtypeProd_symm_apply]
+    split_ifs with h
+    · simp
+    · rfl
+  rw [← he.integral_comp' F]
+  have hFe : Integrable (F ∘ e) _ := (he.integrable_comp_emb e.measurableEmbedding).2 hF
+  rw [integral_prod_symm (fun z => F (e z)) hFe]
+  simp only [happly]
 
 /-
 **Tensorized Stein identity on the product Gaussian measure.**  For a `C¹` function `h`
@@ -512,19 +512,20 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
       · exact MeasureTheory.Integrable.const_mul ( integrable_exp_c_sum_abs_pi c ) _;
       · fun_prop;
       · exact Filter.Eventually.of_forall hdb
-  have h_slice : ∀ y : {j // j ≠ i} → ℝ, ∫ x : ℝ, x * h (Function.update (fun j => if h : j = i then
-    0 else y ⟨j,h⟩) i x) ∂(gaussianReal 0 1) = ∫ x : ℝ,
-    (fderiv ℝ h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x)) (Pi.single i 1)
-    ∂(gaussianReal 0 1) := by
+  have h_slice : ∀ y : {j // ¬j = i} → ℝ,
+      ∫ x : ℝ, x * h (fun j => if hj : j = i then x else y ⟨j, hj⟩) ∂(gaussianReal 0 1) =
+        ∫ x : ℝ, fderiv ℝ h (fun j => if hj : j = i then x else y ⟨j, hj⟩) (Pi.single i 1)
+          ∂(gaussianReal 0 1) := by
     intro y
-    set Yb : ι → ℝ := fun j => if h : j = i then 0 else y ⟨j,h⟩
-    have h_Yb : ∀ x, Function.update Yb i x = fun j => if h : j = i then x else y ⟨j,h⟩ := by
+    set Yb : ι → ℝ := fun j => if hj : j = i then 0 else y ⟨j, hj⟩
+    have h_Yb : ∀ x, (fun j => if hj : j = i then x else y ⟨j, hj⟩) = Function.update Yb i x := by
       intro x
       funext j
       by_cases hj : j = i
       · subst hj
         simp
       · simp [Yb, hj]
+    simp only [h_Yb]
     have h_G : ∀ x, HasDerivAt (fun t => h (Function.update Yb i t)) ((fderiv ℝ h (Function.update
       Yb i x)) (Pi.single i 1)) x := by
       intro x
@@ -556,129 +557,11 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
     · intro x; convert h_G_bound x |>.1 using 1; rw [ mul_assoc, ← Real.exp_add ] ; ring_nf;
     · intro x; specialize h_G_bound x; rw [ mul_assoc, ← Real.exp_add ] ; ring_nf at *;
         exact h_G_bound.2
-  have h_lhs : ∫ y : ι → ℝ, y i * h y ∂(Measure.pi fun _ : ι => gaussianReal 0 1) = ∫ y : {j // j ≠
-    i} → ℝ, ∫ x : ℝ, x * h (Function.update (fun j => if h : j = i then 0 else y ⟨j,h⟩) i x)
-    ∂(gaussianReal 0 1) ∂(Measure.pi fun _ : {j // j ≠ i} => gaussianReal 0 1) := by
-    have h_split : Measure.pi (fun _ : ι => gaussianReal 0 1) = Measure.map (fun p : ℝ × ({j // j ≠
-      i} → ℝ) => Function.update (fun j => if h : j = i then 0 else p.2 ⟨j,h⟩) i p.1) (gaussianReal
-      0 1 |> Measure.prod <| Measure.pi fun _ : {j // j ≠ i} => gaussianReal 0 1) := by
-      refine MeasureTheory.Measure.pi_eq ?_;
-      intro s hs; rw [ MeasureTheory.Measure.map_apply ];
-      · rw [ show ( fun p : ℝ × ( { j // j ≠ i } → ℝ ) => Function.update ( fun j => if h : j = i
-          then 0 else p.2 ⟨ j, h ⟩ ) i p.1 ) ⁻¹' Set.univ.pi s = ( s i ) ×ˢ ( Set.pi Set.univ fun j
-          : { j // j ≠ i } => s j ) from ?_ ];
-        · rw [Finset.prod_eq_mul_prod_sdiff_singleton_of_mem (Finset.mem_univ i)]
-          simp only [ne_eq, Measure.prod_prod, Measure.pi_pi]
-          refine congr rfl ( Finset.prod_bij ( fun j _ => j ) ?_ ?_ ?_ ?_ ) <;> simp;
-        · ext p
-          simp only [Set.mem_preimage, Set.mem_univ_pi, Set.mem_prod]
-          constructor
-          · intro hp
-            refine ⟨by simpa using hp i, fun j => ?_⟩
-            simpa [Function.update_of_ne j.2, j.2] using hp j
-          · rintro ⟨h1, h2⟩ j
-            by_cases hj : j = i
-            · subst hj
-              simpa using h1
-            · simpa [Function.update_of_ne hj, hj] using h2 ⟨j, hj⟩
-      · refine measurable_pi_lambda _ ?_;
-        intro j
-        by_cases hj : j = i
-        · simpa [hj] using measurable_fst
-        · have hm : Measurable (fun p : ℝ × ({j // j ≠ i} → ℝ) ↦ p.2 ⟨j, hj⟩) :=
-            (@measurable_pi_apply {j // j ≠ i} (fun _ ↦ ℝ) _ ⟨j, hj⟩).comp measurable_snd
-          simpa [hj] using hm
-      · exact MeasurableSet.univ_pi hs;
-    rw [ h_split, MeasureTheory.integral_map ];
-    · erw [ MeasureTheory.integral_prod_symm ];
-      · simp;
-      · convert h_integrable.1 using 1;
-        rw [ h_split ];
-        rw [ MeasureTheory.integrable_map_measure ];
-        · rfl;
-        · exact h_split ▸ h_integrable.1.aestronglyMeasurable;
-        · refine Measurable.aemeasurable ?_;
-          refine measurable_pi_lambda _ ?_;
-          intro j
-          by_cases hj : j = i
-          · simpa [hj] using measurable_fst
-          · have hm : Measurable (fun p : ℝ × ({j // j ≠ i} → ℝ) ↦ p.2 ⟨j, hj⟩) :=
-              (@measurable_pi_apply {j // j ≠ i} (fun _ ↦ ℝ) _ ⟨j, hj⟩).comp measurable_snd
-            simpa [hj] using hm
-    · refine Measurable.aemeasurable ?_;
-      refine measurable_pi_lambda _ ?_;
-      intro j
-      by_cases hj : j = i
-      · simpa [hj] using measurable_fst
-      · have hm : Measurable (fun p : ℝ × ({j // j ≠ i} → ℝ) ↦ p.2 ⟨j, hj⟩) :=
-          (@measurable_pi_apply {j // j ≠ i} (fun _ ↦ ℝ) _ ⟨j, hj⟩).comp measurable_snd
-        simpa [hj] using hm
-    · exact h_split ▸ h_integrable.1.aestronglyMeasurable;
-  have h_rhs : ∫ y : ι → ℝ, (fderiv ℝ h y) (Pi.single i 1) ∂(Measure.pi fun _ : ι => gaussianReal 0
-    1) = ∫ y : {j // j ≠ i} → ℝ, ∫ x : ℝ, (fderiv ℝ h (Function.update (fun j => if h : j = i then 0
-    else y ⟨j,h⟩) i x)) (Pi.single i 1) ∂(gaussianReal 0 1) ∂(Measure.pi fun _ : {j // j ≠ i} =>
-    gaussianReal 0 1) := by
-    have h_split : Measure.pi (fun _ : ι => gaussianReal 0 1) = Measure.map (fun p : ℝ × ({j // j ≠
-      i} → ℝ) => Function.update (fun j => if h : j = i then 0 else p.2 ⟨j,h⟩) i p.1) (gaussianReal
-      0 1 |> Measure.prod <| Measure.pi fun _ : {j // j ≠ i} => gaussianReal 0 1) := by
-      rw [ MeasureTheory.Measure.pi_eq ];
-      intro s hs;
-      rw [ MeasureTheory.Measure.map_apply ];
-      · rw [ show ( fun p : ℝ × ( { j // j ≠ i } → ℝ ) => Function.update ( fun j => if h : j = i
-          then 0 else p.2 ⟨ j, h ⟩ ) i p.1 ) ⁻¹' Set.univ.pi s = ( s i ) ×ˢ ( Set.pi Set.univ fun j
-          : { j // j ≠ i } => s j ) from ?_ ];
-        · rw [Finset.prod_eq_mul_prod_sdiff_singleton_of_mem (Finset.mem_univ i)]
-          simp only [ne_eq, Measure.prod_prod, Measure.pi_pi]
-          refine congr rfl ( Finset.prod_bij ( fun j _ => j ) ?_ ?_ ?_ ?_ ) <;> simp;
-        · ext p
-          simp only [Set.mem_preimage, Set.mem_univ_pi, Set.mem_prod]
-          constructor
-          · intro hp
-            refine ⟨by simpa using hp i, fun j => ?_⟩
-            simpa [Function.update_of_ne j.2, j.2] using hp j
-          · rintro ⟨h1, h2⟩ j
-            by_cases hj : j = i
-            · subst hj
-              simpa using h1
-            · simpa [Function.update_of_ne hj, hj] using h2 ⟨j, hj⟩
-      · refine measurable_pi_lambda _ ?_;
-        intro j
-        by_cases hj : j = i
-        · simpa [hj] using measurable_fst
-        · have hm : Measurable (fun p : ℝ × ({j // j ≠ i} → ℝ) ↦ p.2 ⟨j, hj⟩) :=
-            (@measurable_pi_apply {j // j ≠ i} (fun _ ↦ ℝ) _ ⟨j, hj⟩).comp measurable_snd
-          simpa [hj] using hm
-      · exact MeasurableSet.univ_pi hs;
-    rw [ h_split, MeasureTheory.integral_map ];
-    · rw [ MeasureTheory.integral_prod_symm ];
-      rw [ h_split ] at h_integrable;
-      have hmap : Measurable
-          (fun p : ℝ × ({j // j ≠ i} → ℝ) ↦
-            Function.update (fun j ↦ if h : j = i then 0 else p.2 ⟨j, h⟩) i p.1) := by
-        refine measurable_pi_lambda _ fun j ↦ ?_
-        by_cases hj : j = i
-        · simpa [hj] using measurable_fst
-        · have hm : Measurable
-              (fun p : ℝ × ({j // j ≠ i} → ℝ) ↦ p.2 ⟨j, hj⟩) :=
-            (@measurable_pi_apply {j // j ≠ i} (fun _ ↦ ℝ) _ ⟨j, hj⟩).comp
-              measurable_snd
-          simpa [hj] using hm
-      convert h_integrable.2.comp_measurable hmap using 1
-      rfl
-    · refine Measurable.aemeasurable ?_;
-      refine measurable_pi_lambda _ ?_;
-      intro j
-      by_cases hj : j = i
-      · simpa [hj] using measurable_fst
-      · have hm : Measurable (fun p : ℝ × ({j // j ≠ i} → ℝ) ↦ p.2 ⟨j, hj⟩) :=
-          (@measurable_pi_apply {j // j ≠ i} (fun _ ↦ ℝ) _ ⟨j, hj⟩).comp measurable_snd
-        simpa [hj] using hm
-    · convert h_integrable.2.aestronglyMeasurable using 1;
-      exact h_split.symm;
-  rw [h_lhs, h_rhs]
+  rw [integral_pi_eq_integral_slice i h_integrable.1,
+    integral_pi_eq_integral_slice i h_integrable.2]
   congr 1
   funext y
-  exact h_slice y
+  simpa using h_slice y
 
 /-
 Transferring the `i`-th gradient coordinate through the `toLp` identification: it becomes
