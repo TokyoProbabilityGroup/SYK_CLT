@@ -173,12 +173,13 @@ span of the Hermite classes. Polynomial density and unconditional
 Hermite completeness are proved in the node below.
 :::
 
-:::theorem "clt_exponential_moment_determination" (parent := "central_limit_theorem") (lean := "SYK.Probability.measure_eq_of_moments, SYK.GaussianChaos.gaussianExp_memLp_two, SYK.GaussianChaos.gaussianLp_integrable_mul_exp")
+:::theorem "clt_exponential_moment_determination" (parent := "central_limit_theorem") (lean := "SYK.Probability.measure_eq_of_moments, SYK.GaussianChaos.gaussianExpDual_memLp_two")
 Finite real measures with every real exponential moment are determined by
 their polynomial moments. Lean proves this through the analytic moment
-generating function and characteristic-function uniqueness. Real
-exponentials belong to standard Gaussian $`L^2`, and their products with
-arbitrary Gaussian $`L^2` functions are integrable. Applying moment
+generating function and characteristic-function uniqueness. Exponentials
+of continuous linear observables belong to finite-product Gaussian $`L^2`;
+their products with arbitrary Gaussian $`L^2` functions are integrable by
+Cauchy--Schwarz. Applying moment
 determination to every linear projection proves polynomial density below.
 :::
 
@@ -209,7 +210,7 @@ is supplied by the next node. The linked Lean declarations have no
 `sorryAx`.
 :::
 
-:::theorem "clt_hermite_complete" (parent := "central_limit_theorem") (uses := "clt_hermite_polynomial_span, clt_exponential_moment_determination, clt_finite_hermite_projection") (lean := "SYK.GaussianChaos.gaussianMonomialLp_dense, SYK.GaussianChaos.mvPolynomialLp_dense, SYK.GaussianChaos.hermiteOrthonormal_dense, SYK.GaussianChaos.hasSum_hermiteCoefficients_unconditional, SYK.GaussianChaos.hasSum_hermiteDegreeProjection_unconditional")
+:::theorem "clt_hermite_complete" (parent := "central_limit_theorem") (uses := "clt_hermite_polynomial_span, clt_exponential_moment_determination, clt_finite_hermite_projection") (lean := "SYK.GaussianChaos.mvPolynomialLp_dense, SYK.GaussianChaos.hermiteOrthonormal_dense, SYK.GaussianChaos.hasSum_hermiteCoefficients_unconditional, SYK.GaussianChaos.hasSum_hermiteDegreeProjection_unconditional")
 For every finite coordinate set $`\iota`, real multivariate polynomial
 classes are dense in $`L^2(\gamma_\iota)`. Orthogonality to polynomials
 implies vanishing moments under every real continuous linear observable.
@@ -343,11 +344,12 @@ coupling space. These statements require neither an asymptotic CLT
 nor `AnnealedInput`.
 :::
 
-:::theorem "clt_gaussian_quadratic_moments" (parent := "central_limit_theorem") (uses := "clt_gaussian_quadratic_observable") (lean := "SYK.CLT.centeredGaussianSquare_fourth_moment, SYK.CLT.normalizedGaussianSquares_fourth_moment, SYK.CLT.Setting.normalizedQuadraticSum_fourth_moment_le")
+:::theorem "clt_gaussian_quadratic_moments" (parent := "central_limit_theorem") (uses := "clt_gaussian_quadratic_observable") (lean := "SYK.CLT.centeredGaussianSquare_fourth_moment, SYK.CLT.normalizedGaussianSquares_fourth_moment, SYK.CLT.normalizedGaussianSquares_fourth_moment_le")
 For a standard Gaussian $`g`, the observable $`(g^2-1)/\sqrt2` has
 mean zero, second moment $`1`, and fourth moment $`15`. For $`M>0`
 independent coordinates, the normalized sum has fourth moment
-$`3+12/M\le15`. Its product-Gaussian law agrees with its law on the
+$`3+12/M\le15` on the product-Gaussian space. The finite-law
+correspondence in the preceding node transports this bound to the
 shared Euclidean coupling space. These finite moment identities are
 checked independently of the quadratic CLT and `AnnealedInput`.
 They provide the fourth-moment bound used in the logarithmic transfer
@@ -375,7 +377,7 @@ the trace-exponential derivative bound, and Rademacher encoding of the higher-ch
 The sign-gauge symmetry of the scaled, normalized finite-model partition
 function is checked as `SYK.CLT.Setting.Z_sign_gauge`. The odd Hermite
 coefficient vanishes for its Gaussian coupling measure by
-`SYK.CLT.Setting.integral_Z_mul_hermite_eq_zero`. The exact first-chaos
+`SYK.CLT.Setting.integral_Z_mul_hermite_eq_zero_pi`. The exact first-chaos
 conclusion for $`Y_N` is `SYK.CLT.Setting.Y_firstChaos_eq_zero`.
 For distinct interactions $`I\ne J`, the corresponding degree-two Hermite
 coefficient of $`Y_N` vanishes by

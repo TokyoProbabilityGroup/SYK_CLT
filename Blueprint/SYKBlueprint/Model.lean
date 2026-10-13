@@ -64,7 +64,7 @@ The empty tensor product has one basis vector, and each new qubit doubles the
 cardinality of the basis.
 :::
 
-:::theorem "standard_majorana_relations" (parent := "model") (uses := "standard_representation") (lean := "SYK.jordanWigner_sq, SYK.jordanWigner_self_adjoint, SYK.jordanWigner_anticommute, SYK.jordanWigner_zero, SYK.jordanWigner_succ")
+:::theorem "standard_majorana_relations" (parent := "model") (uses := "standard_representation") (lean := "SYK.jordanWigner_sq, SYK.jordanWigner_self_adjoint, SYK.jordanWigner_anticommute")
 Every Jordan--Wigner generator is self-adjoint and squares to the identity.
 Distinct site/type pairs anticommute, so the standard realization obeys
 

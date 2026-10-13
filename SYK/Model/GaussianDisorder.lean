@@ -23,11 +23,6 @@ namespace SYK
 abbrev CouplingSpace (N q : ℕ) :=
   EuclideanSpace ℝ ({s : Finset (Fin N) // s.card = q})
 
-@[simp]
-theorem couplingSpace_card (N q : ℕ) :
-    Fintype.card ({s : Finset (Fin N) // s.card = q}) = Nat.choose N q := by
-  simp
-
 /-- The product standard Gaussian measure transported to coupling space. -/
 noncomputable def standardGaussianMeasure (N q : ℕ) :
     Measure (CouplingSpace N q) :=

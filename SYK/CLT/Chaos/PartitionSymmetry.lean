@@ -9,7 +9,7 @@ import Mathlib.GroupTheory.Perm.Sign
 
 The gauge symmetry in `lem: parity rule lemma` is specialized here to the
 normalized real partition function of a `Setting`.
-Entry points: `Setting.Z_sign_gauge`, `Setting.Z_firstChaos_eq_zero`,
+Entry points: `Setting.Z_sign_gauge`, `Setting.integral_Z_mul_hermite_eq_zero_pi`,
 `Setting.Y_firstChaos_eq_zero`,
 `Setting.inner_offDiagonal_secondChaos_eq_zero`.
 -/
@@ -183,21 +183,6 @@ theorem Setting.integral_Z_mul_hermite_eq_zero_pi {q : ℕ} (S : Setting q)
   simp only [hZ, hH, mul_neg, integral_neg] at key
   linear_combination -key / 2
 
-/-- The parity rule on the actual Euclidean coupling space of `Setting.Z`. -/
-theorem Setting.integral_Z_mul_hermite_eq_zero {q : ℕ} (S : Setting q)
-    (β : ℝ) (n : ℕ) (α : InteractionIndex (S.N n) q → ℕ)
-    (hα : IsOddMultiIndex α) :
-    (∫ g : CouplingSpace (S.N n) q,
-      S.Z β n g * hermiteMulti α (WithLp.ofLp g)
-        ∂standardGaussianMeasure (S.N n) q) = 0 := by
-  let ι := InteractionIndex (S.N n) q
-  let F : CouplingSpace (S.N n) q → ℝ :=
-    fun g => S.Z β n g * hermiteMulti α (WithLp.ofLp g)
-  change (∫ g, F g ∂((gaussianCouplings ι).map
-    (MeasurableEquiv.toLp 2 (ι → ℝ)))) = 0
-  rw [integral_map_equiv (MeasurableEquiv.toLp 2 (ι → ℝ)) F]
-  exact S.integral_Z_mul_hermite_eq_zero_pi β n α hα
-
 /-- Pullback of the finite partition function to the product Gaussian space
 used by the Hermite projection API. -/
 theorem Setting.ZGaussian_memLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
@@ -323,19 +308,6 @@ theorem odd_multiIndex_of_degree_one {N q : ℕ} (hq : 0 < q)
     simp [hαI, hx]
   have := heven x
   simp [hsum] at this
-
-/-- The first Gaussian chaos of the finite partition function is zero. -/
-theorem Setting.Z_firstChaos_eq_zero {q : ℕ} (S : Setting q)
-    (β : ℝ) (n : ℕ) :
-    hermiteDegreeProjection 1 (S.ZGaussianLp β n) = 0 := by
-  classical
-  unfold hermiteDegreeProjection hermiteFiniteProjection
-  apply Finset.sum_eq_zero
-  intro α hα
-  have hdegree := (mem_multiIndices_degree 1 α).mp hα
-  have hodd := odd_multiIndex_of_degree_one
-    (lt_of_lt_of_le (by decide : 0 < 4) S.q_ge_four) α hdegree
-  simp [S.inner_hermiteLp_ZGaussianLp_eq_zero β n α hodd]
 
 /-- The relative partition function as a product Gaussian `L²` element. -/
 noncomputable def Setting.YGaussianLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :

@@ -169,17 +169,6 @@ theorem jordanWigner_anticommute (m : ℕ) (i j : Fin m) (b c : Fin 2)
               ext u v
               simp
 
-/-- The first site acts by Pauli X/Y with identity on the remaining sites. -/
-@[simp]
-theorem jordanWigner_zero (m : ℕ) (b : Fin 2) :
-    jordanWigner (m + 1) 0 b =
-      jordanWignerPauli b ⊗ₖ (1 : Matrix (StandardBasis m) (StandardBasis m) ℂ) := rfl
-
-/-- A later site acquires one leading parity-string factor. -/
-@[simp]
-theorem jordanWigner_succ (m : ℕ) (i : Fin m) (b : Fin 2) :
-    jordanWigner (m + 1) i.succ b = jordanWignerZ ⊗ₖ jordanWigner m i b := rfl
-
 /-- `m` qubits realize `2*m` Majoranas, interleaved as X,Y at each site. -/
 def jordanWignerSystem (m : ℕ) :
     MajoranaSystem (m * 2) (Matrix (StandardBasis m) (StandardBasis m) ℂ) where

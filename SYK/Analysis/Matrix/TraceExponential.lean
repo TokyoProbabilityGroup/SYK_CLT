@@ -179,12 +179,6 @@ private theorem singularValues_sum_rpow (T : E →ₗ[𝕜] E) {p : ℝ} (hp : 0
   · intro i hi
     simp [Real.zero_rpow hp.ne']
 
-private theorem eigenvalues_adjoint_comp_self_of_positive (T : E →ₗ[𝕜] E)
-    (hT : T.IsPositive) :
-    T.isSymmetric_adjoint_comp_self.eigenvalues rfl =
-      fun i => (hT.isSymmetric.eigenvalues rfl i) ^ 2 :=
-  eigenvalues_adjoint_comp_self_of_positive' T hT
-
 end SYK.MatrixAnalysis.SVDAux
 
 

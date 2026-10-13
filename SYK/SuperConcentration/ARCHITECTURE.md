@@ -32,7 +32,7 @@ flowchart TD
 
 共有ガウス基盤と SYK に固有の部分の境界は次のとおりである。
 
-`CouplingSpace`、`couplingSpace_card`、`standardGaussianMeasure` は `Model.GaussianDisorder` に置く。汎用測度は `../Probability/GaussianConcentration/StandardGaussian.lean` に置き、模型の測度をその有限添字型への特殊化として定義する。同一性を述べる `standardGaussianMeasure_eq_onEuclidean` は Model 側に置く。汎用部分は Model に依存せず、`N, q` への特殊化も含まない。
+`CouplingSpace` と `standardGaussianMeasure` は `Model.GaussianDisorder` に置く。汎用測度は `../Probability/GaussianConcentration/StandardGaussian.lean` に置き、模型の測度をその有限添字型への特殊化として定義する。同一性を述べる `standardGaussianMeasure_eq_onEuclidean` は Model 側に置く。汎用部分は Model に依存せず、`N, q` への特殊化も含まない。
 
 汎用測度 `standardGaussianMeasureOnEuclidean ι` は、標準ガウスの積測度を `toLp 2` で移したものとして定義し、mathlib の `stdGaussian (EuclideanSpace ℝ ι)` には置き換えない（研究者の決定、2026-10-11）。両者は `map_pi_eq_stdGaussian` で等しい。この形を保つ理由は次のとおりである。
 
@@ -45,7 +45,7 @@ mathlib の補題は、この等式を経由して証明の中で使う（`isGau
 
 残る基盤部分では、座標を添字付ける任意の有限型 `ι` だけについて量化し、中心となる結果をモーメント母関数の評価 `HasSubgaussianMGF` として述べる。上側・下側・両側の裾の評価は、mathlib の劣ガウス確率変数に関する API から導く。
 
-`L > 0` の場合の既存の証明を保ち、`L = 0` の場合は、関数が定数であることから別に処理する。公開 MGF 定理は、`L ≥ 0` に対してパラメータ `L^2` を与える。正の `L` に対する裾の評価と、零の場合に裾の事象の測度が零になる定理は、分けて述べる。分母に `L^2` を含む表示に、零を代入しない。
+`L > 0` の場合の既存の証明を保ち、`L = 0` の場合は、関数が定数であることから別に処理する。公開 MGF 定理は、`L ≥ 0` に対してパラメータ `L^2` を与える。分母に `L^2` を含む裾の表示に、零を代入しない。
 
 ## 共通ガウス集中不等式の定数
 

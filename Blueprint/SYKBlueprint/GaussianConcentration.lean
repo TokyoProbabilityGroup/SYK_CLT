@@ -27,7 +27,3 @@ version are constant and zero, respectively.
 For L > 0, the sub-Gaussian moment-generating-function bound implies the
 two-sided estimate with right-hand side $2\exp(-t^2/(2L^2))$.
 :::
-
-:::theorem "gaussian_zero_lipschitz_tail" (parent := "gaussian_concentration") (uses := "gaussian_subgaussian_mgf") (lean := "SYK.GaussianConcentration.product_standardGaussian_two_sided_tail_zero")
-For L = 0 and t > 0, the centered tail event is empty and has measure zero.
-:::

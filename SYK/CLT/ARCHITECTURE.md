@@ -166,7 +166,7 @@ flowchart TD
 | `lem:convex-derivatives` | — | 原稿は各点収束から関数・導関数の局所一様収束を全実軸上で結論し、Rockafellar を引用して証明を省略する。補題全体は未形式化であり、条件付き CLT は必要な収束を `AnnealedInput` として受け取る |
 | `subsec:SYK-model`、`eq:Y_N` | `realPartitionFunction`、`Setting.Y`、`partitionFunction_standard` | 有限模型と標準表現の規格化照合は実装済み。標準模型族への条件付き適用も `StandardModel.lean` で検証済み |
 | `eq: chaos` | `hasSum_hermiteCoefficients_unconditional`、`hasSum_hermiteDegreeProjection_unconditional` | ガウス `L²` の展開・完全性は実装済み |
-| `lem: parity rule lemma` | `Setting.Z_sign_gauge`、`Setting.Z_swap`、`Setting.integral_Z_mul_hermite_eq_zero` | CLT に使う対称性と係数消滅は実装済み。原稿の一般反射・任意の符号付き置換の統一形は一部のみ対応 |
+| `lem: parity rule lemma` | `Setting.Z_sign_gauge`、`Setting.Z_swap`、`Setting.integral_Z_mul_hermite_eq_zero_pi` | CLT に使う対称性と係数消滅は実装済み。原稿の一般反射・任意の符号付き置換の統一形は一部のみ対応 |
 | `lem:Gaussian-Hermite-IBP`、`eq:Gaussian-Hermite-IBP` | `hermite_coefficient_ibp`、`Setting.hermite_coefficient_Z_eq_integral_partialMulti` | 一般部分と分配関数への特殊化は実装済み。成分ごとの `η≤α` の成長条件を保持 |
 | `prop:exact-second-chaos` | `Setting.Y_firstChaos_eq_zero`、`Setting.Y_secondChaos_eq` | 全実逆温度で実装済み。アニール入力は不要 |
 | `lem:Z-derivative-bound`、`eq:Z-derivative-bound` | `Setting.abs_partialMulti_Z_le` | 高階微分評価は実装済み。原稿の Duhamel 積分表示そのものは未形式化 |

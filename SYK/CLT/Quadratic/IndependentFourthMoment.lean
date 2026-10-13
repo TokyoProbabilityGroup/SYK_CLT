@@ -1,5 +1,4 @@
 import SYK.CLT.Quadratic.GaussianFourthMoment
-import SYK.CLT.Basic
 
 /-!
 # Fourth moments of independent finite sums
@@ -7,7 +6,7 @@ import SYK.CLT.Basic
 For independent summands the fourth moment of the unnormalized sum of `n` centered squares is
 `3 n² + 12 n` (`centeredGaussianSquares_sum_fourth_moment`), so the normalized sum has fourth
 moment `3 + 12/n` (`normalizedGaussianSquares_fourth_moment`) and the uniform bound `15`
-(`normalizedGaussianSquares_fourth_moment_le`, `Setting.normalizedQuadraticSum_fourth_moment_le`).
+(`normalizedGaussianSquares_fourth_moment_le`).
 This path does not import the quadratic CLT.
 -/
 
@@ -364,38 +363,5 @@ theorem normalizedGaussianSquares_fourth_moment_le
   linarith
 
 end GaussianSums
-
-/-- The same fourth-moment bound on the manuscript's Euclidean coupling space. -/
-theorem normalizedQuadraticSum_fourth_moment_le (N q : ℕ)
-    (hcard : 0 < Fintype.card (InteractionIndex N q)) :
-    (∫ g, normalizedQuadraticSum N q g ^ 4
-      ∂standardGaussianMeasure N q) ≤ 15 := by
-  have hm := normalizedQuadraticSum_measurable N q
-  have hraw : Measurable (fun g : InteractionIndex N q → ℝ =>
-      (Real.sqrt (Fintype.card (InteractionIndex N q) : ℝ))⁻¹ *
-        ∑ i : InteractionIndex N q, centeredGaussianSquare (g i)) := by
-    unfold centeredGaussianSquare
-    fun_prop
-  calc
-    (∫ g, normalizedQuadraticSum N q g ^ 4
-      ∂standardGaussianMeasure N q) =
-        ∫ x : ℝ, x ^ 4 ∂(standardGaussianMeasure N q).map
-          (normalizedQuadraticSum N q) := by
-            symm
-            exact integral_map hm.aemeasurable (by fun_prop)
-    _ = ∫ x : ℝ, x ^ 4 ∂(gaussianCouplings (InteractionIndex N q)).map
-          (fun g => (Real.sqrt (Fintype.card (InteractionIndex N q) : ℝ))⁻¹ *
-            ∑ i : InteractionIndex N q, centeredGaussianSquare (g i)) := by
-            rw [normalizedQuadraticSum_law]
-    _ ≤ 15 := by
-      rw [integral_map hraw.aemeasurable (by fun_prop)]
-      exact normalizedGaussianSquares_fourth_moment_le hcard
-
-theorem Setting.normalizedQuadraticSum_fourth_moment_le {q : ℕ}
-    (S : Setting q) (n : ℕ) :
-    (∫ g, normalizedQuadraticSum (S.N n) q g ^ 4
-      ∂standardGaussianMeasure (S.N n) q) ≤ 15 := by
-  apply SYK.CLT.normalizedQuadraticSum_fourth_moment_le
-  simpa [InteractionIndex] using Nat.choose_pos (S.q_le_N n)
 
 end SYK.CLT
