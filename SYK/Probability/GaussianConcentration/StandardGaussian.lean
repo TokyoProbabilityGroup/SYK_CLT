@@ -132,7 +132,8 @@ theorem integrable_exp_mul_norm {ι : Type*} [Fintype ι] (c : ℝ) :
   have h : 0 ≤ C * (‖x‖ - c / (2 * C)) ^ 2 := by positivity
   have hC' : C ≠ 0 := hC.ne'
   calc c * ‖x‖ = C * ‖x‖ ^ 2 + c ^ 2 / (4 * C) - C * (‖x‖ - c / (2 * C)) ^ 2 := by
-        field_simp; ring
+        field_simp
+        ring
     _ ≤ c ^ 2 / (4 * C) + C * ‖x‖ ^ 2 := by linarith
 
 /-
@@ -254,38 +255,40 @@ lemma herbst_of_cov_bound {ι : Type*} [Fintype ι]
       Real.exp (L ^ 2 * t ^ 2 / 2) := by
   -- Let $\Phi(s) = \log \mathbb{E}[e^{sF}]$.
   set Φ : ℝ → ℝ := fun s => Real.log (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean
-    ι);
+    ι)
   -- We need to show that $\Phi(t) \leq mt + L^2 t^2 / 2$.
   have hΦ : Φ t ≤ (∫ x, F x ∂standardGaussianMeasureOnEuclidean ι) * t + L^2 * t^2 / 2 := by
-    apply quadratic_bound_of_deriv_sub_le;
+    apply quadratic_bound_of_deriv_sub_le
     · have h_analytic : ∀ s : ℝ, AnalyticAt ℝ Φ s := by
-        intro s;
-        apply_rules [ ProbabilityTheory.analyticAt_cgf ];
-        rw [ integrableExpSet_lipschitz_eq_univ F L hLip ] ; norm_num;
-      exact fun s => ( h_analytic s |> AnalyticAt.differentiableAt );
-    · simp +zetaDelta at *;
+        intro s
+        apply ProbabilityTheory.analyticAt_cgf
+        rw [integrableExpSet_lipschitz_eq_univ F L hLip]
+        simp only [interior_univ, Set.mem_univ]
+      exact fun s => (h_analytic s |> AnalyticAt.differentiableAt)
+    · simp [Φ]
     · intro s
       have h_deriv : deriv Φ s = (∫ x, F x * Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean
         ι) / (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι) := by
-        apply_rules [ ProbabilityTheory.deriv_cgf ];
-        rw [ integrableExpSet_lipschitz_eq_univ F L hLip ] ; norm_num;
-      rw [ h_deriv, div_sub' ];
-      · rw [ abs_div, abs_of_nonneg ( show 0 ≤ ∫ x, Real.exp ( s * F x )
+        apply ProbabilityTheory.deriv_cgf
+        rw [integrableExpSet_lipschitz_eq_univ F L hLip]
+        simp only [interior_univ, Set.mem_univ]
+      rw [h_deriv, div_sub']
+      · rw [abs_div, abs_of_nonneg (show 0 ≤ ∫ x, Real.exp (s * F x)
           ∂standardGaussianMeasureOnEuclidean ι from MeasureTheory.integral_nonneg fun _ =>
-          Real.exp_nonneg _ ) ];
-        exact div_le_of_le_mul₀ ( MeasureTheory.integral_nonneg fun _ => Real.exp_nonneg _ )
-          ( by positivity ) ( by simpa only [ mul_comm ] using hcov s );
-      · refine ne_of_gt ( ?_ );
-        rw [ MeasureTheory.integral_pos_iff_support_of_nonneg_ae ];
-        · simp [ Function.support, Real.exp_ne_zero ];
-        · exact Filter.Eventually.of_forall fun x => Real.exp_nonneg _;
-        · exact integrable_exp_smul_lipschitz F L hLip s;
-  convert Real.exp_le_exp.mpr ( show Φ t - ( ∫ x, F x ∂standardGaussianMeasureOnEuclidean ι ) * t ≤
-    L ^ 2 * t ^ 2 / 2 from by linarith ) using 1;
-  rw [ Real.exp_sub, Real.exp_log ];
-  · simp only [mgf, mul_sub, Real.exp_sub];
-    rw [ MeasureTheory.integral_div, mul_comm ];
-  · apply_rules [ ProbabilityTheory.mgf_pos ];
+          Real.exp_nonneg _)]
+        exact div_le_of_le_mul₀ (MeasureTheory.integral_nonneg fun _ => Real.exp_nonneg _)
+          (by positivity) (by simpa only [mul_comm] using hcov s)
+      · refine ne_of_gt (?_)
+        rw [MeasureTheory.integral_pos_iff_support_of_nonneg_ae]
+        · simp [Function.support, Real.exp_ne_zero]
+        · exact Filter.Eventually.of_forall fun x => Real.exp_nonneg _
+        · exact integrable_exp_smul_lipschitz F L hLip s
+  convert Real.exp_le_exp.mpr (show Φ t - (∫ x, F x ∂standardGaussianMeasureOnEuclidean ι) * t ≤
+    L ^ 2 * t ^ 2 / 2 from by linarith) using 1
+  rw [Real.exp_sub, Real.exp_log]
+  · simp only [mgf, mul_sub, Real.exp_sub]
+    rw [MeasureTheory.integral_div, mul_comm]
+  · apply ProbabilityTheory.mgf_pos
     exact integrable_exp_smul_lipschitz F L hLip t
 
 /-- `exp (c |y|)` is integrable against the one-dimensional standard Gaussian. -/
@@ -309,7 +312,9 @@ private lemma hasDerivAt_gaussianPDFReal_zero_one (x : ℝ) :
     ext y
     simp [gaussianPDFReal]
   have h : HasDerivAt (fun y : ℝ => -y ^ 2 / 2) (-x) x :=
-    ((hasDerivAt_pow 2 x).neg.div_const 2).congr_deriv (by norm_num; ring)
+    ((hasDerivAt_pow 2 x).neg.div_const 2).congr_deriv (by
+      norm_num
+      ring)
   simp only [hfun]
   exact (h.exp.const_mul (√(2 * Real.pi))⁻¹).congr_deriv (by ring)
 
@@ -349,7 +354,9 @@ lemma gaussianReal_stein (g g' : ℝ → ℝ)
     calc ‖x * g x‖ = |x| * |g x| := by rw [Real.norm_eq_abs, abs_mul]
       _ ≤ Real.exp |x| * (C * Real.exp (c * |x|)) :=
         mul_le_mul hx (hgbound x) (abs_nonneg _) (Real.exp_nonneg _)
-      _ = C * Real.exp ((c + 1) * |x|) := by rw [add_mul, one_mul, Real.exp_add]; ring
+      _ = C * Real.exp ((c + 1) * |x|) := by
+        rw [add_mul, one_mul, Real.exp_add]
+        ring
   -- Write both sides as Lebesgue integrals against the density `φ` and integrate by parts
   -- with `u = g` and `v = φ`, using `φ' = -x φ`.
   rw [integral_gaussianReal_eq_integral_smul one_ne_zero,
@@ -359,16 +366,25 @@ lemma gaussianReal_stein (g g' : ℝ → ℝ)
     (u := g) (v := gaussianPDFReal 0 1) (u' := g') (v' := fun x => -(x * gaussianPDFReal 0 1 x))
     (fun x _ => hg x) (fun x _ => hasDerivAt_gaussianPDFReal_zero_one x)
     ((integrable_gaussianPDFReal_mul hI_xg).neg.congr (ae_of_all _ fun x => by
-      simp only [Pi.mul_apply, Pi.neg_apply]; ring))
+      simp only [Pi.mul_apply, Pi.neg_apply]
+      ring))
     ((integrable_gaussianPDFReal_mul hI_g').congr (ae_of_all _ fun x => by
-      simp only [Pi.mul_apply]; ring))
+      simp only [Pi.mul_apply]
+      ring))
     ((integrable_gaussianPDFReal_mul hI_g).congr (ae_of_all _ fun x => by
-      simp only [Pi.mul_apply]; ring))
+      simp only [Pi.mul_apply]
+      ring))
   calc ∫ x, gaussianPDFReal 0 1 x * (x * g x)
       = -∫ x, g x * -(x * gaussianPDFReal 0 1 x) := by
-        rw [← integral_neg]; congr 1; ext x; ring
+        rw [← integral_neg]
+        congr 1
+        ext x
+        ring
     _ = ∫ x, gaussianPDFReal 0 1 x * g' x := by
-        rw [key, neg_neg]; congr 1; ext x; ring
+        rw [key, neg_neg]
+        congr 1
+        ext x
+        ring
 
 /-
 The standard Euclidean Gaussian measure is centered: its mean is `0`.
@@ -384,7 +400,8 @@ lemma integrable_exp_c_sum_abs_pi {ι : Type*} [Fintype ι] (c : ℝ) :
       (Measure.pi fun _ : ι => gaussianReal 0 1) := by
   have : (fun y : ι → ℝ => Real.exp (c * ∑ j, |y j|))
       = (fun y : ι → ℝ => ∏ j, Real.exp (c * |y j|)) := by
-    funext y; rw [← Real.exp_sum, Finset.mul_sum]
+    funext y
+    rw [← Real.exp_sum, Finset.mul_sum]
   rw [this]
   exact Integrable.fintype_prod (fun j => integrable_exp_abs_gaussianReal c)
 
@@ -395,19 +412,23 @@ lemma integrable_abs_coord_mul_exp_c_sum_abs_pi {ι : Type*} [Fintype ι]
     (c : ℝ) (i : ι) :
     Integrable (fun y : ι → ℝ => |y i| * Real.exp (c * ∑ j, |y j|))
       (Measure.pi fun _ : ι => gaussianReal 0 1) := by
-  refine MeasureTheory.Integrable.mono' (g := fun y => Real.exp ( ( |c| + 1 ) * ∑ j,
-    |y j| )) ?_ ?_ ?_;
-  · convert integrable_exp_c_sum_abs_pi ( |c| + 1 ) using 1;
-  · fun_prop;
-  · filter_upwards [ ] with y using
-      by
-        rw [ Real.norm_of_nonneg ( by positivity ) ]
-        exact le_trans ( mul_le_mul_of_nonneg_right ( show |y i| ≤ Real.exp |y i| by
-          linarith [ Real.add_one_le_exp |y i| ] ) ( Real.exp_nonneg _ ) ) ( by
-            rw [ ← Real.exp_add ]
-            exact Real.exp_le_exp.mpr ( by
-              cases abs_cases c <;> cases abs_cases ( y i ) <;> nlinarith [ Real.exp_pos |y i|,
-                Finset.single_le_sum ( fun a _ => abs_nonneg ( y a ) ) ( Finset.mem_univ i ) ] ) )
+  refine (integrable_exp_c_sum_abs_pi (|c| + 1)).mono' (by fun_prop) ?_
+  filter_upwards [] with y
+  rw [Real.norm_of_nonneg (by positivity)]
+  have hsum : |y i| ≤ ∑ j, |y j| :=
+    Finset.single_le_sum (fun j _ => abs_nonneg (y j)) (Finset.mem_univ i)
+  have hsum_nonneg : 0 ≤ ∑ j, |y j| :=
+    Finset.sum_nonneg (fun j _ => abs_nonneg (y j))
+  calc
+    |y i| * Real.exp (c * ∑ j, |y j|) ≤
+        Real.exp |y i| * Real.exp (c * ∑ j, |y j|) :=
+      mul_le_mul_of_nonneg_right (by linarith [Real.add_one_le_exp |y i|])
+        (Real.exp_nonneg _)
+    _ = Real.exp (|y i| + c * ∑ j, |y j|) := (Real.exp_add _ _).symm
+    _ ≤ Real.exp ((|c| + 1) * ∑ j, |y j|) := by
+      apply Real.exp_le_exp.mpr
+      have hc := mul_le_mul_of_nonneg_right (le_abs_self c) hsum_nonneg
+      nlinarith
 
 /-- Fubini along the coordinate `i` of the product standard Gaussian: integrate the `i`-th
 coordinate first, with the other coordinates fixed. -/
@@ -430,7 +451,9 @@ private lemma integral_pi_eq_integral_slice {ι : Type*} [Fintype ι] [Decidable
     have h2 :=
       (measurePreserving_piEquivPiSubtypeProd (fun _ : ι => gaussianReal 0 1) (· = i)).symm _
     -- `convert` identifies the two `Fintype` instances on `{j // j = i}`.
-    exact h2.comp (by convert h1; rfl)
+    exact h2.comp (by
+      convert h1
+      rfl)
   have happly : ∀ p : ℝ × ({j // ¬j = i} → ℝ),
       e p = fun j => if h : j = i then p.1 else p.2 ⟨j, h⟩ := by
     intro p
@@ -464,19 +487,21 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
   have h_integrable : MeasureTheory.Integrable (fun y : ι → ℝ => y i * h y) (Measure.pi fun _ : ι =>
     gaussianReal 0 1) ∧ MeasureTheory.Integrable (fun y : ι → ℝ => (fderiv ℝ h y) (Pi.single i 1))
     (Measure.pi fun _ : ι => gaussianReal 0 1) := by
-    constructor;
-    · refine MeasureTheory.Integrable.mono' (g := fun y => C * |y i| * Real.exp ( c * ∑ j,
-        |y j| )) ?_ ?_ ?_;
-      · convert integrable_abs_coord_mul_exp_c_sum_abs_pi c i |> fun h => h.const_mul C using 2 ;
-          ring;
-      · exact MeasureTheory.AEStronglyMeasurable.mul ( measurable_pi_apply i |>
-          Measurable.aestronglyMeasurable ) ( hh.continuous.aestronglyMeasurable );
-      · filter_upwards [ ] with y using by rw [ Real.norm_eq_abs, abs_mul ] ; nlinarith [ hhb y,
-                                            abs_nonneg ( y i ) ] ;
-    · refine MeasureTheory.Integrable.mono' (g := fun y => C * Real.exp ( c * ∑ j,
-        |y j| )) ?_ ?_ ?_;
-      · exact MeasureTheory.Integrable.const_mul ( integrable_exp_c_sum_abs_pi c ) _;
-      · fun_prop;
+    constructor
+    · refine MeasureTheory.Integrable.mono' (g := fun y => C * |y i| * Real.exp (c * ∑ j,
+        |y j|)) ?_ ?_ ?_
+      · convert (integrable_abs_coord_mul_exp_c_sum_abs_pi c i).const_mul C using 2
+        ring
+      · exact MeasureTheory.AEStronglyMeasurable.mul (measurable_pi_apply i |>
+          Measurable.aestronglyMeasurable) (hh.continuous.aestronglyMeasurable)
+      · filter_upwards [] with y
+        rw [Real.norm_eq_abs, abs_mul]
+        simpa only [mul_assoc, mul_left_comm] using
+          mul_le_mul_of_nonneg_left (hhb y) (abs_nonneg (y i))
+    · refine MeasureTheory.Integrable.mono' (g := fun y => C * Real.exp (c * ∑ j,
+        |y j|)) ?_ ?_ ?_
+      · exact MeasureTheory.Integrable.const_mul (integrable_exp_c_sum_abs_pi c) _
+      · fun_prop
       · exact Filter.Eventually.of_forall hdb
   have h_slice : ∀ y : {j // ¬j = i} → ℝ,
       ∫ x : ℝ, x * h (fun j => if hj : j = i then x else y ⟨j, hj⟩) ∂(gaussianReal 0 1) =
@@ -502,27 +527,33 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
         convert HasFDerivAt.comp_hasDerivAt x
           (hh.contDiffAt.differentiableAt (by norm_num) |> DifferentiableAt.hasFDerivAt)
           h_update using 1 <;> rfl
-      exact h_chain;
+      exact h_chain
     have h_G_bound : ∀ x, |h (Function.update Yb i x)| ≤ C * Real.exp (c * (|x| + ∑ j,
       |y j|)) ∧ |(fderiv ℝ h (Function.update Yb i x)) (Pi.single i 1)| ≤ C * Real.exp (c * (|x| + ∑
       j, |y j|)) := by
       intro x
       have h_sum : ∑ j, |(Function.update Yb i x) j| = |x| + ∑ j, |y j| := by
-        rw [Finset.sum_eq_add_sum_sdiff_singleton_of_mem (Finset.mem_univ i)];
-        refine congr_arg₂ ( · + · ) ?_ ?_;
-        · simp;
-        · refine Finset.sum_bij ( fun j hj => ⟨ j, by simpa using hj ⟩ ) ?_ ?_ ?_ ?_ <;>
-            simp [ Function.update_apply ]
+        rw [Finset.sum_eq_add_sum_sdiff_singleton_of_mem (Finset.mem_univ i)]
+        refine congr_arg₂ (· + ·) ?_ ?_
+        · simp
+        · refine Finset.sum_bij (fun j hj => ⟨j, by simpa using hj⟩) ?_ ?_ ?_ ?_ <;>
+            simp [Function.update_apply]
           simp +contextual [Yb]
       exact ⟨by simpa only [h_sum] using hhb (Function.update Yb i x),
         by simpa only [h_sum] using hdb (Function.update Yb i x)⟩
-    have := @gaussianReal_stein;
-    convert this ( fun x => h ( Function.update Yb i x ) ) ( fun x => ( fderiv ℝ h ( Function.update
-      Yb i x ) ) ( Pi.single i 1 ) ) h_G _ ( C * Real.exp ( c * ∑ j, |y j| ) ) c _ _ using 1;
-    · fun_prop;
-    · intro x; convert h_G_bound x |>.1 using 1; rw [ mul_assoc, ← Real.exp_add ] ; ring_nf;
-    · intro x; specialize h_G_bound x; rw [ mul_assoc, ← Real.exp_add ] ; ring_nf at *;
-        exact h_G_bound.2
+    have := @gaussianReal_stein
+    convert this (fun x => h (Function.update Yb i x)) (fun x => (fderiv ℝ h (Function.update
+      Yb i x)) (Pi.single i 1)) h_G _ (C * Real.exp (c * ∑ j, |y j|)) c _ _ using 1
+    · fun_prop
+    · intro x
+      convert (h_G_bound x).1 using 1
+      rw [mul_assoc, ← Real.exp_add]
+      ring_nf
+    · intro x
+      have hb := (h_G_bound x).2
+      rw [mul_assoc, ← Real.exp_add]
+      ring_nf at hb ⊢
+      exact hb
   rw [integral_pi_eq_integral_slice i h_integrable.1,
     integral_pi_eq_integral_slice i h_integrable.2]
   congr 1
@@ -537,19 +568,21 @@ lemma gradient_toLp_coord_eq_fderiv {ι : Type*} [Fintype ι] [DecidableEq ι]
     (g : EuclideanSpace ℝ ι → ℝ) (hg : Differentiable ℝ g) (y : ι → ℝ) (i : ι) :
     (gradient g (WithLp.toLp 2 y)) i
       = fderiv ℝ (fun z => g (WithLp.toLp 2 z)) y (Pi.single i 1) := by
-  rw [ gradient ];
-  rw [ show ( fun z => g ( WithLp.toLp 2 z ) ) = g ∘ ( WithLp.toLp 2 ) from rfl,
-    fderiv_comp ] <;> norm_num [ hg.differentiableAt, WithLp.ofLp ];
-  · rw [ fderiv ];
-    rw [ fderiv ];
-    rw [ fderivWithin_univ, fderivWithin_univ, show ( WithLp.toLp 2 : ( ι → ℝ ) → EuclideanSpace ℝ
-      ι ) = ( PiLp.continuousLinearEquiv 2 ℝ ( fun _ : ι => ℝ ) ).symm from rfl,
-      ContinuousLinearEquiv.fderiv ] ; norm_num;
-    rw [ ← InnerProductSpace.toDual_symm_apply ];
-    rw [ EuclideanSpace.inner_single_right ] ; norm_num;
-  · refine ⟨ ?_, hasFDerivAt_iff_tendsto.mpr ?_ ⟩
-    · exact ( ContinuousLinearEquiv.toContinuousLinearMap ( ContinuousLinearEquiv.symm
-        ( EuclideanSpace.equiv ι ℝ ) ) )
+  rw [gradient]
+  rw [show (fun z => g (WithLp.toLp 2 z)) = g ∘ (WithLp.toLp 2) from rfl,
+    fderiv_comp] <;> norm_num [hg.differentiableAt, WithLp.ofLp]
+  · rw [fderiv]
+    rw [fderiv]
+    rw [fderivWithin_univ, fderivWithin_univ, show (WithLp.toLp 2 : (ι → ℝ) → EuclideanSpace ℝ
+      ι) = (PiLp.continuousLinearEquiv 2 ℝ (fun _ : ι => ℝ)).symm from rfl,
+      ContinuousLinearEquiv.fderiv]
+    norm_num
+    rw [← InnerProductSpace.toDual_symm_apply]
+    rw [EuclideanSpace.inner_single_right]
+    norm_num
+  · refine ⟨?_, hasFDerivAt_iff_tendsto.mpr ?_⟩
+    · exact (ContinuousLinearEquiv.toContinuousLinearMap (ContinuousLinearEquiv.symm
+        (EuclideanSpace.equiv ι ℝ)))
     · simp
 
 /-
@@ -562,36 +595,34 @@ lemma gaussian_ibp_integrable {ι : Type*} [Fintype ι] (g : EuclideanSpace ℝ 
     (hgradb : ∀ w, ‖gradient g w‖ ≤ C * Real.exp (c * ‖w‖)) :
     Integrable (fun w => w i * g w) (standardGaussianMeasureOnEuclidean ι)
       ∧ Integrable (fun w => (gradient g w) i) (standardGaussianMeasureOnEuclidean ι) := by
-  constructor;
-  · refine MeasureTheory.Integrable.mono' (g := fun w => |C| * Real.exp ( ( c + 1 ) * ‖w‖ )) ?_ ?_
-      ?_;
-    · exact MeasureTheory.Integrable.const_mul ( integrable_exp_mul_norm ( c + 1 ) ) _;
-    · refine MeasureTheory.AEStronglyMeasurable.mul ?_ ( hg.continuous.aestronglyMeasurable );
-      fun_prop;
-    · refine Filter.Eventually.of_forall fun w => ?_;
-      refine le_trans ( norm_mul_le _ _ ) ?_;
-      refine le_trans ( mul_le_mul_of_nonneg_right ( show ‖w.ofLp i‖ ≤ ‖w‖ from ?_ )
-        ( norm_nonneg _ ) ) ?_;
-      · simp only [Real.norm_eq_abs, EuclideanSpace.norm_eq, sq_abs];
-        exact Real.abs_le_sqrt ( Finset.single_le_sum ( fun i _ => sq_nonneg ( w.ofLp i ) )
-          ( Finset.mem_univ i ) );
-      · refine le_trans ( mul_le_mul_of_nonneg_left ( hgb w ) ( norm_nonneg _ ) ) ?_;
-        rw [ add_mul, one_mul, Real.exp_add ];
-        cases abs_cases C <;> nlinarith [ show 0 ≤ Real.exp ( c * ‖w‖ ) * Real.exp ‖w‖
-          by
-            positivity, show ‖w‖ ≤ Real.exp ‖w‖ by
-              exact le_trans ( by
-                norm_num ) ( Real.add_one_le_exp _ ), show 0 ≤ C * Real.exp ( c * ‖w‖ ) by
-                  exact le_trans ( abs_nonneg _ ) ( hgb w ) ];
-  · refine MeasureTheory.Integrable.mono' (g := fun w => C * Real.exp ( c * ‖w‖ )) ?_ ?_ ?_;
-    · exact MeasureTheory.Integrable.const_mul ( integrable_exp_mul_norm c ) _;
-    · have h_grad_cont : Continuous (gradient g) := by
-        have := hg.continuous_fderiv;
-        exact Continuous.comp ( LinearIsometryEquiv.continuous _ ) ( this one_ne_zero );
-      fun_prop;
-    · refine Filter.Eventually.of_forall fun w => le_trans ?_ ( hgradb w );
-      simp only [Real.norm_eq_abs, EuclideanSpace.norm_eq, sq_abs];
-      exact Real.abs_le_sqrt ( Finset.single_le_sum ( fun i _ => sq_nonneg ( ( gradient g w ).ofLp
-        i ) ) ( Finset.mem_univ i ) )
+  have hcoord (w : EuclideanSpace ℝ ι) : ‖w i‖ ≤ ‖w‖ := PiLp.norm_apply_le w i
+  constructor
+  · have hmeas : AEStronglyMeasurable (fun w => w i * g w)
+        (standardGaussianMeasureOnEuclidean ι) :=
+      (by fun_prop : Continuous (fun w : EuclideanSpace ℝ ι => w i)).aestronglyMeasurable.mul
+        hg.continuous.aestronglyMeasurable
+    refine ((integrable_exp_mul_norm (c + 1)).const_mul |C|).mono' hmeas ?_
+    filter_upwards [] with w
+    have hgrowth : ‖g w‖ ≤ |C| * Real.exp (c * ‖w‖) := by
+      rw [Real.norm_eq_abs]
+      exact (hgb w).trans
+        (mul_le_mul_of_nonneg_right (le_abs_self C) (Real.exp_nonneg _))
+    have hnorm_exp : ‖w‖ ≤ Real.exp ‖w‖ := by
+      linarith [Real.add_one_le_exp ‖w‖]
+    calc
+      ‖w i * g w‖ = ‖w i‖ * ‖g w‖ := norm_mul _ _
+      _ ≤ ‖w‖ * (|C| * Real.exp (c * ‖w‖)) :=
+        mul_le_mul (hcoord w) hgrowth (norm_nonneg _) (norm_nonneg _)
+      _ ≤ Real.exp ‖w‖ * (|C| * Real.exp (c * ‖w‖)) :=
+        mul_le_mul_of_nonneg_right hnorm_exp (by positivity)
+      _ = |C| * Real.exp ((c + 1) * ‖w‖) := by
+        rw [add_mul, one_mul, Real.exp_add]
+        ring
+  · have hgrad_cont : Continuous (gradient g) :=
+      (InnerProductSpace.toDual ℝ (EuclideanSpace ℝ ι)).symm.continuous.comp
+        (hg.continuous_fderiv one_ne_zero)
+    refine ((integrable_exp_mul_norm c).const_mul C).mono' (by fun_prop) ?_
+    exact Filter.Eventually.of_forall fun w =>
+      (PiLp.norm_apply_le (gradient g w) i).trans (hgradb w)
 
 end SYK.GaussianConcentration
