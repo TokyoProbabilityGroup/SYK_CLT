@@ -1,7 +1,12 @@
+module
+
+public import Mathlib.Analysis.InnerProductSpace.l2Space
+public import SYK.Probability.GaussianChaos.Basic
+import Mathlib.Algebra.Order.Star.Real
 import SYK.Probability.GaussianChaos.CoefficientIBP
-import Mathlib.MeasureTheory.Integral.Pi
-import Mathlib.MeasureTheory.Function.L2Space
-import Mathlib.Analysis.InnerProductSpace.l2Space
+import SYK.Probability.GaussianChaos.HermiteIBP
+
+public section
 
 /-!
 # Orthogonality of Gaussian Hermite products
@@ -173,7 +178,7 @@ theorem hermiteMulti_memLp_two {ι : Type*} [Fintype ι] (α : ι → ℕ) :
   simpa only [pow_two] using integrable_hermiteMulti_mul α α
 
 /-- The Hermite product as an element of real Gaussian `L²`. -/
-noncomputable def hermiteLp {ι : Type*} [Fintype ι] (α : ι → ℕ) :
+@[expose] noncomputable def hermiteLp {ι : Type*} [Fintype ι] (α : ι → ℕ) :
     Lp ℝ 2 (gaussianCouplings ι) :=
   (hermiteMulti_memLp_two α).toLp (hermiteMulti α)
 
@@ -202,7 +207,7 @@ theorem hermiteFactorial_pos {ι : Type*} [Fintype ι] (α : ι → ℕ) :
   exact Finset.prod_pos fun i hi => Nat.cast_pos.mpr (Nat.factorial_pos _)
 
 /-- The Hermite coefficient sum over any finite set of multi-indices. -/
-noncomputable def hermiteFiniteProjection {ι : Type*} [Fintype ι]
+@[expose] noncomputable def hermiteFiniteProjection {ι : Type*} [Fintype ι]
     (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     Lp ℝ 2 (gaussianCouplings ι) :=
   ∑ α ∈ s, (⟪hermiteLp α, f⟫_ℝ /
@@ -258,7 +263,7 @@ theorem mem_multiIndicesOfDegree {ι : Type*} [Fintype ι]
   simp [multiIndicesOfDegree]
 
 /-- Coefficient formula for the finite sum at one homogeneous degree. -/
-noncomputable def hermiteDegreeProjection {ι : Type*} [Fintype ι]
+@[expose] noncomputable def hermiteDegreeProjection {ι : Type*} [Fintype ι]
     (r : ℕ) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     Lp ℝ 2 (gaussianCouplings ι) :=
   hermiteFiniteProjection (multiIndicesOfDegree r) f
@@ -309,7 +314,7 @@ theorem hermiteFiniteProjection_eq_starProjection {ι : Type*} [Fintype ι]
     (hermiteFiniteProjection_error_orthogonal s f)).symm
 
 /-- Unit-norm Hermite products in real Gaussian `L²`. -/
-noncomputable def hermiteOrthonormal {ι : Type*} [Fintype ι] (α : ι → ℕ) :
+@[expose] noncomputable def hermiteOrthonormal {ι : Type*} [Fintype ι] (α : ι → ℕ) :
     Lp ℝ 2 (gaussianCouplings ι) :=
   ‖hermiteLp α‖⁻¹ • hermiteLp α
 

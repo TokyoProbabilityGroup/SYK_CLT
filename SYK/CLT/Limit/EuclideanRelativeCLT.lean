@@ -1,4 +1,10 @@
+module
+
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+public import SYK.CLT.Basic
 import SYK.CLT.Limit.RelativeCLT
+
+public section
 
 /-!
 # Relative fluctuation CLT on the model coupling space

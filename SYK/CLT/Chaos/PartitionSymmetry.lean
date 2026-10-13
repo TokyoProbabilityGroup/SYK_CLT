@@ -1,8 +1,10 @@
-import SYK.CLT.Basic
-import SYK.CLT.Chaos.CliffordSignParity
-import SYK.Probability.GaussianChaos.Orthogonality
-import Mathlib.Logic.Equiv.Fintype
-import Mathlib.GroupTheory.Perm.Sign
+module
+
+public import SYK.CLT.Basic
+public import SYK.CLT.Chaos.CliffordSignParity
+public import SYK.Probability.GaussianChaos.Orthogonality
+
+public section
 
 /-!
 # Preliminary tools for the SYK central limit theorem
@@ -196,7 +198,7 @@ theorem Setting.ZGaussian_memLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
   exact ((MeasurableEquiv.toLp 2 (ι → ℝ)).memLp_map_measure_iff).mp h
 
 /-- The finite partition function as an L² element on the product Gaussian coupling space. -/
-noncomputable def Setting.ZGaussianLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
+@[expose] noncomputable def Setting.ZGaussianLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q)) :=
   (S.ZGaussian_memLp β n).toLp
     (fun g => S.Z β n (WithLp.toLp 2 g))
@@ -311,7 +313,7 @@ private theorem odd_multiIndex_of_degree_one {N q : ℕ} (hq : 0 < q)
   simp [hsum] at this
 
 /-- The relative partition function as a product Gaussian `L²` element. -/
-noncomputable def Setting.YGaussianLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
+@[expose] noncomputable def Setting.YGaussianLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q)) :=
   (S.meanZ β n)⁻¹ • S.ZGaussianLp β n
 

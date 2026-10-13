@@ -1,4 +1,13 @@
+module
+
+public import SYK.CLT.Limit.QuadraticBridge
+import SYK.CLT.Chaos.SecondChaos
+import SYK.CLT.Chaos.SecondChaosAsymptotic
+import SYK.CLT.Chaos.ZeroChaos
 import SYK.CLT.Limit.EuclideanRelativeCLT
+import SYK.Probability.GaussianChaos.PolynomialDensity
+
+public section
 
 /-!
 # Variance of the normalized quadratic Gaussian chaos

@@ -1,6 +1,12 @@
-import SYK.Model.GaussianDisorder
-import SYK.Model.FiniteDimensionalGibbs
+module
+
+public import SYK.Model.GaussianDisorder
+public import SYK.Model.FiniteDimensionalGibbs
+import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Matrix.Spectrum
+import Mathlib.Analysis.Normed.Algebra.MatrixExponential
+
+public section
 
 /-!
 # Finite Gaussian Majorana models
@@ -173,7 +179,7 @@ theorem normalizedHamiltonian_normalizedTrace_eq_zero (P : Params)
   simp only [normalizedTrace, normalizedHamiltonian_trace_eq_zero, zero_div]
 
 /-- The normalized Hamiltonian as a continuous real linear map on the coupling space. -/
-noncomputable def normalizedHamiltonianLinear (P : Params)
+@[expose] noncomputable def normalizedHamiltonianLinear (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) :
     CouplingSpace P.N P.q →L[ℝ] Matrix d d ℂ :=
   ({ toFun := normalizedHamiltonian P M
@@ -184,14 +190,14 @@ noncomputable def normalizedHamiltonianLinear (P : Params)
 /-- The manuscript's `Z_N(z;G) = tr exp(-z H_N(G))`, with trace divided
 by the representation dimension. In the standard representation this
 dimension is `2^(N/2)`. No irreducibility assumption is imposed. -/
-noncomputable def partitionFunction (P : Params)
+@[expose] noncomputable def partitionFunction (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (z : ℂ)
     (g : CouplingSpace P.N P.q) : ℂ :=
   normalizedTrace (gibbsOperator z (normalizedHamiltonian P M g))
 
 /-- Real partition function at real inverse temperature. The imaginary part
 vanishes; positivity requires a nonempty representation, as stated below. -/
-noncomputable def realPartitionFunction (P : Params)
+@[expose] noncomputable def realPartitionFunction (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ)
     (g : CouplingSpace P.N P.q) : ℝ :=
   (partitionFunction P M (β : ℂ) g).re

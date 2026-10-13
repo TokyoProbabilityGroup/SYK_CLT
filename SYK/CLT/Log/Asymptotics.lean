@@ -1,8 +1,15 @@
-import SYK.CLT.Log.EventBound
-import SYK.Probability.LpDistributionTransfer
+module
+
+public import SYK.CLT.Log.Taylor
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+import Mathlib.Algebra.Order.Star.Real
+import SYK.CLT.Chaos.SecondChaosAsymptotic
 import SYK.CLT.Limit.EuclideanRelativeCLT
 import SYK.CLT.Limit.QuadraticGaussianVariance
-import SYK.CLT.Log.Taylor
+import SYK.CLT.Log.EventBound
+import SYK.Probability.LpDistributionTransfer
+
+public section
 
 /-! # Vanishing logarithmic linearization error -/
 

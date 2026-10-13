@@ -1,4 +1,9 @@
-import SYK.CLT.Basic
+module
+
+public import SYK.CLT.Basic
+import Mathlib.Algebra.Order.Star.Real
+
+public section
 
 /-!
 # Pointwise logarithmic approximation
@@ -34,7 +39,7 @@ private theorem log_linear_error_le_sq {y : ℝ}
   exact h1.trans h2
 
 /-- The error Y_N - 1 - log Y_N in the linear approximation to the logarithm. -/
-noncomputable def Setting.logLinearError {q : ℕ} (S : Setting q)
+@[expose] noncomputable def Setting.logLinearError {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) : ℝ :=
   S.Y β n g - 1 - Real.log (S.Y β n g)
 

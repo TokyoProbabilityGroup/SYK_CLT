@@ -1,4 +1,8 @@
-import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+module
+
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+
+public section
 
 /-!
 # Distributional perturbations on varying probability spaces

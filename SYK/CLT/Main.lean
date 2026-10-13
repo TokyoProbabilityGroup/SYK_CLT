@@ -1,6 +1,14 @@
-import SYK.CLT.Basic
+module
+
+public import SYK.CLT.Basic
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+import Mathlib.Analysis.Matrix.Normed -- shake: keep (Matrix.Norms.Operator scope)
+import SYK.CLT.Limit.EuclideanRelativeCLT
+import SYK.CLT.Limit.FiniteVariancePositivity
 import SYK.CLT.Limit.StandardizedCLT
 import SYK.CLT.Log.Asymptotics
+
+public section
 
 /-!
 # Conditional central limit theorem for the SYK model

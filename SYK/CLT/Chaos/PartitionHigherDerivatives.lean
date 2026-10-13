@@ -1,5 +1,11 @@
+module
+
+public import SYK.CLT.Chaos.PartitionSymmetry
+public import Mathlib.Analysis.CStarAlgebra.Matrix
+public import SYK.Probability.GaussianChaos.HermiteIBP
 import SYK.CLT.Chaos.PartitionDerivatives
-import SYK.CLT.Chaos.PartitionSymmetry
+
+public section
 
 /-!
 # Higher derivatives of the finite SYK partition function

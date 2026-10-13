@@ -1,6 +1,14 @@
+module
+
+public import SYK.Model.GaussianDisorder
+public import Mathlib.Probability.Moments.SubGaussian
+public import SYK.Model.FiniteDimensionalGibbs
+import Mathlib.Analysis.Matrix.Order -- shake: keep (MatrixOrder scope)
 import SYK.Probability.GaussianConcentration.Lipschitz
-import SYK.Model.GaussianDisorder
 import SYK.SuperConcentration.MajoranaBound
+
+
+public section
 
 /-!
 # Superconcentration of the SYK log-partition function

@@ -1,6 +1,9 @@
-import SYK.Probability.GaussianChaos.Orthogonality
-import Mathlib.Algebra.Polynomial.Sequence
-import Mathlib.RingTheory.MvPolynomial.Basic
+module
+
+public import SYK.Probability.GaussianChaos.Orthogonality
+public import Mathlib.Algebra.Polynomial.Sequence
+
+public section
 
 /-!
 # Density of Hermite products in Gaussian `L²`
@@ -184,7 +187,7 @@ theorem mvPolynomial_eval_memLp_and_hermiteSpan {ι : Type*} [Fintype ι]
     (mvPolynomial_eval_mem_hermiteMulti_span p)
 
 /-- The Gaussian `L²` class of a multivariate polynomial function. -/
-noncomputable def mvPolynomialLp {ι : Type*} [Fintype ι]
+@[expose] noncomputable def mvPolynomialLp {ι : Type*} [Fintype ι]
     (p : MvPolynomial ι ℝ) : MeasureTheory.Lp ℝ 2 (gaussianCouplings ι) :=
   (mvPolynomial_eval_memLp_and_hermiteSpan p).choose.toLp
     (fun g : ι → ℝ => MvPolynomial.aeval g p)

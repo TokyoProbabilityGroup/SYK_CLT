@@ -1,5 +1,14 @@
+module
+
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+public import SYK.CLT.Basic
+public import SYK.Model.StandardRepresentation
 import SYK.CLT.Main
 import SYK.CLT.Normalization
+
+import Mathlib.Analysis.Matrix.Normed -- shake: keep (Matrix.Norms.Operator scope)
+
+public section
 
 /-!
 # The standard Gaussian SYK family
@@ -16,7 +25,7 @@ open scoped Topology NNReal Matrix.Norms.Operator
 namespace SYK.CLT
 
 /-- Standard matrix representations at every admissible even size. -/
-def standardSetting (q : ℕ) (hq : Even q) (hq4 : 4 ≤ q) : Setting q where
+@[expose] def standardSetting (q : ℕ) (hq : Even q) (hq4 : 4 ≤ q) : Setting q where
   q_even := hq
   q_ge_four := hq4
   N n := q + 2 * n

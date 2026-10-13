@@ -1,5 +1,9 @@
-import SYK.CLT.Basic
+module
+
+public import SYK.CLT.Basic
 import Mathlib.Analysis.SpecialFunctions.Choose
+
+public section
 
 /-!
 # Asymptotics of the second-chaos coefficient

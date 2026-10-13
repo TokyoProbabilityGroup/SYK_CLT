@@ -1,30 +1,13 @@
-import SYK.Analysis.Matrix.SingularValues
-import Mathlib.Analysis.Analytic.ChangeOrigin
-import Mathlib.Analysis.Analytic.IteratedFDeriv
-import Mathlib.Analysis.Calculus.Deriv.Mul
-import Mathlib.Analysis.Calculus.ContDiff.RestrictScalars
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.InnerProductSpace.Positive
-import Mathlib.Analysis.InnerProductSpace.SingularValues
-import Mathlib.Analysis.InnerProductSpace.Spectrum
+module
+
+public import Mathlib.Analysis.InnerProductSpace.Positive
 import Mathlib.Analysis.InnerProductSpace.Trace
-import Mathlib.Analysis.Matrix.Spectrum
-import Mathlib.Analysis.MeanInequalitiesPow
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Analysis.SpecialFunctions.Exponential
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
-import Mathlib.Tactic.FieldSimp
-import Mathlib.Tactic.FinCases
-import Mathlib.Tactic.FunProp
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.NoncommRing
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
-import Mathlib.Tactic.Tauto
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import SYK.Analysis.Matrix.SingularValues
 
-@[expose] public section
+public section
 
 set_option autoImplicit false
 
@@ -327,7 +310,7 @@ variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 
 /-- Normalized matrix trace `card(n)⁻¹ * Tr(A)`, zero for an empty index type. It is
 distinct from `SYK.normalizedTrace` in `SYK.Model.FiniteDimensionalGibbs`. -/
-noncomputable def normalizedTrace (A : Matrix n n 𝕜) : 𝕜 :=
+@[expose] noncomputable def normalizedTrace (A : Matrix n n 𝕜) : 𝕜 :=
   (Fintype.card n : 𝕜)⁻¹ * A.trace
 
 /-- Normalized trace as a continuous linear map. -/

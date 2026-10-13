@@ -1,6 +1,11 @@
+module
+
+public import Mathlib.Analysis.InnerProductSpace.Basic
+public import Mathlib.MeasureTheory.Integral.Bochner.Basic
+public import Mathlib.Probability.Independence.Basic
 import Mathlib.Probability.Independence.Integration
-import Mathlib.Tactic.FunProp
-import Mathlib.Tactic.Ring
+
+public section
 
 /-!
 # Moments of sums of independent centered variables

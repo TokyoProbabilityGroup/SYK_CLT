@@ -1,8 +1,13 @@
+module
+
+public import SYK.Probability.GaussianChaos.Basic
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Calculus.Deriv.Pi
 import Mathlib.Analysis.Calculus.Deriv.Polynomial
 import Mathlib.Analysis.Calculus.FDeriv.Symmetric
-import Mathlib.RingTheory.Polynomial.Hermite.Basic
 import SYK.Probability.GaussianConcentration.StandardGaussian
-import SYK.Probability.GaussianChaos.Basic
+
+public section
 
 /-!
 # Iterated Gaussian integration by parts
@@ -25,7 +30,7 @@ namespace SYK.GaussianChaos
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- The derivative along coordinate `i`, defined using a one-dimensional slice. -/
-noncomputable def coordDeriv (i : ι) (f : (ι → ℝ) → ℝ) : (ι → ℝ) → ℝ :=
+@[expose] noncomputable def coordDeriv (i : ι) (f : (ι → ℝ) → ℝ) : (ι → ℝ) → ℝ :=
   fun g => deriv (fun x => f (Function.update g i x)) (g i)
 
 /-- Identify the slice derivative with the Fréchet derivative in the selected
@@ -175,7 +180,7 @@ private theorem coord_stein_of_euclidean_expGrowth
     (fun g => (hdb g).trans (hbound g))
 
 /-- Iterate coordinate derivatives in the order given by a list. -/
-noncomputable def partialList :
+@[expose] noncomputable def partialList :
     List ι → ((ι → ℝ) → ℝ) → (ι → ℝ) → ℝ
   | [], f => f
   | i :: l, f => partialList l (coordDeriv i f)
@@ -190,7 +195,7 @@ theorem partialList_append (l₁ l₂ : List ι) (f : (ι → ℝ) → ℝ) :
       simpa [partialList] using ih (coordDeriv i f)
 
 /-- The coordinate creation operator $g_i-\partial_i$. -/
-noncomputable def creation (i : ι) (f : (ι → ℝ) → ℝ) : (ι → ℝ) → ℝ :=
+@[expose] noncomputable def creation (i : ι) (f : (ι → ℝ) → ℝ) : (ι → ℝ) → ℝ :=
   fun g => g i * f g - coordDeriv i f g
 
 /-- Product rule for the selected coordinate derivative. -/
@@ -393,7 +398,7 @@ private theorem contDiff_hermiteList (l : List ι) :
       exact (hcoord.mul ih).sub (contDiff_coordDeriv i ih)
 
 /-- A fixed list containing each coordinate `i` exactly `α i` times. -/
-noncomputable def multiIndexList (α : ι → ℕ) : List ι := by
+@[expose] noncomputable def multiIndexList (α : ι → ℕ) : List ι := by
   classical
   exact Finset.univ.toList.flatMap (fun i => List.replicate (α i) i)
 
@@ -407,7 +412,7 @@ theorem multiIndexList_length (α : ι → ℕ) :
 /-- The multi-index partial derivative `∂^α f`: coordinate derivatives iterated along
 `multiIndexList α`. For `f` of class `C^{|α|}` the order of differentiation does not matter
 (`partialList_perm`). -/
-noncomputable def partialMulti (α : ι → ℕ)
+@[expose] noncomputable def partialMulti (α : ι → ℕ)
     (f : (ι → ℝ) → ℝ) : (ι → ℝ) → ℝ :=
   partialList (multiIndexList α) f
 

@@ -1,5 +1,13 @@
-import SYK.CLT.Quadratic.IndependentFourthMoment
+module
+
+public import SYK.CLT.Chaos.HigherChaosRemainder
+import Mathlib.Algebra.Order.Star.Real
+import SYK.CLT.Chaos.ZeroChaos
 import SYK.CLT.Limit.QuadraticBridge
+import SYK.CLT.Quadratic.GaussianFourthMoment
+import SYK.CLT.Quadratic.IndependentFourthMoment
+
+public section
 
 /-! # Small-event estimates for the logarithmic CLT -/
 

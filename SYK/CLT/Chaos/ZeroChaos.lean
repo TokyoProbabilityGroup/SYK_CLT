@@ -1,4 +1,8 @@
-import SYK.CLT.Chaos.HigherChaosRemainder
+module
+
+public import SYK.CLT.Chaos.HigherChaosRemainder
+
+public section
 
 /-!
 # The zeroth chaos and exact relative-partition decomposition

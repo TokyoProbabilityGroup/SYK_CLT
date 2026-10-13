@@ -1,7 +1,12 @@
-import SYK.Model.Majorana
+module
+
+public import SYK.Model.Majorana
+public import Mathlib.LinearAlgebra.Matrix.ConjTranspose
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 import Mathlib.LinearAlgebra.Matrix.Kronecker
-import Mathlib.Logic.Equiv.Fin.Basic
-import Mathlib.Tactic.FinCases
+
+public section
 
 /-!
 # Standard Jordan–Wigner representation
@@ -16,7 +21,7 @@ open scoped BigOperators Kronecker
 namespace SYK
 
 /-- The computational basis of `m` qubits, with the first site outermost. -/
-@[reducible]
+@[reducible, expose]
 def StandardBasis : ℕ → Type
   | 0 => Unit
   | m + 1 => Fin 2 × StandardBasis m

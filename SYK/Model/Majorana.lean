@@ -1,4 +1,16 @@
-import SYK.Model.Definitions
+module
+
+public import SYK.Model.Definitions
+public import Mathlib.Algebra.Algebra.Defs
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Data.Complex.Basic
+public import Mathlib.Data.Fintype.Powerset
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.NormNum.GCD
+
+public section
 
 /-!
 # Abstract Majorana systems and interaction operators
@@ -34,7 +46,7 @@ variable {N q : ℕ} {A : Type*}
   (M : MajoranaSystem N A)
 
 /-- The ordered product of the Majorana generators in an interaction. -/
-def psiProduct (s : InteractionIndex N q) : A :=
+@[expose] def psiProduct (s : InteractionIndex N q) : A :=
   ((orderedIndices s).map M.ψ).prod
 
 theorem anticommute {i j : Fin N} (hij : i ≠ j) :
@@ -144,7 +156,7 @@ private theorem star_psiProduct_of_even (s : InteractionIndex N q) (hq : Even q)
 end MajoranaSystem
 
 /-- The phase used for an even `q`. -/
-def phase (q : ℕ) : ℂ := Complex.I ^ (q / 2)
+@[expose] def phase (q : ℕ) : ℂ := Complex.I ^ (q / 2)
 
 private theorem phase_sq (q : ℕ) :
     phase q * phase q = (-1 : ℂ) ^ (q / 2) := by
@@ -165,7 +177,7 @@ variable {N q : ℕ} {A : Type*}
   (M : MajoranaSystem N A)
 
 /-- A phase-corrected Majorana interaction observable. -/
-noncomputable def interactionOperator (s : InteractionIndex N q) : A :=
+@[expose] noncomputable def interactionOperator (s : InteractionIndex N q) : A :=
   phase q • M.psiProduct s
 
 private theorem star_phase_mul_sign (q : ℕ) :
@@ -290,7 +302,7 @@ theorem interactionOperator_mul_generator_of_mem
 end MajoranaSystem
 
 /-- The deterministic SYK Hamiltonian associated to real couplings `J`. -/
-noncomputable def hamiltonian
+@[expose] noncomputable def hamiltonian
     {A : Type*} [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
     (P : Params) (M : MajoranaSystem P.N A)
     (J : InteractionIndex P.N P.q → ℝ) : A :=

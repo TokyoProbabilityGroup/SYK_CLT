@@ -1,20 +1,11 @@
-import SYK.Probability.GaussianChaos.Basic
-import SYK.Model.Majorana
-import SYK.Model.FiniteDimensionalGibbs
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.InnerProductSpace.SingularValues
-import Mathlib.Analysis.InnerProductSpace.Trace
-import Mathlib.Analysis.Matrix.Spectrum
-import Mathlib.Analysis.Matrix.PosDef
+module
+
+public import SYK.Probability.GaussianChaos.Basic
+public import SYK.Model.Majorana
+public import SYK.Model.FiniteDimensionalGibbs
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
-import Mathlib.Analysis.Analytic.Constructions
-import Mathlib.Analysis.SpecialFunctions.Exponential
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
-import Mathlib.LinearAlgebra.Matrix.Trace
-import Mathlib.Analysis.Calculus.Deriv.Mul
-import Mathlib.MeasureTheory.Integral.DominatedConvergence
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
+
+public section
 
 /-!
 # Clifford sign gauges and Hermite parity
@@ -192,7 +183,7 @@ private theorem mul_listProduct_swap {U : A} (i j : Fin N)
         Algebra.mul_smul_comm, smul_smul, mul_assoc]
 
 /-- Relabel an interaction by exchanging two Majorana labels. -/
-def swapInteractionIndex {q : ℕ} (i j : Fin N) (s : InteractionIndex N q) :
+@[expose] def swapInteractionIndex {q : ℕ} (i j : Fin N) (s : InteractionIndex N q) :
     InteractionIndex N q :=
   ⟨s.1.image (Equiv.swap i j), by
     rw [Finset.card_image_of_injective _ (Equiv.swap i j).injective, s.2]⟩
@@ -204,12 +195,12 @@ private theorem swapInteractionIndex_swap {q : ℕ} (i j : Fin N)
   simp [swapInteractionIndex, Finset.image_image, Function.comp_def]
 
 /-- The equivalence of interaction subsets induced by swapping two vertex labels. -/
-def swapInteractionEquiv {q : ℕ} (i j : Fin N) :
+@[expose] def swapInteractionEquiv {q : ℕ} (i j : Fin N) :
     InteractionIndex N q ≃ InteractionIndex N q where
   toFun := swapInteractionIndex i j
   invFun := swapInteractionIndex i j
-  left_inv := swapInteractionIndex_swap i j
-  right_inv := swapInteractionIndex_swap i j
+  left_inv := private_decl% swapInteractionIndex_swap i j
+  right_inv := private_decl% swapInteractionIndex_swap i j
 
 private theorem orderedIndices_swap_perm {q : ℕ} (i j : Fin N)
     (s : InteractionIndex N q) :
@@ -371,7 +362,7 @@ theorem hamiltonian_swap (P : Params) {A : Type*}
   exact (M.interactionSum_swap i j U V hUV c J hO).symm
 
 /-- The sign character `χ_s(I) = ∏_{x ∈ I} s_x`. -/
-def signCharacter {N q : ℕ} (s : Fin N → ℝ) (I : InteractionIndex N q) : ℝ :=
+@[expose] def signCharacter {N q : ℕ} (s : Fin N → ℝ) (I : InteractionIndex N q) : ℝ :=
   ∏ x ∈ I.1, s x
 
 /-- Conjugation of the Hamiltonian by a gauge element. -/
@@ -443,11 +434,11 @@ theorem partitionFunction_swap {d : Type*} [Fintype d] [DecidableEq d]
 /-! ### Multi-indices, Hermite polynomials and the Gaussian expectation -/
 
 /-- A multi-index `α` is even if `∑_{I ∋ x} α_I` is even for every `x ∈ [N]`. -/
-def IsEvenMultiIndex {N q : ℕ} (α : InteractionIndex N q → ℕ) : Prop :=
+@[expose] def IsEvenMultiIndex {N q : ℕ} (α : InteractionIndex N q → ℕ) : Prop :=
   ∀ x : Fin N, Even (∑ I with x ∈ I.1, α I)
 
 /-- A multi-index is odd if it is not even. -/
-def IsOddMultiIndex {N q : ℕ} (α : InteractionIndex N q → ℕ) : Prop :=
+@[expose] def IsOddMultiIndex {N q : ℕ} (α : InteractionIndex N q → ℕ) : Prop :=
   ¬ IsEvenMultiIndex α
 
 /-- Flipping the interactions containing vertex x negates a Hermite monomial

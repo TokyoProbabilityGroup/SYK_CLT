@@ -1,6 +1,9 @@
-import Mathlib.Probability.Distributions.Gaussian.Real
-import Mathlib.RingTheory.Polynomial.Hermite.Gaussian
-import Mathlib.MeasureTheory.Integral.Pi
+module
+
+public import Mathlib.Probability.Distributions.Gaussian.Real
+public import Mathlib.RingTheory.Polynomial.Hermite.Basic
+
+public section
 
 /-!
 # Hermite products and symmetries of finite product Gaussians
@@ -26,11 +29,11 @@ theorem hermite_two_eval (x : ℝ) :
   ring
 
 /-- The multivariate (probabilists') Hermite polynomial `H_α(g) = ∏_I He_{α_I}(g_I)`. -/
-noncomputable def hermiteMulti {ι : Type*} [Fintype ι] (α : ι → ℕ) (g : ι → ℝ) : ℝ :=
+@[expose] noncomputable def hermiteMulti {ι : Type*} [Fintype ι] (α : ι → ℕ) (g : ι → ℝ) : ℝ :=
   ∏ I, Polynomial.aeval (g I) (Polynomial.hermite (α I))
 
 /-- The law of the couplings: i.i.d. standard Gaussians. -/
-noncomputable def gaussianCouplings (ι : Type*) [Fintype ι] : Measure (ι → ℝ) :=
+@[expose] noncomputable def gaussianCouplings (ι : Type*) [Fintype ι] : Measure (ι → ℝ) :=
   Measure.pi fun _ => gaussianReal 0 1
 
 instance gaussianCouplings_isProbability (ι : Type*) [Fintype ι] :

@@ -103,7 +103,7 @@ flowchart TD
 | MA-07 | A14、A16 | 完了 |
 | MA-08 | docstring とコメント | 完了 |
 | MA-09 | 公開範囲 | 完了（173件を再調査し171件を非公開化。`word_schatten_bound` は章内 docstring の参照、`integrable_exp_smul_lipschitz` は `Lipschitz.lean` からの使用があるため公開を維持） |
-| MA-10 | モジュールシステムへの移行 | 未着手 |
+| MA-10 | モジュールシステムへの移行 | 完了（53ファイル、import 整理、型・公理・Blueprint 表示の比較、Astra 監査 PASS） |
 | MA-11 | `SYK/MainAudit.lean` と不変条件の記述 | 未着手 |
 | MA-12 | Blueprint | 未着手 |
 | MA-13 | 文書 | 未着手 |

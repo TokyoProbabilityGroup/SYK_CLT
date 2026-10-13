@@ -1,18 +1,14 @@
-import Mathlib.Algebra.BigOperators.Field
+module
+
+public import SYK.Probability.GaussianChaos.Orthogonality
+public import SYK.CLT.Chaos.CliffordSignParity
 import Mathlib.Algebra.Order.Field.GeomSum
+import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Series
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.Analysis.Real.Sqrt
 import Mathlib.Data.Nat.Choose.Multinomial
 import Mathlib.RingTheory.MvPolynomial.Symmetric.NewtonIdentities
-import Mathlib.Tactic.FieldSimp
-import Mathlib.Tactic.GCongr
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
-import SYK.Probability.GaussianChaos.Orthogonality
-import SYK.CLT.Chaos.CliffordSignParity
+
+public section
 
 /-!
 # Rademacher bounds for higher SYK chaoses
@@ -39,7 +35,7 @@ noncomputable def rad (b : Bool) : ℝ := if b then 1 else -1
 
 /-- Expectation over `N` independent Rademacher signs: the uniform average over
 `{true, false}^N` (this is exactly the joint law of `N` independent Rademachers). -/
-noncomputable def radE (N : ℕ) (f : (Fin N → Bool) → ℝ) : ℝ :=
+@[expose] noncomputable def radE (N : ℕ) (f : (Fin N → Bool) → ℝ) : ℝ :=
   ((2 : ℝ) ^ N)⁻¹ * ∑ ε : Fin N → Bool, f ε
 
 /-- The Rademacher chaos `S_{N,q} = ∑_{|I| = q} ∏_{x ∈ I} ε_x`. -/

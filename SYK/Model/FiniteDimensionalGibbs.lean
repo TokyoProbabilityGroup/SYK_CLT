@@ -1,12 +1,20 @@
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.Complex.CauchyIntegral
+module
+
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Analysis.Calculus.LogDeriv
+public import Mathlib.Analysis.InnerProductSpace.Basic
+public import Mathlib.Analysis.Normed.Algebra.Exponential
+public import Mathlib.Analysis.SpecialFunctions.Complex.Log
+public import Mathlib.LinearAlgebra.Matrix.PosDef
+public import Mathlib.Topology.Algebra.Module.ModuleTopology
+public import Mathlib.Topology.Instances.Matrix
 import Mathlib.Analysis.Calculus.SmoothSeries
+import Mathlib.Analysis.Complex.CauchyIntegral
 import Mathlib.Analysis.Matrix.Order
-import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
-import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Analysis.SpecialFunctions.Complex.LogDeriv
-import Mathlib.LinearAlgebra.Matrix.Trace
+
+public section
 
 /-!
 # Finite-dimensional Gibbs states and trace-exponential calculus
@@ -31,11 +39,11 @@ variable {d : Type*} [Fintype d] [DecidableEq d]
 /-! ## Density matrices and expectations -/
 
 /-- A finite-dimensional density matrix. -/
-def IsDensityMatrix (ρ : Matrix d d ℂ) : Prop :=
+@[expose] def IsDensityMatrix (ρ : Matrix d d ℂ) : Prop :=
   ρ.PosSemidef ∧ Matrix.trace ρ = 1
 
 /-- Expectation of a matrix observable in a density matrix. -/
-noncomputable def expectation (ρ A : Matrix d d ℂ) : ℂ :=
+@[expose] noncomputable def expectation (ρ A : Matrix d d ℂ) : ℂ :=
   Matrix.trace (ρ * A)
 
 omit [DecidableEq d] in
@@ -103,15 +111,15 @@ theorem density_variance_nonneg
 /-! ## Normalized traces and complex partition functions -/
 
 /-- The matrix trace divided by the dimension, with value zero for an empty index type. -/
-noncomputable def normalizedTrace (A : Matrix d d ℂ) : ℂ :=
+@[expose] noncomputable def normalizedTrace (A : Matrix d d ℂ) : ℂ :=
   Matrix.trace A / (Fintype.card d : ℂ)
 
 /-- The matrix exponential `exp (-z H)` at complex inverse temperature `z`. -/
-noncomputable def gibbsOperator (z : ℂ) (H : Matrix d d ℂ) : Matrix d d ℂ :=
+@[expose] noncomputable def gibbsOperator (z : ℂ) (H : Matrix d d ℂ) : Matrix d d ℂ :=
   NormedSpace.exp (-z • H)
 
 /-- The partition function `Tr (exp (-z H))`. -/
-noncomputable def partitionFunction (z : ℂ) (H : Matrix d d ℂ) : ℂ :=
+@[expose] noncomputable def partitionFunction (z : ℂ) (H : Matrix d d ℂ) : ℂ :=
   Matrix.trace (gibbsOperator z H)
 
 @[simp]
@@ -169,7 +177,7 @@ theorem partitionFunction_mul_log_deriv (H : Matrix d d ℂ) (z : ℂ)
 section PhysicalGibbs
 
 /-- The normalized Gibbs matrix; positivity and unit trace require a nonempty index type. -/
-noncomputable def thermalDensity
+@[expose] noncomputable def thermalDensity
     (β : NNReal) (H : Matrix d d ℂ) : Matrix d d ℂ :=
   ((partitionFunction (β : ℂ) H).re⁻¹ : ℝ) •
     gibbsOperator (β : ℂ) H

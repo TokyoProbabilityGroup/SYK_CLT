@@ -1,4 +1,11 @@
-import SYK.Probability.GaussianConcentration.StandardGaussian
+module
+
+public import SYK.Probability.GaussianConcentration.StandardGaussian
+public import Mathlib.Probability.Distributions.Fernique
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Probability.Distributions.Gaussian.Fernique
+
+public section
 
 /-!
 # Smooth-case Gaussian covariance bound

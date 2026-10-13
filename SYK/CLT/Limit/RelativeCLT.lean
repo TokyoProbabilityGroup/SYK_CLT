@@ -1,5 +1,12 @@
+module
+
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+public import SYK.CLT.Basic
+public import SYK.Probability.GaussianChaos.Basic
 import SYK.CLT.Limit.QuadraticBridge
 import SYK.Probability.LpDistributionTransfer
+
+public section
 
 /-!
 # Relative partition fluctuation on the product Gaussian space

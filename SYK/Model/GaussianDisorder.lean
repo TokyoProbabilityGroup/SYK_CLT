@@ -1,5 +1,10 @@
-import SYK.Model.Majorana
-import SYK.Probability.GaussianConcentration.StandardGaussian
+module
+
+public import SYK.Model.Majorana
+public import SYK.Probability.GaussianConcentration.StandardGaussian
+public import Mathlib.Analysis.CStarAlgebra.Classes
+
+public section
 
 /-!
 # Gaussian disorder for the SYK Hamiltonian
@@ -24,7 +29,7 @@ abbrev CouplingSpace (N q : ℕ) :=
   EuclideanSpace ℝ ({s : Finset (Fin N) // s.card = q})
 
 /-- The product standard Gaussian measure transported to coupling space. -/
-noncomputable def standardGaussianMeasure (N q : ℕ) :
+@[expose] noncomputable def standardGaussianMeasure (N q : ℕ) :
     Measure (CouplingSpace N q) :=
   GaussianConcentration.standardGaussianMeasureOnEuclidean
     ({s : Finset (Fin N) // s.card = q})
@@ -45,7 +50,7 @@ theorem standardGaussianMeasure_eq_onEuclidean (N q : ℕ) :
 /-- The standard scale `σ_N` multiplying each standard Gaussian coordinate.
 Each actual coefficient `J_A = σ_N g_A` has variance `(q-1)! / N^(q-1)`;
 this is the variance of one coefficient, not of the whole Hamiltonian. -/
-noncomputable def couplingScale (P : Params) : ℝ :=
+@[expose] noncomputable def couplingScale (P : Params) : ℝ :=
   Real.sqrt ((P.q - 1).factorial / (P.N : ℝ) ^ (P.q - 1))
 
 /-- The standard scale is nonnegative. -/
@@ -58,7 +63,7 @@ theorem couplingScale_sq (P : Params) :
   exact Real.sq_sqrt (by positivity)
 
 /-- The standard SYK Hamiltonian in standard Gaussian coordinates `g_A`. -/
-noncomputable def normalizedHamiltonian
+@[expose] noncomputable def normalizedHamiltonian
     {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (g : CouplingSpace P.N P.q) : Matrix d d ℂ :=

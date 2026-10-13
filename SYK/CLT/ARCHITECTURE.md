@@ -14,6 +14,8 @@
 | `SYK/CLT/Quadratic/` | 有限個のガウス変数二乗の観測量・四次モーメント・二次和の CLT | `SYK.CLT` |
 | `SYK/CLT/Limit/`・`SYK/CLT/Log/` | 模型への分布移送・分散・相対・標準化 CLT と対数への移送 | `SYK.CLT` |
 
+数学ライブラリは Lean のモジュール形式を用いる。公開宣言は `public section`、内部の補助宣言は `private` とし、公開宣言の文に必要な依存を `public import` で伝える。他ファイルで必要な定義の展開だけを `@[expose]` で公開する。公開定理の型の一致に必要な `standardSetting`・`StandardBasis` の展開も、この公開の境界に含む。公開する同値写像の逆写像の証明は `private_decl%` で非公開補題の参照を保つ。Blueprint は従来形式のままライブラリを読み込む。
+
 ## 基準と正式な参照元
 
 有限模型と、三種類の条件付き CLT をまとめた `partition_and_log_partition_clt` は、Lean に受理されている。現行の `AnnealedInput` は、原稿の `prop:annealed-free-energy` の命題文に対応する内容を、明示的な仮定として受け取る。各フィールドの対応は「アニール入力」に記す。入力を整理した後の検証の時点と公理依存は [CLT-INPUT の記録](../../WORK_HISTORY.md#clt-input-2026-10-04)、原稿全体の照合は [監査記録](../../WORK_HISTORY.md#clt-audit-2026-10-04) を参照する。

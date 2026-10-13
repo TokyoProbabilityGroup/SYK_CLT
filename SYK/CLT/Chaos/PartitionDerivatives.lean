@@ -1,8 +1,10 @@
-import SYK.Analysis.Matrix.TraceExpDerivatives
-import SYK.CLT.Basic
-import SYK.Probability.GaussianChaos.Basic
-import SYK.Probability.GaussianChaos.HermiteIBP
-import Mathlib.Analysis.Calculus.ParametricIntegral
+module
+
+public import SYK.Analysis.Matrix.TraceExpDerivatives
+public import SYK.CLT.Basic
+public import SYK.Probability.GaussianChaos.HermiteIBP
+
+public section
 
 /-!
 # Finite partition-function derivatives
@@ -24,7 +26,7 @@ namespace SYK.CLT
 
 /-- The Hamiltonian g ↦ H_N(g), viewed as a continuous real linear map into
 the matrix space equipped with the L² operator norm. -/
-noncomputable def Setting.disorderMatrix {q : ℕ} (S : Setting q) (n : ℕ) :
+@[expose] noncomputable def Setting.disorderMatrix {q : ℕ} (S : Setting q) (n : ℕ) :
     CouplingSpace (S.N n) q →L[ℝ] Matrix (S.d n) (S.d n) ℂ :=
   (normalizedHamiltonianLinear (S.params n) (S.majorana n)).toLinearMap.toContinuousLinearMap
 

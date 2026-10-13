@@ -1,5 +1,11 @@
+module
+
+public import SYK.CLT.Quadratic.GaussianQuadraticObservable
+import Mathlib.Algebra.Order.Star.Real
 import SYK.CLT.Quadratic.GaussianFourthMoment
 import SYK.Probability.IndependentMoments
+
+public section
 
 /-!
 # Fourth moments of independent finite sums

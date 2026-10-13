@@ -1,5 +1,10 @@
+module
+
+public import SYK.CLT.Chaos.Rademacher
+public import SYK.CLT.Chaos.PartitionSymmetry
 import SYK.CLT.Chaos.PartitionHigherDerivatives
-import SYK.CLT.Chaos.Rademacher
+
+public section
 
 /-!
 # Higher-chaos projection bounds

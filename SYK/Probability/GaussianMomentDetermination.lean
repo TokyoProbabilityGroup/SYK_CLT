@@ -1,5 +1,9 @@
+module
+
+public import Mathlib.Probability.Moments.Basic
 import Mathlib.Probability.Moments.MGFAnalytic
-import Mathlib.Analysis.Analytic.IsolatedZeros
+
+public section
 
 /-!
 # Moment determination under exponential integrability

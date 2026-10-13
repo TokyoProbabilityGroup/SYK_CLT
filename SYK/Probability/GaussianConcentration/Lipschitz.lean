@@ -1,6 +1,12 @@
-import SYK.Probability.GaussianConcentration.Smooth
+module
+
+public import Mathlib.Probability.Moments.SubGaussian
+public import SYK.Probability.GaussianConcentration.StandardGaussian
+import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Calculus.BumpFunction.Convolution
-import Mathlib.Probability.Moments.SubGaussian
+import SYK.Probability.GaussianConcentration.Smooth
+
+public section
 
 /-!
 # Mollification of Lipschitz functions

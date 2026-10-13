@@ -1,5 +1,10 @@
-import SYK.Probability.GaussianChaos.HermiteDensity
+module
+
+public import SYK.Probability.GaussianChaos.HermiteDensity
+import SYK.Probability.GaussianConcentration.StandardGaussian
 import SYK.Probability.GaussianMomentDetermination
+
+public section
 
 /-!
 # Polynomial density for Gaussian `L²`

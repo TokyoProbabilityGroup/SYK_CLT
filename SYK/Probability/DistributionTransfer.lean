@@ -1,6 +1,10 @@
-import Mathlib.MeasureTheory.Measure.FiniteMeasureProd
+module
+
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
 import Mathlib.MeasureTheory.Measure.DiracProba
-import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+import Mathlib.MeasureTheory.Measure.FiniteMeasureProd
+
+public section
 
 /-!
 # A changing scalar in weak convergence

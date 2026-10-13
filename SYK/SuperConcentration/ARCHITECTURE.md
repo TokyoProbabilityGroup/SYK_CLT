@@ -93,6 +93,8 @@ L = β / sqrt q,
 
 ## モジュールと名前空間
 
+この層は Lean のモジュール形式を用いる。公開宣言は `public section` に置き、内部の補助宣言は `private` とする。公開名を持つ `logPartition` と `logPartitionLipschitzConstant` は他ファイルで展開しないため、中身を公開しない。
+
 ```text
 SYK/Probability/GaussianConcentration/
   StandardGaussian.lean

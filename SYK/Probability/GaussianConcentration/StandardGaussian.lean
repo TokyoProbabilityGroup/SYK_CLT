@@ -1,16 +1,12 @@
+module
+
+public import Mathlib.Analysis.Calculus.Gradient.Basic
+import Mathlib.Probability.Distributions.Gaussian.Fernique
+public import Mathlib.Probability.Distributions.Gaussian.Basic
 import Mathlib.Analysis.Calculus.Deriv.Pi
-import Mathlib.Analysis.Calculus.Gradient.Basic
-import Mathlib.Analysis.Convex.Deriv
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.IntegrationByParts
-import Mathlib.MeasureTheory.Integral.Pi
-import Mathlib.Probability.Distributions.Gaussian.HasGaussianLaw.Independence
 import Mathlib.Probability.Distributions.Gaussian.Multivariate
-import Mathlib.Probability.Distributions.Gaussian.Real
-import Mathlib.Tactic.FunProp
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
+
+public section
 
 /-!
 # The standard Gaussian on a finite coordinate space
@@ -41,7 +37,7 @@ It equals mathlib's `stdGaussian (EuclideanSpace ℝ ι)` by `map_pi_eq_stdGauss
 form is kept as the definition on purpose: the coordinatewise Stein identity, the Hermite
 expansion and the CLT work in this form, so proofs use `stdGaussian` lemmas only through that
 equation. See `SYK/SuperConcentration/ARCHITECTURE.md`. -/
-noncomputable def standardGaussianMeasureOnEuclidean
+@[expose] noncomputable def standardGaussianMeasureOnEuclidean
     (ι : Type*) [Fintype ι] :
     Measure (EuclideanSpace ℝ ι) :=
   (Measure.pi fun _ : ι => gaussianReal 0 1).map (WithLp.toLp 2)

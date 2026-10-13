@@ -1,4 +1,11 @@
-import SYK.CLT.Quadratic.GaussianQuadraticObservable
+module
+
+public import SYK.CLT.Quadratic.GaussianQuadraticObservable
+import Mathlib.Algebra.Order.Star.Real
+import SYK.Probability.GaussianChaos.CoefficientIBP
+import SYK.Probability.GaussianChaos.Orthogonality
+
+public section
 
 /-!
 # Fourth moments of centered Gaussian squares

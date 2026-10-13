@@ -1,6 +1,14 @@
-import SYK.CLT.Chaos.SecondChaosAsymptotic
-import SYK.CLT.Quadratic.GaussianQuadraticObservable
+module
+
+public import SYK.CLT.Quadratic.GaussianQuadraticObservable
+import Mathlib.MeasureTheory.Measure.LevyConvergence
+import Mathlib.Probability.Independence.CharacteristicFunction
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+public import SYK.CLT.Basic
 import Mathlib.Probability.CentralLimitTheorem
+import SYK.CLT.Chaos.SecondChaosAsymptotic
+
+public section
 
 /-!
 # Central limit theorem for normalized sums of Gaussian squares

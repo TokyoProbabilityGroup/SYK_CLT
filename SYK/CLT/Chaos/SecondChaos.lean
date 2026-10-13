@@ -1,5 +1,9 @@
-import SYK.CLT.Chaos.PartitionSymmetry
+module
+
+public import SYK.CLT.Chaos.PartitionSymmetry
 import SYK.CLT.Chaos.PartitionDerivatives
+
+public section
 
 /-!
 # Exact second chaos of the SYK partition function

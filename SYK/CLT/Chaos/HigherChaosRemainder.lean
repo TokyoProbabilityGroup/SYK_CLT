@@ -1,5 +1,11 @@
+module
+
+public import SYK.CLT.Chaos.PartitionSymmetry
+import Mathlib.Algebra.Order.Star.Real
 import SYK.CLT.Chaos.HigherChaosProjection
 import SYK.Probability.GaussianChaos.PolynomialDensity
+
+public section
 
 /-!
 # The higher-chaos remainder in Gaussian L²
@@ -46,7 +52,7 @@ private theorem norm_sq_eq_tsum_of_pairwise_orthogonal
   exact hsum.tsum_eq.symm
 
 /-- The Gaussian L² sum of Hermite chaoses of degree at least three. -/
-noncomputable def Setting.higherChaosRemainderLp {q : ℕ}
+@[expose] noncomputable def Setting.higherChaosRemainderLp {q : ℕ}
     (S : Setting q) (β : ℝ) (n : ℕ) :
     Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q)) :=
   S.YGaussianLp β n -

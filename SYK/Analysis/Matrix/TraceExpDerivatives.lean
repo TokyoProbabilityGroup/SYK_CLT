@@ -1,6 +1,11 @@
-import SYK.Analysis.Matrix.TraceExponential
+module
 
-@[expose] public section
+public import SYK.Analysis.Matrix.TraceExponential
+import Mathlib.Analysis.Analytic.IteratedFDeriv
+import Mathlib.Analysis.SpecialFunctions.Exponential
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+
+public section
 
 set_option autoImplicit false
 
@@ -35,7 +40,7 @@ variable {E F : Type*}
 Iterated directional Fréchet derivative.  The empty list gives `f x`; prepending a direction takes
 one more directional derivative.
 -/
-noncomputable def iterDirectionalFDeriv (f : E → F) : List E → E → F
+@[expose] noncomputable def iterDirectionalFDeriv (f : E → F) : List E → E → F
   | [], x => f x
   | v :: vs, x =>
       (fderiv ℝ (fun y => iterDirectionalFDeriv f vs y) x) v
@@ -71,7 +76,7 @@ section
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 
 /-- Normalized trace exponential, shared by the smoothness and derivative estimates. -/
-noncomputable def traceExp (A : Matrix n n 𝕜) : 𝕜 :=
+@[expose] noncomputable def traceExp (A : Matrix n n 𝕜) : 𝕜 :=
   normalizedTrace (NormedSpace.exp A)
 
 end

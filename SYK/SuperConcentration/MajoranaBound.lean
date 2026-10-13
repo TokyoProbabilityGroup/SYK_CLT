@@ -1,7 +1,14 @@
+module
+
+public import SYK.Model.Majorana
+public import SYK.Model.FiniteDimensionalGibbs
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import SYK.SuperConcentration.DensityMatrix
-import SYK.Model.Majorana
-import Mathlib.Data.Fintype.Powerset
-import Mathlib.Data.Nat.Choose.Bounds
+
+import Mathlib.Analysis.Matrix.Normed -- shake: keep (Matrix.Norms.Operator scope)
+
+public section
 
 /-! The finite-size sum-of-squares bound for Majorana interactions. -/
 
