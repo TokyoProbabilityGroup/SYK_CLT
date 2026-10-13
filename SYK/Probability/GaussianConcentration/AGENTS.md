@@ -4,7 +4,7 @@
 
 `SYK/Probability/GaussianConcentration/` 以下に適用する。ワークスペースと [リポジトリの規則](../../../AGENTS.md) も適用する。このディレクトリは、SYK 模型から独立した共通の基盤として、有限次元ユークリッド空間上のガウス集中不等式を提供する。
 
-横断的な残件は [全体計画](../../../EDITING_PLAN.md) を確認する。完了済み作業の検証経緯は、必要なときに [作業履歴](../../../WORK_HISTORY.md#gaussian-foundation) を参照する。
+横断的な残件は [全体計画](../../../EDITING_PLAN.md) を確認する。完了済み作業の設計の経緯は、必要なときに [作業履歴](../../../WORK_HISTORY.md#gaussian-foundation) を参照する。
 
 ## 独立性と公開 API
 
@@ -20,4 +20,4 @@
 
 モジュールは `SYK.Probability.GaussianConcentration.*`、宣言は名前空間 `SYK.GaussianConcentration` に置く。
 
-Lean ファイルを変更したら、各ファイルを依存先から順に個別に検査する。Lean 実装の完了時には `lake build SYK` も実行し、公開 MGF の正確な型とパラメータを照合する。
+Lean 実装の完了時には、公開 MGF の正確な型とパラメータを、上の `L^2`・`L = 0` の規約と利用側（SuperConcentration）に照合する。

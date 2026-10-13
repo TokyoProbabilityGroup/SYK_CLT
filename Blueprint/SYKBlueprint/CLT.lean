@@ -41,7 +41,7 @@ H_N(G)=\sigma_N\sum_{I\in\mathcal I_N}g_I\psi_I,\qquad
 Z_N(z;G)=\frac1{d_N}\operatorname{Tr}e^{-zH_N(G)}.
 `
 For real $`\beta`, define $`Y_N(\beta)=Z_N(\beta)/\mathbb E Z_N(\beta)`
-and $`M_N=|\mathcal I_N|=\binom Nq`.
+and note that $`|\mathcal I_N|=\binom Nq`.
 The manuscript's `subsec:SYK-model` uses $`d_N=2^{N/2}`; the family here
 also permits other nonempty finite representations.
 :::
@@ -168,7 +168,7 @@ orthogonality now give Hermite completeness and the grouped expansion.
 For every real $`\beta`, `prop:exact-second-chaos` gives
 $$`
 P_1Y_N=0,\qquad
-P_2Y_N=\frac{\beta\,\partial_\beta\log\mathbb E Z_N}{2M_N}
+P_2Y_N=\frac{\beta\,\partial_\beta\log\mathbb E Z_N}{2|\mathcal I_N|}
 \sum_{I\in\mathcal I_N}(g_I^2-1).
 `
 Here $`\operatorname{He}_2(x)=x^2-1` and
@@ -227,7 +227,7 @@ $$`
 =\frac1{r!}\mathbb E_\varepsilon[S_{N,q}^r].
 `
 For fixed even $`q\ge4`, there are $`c_q>0` and finite $`C_q` depending
-only on $`q` such that for $`N\ge q` and $`0\le t\le c_qN^{-(q-1)}`,
+only on $`q` such that for every $`N` and every $`0\le t\le c_qN^{-(q-1)}`,
 `eq:Rademacher-exponential-moment` gives
 $$`
 \mathbb E_\varepsilon[|S_{N,q}|^3e^{t|S_{N,q}|}]
@@ -354,14 +354,14 @@ derivative converge for every real $`\beta`. The scaled quadratic coefficient
 satisfies
 $$`
 N^{q/2-1}
-\frac{\beta\,\partial_\beta\log\mathbb E Z_N(\beta)}{\sqrt{2M_N}}
+\frac{\beta\,\partial_\beta\log\mathbb E Z_N(\beta)}{\sqrt{2|\mathcal I_N|}}
 \longrightarrow\sqrt{\frac{q!}{2}}\,\beta\ell_q'(\beta).
 `
 :::
 
 :::proof "clt_conditional_annealed_limit" (uses := "gaussian_annealed_input")
 Use the derivative convergence from the input and the fixed-order asymptotic
-$`M_N=\binom Nq\sim N^q/q!`. This is the coefficient limit in the proof of
+$`|\mathcal I_N|=\binom Nq\sim N^q/q!`. This is the coefficient limit in the proof of
 `thm:partition-clt`.
 :::
 
@@ -403,16 +403,16 @@ the moment bound to Euclidean coupling coordinates.
 :::
 
 :::lemma_ "clt_gaussian_quadratic_sum" (parent := "clt_main_results") (lean := "SYK.CLT.Setting.interactionCard_tendsto, SYK.CLT.Setting.normalizedQuadraticSum_clt")
-With $`M_N=\binom Nq`,
+With $`|\mathcal I_N|=\binom Nq`,
 $$`
-U_N=\frac1{\sqrt{2M_N}}\sum_{I\in\mathcal I_N}(g_I^2-1)
+U_N=\frac1{\sqrt{2|\mathcal I_N|}}\sum_{I\in\mathcal I_N}(g_I^2-1)
 \Longrightarrow\mathcal N(0,1).
 `
 :::
 
 :::proof "clt_gaussian_quadratic_sum" (uses := "clt_gaussian_quadratic_observable")
 The summands are independent with mean zero and variance one after
-normalization. The classical i.i.d. CLT applies as $`M_N\to\infty`.
+normalization. The classical i.i.d. CLT applies as $`|\mathcal I_N|\to\infty`.
 Equivalently, the finite product characteristic function and its quadratic
 Taylor limit give this convergence on the varying coupling spaces.
 :::
@@ -421,7 +421,7 @@ Taylor limit give this convergence on the varying coupling spaces.
 As in `eq:Y-decomposition-final`,
 $$`
 Y_N-1=c_NU_N+\mathcal R_N,\qquad
-c_N=\frac{\beta\,\partial_\beta\log\mathbb E Z_N}{\sqrt{2M_N}},
+c_N=\frac{\beta\,\partial_\beta\log\mathbb E Z_N}{\sqrt{2|\mathcal I_N|}},
 \qquad \mathcal R_N=\sum_{r\ge3}P_rY_N.
 `
 The remainder is orthogonal to $`U_N` and

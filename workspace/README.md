@@ -15,7 +15,7 @@ This directory supplies the parent `ResearchWorkspace` configuration for the loc
     ├── lakefile.toml        # mathematical SYK package, mathlib only
     ├── lake-manifest.json   # mathematical dependency lock
     ├── lean-toolchain      # same Lean version as the parent
-    ├── SYK/                # Analysis, Probability, Model, SuperConcentration, CLT
+    ├── SYK/                # Main.lean, MainAudit.lean, Analysis, Probability, Model, SuperConcentration, CLT
     ├── Blueprint/          # SYKBlueprint package: lakefile.toml, lake-manifest.json,
     │   ├── lean-toolchain         # same Lean version as the parent
     │   ├── SYKBlueprint.lean      # the document

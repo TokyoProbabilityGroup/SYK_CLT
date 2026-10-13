@@ -2,7 +2,7 @@
 
 ## 目的
 
-共有 SYK 模型のうち物理的なギブス状態を扱う層と、模型に依存しないガウス集中不等式の基盤部分を接続し、通常のトレースで定義した SYK 分配関数の対数に対する集中不等式を証明する。評価は `DensityMatrix`、`MajoranaBound`、`Main` の3つのファイルに分け、MGF と、上側・下側・両側の裾の評価を供給する。残件は [全体計画](../../EDITING_PLAN.md)、過去の検証根拠は [作業履歴](../../WORK_HISTORY.md#super-w05) を参照する。
+共有 SYK 模型のうち物理的なギブス状態を扱う層と、模型に依存しないガウス集中不等式の基盤部分を接続し、通常のトレースで定義した SYK 分配関数の対数に対する集中不等式を証明する。評価は `DensityMatrix`、`MajoranaBound`、`Main` の3つのファイルに分け、MGF と、上側・下側・両側の裾の評価を供給する。残件は [全体計画](../../EDITING_PLAN.md)、設計の経緯は [作業履歴](../../WORK_HISTORY.md#super-w05) を参照する。
 
 ## 依存関係
 
@@ -17,6 +17,7 @@ flowchart TD
     lipschitz["分配関数の対数の微分とリプシッツ評価"]
     concentration["モーメント母関数と裾の評価への適用"]
 
+    gaussian --> model
     gaussian --> concentration
     model --> density
     model --> majorana
@@ -26,7 +27,7 @@ flowchart TD
     lipschitz --> concentration
 ```
 
-依存は図の矢印に沿う一方向とする。ガウス集中不等式の基盤部分は `Model` も `SuperConcentration` も `import` しない。
+依存は図の矢印に沿う一方向とする。模型の係数の測度は、ガウス基盤の汎用測度の特殊化として定義する。ガウス集中不等式の基盤部分は `Model` も `SuperConcentration` も `import` しない。
 
 ## 汎用的な基盤部分の分離
 
@@ -34,7 +35,7 @@ flowchart TD
 
 `CouplingSpace` と `standardGaussianMeasure` は `Model.GaussianDisorder` に置く。汎用測度は `../Probability/GaussianConcentration/StandardGaussian.lean` に置き、模型の測度をその有限添字型への特殊化として定義する。同一性を述べる `standardGaussianMeasure_eq_onEuclidean` は Model 側に置く。汎用部分は Model に依存せず、`N, q` への特殊化も含まない。
 
-汎用測度 `standardGaussianMeasureOnEuclidean ι` は、標準ガウスの積測度を `toLp 2` で移したものとして定義し、mathlib の `stdGaussian (EuclideanSpace ℝ ι)` には置き換えない（研究者の決定、2026-10-11）。両者は `map_pi_eq_stdGaussian` で等しい。この形を保つ理由は次のとおりである。
+汎用測度 `standardGaussianMeasureOnEuclidean ι` は、標準ガウスの積測度を `toLp 2` で移したものとして定義し、mathlib の `stdGaussian (EuclideanSpace ℝ ι)` には置き換えない。両者は `map_pi_eq_stdGaussian` で等しい。この形を保つ理由は次のとおりである。
 
 - 座標ごとの Stein の恒等式、Hermite 展開、CLT の `gaussianCouplings` は積測度の形で進む。`stdGaussian` を定義にすると、定義が積測度の像であることに依存する箇所（`Smooth` の `gaussian_ibp_coord`、CLT の `normalizedQuadraticSum_law` と `FiniteVariancePositivity`）で、毎回書き換えが要る。
 - 定理文は名前で述べているので、置き換えても文面は簡単にならない。得られるのは確率測度・`IsGaussian` のインスタンスの証明の省略（数行）だけである。
@@ -55,9 +56,9 @@ mathlib の補題は、この等式を経由して証明の中で使う（`isGau
 
 `Ψ_A` はマヨラナ演算子の昇順の積に位相因子を掛けた相互作用演算子である。共有分配関数には通常のトレースを使うため、`Z(0)=d`、`log Z(0)=log d` となる。ただし、この定数は相互作用係数に依存しない。
 
-ここで二乗和の評価は、相互作用演算子 `Ψ_A` に対する `sum_A |Tr(ρ Ψ_A)|^2` の上界を指す。個々のマヨラナ演算子の期待値の和ではない。また、以下の `L` は使えるリプシッツ定数であり、その最小値を同定したという意味ではない。
+ここで二乗和の評価は、相互作用演算子 `Ψ_A` に対する `sum_A |Tr(ρ Ψ_A)|^2` の上界を指す。個々のマヨラナ演算子の期待値の和ではない。また、以下の `L` は成り立つリプシッツ定数であり、その最小値を同定したという意味ではない。
 
-期待値と確率は、独立な標準正規座標 `g_A` の積測度に関するものとする。ハミルトニアンの実際の係数は `J_A = σ_N g_A` であり、リプシッツ定数は `g_A` のユークリッドノルムに関して測る。係数 `J_A` 自体を座標にすると定数も変わるため、二つを混同しない。
+期待値と確率は、独立な標準正規確率変数 `g_A` の積測度に関するものとする。ハミルトニアンの実際の係数は `J_A = σ_N g_A` であり、リプシッツ定数は `g_A` のユークリッドノルムに関して測る。係数 `J_A` 自体を座標にすると定数も変わるため、二つを混同しない。
 
 物理的な逆温度 `β : ℝ≥0` と標準的に規格化したハミルトニアンに対し、通常の分配関数で定義したギブス状態の微分公式と、マヨラナ相互作用演算子の二乗和評価から
 
@@ -72,24 +73,24 @@ L = β / sqrt q,
 
 `X = log Z - E[log Z]` とすると、モーメント母関数の評価とは、すべての実数 `s` に対する `E[exp(s X)] <= exp(s^2 β^2 / (2q))` を指す。劣ガウス性のパラメータ `β^2/q` は分散そのものではなく上界の定数である。`β > 0`、`t > 0` では上下それぞれの裾に `exp(-q t^2/(2β^2))`、両側の裾にその2倍を得る。`β = 0` では `X = 0` を直接使い、この分母を持つ式には代入しない。
 
-標準スケールとハミルトニアンは `Model.GaussianDisorder` に置き、一般スケール `𝒥` は基本 API に含めない。公開の MGF と、上側・下側・両側の裾の評価は、標準ガウス座標に対するリプシッツ性を内部で証明する。`logPartitionLipschitzConstant` は単一の公開リプシッツ定数であり、有限サイズの途中計算用定数は非公開とする。通常のトレースと規格化トレースの差が中心化で消える理由は `../Model/ARCHITECTURE.md` を参照する。
+標準スケールとハミルトニアンは `Model.GaussianDisorder` に置き、一般スケール `𝒥` は基本 API に含めない。`g` のユークリッドノルムに関するリプシッツ性は公開定理 `logPartition_lipschitz` として証明し、MGF と裾の評価はこれから導く。`logPartitionLipschitzConstant` は単一の公開リプシッツ定数であり、有限サイズの途中計算用定数は非公開とする。通常のトレースと規格化トレースの差が中心化で消える理由は `../Model/ARCHITECTURE.md` を参照する。
 
 複素数 `z` に対する分配関数の整関数性や対数微分は、`Model` の解析部分で扱う。この証明には正の実数値を取る分配関数が必要なので、複素逆温度に対して非零性を仮定する API は経由しない。
 
-抽象的なマヨラナ系に対する二乗和評価と対数分配関数の評価には、標準行列表現やトレース直交性を要求しない。必要な入力は、共有の行列解析、標準ハミルトニアン、汎用のガウス集中の3つである。旧配置と削除済み API の経緯は [作業履歴](../../WORK_HISTORY.md#super-legacy) を参照する。
+抽象的なマヨラナ系に対する二乗和評価と対数分配関数の評価には、標準行列表現を要求しない。必要な入力は、共有模型の有限次元のギブス状態とトレース指数関数の解析（`Model.FiniteDimensionalGibbs`）、標準ハミルトニアン、汎用のガウス集中の3つである。旧配置と削除済み API の経緯は [作業履歴](../../WORK_HISTORY.md#super-legacy) を参照する。
 
 ## 公開定理と有限サイズの評価
 
-`SYK/SuperConcentration/Main.lean` の公開定理は `SYK.logPartition_hasSubgaussianMGF`、`logPartition_upper_tail_standardGaussian`、`logPartition_lower_tail_standardGaussian`、`logPartition_two_sided_tail_standardGaussian` である。入力は `P : SYK.Params`、非空有限行列表現の `MajoranaSystem`、`β : ℝ≥0` である。裾の指数表示には、追加で `β ≠ 0` と `t > 0` を仮定する。`β = 0` の場合は、`logPartition_tail_of_beta_zero`、`logPartition_centered_of_beta_zero` と、上側・下側の対応する定理で処理する。MGF はこの場合も含む。
+`SYK/SuperConcentration/Main.lean` の主な公開定理は、集中評価の `SYK.logPartition_hasSubgaussianMGF`、`logPartition_upper_tail_standardGaussian`、`logPartition_lower_tail_standardGaussian`、`logPartition_two_sided_tail_standardGaussian` である。その途中の結果として、リプシッツ性 `logPartition_lipschitz`、方向微分の式 `logPartition_line_deriv_eq`、ハミルトニアンの期待値の評価 `abs_beta_expectation_normHam_le` と `abs_beta_expectation_normHam_sq_le_exact` も公開する。入力は `P : SYK.Params`、非空有限行列表現の `MajoranaSystem`、`β : ℝ≥0` である。裾の指数表示には、追加で `β ≠ 0` と `t > 0` を仮定する。`β = 0` の場合は、両側の裾の `logPartition_tail_of_beta_zero`、中心化の `logPartition_centered_of_beta_zero`、値の `logPartition_eq_log_card_of_beta_zero` で処理する。MGF はこの場合も含む。
 
-`SYK.syk_sum_sq_expectation_le` は任意の密度行列 `ρ` について次を証明する。
+`SYK.syk_sum_sq_expectation_le` は、任意の密度行列 `ρ` について二乗和の評価を証明する。`abs_beta_expectation_normHam_sq_le_exact` は、これを方向 `V` の微分の評価に移す。
 
 ```text
 Σ_{|A|=q} |Tr(ρ Ψ_A)|² ≤ choose(N,q-1)/q,
-有限サイズのリプシッツ定数の二乗 ≤ (β couplingScale(P))² choose(N,q-1)/q.
+|β Re E_ρ[H(V)]|² ≤ (β couplingScale(P))² (choose(N,q-1)/q) ‖V‖².
 ```
 
-`couplingScale(P) = sqrt((q-1)!/N^(q-1))` を用いて後者を `β²/q` で抑え、上の MGF と裾評価を得る。標準ガウス座標に関する評価で、規模 `N` に依存しない上界である。
+`couplingScale(P) = sqrt((q-1)!/N^(q-1))` を用いて後者の係数を `β²/q` で抑え、上の MGF と裾評価を得る。`g` のユークリッドノルムに関する評価で、系の大きさ `N` に依存しない上界である。
 
 ## モジュールと名前空間
 
