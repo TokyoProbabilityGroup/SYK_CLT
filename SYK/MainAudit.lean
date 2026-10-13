@@ -2,7 +2,6 @@ module
 
 import all SYK.Main
 public meta import Lean.Elab.Command
-meta import Lean
 
 /-!
 # Audit of the standalone Gaussian SYK statements

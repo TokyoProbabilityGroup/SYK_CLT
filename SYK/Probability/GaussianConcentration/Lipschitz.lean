@@ -198,7 +198,7 @@ private lemma tendsto_integrals_of_approx {ι : Type*} [Fintype ι]
         have h_integrable : Integrable (fun x => ‖x‖ * Real.exp (|s| * L * ‖x‖))
           (standardGaussianMeasureOnEuclidean ι) := by
           convert integrable_exp_mul_norm (|s| * L + 1) |> fun h => h.mono' _ _ using 1
-          · exact Continuous.aestronglyMeasurable (by continuity)
+          · exact Continuous.aestronglyMeasurable (by fun_prop)
           · filter_upwards [] with x using by
               rw [Real.norm_of_nonneg (by positivity)]
               rw [add_mul, one_mul, Real.exp_add]

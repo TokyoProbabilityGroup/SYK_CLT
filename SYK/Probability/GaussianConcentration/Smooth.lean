@@ -349,7 +349,7 @@ private lemma integrable_cov_psi (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (
             · filter_upwards [] with x using by simpa using le_trans (by norm_num)
                                                   (Real.add_one_le_exp _)
           · convert integrable_exp_mul_norm 2 |> fun h => h.mono' _ _ using 1
-            · exact Continuous.aestronglyMeasurable (by continuity)
+            · exact Continuous.aestronglyMeasurable (by fun_prop)
             · filter_upwards [] with x using
                 by
                   rw [Real.norm_of_nonneg (sq_nonneg _)]
@@ -502,7 +502,7 @@ private lemma gaussian_cov_change_of_var (F : EuclideanSpace ℝ ι → ℝ) (L 
             ring_nf
             rw [Real.sin_sq, Real.cos_sq]
             ring]
-    · exact Continuous.aemeasurable (by continuity)
+    · exact Continuous.aemeasurable (by fun_prop)
     · refine MeasureTheory.Integrable.aestronglyMeasurable ?_
       rw [(rotation_measurePreserving θ).map_eq]
       assumption
@@ -935,7 +935,7 @@ lemma gaussian_cov_bound_smooth (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (h
       (g := fun θ => |Real.sin θ| *
         (|s| * L ^ 2 * ∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)) ?_ ?_ ?_) ?_)
   · exact Filter.Eventually.of_forall fun _ => norm_nonneg _
-  · exact Continuous.integrableOn_Ioc (by continuity)
+  · exact Continuous.integrableOn_Ioc (by fun_prop)
   · filter_upwards [MeasureTheory.ae_restrict_mem measurableSet_Ioc] with θ hθ
     simpa only [norm_mul, Real.norm_eq_abs] using mul_le_mul_of_nonneg_left
       (gaussian_cov_H_bound F L hL hF hgrad s θ) (abs_nonneg _)
