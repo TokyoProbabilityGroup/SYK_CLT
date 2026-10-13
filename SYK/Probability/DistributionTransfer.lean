@@ -29,7 +29,7 @@ private theorem dirac_prod_mul_law (c : ℝ) (μ : ProbabilityMeasure ℝ) :
   rfl
 
 /-- Weak convergence of laws is preserved when multiplication coefficients converge. -/
-theorem probabilityMeasure_mul_tendsto
+private theorem probabilityMeasure_mul_tendsto
     (μs : ℕ → ProbabilityMeasure ℝ) (μ : ProbabilityMeasure ℝ)
     (hμ : Tendsto μs atTop (𝓝 μ))
     (a : ℕ → ℝ) (b : ℝ) (ha : Tendsto a atTop (𝓝 b)) :

@@ -133,7 +133,7 @@ lemma exists_smooth_lipschitz_approx {ι : Type*} [Fintype ι]
 Dominated-convergence transfer of the three relevant integrals along a uniformly
 linearly-bounded, pointwise-convergent approximating sequence.
 -/
-lemma tendsto_integrals_of_approx {ι : Type*} [Fintype ι]
+private lemma tendsto_integrals_of_approx {ι : Type*} [Fintype ι]
     (F : EuclideanSpace ℝ ι → ℝ) (Fn : ℕ → EuclideanSpace ℝ ι → ℝ) (C L : ℝ)
     (hC : 0 ≤ C) (hL : 0 ≤ L)
     (hcont : ∀ n, Continuous (Fn n))
@@ -243,7 +243,7 @@ lemma gaussian_cov_bound {ι : Type*} [Fintype ι]
 
 /-- The centered Lipschitz function of a standard Gaussian vector satisfies the
 moment-generating-function estimate with variance proxy `L ^ 2`. -/
-theorem product_standardGaussian_mgf_le
+private theorem product_standardGaussian_mgf_le
     {ι : Type*} [Fintype ι]
     (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 < L)
     (hLip : LipschitzWith L.toNNReal F) (t : ℝ) :
@@ -253,7 +253,7 @@ theorem product_standardGaussian_mgf_le
   herbst_of_cov_bound F L hLip (gaussian_cov_bound F L hL hLip) t
 
 /-- A function with Lipschitz constant zero is constant. -/
-lemma eq_const_of_lipschitz_zero {ι : Type*} [Fintype ι]
+private lemma eq_const_of_lipschitz_zero {ι : Type*} [Fintype ι]
     (F : EuclideanSpace ℝ ι → ℝ)
     (hLip : LipschitzWith (0 : ℝ≥0) F) (x : EuclideanSpace ℝ ι) :
     F x = F 0 := by
@@ -264,7 +264,7 @@ lemma eq_const_of_lipschitz_zero {ι : Type*} [Fintype ι]
 
 /-- Centering a zero-Lipschitz function under the standard Gaussian measure
 gives the zero function. -/
-theorem centered_eq_zero_of_lipschitz_zero {ι : Type*} [Fintype ι]
+private theorem centered_eq_zero_of_lipschitz_zero {ι : Type*} [Fintype ι]
     (F : EuclideanSpace ℝ ι → ℝ)
     (hLip : LipschitzWith (0 : ℝ≥0) F) (x : EuclideanSpace ℝ ι) :
     F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι = 0 := by
@@ -348,7 +348,7 @@ theorem product_standardGaussian_lower_tail
     ext
     simp [add_comm]
 
-theorem abs_gt_iff_pos_or_neg {a t : ℝ} : |a| > t ↔ a > t ∨ -a > t := by
+private theorem abs_gt_iff_pos_or_neg {a t : ℝ} : |a| > t ↔ a > t ∨ -a > t := by
   rw [abs_eq_max_neg, gt_iff_lt, gt_iff_lt, gt_iff_lt, lt_max_iff, lt_neg]
 
 /-- Two-sided Gaussian concentration for a positive Lipschitz constant. -/

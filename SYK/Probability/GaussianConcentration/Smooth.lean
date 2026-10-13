@@ -137,7 +137,7 @@ lemma gaussian_ibp {ι : Type*} [Fintype ι] (g : EuclideanSpace ℝ ι → ℝ)
           i |>.1).const_mul (v.ofLp i)
 
 /-- A `C¹` function with gradient bounded by `L` grows at most linearly. -/
-lemma contDiff_abs_le_of_gradient_le {ι : Type*} [Fintype ι]
+private lemma contDiff_abs_le_of_gradient_le {ι : Type*} [Fintype ι]
     (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (x : EuclideanSpace ℝ ι) :
     |F x| ≤ |F 0| + L * ‖x‖ := by
@@ -162,7 +162,7 @@ lemma contDiff_abs_le_of_gradient_le {ι : Type*} [Fintype ι]
       simpa only [add_comm] using add_le_add_right hb |F 0|
 
 /-- The gradient of `x ↦ exp (s * F x)`. -/
-lemma gradient_exp_smul {ι : Type*} [Fintype ι]
+private lemma gradient_exp_smul {ι : Type*} [Fintype ι]
     (F : EuclideanSpace ℝ ι → ℝ) (hF : ContDiff ℝ 1 F) (s : ℝ) (x : EuclideanSpace ℝ ι) :
     gradient (fun y => Real.exp (s * F y)) x = (s * Real.exp (s * F x)) • gradient F x := by
   have hd : HasFDerivAt F (fderiv ℝ F x) x :=
@@ -194,7 +194,7 @@ lemma rotation_measurePreserving (θ : ℝ) :
 /--
 Gradient of `F` composed with the affine map `z ↦ c • x - d • z`.
 -/
-lemma gradient_affine_comp (F : EuclideanSpace ℝ ι → ℝ) (hF : Differentiable ℝ F)
+private lemma gradient_affine_comp (F : EuclideanSpace ℝ ι → ℝ) (hF : Differentiable ℝ F)
     (c d : ℝ) (x y : EuclideanSpace ℝ ι) :
     gradient (fun z => F (c • x - d • z)) y = (-d) • gradient F (c • x - d • y) := by
   have haff : HasFDerivAt (fun z : EuclideanSpace ℝ ι => c • x - d • z)
@@ -217,7 +217,7 @@ lemma gradient_affine_comp (F : EuclideanSpace ℝ ι → ℝ) (hF : Differentia
 /--
 The covariance rewritten as a double integral over the product measure.
 -/
-lemma gaussian_cov_eq_double (f g : EuclideanSpace ℝ ι → ℝ)
+private lemma gaussian_cov_eq_double (f g : EuclideanSpace ℝ ι → ℝ)
     (hf : Integrable f (standardGaussianMeasureOnEuclidean ι))
     (hg : Integrable g (standardGaussianMeasureOnEuclidean ι))
     (hfg : Integrable (fun x => f x * g x) (standardGaussianMeasureOnEuclidean ι)) :
@@ -244,7 +244,7 @@ lemma gaussian_cov_eq_double (f g : EuclideanSpace ℝ ι → ℝ)
 /--
 Fundamental theorem of calculus along the rotation path `θ ↦ cos θ • a + sin θ • b`.
 -/
-lemma gaussian_path_ftc (g : EuclideanSpace ℝ ι → ℝ) (hg : ContDiff ℝ 1 g)
+private lemma gaussian_path_ftc (g : EuclideanSpace ℝ ι → ℝ) (hg : ContDiff ℝ 1 g)
     (a b : EuclideanSpace ℝ ι) :
     g a - g b = - ∫ θ in (0:ℝ)..(Real.pi/2),
       inner ℝ (gradient g (Real.cos θ • a + Real.sin θ • b))
@@ -296,7 +296,7 @@ lemma gaussian_path_ftc (g : EuclideanSpace ℝ ι → ℝ) (hg : ContDiff ℝ 1
 Integrability of the change-of-variables covariance integrand
 `ψ (x,y) = F(cos θ•x - sin θ•y) · ⟪∇G x, y⟫` on the product Gaussian measure.
 -/
-lemma integrable_cov_psi (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
+private lemma integrable_cov_psi (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s θ : ℝ) :
     Integrable (fun p : EuclideanSpace ℝ ι × EuclideanSpace ℝ ι =>
         F (Real.cos θ • p.1 - Real.sin θ • p.2) *
@@ -412,7 +412,7 @@ lemma integrable_cov_psi (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 �
 Integrability of the original covariance integrand
 `Φ (a,b) = F a · ⟪∇G(cos θ•a+sin θ•b), -sin θ•a+cos θ•b⟫` on the product Gaussian measure.
 -/
-lemma integrable_cov_Phi (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
+private lemma integrable_cov_Phi (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s θ : ℝ) :
     Integrable (fun p : EuclideanSpace ℝ ι × EuclideanSpace ℝ ι =>
         F p.1 *
@@ -454,7 +454,7 @@ Change of variables by the rotation on the product Gaussian measure: rewriting t
 covariance integrand `F a · ⟪∇G(cos θ•a+sin θ•b), -sin θ•a+cos θ•b⟫` as
 `F(cos θ•x - sin θ•y) · ⟪∇G x, y⟫`.  Here `G z = exp (s * F z)`.
 -/
-lemma gaussian_cov_change_of_var (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
+private lemma gaussian_cov_change_of_var (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s θ : ℝ) :
     (∫ a, ∫ b, F a *
         inner ℝ (gradient (fun z => Real.exp (s * F z)) (Real.cos θ • a + Real.sin θ • b))
@@ -509,7 +509,7 @@ lemma gaussian_cov_change_of_var (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (
 Gaussian integration by parts in the `y`-variable, applied to the change-of-variables
 form.  Here `G z = exp (s * F z)`.
 -/
-lemma gaussian_cov_ibp_step (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
+private lemma gaussian_cov_ibp_step (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s θ : ℝ) :
     (∫ x, ∫ y, F (Real.cos θ • x - Real.sin θ • y) *
           inner ℝ (gradient (fun z => Real.exp (s * F z)) x) y
@@ -567,7 +567,7 @@ lemma gaussian_cov_ibp_step (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 
 
 /-- Per-angle covariance identity: change of variables (rotation) followed by Gaussian
 integration by parts in the second variable.  Here `G z = exp (s * F z)`. -/
-lemma gaussian_cov_per_theta (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
+private lemma gaussian_cov_per_theta (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s θ : ℝ) :
     (∫ a, ∫ b, F a *
         inner ℝ (gradient (fun z => Real.exp (s * F z)) (Real.cos θ • a + Real.sin θ • b))
@@ -584,7 +584,7 @@ lemma gaussian_cov_per_theta (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL :
 Joint integrability of the covariance integrand over `((a,b), θ)` where `θ` ranges over
 the finite interval `Ioc 0 (π/2)`.  Used for the Fubini swap.
 -/
-lemma integrable_cov_joint (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
+private lemma integrable_cov_joint (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s : ℝ) :
     Integrable (fun q : (EuclideanSpace ℝ ι × EuclideanSpace ℝ ι) × ℝ =>
         F q.1.1 *
@@ -733,7 +733,7 @@ lemma integrable_cov_joint (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0
               (1 + ‖q.1.1‖)) *
             ((1 + ‖q.1.2‖) * Real.exp (|s| * L * ‖q.1.2‖)) := by ring
 
-lemma gaussian_cov_fubini_swap (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
+private lemma gaussian_cov_fubini_swap (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s : ℝ) :
     (∫ a, ∫ b, F a * (∫ θ in (0:ℝ)..(Real.pi/2),
         inner ℝ (gradient (fun z => Real.exp (s * F z)) (Real.cos θ • a + Real.sin θ • b))
@@ -861,7 +861,7 @@ lemma gaussian_cov_repr (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 �
 /--
 Pointwise bound on the inner double integral `H θ`.
 -/
-lemma gaussian_cov_H_bound (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
+private lemma gaussian_cov_H_bound (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)
     (hF : ContDiff ℝ 1 F) (hgrad : ∀ x, ‖gradient F x‖ ≤ L) (s θ : ℝ) :
     |∫ x, ∫ y, inner ℝ (gradient (fun z => Real.exp (s * F z)) x)
           (gradient F (Real.cos θ • x - Real.sin θ • y))

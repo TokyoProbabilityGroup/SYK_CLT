@@ -45,7 +45,7 @@ private theorem exp_tail_range_le (u : ℝ) (hu : 0 ≤ u) (m : ℕ) :
     _ ≤ _ := by
       exact mul_le_mul_of_nonneg_left (Real.sum_le_exp_of_nonneg hu m) (by positivity)
 
-theorem Setting.inner_hermiteLp_YGaussianLp_eq_zero_of_odd
+private theorem Setting.inner_hermiteLp_YGaussianLp_eq_zero_of_odd
     {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (α : InteractionIndex (S.N n) q → ℕ) (hα : IsOddMultiIndex α) :
     ⟪hermiteLp α, S.YGaussianLp β n⟫_ℝ = 0 := by

@@ -36,7 +36,7 @@ namespace MajoranaSystem
 variable {N : ℕ} {A : Type*} [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
   (M : MajoranaSystem N A)
 
-theorem listProduct_mul_reverse (l : List (Fin N)) :
+private theorem listProduct_mul_reverse (l : List (Fin N)) :
     (l.map M.ψ).prod * (l.reverse.map M.ψ).prod = 1 := by
   induction l with
   | nil => simp
@@ -46,25 +46,25 @@ theorem listProduct_mul_reverse (l : List (Fin N)) :
     rw [mul_assoc, ← mul_assoc (l.map M.ψ).prod, ih, one_mul, M.majorana_sq]
 
 /-- The interaction index consisting of all labels except `x`. -/
-def complementIndex (x : Fin N) : InteractionIndex N (N - 1) :=
+private def complementIndex (x : Fin N) : InteractionIndex N (N - 1) :=
   ⟨Finset.univ.erase x, by simp⟩
 
 /-- The product of all generators except `ψ x` (a single-coordinate reflection). -/
 noncomputable def reflection (x : Fin N) : A := M.psiProduct (complementIndex x)
 
 /-- The inverse of `reflection x`. -/
-noncomputable def reflectionInv (x : Fin N) : A :=
+private noncomputable def reflectionInv (x : Fin N) : A :=
   ((orderedIndices (complementIndex x)).reverse.map M.ψ).prod
 
-theorem reflection_mul_inv (x : Fin N) : M.reflection x * M.reflectionInv x = 1 :=
+private theorem reflection_mul_inv (x : Fin N) : M.reflection x * M.reflectionInv x = 1 :=
   M.listProduct_mul_reverse _
 
-theorem reflectionInv_mul (x : Fin N) : M.reflectionInv x * M.reflection x = 1 := by
+private theorem reflectionInv_mul (x : Fin N) : M.reflectionInv x * M.reflection x = 1 := by
   have := M.listProduct_mul_reverse (orderedIndices (complementIndex x)).reverse
   rw [List.reverse_reverse] at this
   exact this
 
-theorem reflection_mul_generator (hN : Even N) (x j : Fin N) :
+private theorem reflection_mul_generator (hN : Even N) (x j : Fin N) :
     M.reflection x * M.ψ j =
       (if j = x then (-1 : ℂ) else 1) • (M.ψ j * M.reflection x) := by
   by_cases hjx : j = x
@@ -111,7 +111,7 @@ theorem exists_gauge (hN : Even N) (S : Finset (Fin N)) :
 /-- An invertible Clifford element exchanges two generators under conjugation.
 It negates all other generators. For even interaction order, this realizes a
 transposition of interaction labels up to signs. -/
-theorem exists_generator_swap (i j : Fin N) (hij : i ≠ j) :
+private theorem exists_generator_swap (i j : Fin N) (hij : i ≠ j) :
     ∃ U V : A, U * V = 1 ∧ V * U = 1 ∧
       U * M.ψ i = M.ψ j * U ∧
       U * M.ψ j = M.ψ i * U ∧
@@ -157,7 +157,7 @@ theorem exists_generator_swap (i j : Fin N) (hij : i ≠ j) :
     abel
 
 /-- The swap conjugation as a signed permutation of generator labels. -/
-theorem exists_generator_swap_action (i j : Fin N) (hij : i ≠ j) :
+private theorem exists_generator_swap_action (i j : Fin N) (hij : i ≠ j) :
     ∃ U V : A, U * V = 1 ∧ V * U = 1 ∧
       ∀ k : Fin N,
         U * M.ψ k =
@@ -176,7 +176,7 @@ theorem exists_generator_swap_action (i j : Fin N) (hij : i ≠ j) :
     hother k hki hkj
 
 /-- Move the swap element through a Majorana word. -/
-theorem mul_listProduct_swap {U : A} (i j : Fin N)
+private theorem mul_listProduct_swap {U : A} (i j : Fin N)
     (hU : ∀ k : Fin N,
       U * M.ψ k =
         (if k = i ∨ k = j then (1 : ℂ) else -1) •
@@ -197,7 +197,7 @@ def swapInteractionIndex {q : ℕ} (i j : Fin N) (s : InteractionIndex N q) :
   ⟨s.1.image (Equiv.swap i j), by
     rw [Finset.card_image_of_injective _ (Equiv.swap i j).injective, s.2]⟩
 
-theorem swapInteractionIndex_swap {q : ℕ} (i j : Fin N)
+private theorem swapInteractionIndex_swap {q : ℕ} (i j : Fin N)
     (s : InteractionIndex N q) :
     swapInteractionIndex i j (swapInteractionIndex i j s) = s := by
   apply Subtype.ext
@@ -211,7 +211,7 @@ def swapInteractionEquiv {q : ℕ} (i j : Fin N) :
   left_inv := swapInteractionIndex_swap i j
   right_inv := swapInteractionIndex_swap i j
 
-theorem orderedIndices_swap_perm {q : ℕ} (i j : Fin N)
+private theorem orderedIndices_swap_perm {q : ℕ} (i j : Fin N)
     (s : InteractionIndex N q) :
     ((orderedIndices s).map (Equiv.swap i j)).Perm
       (orderedIndices (swapInteractionIndex i j s)) := by
@@ -223,7 +223,7 @@ theorem orderedIndices_swap_perm {q : ℕ} (i j : Fin N)
 
 /-- Swapping two generator labels carries each interaction word to the
 relabelled interaction word, up to a real sign. -/
-theorem psiProduct_swap {q : ℕ} {U : A} (i j : Fin N)
+private theorem psiProduct_swap {q : ℕ} {U : A} (i j : Fin N)
     (hU : ∀ k : Fin N,
       U * M.ψ k =
         (if k = i ∨ k = j then (1 : ℂ) else -1) •
@@ -255,7 +255,7 @@ theorem psiProduct_swap {q : ℕ} {U : A} (i j : Fin N)
     change _ = _ • ((orderedIndices (swapInteractionIndex i j s) |>.map M.ψ).prod * U)
     rw [hreorder', Algebra.smul_mul_assoc, smul_smul]
 
-theorem interactionOperator_swap {q : ℕ} {U : A} (i j : Fin N)
+private theorem interactionOperator_swap {q : ℕ} {U : A} (i j : Fin N)
     (hU : ∀ k : Fin N,
       U * M.ψ k =
         (if k = i ∨ k = j then (1 : ℂ) else -1) •
@@ -270,7 +270,7 @@ theorem interactionOperator_swap {q : ℕ} {U : A} (i j : Fin N)
   rw [smul_comm]
 
 /-- A single choice of real signs for every interaction under a generator swap. -/
-theorem exists_interaction_swap_sign {q : ℕ} {U : A} (i j : Fin N)
+private theorem exists_interaction_swap_sign {q : ℕ} {U : A} (i j : Fin N)
     (hU : ∀ k : Fin N,
       U * M.ψ k =
         (if k = i ∨ k = j then (1 : ℂ) else -1) •
@@ -292,7 +292,7 @@ theorem exists_interaction_swap_sign {q : ℕ} {U : A} (i j : Fin N)
   exact ⟨c, hc, heq⟩
 
 /-- A signed relabelling of couplings conjugates the finite interaction sum. -/
-theorem interactionSum_swap {q : ℕ} (i j : Fin N)
+private theorem interactionSum_swap {q : ℕ} (i j : Fin N)
     (U V : A) (hUV : U * V = 1)
     (c J : InteractionIndex N q → ℝ)
     (hO : ∀ s, U * M.interactionOperator s =
@@ -328,7 +328,7 @@ theorem interactionSum_swap {q : ℕ} (i j : Fin N)
             intro s
             simp [swapInteractionEquiv, swapInteractionIndex_swap, mul_comm]
 
-theorem mul_listProduct {U : A} {ε : Fin N → ℂ}
+private theorem mul_listProduct {U : A} {ε : Fin N → ℂ}
     (h : ∀ j, U * M.ψ j = ε j • (M.ψ j * U)) (l : List (Fin N)) :
     U * (l.map M.ψ).prod = (l.map ε).prod • ((l.map M.ψ).prod * U) := by
   induction l with
@@ -338,7 +338,7 @@ theorem mul_listProduct {U : A} {ε : Fin N → ℂ}
     rw [← mul_assoc, h i, Algebra.smul_mul_assoc, mul_assoc, ih, Algebra.mul_smul_comm,
       smul_smul, mul_assoc]
 
-theorem mul_interactionOperator {q : ℕ} {U : A} {ε : Fin N → ℂ}
+private theorem mul_interactionOperator {q : ℕ} {U : A} {ε : Fin N → ℂ}
     (h : ∀ j, U * M.ψ j = ε j • (M.ψ j * U)) (s : InteractionIndex N q) :
     U * M.interactionOperator s = (∏ j ∈ s.1, ε j) • (M.interactionOperator s * U) := by
   have hl := M.mul_listProduct h (orderedIndices s)

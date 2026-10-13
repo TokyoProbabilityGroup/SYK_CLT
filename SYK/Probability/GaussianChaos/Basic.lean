@@ -92,7 +92,7 @@ theorem integral_gaussianCouplings_sign {ι E : Type*} [Fintype ι]
   exact hmp.integral_comp' F
 
 /-- Reindexing i.i.d. standard Gaussian coordinates preserves expectation. -/
-theorem integral_gaussianCouplings_perm {ι E : Type*} [Fintype ι]
+private theorem integral_gaussianCouplings_perm {ι E : Type*} [Fintype ι]
     [NormedAddCommGroup E] [NormedSpace ℝ E]
     (e : ι ≃ ι) (F : (ι → ℝ) → E) :
     ∫ g, F (fun i => g (e i)) ∂gaussianCouplings ι =

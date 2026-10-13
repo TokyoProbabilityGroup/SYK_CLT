@@ -199,7 +199,7 @@ theorem gibbsOperator_posDef (β : NNReal) {H : Matrix d d ℂ}
   apply hpsd.posDef_iff_isUnit.mpr
   exact Matrix.isUnit_exp A
 
-theorem partitionFunction_star_eq (β : NNReal) {H : Matrix d d ℂ}
+private theorem partitionFunction_star_eq (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) :
     star (partitionFunction (β : ℂ) H) = partitionFunction (β : ℂ) H := by
   have hG : star (gibbsOperator (β : ℂ) H) = gibbsOperator (β : ℂ) H :=
@@ -214,7 +214,7 @@ theorem partitionFunction_im_eq_zero (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) : (partitionFunction (β : ℂ) H).im = 0 :=
   Complex.conj_eq_iff_im.mp (partitionFunction_star_eq β hH)
 
-theorem partitionFunction_eq_ofReal_re (β : NNReal) {H : Matrix d d ℂ}
+private theorem partitionFunction_eq_ofReal_re (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) :
     ((partitionFunction (β : ℂ) H).re : ℂ) = partitionFunction (β : ℂ) H := by
   apply Complex.ext
@@ -321,12 +321,12 @@ section TraceExponentialDerivative
 
 variable {d : Type*} [Fintype d] [DecidableEq d]
 
-noncomputable def matrixTraceCLM : Matrix d d ℂ →L[ℝ] ℂ :=
+private noncomputable def matrixTraceCLM : Matrix d d ℂ →L[ℝ] ℂ :=
   LinearMap.toContinuousLinearMap (Matrix.traceLinearMap d ℝ ℂ)
 
 omit [DecidableEq d] in
 @[simp]
-theorem matrixTraceCLM_apply (A : Matrix d d ℂ) :
+private theorem matrixTraceCLM_apply (A : Matrix d d ℂ) :
     matrixTraceCLM A = Matrix.trace A := rfl
 
 private theorem trace_pow_mul_cycle (A B : Matrix d d ℂ)

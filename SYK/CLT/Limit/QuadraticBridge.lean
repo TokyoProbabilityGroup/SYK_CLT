@@ -18,7 +18,7 @@ open SYK.GaussianChaos SYK.Probability
 
 namespace SYK.CLT
 
-theorem hermite_sum_ae {ι : Type*} [Fintype ι] [DecidableEq ι] :
+private theorem hermite_sum_ae {ι : Type*} [Fintype ι] [DecidableEq ι] :
     (fun g => (∑ i : ι, hermiteLp (Pi.single i 2) :
       Lp ℝ 2 (gaussianCouplings ι)) g) =ᵐ[gaussianCouplings ι]
       fun g => ∑ i : ι, (g i ^ 2 - 1) := by

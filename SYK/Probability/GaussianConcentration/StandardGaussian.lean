@@ -98,7 +98,7 @@ theorem integrable_exp_mul_norm {ι : Type*} [Fintype ι] (c : ℝ) :
 /-- If Φ is differentiable, Φ(0) = 0, and |Φ'(s) - m| ≤ c |s|, then
 Φ(t) ≤ m t + c t² / 2. For s ≥ 0, Φ'(s) - m ≤ c s; for s ≤ 0,
 Φ'(s) - m ≥ c s. Thus ψ(s) = Φ(s) - (m s + c s² / 2) is maximized at 0. -/
-lemma quadratic_bound_of_deriv_sub_le {Φ : ℝ → ℝ} {m c : ℝ}
+private lemma quadratic_bound_of_deriv_sub_le {Φ : ℝ → ℝ} {m c : ℝ}
     (hdiff : Differentiable ℝ Φ) (h0 : Φ 0 = 0)
     (hderiv : ∀ s, |deriv Φ s - m| ≤ c * |s|) (t : ℝ) :
     Φ t ≤ m * t + c * t ^ 2 / 2 := by
@@ -178,7 +178,7 @@ lemma integrable_exp_smul_lipschitz {ι : Type*} [Fintype ι]
 
 /-- For `F` satisfying `LipschitzWith L.toNNReal F`, every real exponent
 belongs to its Gaussian integrability set. -/
-lemma integrableExpSet_lipschitz_eq_univ {ι : Type*} [Fintype ι]
+private lemma integrableExpSet_lipschitz_eq_univ {ι : Type*} [Fintype ι]
     (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ)
     (hLip : LipschitzWith L.toNNReal F) :
     integrableExpSet F (standardGaussianMeasureOnEuclidean ι) = Set.univ := by

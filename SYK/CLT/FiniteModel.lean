@@ -144,7 +144,7 @@ theorem normalizedHamiltonian_trace_eq_zero (P : Params)
     Matrix.trace_smul, interactionOperator_trace_eq_zero P M]
 
 /-- A single nonzero Gaussian coupling gives a nonzero Hamiltonian. -/
-theorem normalizedHamiltonian_single_ne_zero [Nonempty d] (P : Params)
+private theorem normalizedHamiltonian_single_ne_zero [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ))
     (s : InteractionIndex P.N P.q) :
     normalizedHamiltonian P M (WithLp.toLp 2 (Pi.single s (1 : ℝ))) ≠ 0 := by
@@ -260,7 +260,7 @@ theorem realPartitionFunction_ge_one [Nonempty d] (P : Params)
 
 /-- The lower bound is strict when the Hamiltonian and inverse temperature
 are nonzero. -/
-theorem realPartitionFunction_gt_one_of_hamiltonian_ne_zero [Nonempty d] (P : Params)
+private theorem realPartitionFunction_gt_one_of_hamiltonian_ne_zero [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) (hβ : β ≠ 0)
     (g : CouplingSpace P.N P.q)
     (hH : normalizedHamiltonian P M g ≠ 0) :

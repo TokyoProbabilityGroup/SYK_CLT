@@ -210,7 +210,7 @@ noncomputable def hermiteFiniteProjection {ι : Type*} [Fintype ι]
 
 /-- On the chosen finite set, the coefficient sum preserves every Hermite
 coefficient. -/
-theorem inner_hermiteFiniteProjection {ι : Type*} [Fintype ι]
+private theorem inner_hermiteFiniteProjection {ι : Type*} [Fintype ι]
     (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι))
     (β : ι → ℕ) (hβ : β ∈ s) :
     ⟪hermiteLp β, hermiteFiniteProjection s f⟫_ℝ = ⟪hermiteLp β, f⟫_ℝ := by
@@ -222,7 +222,7 @@ theorem inner_hermiteFiniteProjection {ι : Type*} [Fintype ι]
 
 /-- The error of a finite Hermite coefficient sum is orthogonal to every
 Hermite polynomial included in the sum. -/
-theorem inner_hermiteFiniteProjection_error {ι : Type*} [Fintype ι]
+private theorem inner_hermiteFiniteProjection_error {ι : Type*} [Fintype ι]
     (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι))
     (β : ι → ℕ) (hβ : β ∈ s) :
     ⟪hermiteLp β, f - hermiteFiniteProjection s f⟫_ℝ = 0 := by
@@ -230,7 +230,7 @@ theorem inner_hermiteFiniteProjection_error {ι : Type*} [Fintype ι]
   exact sub_self _
 
 /-- There are only finitely many multi-indices of bounded total degree. -/
-theorem finite_multiIndices_degree_le {ι : Type*} [Fintype ι] (r : ℕ) :
+private theorem finite_multiIndices_degree_le {ι : Type*} [Fintype ι] (r : ℕ) :
     {α : ι → ℕ | ∑ i, α i ≤ r}.Finite := by
   classical
   let e : {α : ι → ℕ | ∑ i, α i ≤ r} → (ι → Fin (r + 1)) :=
@@ -273,7 +273,7 @@ noncomputable instance hermiteFiniteSpan_finiteDimensional {ι : Type*} [Fintype
   unfold hermiteFiniteSpan
   exact FiniteDimensional.span_of_finite ℝ (Set.toFinite _)
 
-theorem hermiteFiniteProjection_mem {ι : Type*} [Fintype ι]
+private theorem hermiteFiniteProjection_mem {ι : Type*} [Fintype ι]
     (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     hermiteFiniteProjection s f ∈ hermiteFiniteSpan s := by
   classical
@@ -283,7 +283,7 @@ theorem hermiteFiniteProjection_mem {ι : Type*} [Fintype ι]
   apply Submodule.smul_mem
   exact Submodule.subset_span ⟨α, hα, rfl⟩
 
-theorem hermiteFiniteProjection_error_orthogonal {ι : Type*} [Fintype ι]
+private theorem hermiteFiniteProjection_error_orthogonal {ι : Type*} [Fintype ι]
     (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     f - hermiteFiniteProjection s f ∈ (hermiteFiniteSpan s)ᗮ := by
   classical
@@ -376,7 +376,7 @@ theorem hasSum_hermiteCoefficients {ι : Type*} [Fintype ι]
   simpa only [← hermiteOrthonormal_coefficient] using hasSum_hermiteOrthonormal hdense f
 
 /-- Grouping a multi-index by its total degree. -/
-def multiIndexDegreeEquiv {ι : Type*} [Fintype ι] :
+private def multiIndexDegreeEquiv {ι : Type*} [Fintype ι] :
     (ι → ℕ) ≃ (Σ r : ℕ, {α : ι → ℕ // ∑ i, α i = r}) where
   toFun α := ⟨∑ i, α i, ⟨α, rfl⟩⟩
   invFun p := p.2.1
@@ -395,7 +395,7 @@ private noncomputable instance finiteDegreeSubtype {ι : Type*} [Fintype ι] (r 
 private noncomputable instance fintypeDegreeSubtype {ι : Type*} [Fintype ι] (r : ℕ) :
     Fintype {α : ι → ℕ // ∑ i, α i = r} := Fintype.ofFinite _
 
-theorem sum_multiIndicesOfDegree {ι : Type*} [Fintype ι]
+private theorem sum_multiIndicesOfDegree {ι : Type*} [Fintype ι]
     (r : ℕ) {E : Type*} [AddCommMonoid E] (t : (ι → ℕ) → E) :
     (∑ α : {α : ι → ℕ // ∑ i, α i = r}, t α.1) =
       ∑ α ∈ multiIndicesOfDegree r, t α := by

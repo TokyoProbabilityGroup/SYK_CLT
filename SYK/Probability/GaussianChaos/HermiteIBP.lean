@@ -41,7 +41,7 @@ theorem coordDeriv_eq_fderiv (i : ι)
 
 /-- Exponential-growth Stein identity on a finite product Gaussian. Only the
 chosen coordinate derivative needs a growth bound. -/
-theorem coord_stein_of_expGrowth
+private theorem coord_stein_of_expGrowth
     (h : (ι → ℝ) → ℝ) (i : ι) (hh : ContDiff ℝ 1 h)
     (C c : ℝ)
     (hhb : ∀ g, |h g| ≤ C * Real.exp (c * ∑ j, |g j|))
@@ -58,7 +58,7 @@ theorem coord_stein_of_expGrowth
 omit [DecidableEq ι] in
 /-- The bound for the Euclidean norm used for the disorder vector
 in the manuscript. -/
-theorem euclidean_norm_le_sum_abs (g : ι → ℝ) :
+private theorem euclidean_norm_le_sum_abs (g : ι → ℝ) :
     ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖ ≤ ∑ j, |g j| := by
   classical
   have hsum : (WithLp.toLp 2 g : EuclideanSpace ℝ ι) =
@@ -113,7 +113,7 @@ private theorem abs_coord_le_euclidean_norm (g : ι → ℝ) (i : ι) :
 
 omit [DecidableEq ι] in
 /-- A fixed Hermite factor has exponential growth in the disorder norm. -/
-theorem hermite_factor_exp_bound (i : ι) (n : ℕ) :
+private theorem hermite_factor_exp_bound (i : ι) (n : ℕ) :
     ∃ C c : ℝ, 0 ≤ C ∧ 0 ≤ c ∧ ∀ g : ι → ℝ,
       |Polynomial.aeval (g i) (Polynomial.hermite n)| ≤
         C * Real.exp (c * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖) := by
@@ -126,7 +126,7 @@ theorem hermite_factor_exp_bound (i : ι) (n : ℕ) :
 
 omit [DecidableEq ι] in
 /-- A finite product of Hermite factors has exponential Euclidean growth. -/
-theorem hermite_product_exp_bound (α : ι → ℕ) (s : Finset ι) :
+private theorem hermite_product_exp_bound (α : ι → ℕ) (s : Finset ι) :
     ∃ C c : ℝ, 0 ≤ C ∧ 0 ≤ c ∧ ∀ g : ι → ℝ,
       |∏ i ∈ s, Polynomial.aeval (g i) (Polynomial.hermite (α i))| ≤
         C * Real.exp (c * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖) := by
@@ -156,7 +156,7 @@ theorem hermite_product_exp_bound (α : ι → ℕ) (s : Finset ι) :
 
 /-- Selected-coordinate Stein identity using the Euclidean norm from the
 manuscript's exponential-growth condition. -/
-theorem coord_stein_of_euclidean_expGrowth
+private theorem coord_stein_of_euclidean_expGrowth
     (h : (ι → ℝ) → ℝ) (i : ι) (hh : ContDiff ℝ 1 h)
     (C c : ℝ) (hc : 0 ≤ c) (hC : 0 ≤ C)
     (hhb : ∀ g, |h g| ≤ C * Real.exp (c * ‖(WithLp.toLp 2 g : EuclideanSpace ℝ ι)‖))
@@ -301,7 +301,7 @@ theorem integrable_coord_mul_of_euclidean_expBound
 exponential-growth Stein identity. The integrability hypotheses isolate the
 linear integral rearrangement; they follow from growth bounds in the
 multi-index application. -/
-theorem creation_ibp_of_expGrowth
+private theorem creation_ibp_of_expGrowth
     (i : ι) (φ ψ : (ι → ℝ) → ℝ)
     (hφ : ContDiff ℝ 1 φ) (hψ : ContDiff ℝ 1 ψ)
     (C c : ℝ) (hc : 0 ≤ c) (hC : 0 ≤ C)
@@ -381,7 +381,7 @@ noncomputable def hermiteList : List ι → (ι → ℝ) → ℝ
   | i :: l => creation i (hermiteList l)
 
 /-- Every creation-operator Hermite function is smooth. -/
-theorem contDiff_hermiteList (l : List ι) :
+private theorem contDiff_hermiteList (l : List ι) :
     ContDiff ℝ ⊤ (hermiteList l) := by
   induction l with
   | nil => simpa [hermiteList] using
@@ -429,7 +429,7 @@ def ExpIBPChain : List ι → ((ι → ℝ) → ℝ) → Prop
 
 /-- Multi-coordinate Gaussian IBP from exponential bounds along precisely
 the derivative chain used by the multi-index. -/
-theorem hermiteList_ibp_of_expChain (l : List ι)
+private theorem hermiteList_ibp_of_expChain (l : List ι)
     {f : (ι → ℝ) → ℝ} (hfSmooth : ContDiff ℝ l.length f)
     (hf : ExpIBPChain l f) :
     (∫ g, hermiteList l g * f g
@@ -611,7 +611,7 @@ theorem integrable_hermiteMulti_mul_of_expGrowth (α : ι → ℕ)
 
 /-- The exponential-growth chain yields the multi-index formula with the
 standard product of probabilists' Hermite polynomials. -/
-theorem hermiteMulti_ibp_of_expChain (α : ι → ℕ)
+private theorem hermiteMulti_ibp_of_expChain (α : ι → ℕ)
     {f : (ι → ℝ) → ℝ}
     (hfSmooth : ContDiff ℝ (↑(∑ i : ι, α i)) f)
     (hf : ExpIBPChain (multiIndexList α) f) :

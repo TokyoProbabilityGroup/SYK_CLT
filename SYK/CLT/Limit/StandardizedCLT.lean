@@ -11,7 +11,7 @@ open SYK.Probability
 
 namespace SYK.CLT
 
-theorem Setting.standardizedFluctuation_eq_multiplier {q : ℕ} (S : Setting q)
+private theorem Setting.standardizedFluctuation_eq_multiplier {q : ℕ} (S : Setting q)
     (β : ℝ) (hβ : β ≠ 0) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :
     S.standardizedFluctuation β n g =
@@ -38,7 +38,7 @@ theorem Setting.standardizedFluctuation_eq_multiplier {q : ℕ} (S : Setting q)
   unfold Setting.standardizedFluctuation Setting.relativeFluctuation Setting.Y
   field_simp [ne_of_gt hs, ne_of_gt hm, ne_of_gt (Real.sqrt_pos.mpr hv)]
 
-theorem gaussian_normalized_limit_law (v : ℝ≥0) (hv : 0 < v) :
+private theorem gaussian_normalized_limit_law (v : ℝ≥0) (hv : 0 < v) :
     (gaussianReal 0 v).map
       (fun x : ℝ => (Real.sqrt (v : ℝ))⁻¹ * x) = gaussianReal 0 1 := by
   rw [gaussianReal_map_const_mul]

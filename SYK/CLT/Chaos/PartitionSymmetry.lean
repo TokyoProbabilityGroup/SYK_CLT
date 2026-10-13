@@ -43,7 +43,7 @@ theorem Setting.Z_swap {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
   exact congrArg (fun z : ℂ => (z / (Fintype.card (S.d n) : ℂ)).re) h
 
 /-- Diagonal quadratic coefficients are unchanged by a vertex transposition. -/
-theorem Setting.integral_Y_mul_sq_sub_one_swap {q : ℕ} (S : Setting q)
+private theorem Setting.integral_Y_mul_sq_sub_one_swap {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (i j : Fin (S.N n)) (hij : i ≠ j)
     (I : InteractionIndex (S.N n) q) :
     (∫ g : InteractionIndex (S.N n) q → ℝ,
@@ -67,7 +67,7 @@ theorem Setting.integral_Y_mul_sq_sub_one_swap {q : ℕ} (S : Setting q)
   simpa only [MajoranaSystem.swapInteractionEquiv, Equiv.coe_fn_mk, hY, hsq] using h.symm
 
 /-- Transpositions act transitively on interaction subsets of fixed cardinality. -/
-theorem interaction_function_constant_of_swap {N q : ℕ}
+private theorem interaction_function_constant_of_swap {N q : ℕ}
     (f : InteractionIndex N q → ℝ)
     (hf : ∀ (i j : Fin N), i ≠ j → ∀ I,
       f I = f (MajoranaSystem.swapInteractionIndex i j I))
@@ -223,7 +223,7 @@ theorem Setting.inner_hermiteLp_ZGaussianLp_eq_zero {q : ℕ} (S : Setting q)
   exact S.integral_Z_mul_hermite_eq_zero_pi β n α hα
 
 /-- A natural multi-index of total degree one is supported at one coordinate. -/
-theorem multiIndex_eq_single_of_degree_one {ι : Type*} [Fintype ι] [DecidableEq ι]
+private theorem multiIndex_eq_single_of_degree_one {ι : Type*} [Fintype ι] [DecidableEq ι]
     (α : ι → ℕ) (hdegree : ∑ I, α I = 1) :
     ∃ I, α = Pi.single I 1 := by
   classical
@@ -298,7 +298,7 @@ theorem multiIndex_degree_two_cases {ι : Type*} [Fintype ι] [DecidableEq ι]
       exact hδK
 
 /-- A degree-one multi-index is odd when interactions are nonempty. -/
-theorem odd_multiIndex_of_degree_one {N q : ℕ} (hq : 0 < q)
+private theorem odd_multiIndex_of_degree_one {N q : ℕ} (hq : 0 < q)
     (α : InteractionIndex N q → ℕ) (hdegree : ∑ I, α I = 1) :
     IsOddMultiIndex α := by
   classical
@@ -339,7 +339,7 @@ theorem Setting.Y_firstChaos_eq_zero {q : ℕ} (S : Setting q)
   simp [inner_smul_right, S.inner_hermiteLp_ZGaussianLp_eq_zero β n α hodd]
 
 /-- Two distinct interactions give an odd second-order Hermite multi-index. -/
-theorem odd_multiIndex_two_distinct {N q : ℕ} (I J : InteractionIndex N q)
+private theorem odd_multiIndex_two_distinct {N q : ℕ} (I J : InteractionIndex N q)
     (hIJ : I ≠ J) :
     IsOddMultiIndex (Pi.single I 1 + Pi.single J 1) := by
   classical

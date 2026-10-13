@@ -26,7 +26,7 @@ theorem integral_Y_pi {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
   rw [integral_map_equiv (MeasurableEquiv.toLp 2 (ι → ℝ)) (S.Y β n)] at h
   exact h
 
-theorem inner_hermiteLp_zero_Y {q : ℕ} (S : Setting q)
+private theorem inner_hermiteLp_zero_Y {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     ⟪hermiteLp (0 : InteractionIndex (S.N n) q → ℕ), S.YGaussianLp β n⟫_ℝ = 1 := by
   rw [MeasureTheory.L2.inner_def]

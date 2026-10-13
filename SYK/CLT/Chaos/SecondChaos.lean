@@ -18,11 +18,11 @@ open SYK.GaussianChaos
 namespace SYK.CLT
 
 /-- The degree-two multi-indices supported at one interaction. -/
-noncomputable def diagonalMultiIndices (ι : Type*) [Fintype ι] [DecidableEq ι] :
+private noncomputable def diagonalMultiIndices (ι : Type*) [Fintype ι] [DecidableEq ι] :
     Finset (ι → ℕ) :=
   (multiIndicesOfDegree (ι := ι) 2).filter (fun α => ∃ I, α = Pi.single I 2)
 
-theorem diagonalMultiIndices_eq_image (ι : Type*) [Fintype ι] [DecidableEq ι] :
+private theorem diagonalMultiIndices_eq_image (ι : Type*) [Fintype ι] [DecidableEq ι] :
     diagonalMultiIndices ι = (Finset.univ : Finset ι).image (fun I => Pi.single I 2) := by
   classical
   ext α
@@ -60,7 +60,7 @@ theorem hermiteMulti_single_two {ι : Type*} [Fintype ι] [DecidableEq ι]
   · simp
 
 /-- The diagonal Hermite coefficient is the manuscript's Gaussian expectation. -/
-theorem Setting.inner_single_two_Y_eq_integral {q : ℕ} (S : Setting q)
+private theorem Setting.inner_single_two_Y_eq_integral {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (I : InteractionIndex (S.N n) q) :
     ⟪hermiteLp (Pi.single I 2), S.YGaussianLp β n⟫_ℝ =
       ∫ g : InteractionIndex (S.N n) q → ℝ,
@@ -76,7 +76,7 @@ theorem Setting.inner_single_two_Y_eq_integral {q : ℕ} (S : Setting q)
     hgY, hermiteMulti_single_two]
 
 /-- Parity removes every off-diagonal term from the second chaos of `Y_N`. -/
-theorem Setting.Y_secondChaos_eq_diagonal {q : ℕ} (S : Setting q)
+private theorem Setting.Y_secondChaos_eq_diagonal {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     hermiteDegreeProjection 2 (S.YGaussianLp β n) =
       hermiteFiniteProjection (diagonalMultiIndices (InteractionIndex (S.N n) q))
@@ -96,7 +96,7 @@ theorem Setting.Y_secondChaos_eq_diagonal {q : ℕ} (S : Setting q)
 
 /-- The second chaos is a sum of diagonal Hermite terms, with its finite-size
 coefficients displayed individually. -/
-theorem Setting.Y_secondChaos_eq_sum_diagonal {q : ℕ} (S : Setting q)
+private theorem Setting.Y_secondChaos_eq_sum_diagonal {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     hermiteDegreeProjection 2 (S.YGaussianLp β n) =
       ∑ I : InteractionIndex (S.N n) q,
@@ -114,7 +114,7 @@ theorem Setting.Y_secondChaos_eq_sum_diagonal {q : ℕ} (S : Setting q)
   simp [hne] at h
 
 /-- Each diagonal Hermite product has squared norm two. -/
-theorem Setting.Y_secondChaos_eq_half_sum {q : ℕ} (S : Setting q)
+private theorem Setting.Y_secondChaos_eq_half_sum {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     hermiteDegreeProjection 2 (S.YGaussianLp β n) =
       ∑ I : InteractionIndex (S.N n) q,
@@ -137,7 +137,7 @@ theorem Setting.Y_secondChaos_eq_integral_sum {q : ℕ} (S : Setting q)
 /-- The algebraic conclusion of `prop:exact-second-chaos`. The two inputs are
 the interaction-index symmetry of the diagonal coefficient and the radial
 derivative identity for its sum. -/
-theorem Setting.Y_secondChaos_eq_common_of_symmetry_and_sum {q : ℕ} (S : Setting q)
+private theorem Setting.Y_secondChaos_eq_common_of_symmetry_and_sum {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ)
     (hsym : ∀ I J : InteractionIndex (S.N n) q,
       (∫ g : InteractionIndex (S.N n) q → ℝ,

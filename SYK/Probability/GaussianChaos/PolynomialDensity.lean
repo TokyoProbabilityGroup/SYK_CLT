@@ -38,17 +38,17 @@ theorem gaussianExpDual_memLp_two {ι : Type*} [Fintype ι]
   ring
 
 /-- The positive part of a Gaussian `L²` class, viewed as a weighted measure. -/
-noncomputable def gaussianPositiveMeasurePi {ι : Type*} [Fintype ι]
+private noncomputable def gaussianPositiveMeasurePi {ι : Type*} [Fintype ι]
     (f : Lp ℝ 2 (gaussianCouplings ι)) : Measure (ι → ℝ) :=
   (gaussianCouplings ι).withDensity fun g => ENNReal.ofReal (f g)
 
-theorem gaussianPositiveMeasurePi_finite {ι : Type*} [Fintype ι]
+private theorem gaussianPositiveMeasurePi_finite {ι : Type*} [Fintype ι]
     (f : Lp ℝ 2 (gaussianCouplings ι)) :
     IsFiniteMeasure (gaussianPositiveMeasurePi f) := by
   apply isFiniteMeasure_withDensity_ofReal
   exact ((Lp.memLp f).integrable (by norm_num)).2
 
-theorem gaussianPositiveMeasurePi_integrable_exp_dual {ι : Type*} [Fintype ι]
+private theorem gaussianPositiveMeasurePi_integrable_exp_dual {ι : Type*} [Fintype ι]
     (f : Lp ℝ 2 (gaussianCouplings ι))
     (L : StrongDual ℝ (ι → ℝ)) (t : ℝ) :
     Integrable (fun g => Real.exp (t * L g)) (gaussianPositiveMeasurePi f) := by
@@ -63,7 +63,7 @@ theorem gaussianPositiveMeasurePi_integrable_exp_dual {ι : Type*} [Fintype ι]
     max_mul_of_nonneg (f g) 0 (le_of_lt (Real.exp_pos _))]
   simp
 
-theorem integral_gaussianPositiveMeasurePi {ι : Type*} [Fintype ι]
+private theorem integral_gaussianPositiveMeasurePi {ι : Type*} [Fintype ι]
     (f : Lp ℝ 2 (gaussianCouplings ι)) (h : (ι → ℝ) → ℝ) :
     (∫ g, h g ∂gaussianPositiveMeasurePi f) =
       ∫ g, max (f g) 0 * h g ∂gaussianCouplings ι := by
@@ -73,7 +73,7 @@ theorem integral_gaussianPositiveMeasurePi {ι : Type*} [Fintype ι]
     integral_withDensity_eq_integral_toReal_smul₀ hmeas (by simp)]
   simp only [smul_eq_mul, ENNReal.toReal_ofReal']
 
-theorem gaussianPositiveMeasurePi_integrable_pow_dual {ι : Type*} [Fintype ι]
+private theorem gaussianPositiveMeasurePi_integrable_pow_dual {ι : Type*} [Fintype ι]
     (f : Lp ℝ 2 (gaussianCouplings ι))
     (L : StrongDual ℝ (ι → ℝ)) (n : ℕ) :
     Integrable (fun g => (L g) ^ n) (gaussianPositiveMeasurePi f) := by
@@ -93,7 +93,7 @@ private theorem gaussianPositivePartPi_mul_pow_integrable {ι : Type*} [Fintype 
     hmeas (by simp)).mp (gaussianPositiveMeasurePi_integrable_pow_dual f L n)
   simpa only [gaussianPositiveMeasurePi, smul_eq_mul, ENNReal.toReal_ofReal'] using h
 
-theorem gaussianPositiveMeasurePi_moments_eq_of_orthogonal {ι : Type*} [Fintype ι]
+private theorem gaussianPositiveMeasurePi_moments_eq_of_orthogonal {ι : Type*} [Fintype ι]
     (f : Lp ℝ 2 (gaussianCouplings ι))
     (L : StrongDual ℝ (ι → ℝ))
     (horth : ∀ n : ℕ, ∫ g, f g * (L g) ^ n ∂gaussianCouplings ι = 0)
@@ -121,7 +121,7 @@ theorem gaussianPositiveMeasurePi_moments_eq_of_orthogonal {ι : Type*} [Fintype
   rw [hdecomp, horth n] at h
   linarith
 
-theorem gaussianPositiveMeasurePi_map_eq_neg_of_orthogonal {ι : Type*} [Fintype ι]
+private theorem gaussianPositiveMeasurePi_map_eq_neg_of_orthogonal {ι : Type*} [Fintype ι]
     (f : Lp ℝ 2 (gaussianCouplings ι))
     (L : StrongDual ℝ (ι → ℝ))
     (horth : ∀ n : ℕ, ∫ g, f g * (L g) ^ n ∂gaussianCouplings ι = 0) :
@@ -139,7 +139,7 @@ theorem gaussianPositiveMeasurePi_map_eq_neg_of_orthogonal {ι : Type*} [Fintype
     rw [integral_map (by fun_prop) (by fun_prop), integral_map (by fun_prop) (by fun_prop)]
     exact gaussianPositiveMeasurePi_moments_eq_of_orthogonal f L horth n
 
-theorem gaussianPositiveMeasurePi_eq_neg_of_dual_moments {ι : Type*} [Fintype ι]
+private theorem gaussianPositiveMeasurePi_eq_neg_of_dual_moments {ι : Type*} [Fintype ι]
     (f : Lp ℝ 2 (gaussianCouplings ι))
     (horth : ∀ (L : StrongDual ℝ (ι → ℝ)) (n : ℕ),
       ∫ g, f g * (L g) ^ n ∂gaussianCouplings ι = 0) :

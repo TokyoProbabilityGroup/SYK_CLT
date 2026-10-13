@@ -14,11 +14,11 @@ open scoped Topology
 
 namespace SYK.CLT
 
-theorem log_linear_error_nonneg {y : ℝ} (hy : 0 < y) :
+private theorem log_linear_error_nonneg {y : ℝ} (hy : 0 < y) :
     0 ≤ y - 1 - Real.log y := by
   linarith [Real.log_le_sub_one_of_pos hy]
 
-theorem log_linear_error_le_sq {y : ℝ}
+private theorem log_linear_error_le_sq {y : ℝ}
     (hy : 0 < y) (hhalf : (1 / 2 : ℝ) ≤ y) :
     y - 1 - Real.log y ≤ 2 * (y - 1) ^ 2 := by
   have hlog := Real.log_le_sub_one_of_pos (inv_pos.mpr hy)

@@ -363,17 +363,17 @@ private theorem normalizedSchattenNorm_eq_sum {p : ℝ} (hp : 0 < p) (A : Matrix
     show (Module.finrank 𝕜 (EuclideanSpace 𝕜 n) : ℝ) = Fintype.card n by
       rw [finrank_euclideanSpace]]
 
-theorem toEuclideanLin_mul' (A B : Matrix n n 𝕜) :
+private theorem toEuclideanLin_mul' (A B : Matrix n n 𝕜) :
     Matrix.toEuclideanLin (A * B) = Matrix.toEuclideanLin A ∘ₗ Matrix.toEuclideanLin B := by
   rw [Matrix.toEuclideanLin_eq_toLin_orthonormal,
     Matrix.toLin_mul _ (EuclideanSpace.basisFun n 𝕜).toBasis]
 
-theorem norm_toContinuousLinearMap_toEuclideanLin (B : Matrix n n 𝕜) :
+private theorem norm_toContinuousLinearMap_toEuclideanLin (B : Matrix n n 𝕜) :
     ‖LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin B)‖ = ‖B‖ := by
   rw [← Matrix.l2_opNorm_toEuclideanCLM]
   rfl
 
-theorem trace_eq_trace_toEuclideanLin (A : Matrix n n 𝕜) :
+private theorem trace_eq_trace_toEuclideanLin (A : Matrix n n 𝕜) :
     A.trace = LinearMap.trace 𝕜 (EuclideanSpace 𝕜 n) (Matrix.toEuclideanLin A) := by
   rw [Matrix.toEuclideanLin_eq_toLin_orthonormal,
     LinearMap.trace_eq_matrix_trace 𝕜 (EuclideanSpace.basisFun n 𝕜).toBasis,
@@ -493,7 +493,7 @@ section WordBounds
 
 open scoped Nat
 
-theorem normalizedSchattenNorm_nonneg' {p : ℝ} (hp : 0 < p) (A : Matrix n n 𝕜) :
+private theorem normalizedSchattenNorm_nonneg' {p : ℝ} (hp : 0 < p) (A : Matrix n n 𝕜) :
     0 ≤ normalizedSchattenNorm p A := by
   rw [normalizedSchattenNorm_eq_sum hp]
   exact Real.rpow_nonneg (div_nonneg (sum_sv_rpow_nonneg A p) (Nat.cast_nonneg _)) _
@@ -605,7 +605,7 @@ noncomputable def conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n �
   (↑hH.eigenvectorUnitary : Matrix n n 𝕜) * Matrix.diagonal (fun j => (ν j : 𝕜)) *
     star (↑hH.eigenvectorUnitary : Matrix n n 𝕜)
 
-theorem conjDiag_pow (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ) (l : ℕ) :
+private theorem conjDiag_pow (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ) (l : ℕ) :
     conjDiag H hH ν ^ l = conjDiag H hH (fun j => ν j ^ l) := by
   unfold conjDiag
   rw [← Unitary.conjStarAlgAut_apply (S := 𝕜), ← map_pow, Matrix.diagonal_pow,
@@ -614,7 +614,7 @@ theorem conjDiag_pow (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ)
   ext j
   simp
 
-theorem trace_conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ) :
+private theorem trace_conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ) :
     (conjDiag H hH ν).trace = ∑ j, (ν j : 𝕜) := by
   unfold conjDiag
   rw [Matrix.trace_mul_comm, ← Matrix.mul_assoc, Unitary.coe_star_mul_self, one_mul,
@@ -631,7 +631,7 @@ theorem normalizedTrace_conjDiag_pow (H : Matrix n n 𝕜) (hH : H.IsHermitian) 
 section
 open scoped ComplexOrder
 
-theorem posSemidef_conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ)
+private theorem posSemidef_conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ)
     (hν : ∀ j, 0 ≤ ν j) : (conjDiag H hH ν).PosSemidef := by
   unfold conjDiag
   have hU : IsUnit (↑hH.eigenvectorUnitary : Matrix n n 𝕜) := Unitary.isUnit_coe
@@ -691,7 +691,7 @@ theorem abs_eigenvalues_le (H : Matrix n n 𝕜) (hH : H.IsHermitian) (j : n) :
     add_zero] at hle
   exact hle
 
-theorem prod_weight_finSumEquivOfFinset {k l : ℕ} {s : Finset (Fin (k + l))}
+private theorem prod_weight_finSumEquivOfFinset {k l : ℕ} {s : Finset (Fin (k + l))}
     (hs : s.card = l) (hl : sᶜ.card = k) (D : Matrix n n 𝕜) (w : Fin k → Matrix n n 𝕜) :
     (∏ i : Fin (k + l), if i ∈ s then (1 : ℝ) else
         ‖Sum.elim (fun _ : Fin l => D) w ((finSumEquivOfFinset hs hl).symm i)‖) =
@@ -706,7 +706,7 @@ theorem prod_weight_finSumEquivOfFinset {k l : ℕ} {s : Finset (Fin (k + l))}
     Sum.elim_inr]
 
 omit [RCLike 𝕜] [Fintype n] [DecidableEq n] in
-theorem elim_finSumEquivOfFinset_of_mem {k l : ℕ} {s : Finset (Fin (k + l))}
+private theorem elim_finSumEquivOfFinset_of_mem {k l : ℕ} {s : Finset (Fin (k + l))}
     (hs : s.card = l) (hl : sᶜ.card = k) (D : Matrix n n 𝕜) (w : Fin k → Matrix n n 𝕜)
     (i : Fin (k + l)) (hi : i ∈ s) :
     Sum.elim (fun _ : Fin l => D) w ((finSumEquivOfFinset hs hl).symm i) = D := by

@@ -81,7 +81,7 @@ theorem Setting.norm_traceExp_disorder {q : ℕ} (S : Setting q) (β : ℝ) (n :
   exact le_trans (by norm_num) (S.Z_ge_one β n g)
 
 /-- A first directional derivative bound, with no restriction on inverse temperature. -/
-theorem Setting.norm_fderiv_Z_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
+private theorem Setting.norm_fderiv_Z_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (g v : CouplingSpace (S.N n) q) :
     ‖fderiv ℝ (S.Z β n) g v‖ ≤
       |β| * ‖S.disorderMatrix n v‖ * S.Z β n g := by
@@ -114,7 +114,7 @@ theorem Setting.norm_fderiv_Z_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
       simp
 
 /-- The finite partition function is smooth in real inverse temperature. -/
-theorem Setting.Z_contDiff_beta {q : ℕ} (S : Setting q) (n : ℕ)
+private theorem Setting.Z_contDiff_beta {q : ℕ} (S : Setting q) (n : ℕ)
     (g : CouplingSpace (S.N n) q) : ContDiff ℝ ⊤ (fun β => S.Z β n g) := by
   have hg : ContDiff ℝ ⊤ (fun b : ℝ => b • g) := contDiff_id.smul contDiff_const
   have h := (S.Z_contDiff_couplings 1 n).comp hg
@@ -144,7 +144,7 @@ theorem Setting.fderiv_Z_self_eq_beta_deriv {q : ℕ} (S : Setting q)
 
 /-- Bound the inverse-temperature derivative by the Hamiltonian norm
 times the partition function. -/
-theorem Setting.norm_deriv_Z_beta_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
+private theorem Setting.norm_deriv_Z_beta_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :
     ‖deriv (fun b => S.Z b n g) β‖ ≤ ‖S.disorderMatrix n g‖ * S.Z β n g := by
   rw [(S.Z_hasDerivAt_beta β n g).deriv]
@@ -152,7 +152,7 @@ theorem Setting.norm_deriv_Z_beta_le {q : ℕ} (S : Setting q) (β : ℝ) (n : �
     S.norm_fderiv_Z_le 1 n (β • g) g
 
 /-- The inverse-temperature derivative is continuous as a function of disorder. -/
-theorem Setting.continuous_deriv_Z_beta {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
+private theorem Setting.continuous_deriv_Z_beta {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     Continuous (fun g : CouplingSpace (S.N n) q => deriv (fun b => S.Z b n g) β) := by
   have hg : Continuous (fun g : CouplingSpace (S.N n) q => β • g) :=
     continuous_id.const_smul β
@@ -233,7 +233,7 @@ theorem Setting.coordDeriv_Z_eq {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
   rfl
 
 /-- The value and each selected first partial derivative have exponential growth. -/
-theorem Setting.Z_coord_exp_bounds {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
+private theorem Setting.Z_coord_exp_bounds {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     ∃ C c : ℝ, 0 ≤ C ∧ 0 ≤ c ∧
       (∀ g : InteractionIndex (S.N n) q → ℝ,
         |S.Z β n (WithLp.toLp 2 g)| ≤ C * Real.exp (c * ‖WithLp.toLp 2 g‖)) ∧

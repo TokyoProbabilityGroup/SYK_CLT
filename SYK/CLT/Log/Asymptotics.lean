@@ -13,7 +13,7 @@ open SYK.GaussianChaos SYK.Probability
 
 namespace SYK.CLT
 
-theorem Setting.fluctuationScale_tendsto_atTop {q : ℕ} (S : Setting q) :
+private theorem Setting.fluctuationScale_tendsto_atTop {q : ℕ} (S : Setting q) :
     Tendsto S.fluctuationScale atTop atTop := by
   have hN : Tendsto (fun n => (S.N n : ℝ)) atTop atTop :=
     tendsto_natCast_atTop_atTop.comp S.N_tendsto
@@ -23,7 +23,7 @@ theorem Setting.fluctuationScale_tendsto_atTop {q : ℕ} (S : Setting q) :
   change Tendsto (fun n => (S.N n : ℝ) ^ (q / 2 - 1)) atTop atTop
   simpa only [Function.comp_def] using (tendsto_pow_atTop he).comp hN
 
-theorem Setting.unscaledQuadraticCoefficient_tendsto_zero {q : ℕ}
+private theorem Setting.unscaledQuadraticCoefficient_tendsto_zero {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) (β : ℝ) :
     Tendsto (fun n =>
       β * deriv (fun b => Real.log (S.meanZ b n)) β /
@@ -121,7 +121,7 @@ theorem Setting.scaled_sq_Y_lt_half_tendsto_zero {q : ℕ}
           16 * (S.fluctuationScale n ^ 2 *
             ‖S.higherChaosRemainderLp β n‖ ^ 2) := by ring
 
-theorem Setting.N_le_fluctuationScale {q : ℕ} (S : Setting q) (n : ℕ) :
+private theorem Setting.N_le_fluctuationScale {q : ℕ} (S : Setting q) (n : ℕ) :
     (S.N n : ℝ) ≤ S.fluctuationScale n := by
   have hN : (1 : ℝ) ≤ S.N n := by
     exact_mod_cast (show 1 ≤ S.N n from
@@ -133,7 +133,7 @@ theorem Setting.N_le_fluctuationScale {q : ℕ} (S : Setting q) (n : ℕ) :
 
 /-- The lower-tail contribution to the logarithmic error is negligible at
 the CLT scale, including the linear growth of the annealed pressure. -/
-theorem Setting.scaled_log_meanZ_Y_lt_half_tendsto_zero {q : ℕ}
+private theorem Setting.scaled_log_meanZ_Y_lt_half_tendsto_zero {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
     ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →
       Tendsto (fun n => S.fluctuationScale n * Real.log (S.meanZ β n) *
@@ -218,7 +218,7 @@ theorem Setting.integral_logLinearError_le_variance_tail {q : ℕ}
     integral_const_mul, integral_indicator_const _ hbad] at hmono
   simpa only [hvar, smul_eq_mul, mul_comm] using hmono
 
-theorem Setting.varianceY_eq_varianceY_pi {q : ℕ}
+private theorem Setting.varianceY_eq_varianceY_pi {q : ℕ}
     (S : Setting q) (β : ℝ) (n : ℕ) :
     variance (S.Y β n) (standardGaussianMeasure (S.N n) q) =
       variance (fun g : InteractionIndex (S.N n) q → ℝ =>
@@ -230,7 +230,7 @@ theorem Setting.varianceY_eq_varianceY_pi {q : ℕ}
   rw [variance_map_equiv]
   rfl
 
-theorem Setting.scaled_varianceY_tendsto {q : ℕ}
+private theorem Setting.scaled_varianceY_tendsto {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
     ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →
       Tendsto (fun n => S.fluctuationScale n ^ 2 *
@@ -241,7 +241,7 @@ theorem Setting.scaled_varianceY_tendsto {q : ℕ}
   intro β hβ
   simpa only [S.varianceY_eq_varianceY_pi] using hvar β hβ
 
-theorem Setting.scaled_varianceY_tendsto_zero {q : ℕ}
+private theorem Setting.scaled_varianceY_tendsto_zero {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
     ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →
       Tendsto (fun n => S.fluctuationScale n *

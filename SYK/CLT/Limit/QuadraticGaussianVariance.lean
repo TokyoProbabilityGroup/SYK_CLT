@@ -17,7 +17,7 @@ open SYK.GaussianChaos
 
 namespace SYK.CLT
 
-theorem inner_hermiteLp_single_two {ι : Type*} [Fintype ι]
+private theorem inner_hermiteLp_single_two {ι : Type*} [Fintype ι]
     [DecidableEq ι] (i j : ι) :
     ⟪hermiteLp (Pi.single i 2), hermiteLp (Pi.single j 2)⟫_ℝ =
       if i = j then 2 else 0 := by
@@ -31,7 +31,7 @@ theorem inner_hermiteLp_single_two {ι : Type*} [Fintype ι]
       simp [hij] at hi
     simp [hij, hne]
 
-theorem quadraticGaussianLp_norm_sq {ι : Type*} [Fintype ι]
+private theorem quadraticGaussianLp_norm_sq {ι : Type*} [Fintype ι]
     [DecidableEq ι] [Nonempty ι] : ‖quadraticGaussianLp ι‖ ^ 2 = 1 := by
   classical
   have hcard : 0 < (Fintype.card ι : ℝ) := by
@@ -51,7 +51,7 @@ theorem quadraticGaussianLp_norm_sq {ι : Type*} [Fintype ι]
   rw [Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 2), Real.sq_sqrt hcard.le]
 
 /-- The quadratic chaos is orthogonal to the full higher-degree remainder. -/
-theorem Setting.inner_secondChaos_higherChaosRemainder_eq_zero {q : ℕ}
+private theorem Setting.inner_secondChaos_higherChaosRemainder_eq_zero {q : ℕ}
     (S : Setting q) (β : ℝ) (n : ℕ) :
     ⟪hermiteDegreeProjection 2 (S.YGaussianLp β n),
       S.higherChaosRemainderLp β n⟫_ℝ = 0 := by
@@ -70,7 +70,7 @@ theorem Setting.inner_secondChaos_higherChaosRemainder_eq_zero {q : ℕ}
 
 /-- The disorder variance of the relative partition function is its centered
 Gaussian `L²` norm squared on the product coupling space. -/
-theorem Setting.varianceY_pi_eq_norm_sq {q : ℕ} (S : Setting q)
+private theorem Setting.varianceY_pi_eq_norm_sq {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     variance (fun g : InteractionIndex (S.N n) q → ℝ =>
       S.Y β n (WithLp.toLp 2 g))
@@ -158,7 +158,7 @@ theorem Setting.scaled_varianceY_pi_tendsto {q : ℕ} (S : Setting q)
 
 /-- The Euclidean disorder variance is the product-space relative variance,
 multiplied by the square of the partition-function mean. -/
-theorem Setting.varianceZ_eq_mean_sq_varianceY_pi {q : ℕ}
+private theorem Setting.varianceZ_eq_mean_sq_varianceY_pi {q : ℕ}
     (S : Setting q) (β : ℝ) (n : ℕ) :
     S.varianceZ β n = (S.meanZ β n) ^ 2 *
       variance (fun g : InteractionIndex (S.N n) q → ℝ =>

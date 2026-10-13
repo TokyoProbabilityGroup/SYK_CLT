@@ -112,7 +112,7 @@ private theorem star_listProduct (l : List (Fin N)) :
       simp [List.reverse_cons]
 
 /-- Reversing a product under `star` contributes one sign for every pair of generators. -/
-theorem star_psiProduct (s : InteractionIndex N q) :
+private theorem star_psiProduct (s : InteractionIndex N q) :
     star (M.psiProduct s) =
       ((-1 : ℂ) ^ (q * (q - 1) / 2)) • M.psiProduct s := by
   rw [psiProduct, M.star_listProduct, M.reverse_listProduct]
@@ -120,7 +120,7 @@ theorem star_psiProduct (s : InteractionIndex N q) :
   · simp [orderedIndices]
 
 /-- For even `q`, the reversal sign is `(-1)^(q/2)`. -/
-theorem star_psiProduct_of_even (s : InteractionIndex N q) (hq : Even q) :
+private theorem star_psiProduct_of_even (s : InteractionIndex N q) (hq : Even q) :
     star (M.psiProduct s) = ((-1 : ℂ) ^ (q / 2)) • M.psiProduct s := by
   rw [M.star_psiProduct s]
   congr 1
@@ -152,7 +152,7 @@ private theorem phase_sq (q : ℕ) :
   norm_num
 
 /-- The phase has complex norm one. -/
-theorem star_phase_mul_self (q : ℕ) :
+private theorem star_phase_mul_self (q : ℕ) :
     star (phase q) * phase q = 1 := by
   change star (Complex.I ^ (q / 2)) * Complex.I ^ (q / 2) = 1
   rw [star_pow, ← mul_pow]

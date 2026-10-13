@@ -31,7 +31,7 @@ noncomputable def logPartition
     (partitionFunction (β : ℂ)
       (normalizedHamiltonian P M J)).re
 
-theorem hasDerivAt_logPartition_line
+private theorem hasDerivAt_logPartition_line
     {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (J V : CouplingSpace P.N P.q) (s : ℝ) :
@@ -100,7 +100,7 @@ noncomputable def logPartitionLipschitzConstant
 The normalization constant absorbs the sum-of-squares SYK bound:
 `couplingScale · √(C(N,q-1)/q) ≤ 1 / √q`.
 -/
-theorem couplingScale_mul_sqrt_choose_le
+private theorem couplingScale_mul_sqrt_choose_le
     (P : Params) :
     couplingScale P *
         Real.sqrt ((Nat.choose P.N (P.q - 1) : ℝ) / (P.q : ℝ)) ≤
