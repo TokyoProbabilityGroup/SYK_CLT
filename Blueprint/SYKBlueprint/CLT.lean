@@ -119,7 +119,7 @@ converging pointwise to $`h\in C^1(\mathbb R)`. The manuscript's
 $`h_N\to h` and $`h_N'\to h'` on $`\mathbb R`.
 :::
 
-:::theorem "clt_conditional_nondegeneracy" (parent := "central_limit_theorem") (uses := "clt_conditional_annealed_limit") (lean := "SYK.CLT.exists_small_temperature_sign, SYK.CLT.exists_small_temperature_variance_pos")
+:::theorem "clt_conditional_nondegeneracy" (parent := "central_limit_theorem") (uses := "clt_conditional_annealed_limit") (lean := "SYK.CLT.limitVariance_pos_of_ne_zero")
 The sign field in `hFE` gives
 $`\beta\ell'(\beta)>0` for every nonzero real $`\beta`, and hence positive
 limiting variance. These are verified conditional Lean results.
@@ -485,7 +485,7 @@ $`\log\mathbb E Z_N`. Lean proves the required vanishing scaled
 mean error and centered $`L^1` error under `hFE`.
 :::
 
-:::theorem "log_partition_clt" (parent := "central_limit_theorem") (uses := "partition_function_clt, clt_log_centering_error") (lean := "SYK.CLT.log_partition_clt, SYK.CLT.partition_and_log_partition_clt, SYK.CLT.GaussianSYK.syk_partition_and_log_partition_clt, SYK.CLT.GaussianSYK.syk_log_partition_clt")
+:::theorem "log_partition_clt" (parent := "central_limit_theorem") (uses := "partition_function_clt, clt_log_centering_error") (lean := "SYK.CLT.partition_and_log_partition_clt, SYK.CLT.GaussianSYK.syk_partition_and_log_partition_clt, SYK.CLT.GaussianSYK.syk_log_partition_clt")
 Under the same `hFE`, $`\beta_q`, and real $`0<|\beta|<\beta_q`, the
 conclusion is
 
@@ -500,14 +500,13 @@ $`\log`, and the preceding centering estimate. Lean verifies the
 logarithmic CLT and the joint theorem without `sorryAx`, conditional on
 `hFE`. The joint theorem combines the independently proved partition theorem
 with the lower-level logarithmic CLT, taking a common smaller positive radius.
-The individual logarithmic theorem projects this joint conclusion.
 The joint theorem `SYK.CLT.GaussianSYK.syk_partition_and_log_partition_clt`
 in `SYK/Main.lean` also existentially quantifies one positive radius for
 both CLT assertions. Its individual partition and log-partition theorems
 are projections of this conclusion.
 :::
 
-:::theorem "clt_standard_model_application" (parent := "central_limit_theorem") (uses := "partition_function_clt, log_partition_clt") (lean := "SYK.CLT.standardSetting, SYK.CLT.standardSetting_size_iff, SYK.CLT.standardSetting_Z, SYK.CLT.standard_partition_and_log_partition_clt, SYK.CLT.standard_partition_clt, SYK.CLT.standard_log_partition_clt")
+:::theorem "clt_standard_model_application" (parent := "central_limit_theorem") (uses := "partition_function_clt, log_partition_clt") (lean := "SYK.CLT.standardSetting, SYK.CLT.standardSetting_size_iff, SYK.CLT.standardSetting_Z, SYK.CLT.standard_partition_and_log_partition_clt")
 `standardSetting` uses the standard Majorana representation at sizes
 $`N_n=q+2n`. Every even size at least $`q` occurs exactly once, and
 $`N_n` tends to infinity. `standardSetting_Z` identifies the partition
@@ -516,8 +515,7 @@ function with the normalized trace in `subsec:SYK-model`.
 Assuming `AnnealedInput` for this same family, the joint theorem gives
 `thm:partition-clt` and `thm:free-energy-clt` with one common radius,
 the manuscript scaling and centering, and positive limiting and
-finite-size variances. The two individual theorems are projections of
-that result. These are conditional applications: the annealed
+finite-size variances. This is a conditional application: the annealed
 proposition and representation independence are not proved here.
 :::
 

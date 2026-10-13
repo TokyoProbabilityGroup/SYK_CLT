@@ -99,7 +99,7 @@ flowchart TD
 | MA-03 | GEN-1〜GEN-3 | 完了 |
 | MA-04 | REF-1〜REF-3 と書式 | 完了 |
 | MA-05 | A17 | 完了 |
-| MA-06 | A2、A4 | 未着手 |
+| MA-06 | A2、A4 | 完了 |
 | MA-07 | A14、A16 | 未着手 |
 | MA-08 | docstring とコメント | 未着手 |
 | MA-09 | 公開範囲 | 未着手 |

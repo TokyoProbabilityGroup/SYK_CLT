@@ -294,25 +294,14 @@ It is allowed to vanish, in particular at `β = 0`. -/
 noncomputable def limitVariance (q : ℕ) (ℓ : ℝ → ℝ) (β : ℝ) : ℝ≥0 :=
   ⟨(q.factorial : ℝ) / 2 * β ^ 2 * (deriv ℓ β) ^ 2, by positivity⟩
 
-/-- `prop:annealed-free-energy` gives the sign at every nonzero inverse temperature. -/
-theorem exists_small_temperature_sign {q : ℕ} {S : Setting q}
-    (hFE : AnnealedInput q S) :
-    ∃ r : ℝ, 0 < r ∧
-      ∀ β : ℝ, |β| < r → β ≠ 0 → 0 < β * deriv hFE.ℓ β := by
-  exact ⟨1, by norm_num, fun β _ hβ0 ↦ hFE.sign β hβ0⟩
-
-/-- The limiting variance is positive at the small nonzero inverse temperatures
-selected by `prop:annealed-free-energy`. -/
-theorem exists_small_temperature_variance_pos {q : ℕ} {S : Setting q}
-    (hFE : AnnealedInput q S) :
-    ∃ r : ℝ, 0 < r ∧
-      ∀ β : ℝ, |β| < r → β ≠ 0 → 0 < limitVariance q hFE.ℓ β := by
-  obtain ⟨r, hr, hsign⟩ := exists_small_temperature_sign hFE
-  refine ⟨r, hr, ?_⟩
-  intro β hβ hβ0
+/-- Under `prop:annealed-free-energy`, the limiting variance is positive at every
+nonzero real inverse temperature. -/
+theorem limitVariance_pos_of_ne_zero {q : ℕ} {S : Setting q}
+    (hFE : AnnealedInput q S) (β : ℝ) (hβ0 : β ≠ 0) :
+    0 < limitVariance q hFE.ℓ β := by
   have hd : deriv hFE.ℓ β ≠ 0 := by
     intro hd
-    simpa [hd] using hsign β hβ hβ0
+    simpa [hd] using hFE.sign β hβ0
   change (0 : ℝ) < (q.factorial : ℝ) / 2 * β ^ 2 * (deriv hFE.ℓ β) ^ 2
   exact mul_pos
     (mul_pos (div_pos (Nat.cast_pos.mpr q.factorial_pos) (by norm_num))

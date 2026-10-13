@@ -56,16 +56,13 @@ theorem Setting.standardizedFluctuation_clt {q : ℕ} (S : Setting q)
         (gaussianReal 0 1) := by
   obtain ⟨rrel, hrrel, hrel⟩ := S.relativeFluctuation_clt hFE
   obtain ⟨rvar, hrvar, hvar⟩ := S.scaled_varianceZ_over_mean_sq_tendsto hFE
-  obtain ⟨rpos, hrpos, hpos⟩ := exists_small_temperature_variance_pos hFE
-  refine ⟨min rrel (min rvar rpos), lt_min hrrel (lt_min hrvar hrpos), ?_⟩
+  refine ⟨min rrel rvar, lt_min hrrel hrvar, ?_⟩
   intro β hβ hβ0
   have hβrel : |β| < rrel := lt_of_lt_of_le hβ (min_le_left _ _)
   have hβvar : |β| < rvar :=
-    lt_of_lt_of_le hβ ((min_le_right _ _).trans (min_le_left _ _))
-  have hβpos : |β| < rpos :=
-    lt_of_lt_of_le hβ ((min_le_right _ _).trans (min_le_right _ _))
+    lt_of_lt_of_le hβ (min_le_right _ _)
   let v := limitVariance q hFE.ℓ β
-  have hv : 0 < v := hpos β hβpos hβ0
+  have hv : 0 < v := limitVariance_pos_of_ne_zero hFE β hβ0
   let a (n : ℕ) := (Real.sqrt (S.fluctuationScale n ^ 2 *
       S.varianceZ β n / S.meanZ β n ^ 2))⁻¹
   have ha : Tendsto a atTop (𝓝 (Real.sqrt (v : ℝ))⁻¹) :=

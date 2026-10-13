@@ -61,7 +61,7 @@
 
 `StandardModel.lean` の `standardSetting` は `N n = q + 2 * n` の標準表現族を構成する。偶数 `q ≥ 4` に対してこの列は `N ≥ q` の偶数をすべて一度ずつ通り、無限大へ発散する。したがって、原稿の偶数サイズの極限を表せる。有限個の `N < q` を除いても極限は変わらず、有限サイズの規格化では、必要な `q ≤ N` を明示できる。スケーリングは列の添字ではなく実際のサイズ `N` のべきとする。
 
-`StandardModel.lean` は、模型族の構成、偶数サイズの対応、規格化の橋渡し、具体的な適用を担う。このファイルは `Main.lean` と `Normalization.lean` の利用側に置く。これにより、標準表現の import を抽象的な CLT の証明の依存に入れずに、原稿の `2^(-N/2) Tr` と共有の標準模型を接続する。公開定理の仕様は下の表に記す。`standardSetting_size_iff` が全ての偶数サイズの列挙を、`standardSetting_Z` が規格化を照合する。`standard_partition_and_log_partition_clt` と2つの個別定理は、この族に対する `AnnealedInput` の下で検証済みである。検証記録は [作業履歴](../../WORK_HISTORY.md#clt-log-apply-completion-2026-10-05) を参照する。
+`StandardModel.lean` は、模型族の構成、偶数サイズの対応、規格化の橋渡し、具体的な適用を担う。このファイルは `Main.lean` と `Normalization.lean` の利用側に置く。これにより、標準表現の import を抽象的な CLT の証明の依存に入れずに、原稿の `2^(-N/2) Tr` と共有の標準模型を接続する。公開定理の仕様は下の表に記す。`standardSetting_size_iff` が全ての偶数サイズの列挙を、`standardSetting_Z` が規格化を照合する。`standard_partition_and_log_partition_clt` は、この族に対する `AnnealedInput` の下で検証済みである。検証記録は [作業履歴](../../WORK_HISTORY.md#clt-log-apply-completion-2026-10-05) を参照する。
 
 入力は、構成した標準模型族そのものに対する `AnnealedInput` とする。表現独立性を経由せずに、この族へ条件付きの定理を適用するので、表現独立性の証明は不要である。定理 `standard_partition_and_log_partition_clt` から、同じ高温の半径で、相対・標準化・対数の CLT を得る。`E[log Y_N]` の明示的な評価は、標準模型族への適用に必要な入力ではない。
 
@@ -70,10 +70,8 @@
 | 公開定理（名前空間 `SYK.CLT`） | 結論と証明依存 |
 | --- | --- |
 | `standard_partition_and_log_partition_clt` | `partition_and_log_partition_clt` を適用し、圧力収束、相対・対数 CLT、極限分散と全有限サイズ分散の正値性、標準化 CLT を同時に結論する |
-| `standard_partition_clt` | 上の `standard_partition_and_log_partition_clt` から圧力収束、相対 CLT、両分散の正値性、標準化 CLT を射影する |
-| `standard_log_partition_clt` | 同じ `standard_partition_and_log_partition_clt` から圧力収束と中心化した対数 CLT を射影する |
 
-各定理の入力は `{q : ℕ} (hq : Even q) (hq4 : 4 ≤ q)` と `hFE : AnnealedInput q (standardSetting q hq hq4)` である。`S := standardSetting q hq hq4` とし、量化は `∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq → β ≠ 0 → ...` である。`standard_partition_and_log_partition_clt` が全結論に共通する半径を供給し、個別の 2 定理はその証人を利用する。
+この定理の入力は `{q : ℕ} (hq : Even q) (hq4 : 4 ≤ q)` と `hFE : AnnealedInput q (standardSetting q hq hq4)` である。`S := standardSetting q hq hq4` とし、量化は `∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq → β ≠ 0 → ...` である。`standard_partition_and_log_partition_clt` が全結論に共通する半径を供給する。
 
 相対量は `N^(q/2-1)(Z/E Z-1)`、対数量は `N^(q/2-1)(log Z-E log Z)`、標準化量は `(Z-E Z)/sqrt(Var Z)` である。サイズは `N=q+2*n`、測度は `standardGaussianMeasure (S.N n) q`、極限変数は `fun x : ℝ ↦ x` とする。相対量と対数量の極限測度は `gaussianReal 0 (limitVariance q hFE.ℓ β)`、標準化量の極限測度は `gaussianReal 0 1` である。収束は `n → atTop` の `TendstoInDistribution` であり、共通確率空間や概収束は仮定しない。
 
@@ -127,7 +125,7 @@ flowchart TD
 
 行列のトレース指数関数の定義は、`SYK.MatrixAnalysis.traceExp` の1つだけである。滑らかさは `SYK.MatrixAnalysis.contDiff_traceExp` が与え、Hermitian な基点での高階微分評価は、内部補題 `iteratedFDeriv_traceExp_bound_hermitian` で証明する。List に沿う微分と mathlib の反復 Fréchet 微分は、滑らかさによって接続する。この接続と、二つの規格化トレースの型は保つ。`TraceExponential` では、Schatten ノルムと語の評価、Taylor 係数が高階微分の解析的な証明を担う。Duhamel の公式は使わない。
 
-`Main` は分配関数の CLT を先に証明し、`partition_and_log_partition_clt` が下位の対数 CLT と組み合わせて共通半径を取る。個別の対数 CLT はこの定理から射影する。矢印は証明結果から利用側へ向かい、公開定理の全結論と入力 `hFE` は変えない。
+`Main` は分配関数の CLT を先に証明し、`partition_and_log_partition_clt` が下位の対数 CLT と組み合わせて共通半径を取る。`SYK/Main.lean` の個別定理は同じファイルの共同定理から射影する。矢印は証明結果から利用側へ向かい、公開定理の全結論と入力 `hFE` は変えない。
 
 ```mermaid
 flowchart TD
@@ -135,11 +133,12 @@ flowchart TD
     standardized["標準化 CLT・分散正値性"] --> partition
     partition --> joint["partition_and_log_partition_clt"]
     lowerlog["Setting.logFluctuation_clt"] --> joint
-    joint --> log["log_partition_clt"]
     joint --> standard["標準模型への適用"]
 ```
 
 検証結果は [作業履歴](../../WORK_HISTORY.md#clt-cleanup-2026-10-06) を参照する。
+
+`AnnealedInput.sign` はすべての非零の実逆温度で `β * deriv ℓ β > 0` を与える。この入力の下で `limitVariance_pos_of_ne_zero` は半径なしに極限分散の正値性を証明する。CLT の高温の半径は、相対・標準化・対数の収束評価から取る。
 
 ## アニール入力
 
@@ -175,7 +174,7 @@ flowchart TD
 | `prop:higher-chaos-closure` | `Setting.tsum_higherChaosProjection_le_power`、`Setting.higherChaosProjection_isLittleO` | 高温でのべき評価と little-o は実装済み |
 | `prop:annealed-free-energy` | `AnnealedInput` | 命題文の内容を明示的な仮定として受け取る。命題自体と入力の構築は未形式化 |
 | `eq:intro-A_N-limit`、`eq:Y-decomposition-final` | `secondChaosCoefficient_tendsto`、`Setting.secondChaosScaledCoefficient_tendsto`、`Setting.Y_decomposition` | 分解は実装済み、係数の各点での極限は条件付きで実装済み。係数の局所一様収束の独立した定理は未追加 |
-| `thm:partition-clt`、`thm:free-energy-clt` | `partition_clt`、`log_partition_clt`、`partition_and_log_partition_clt` | `0<\|β\|<β_q` で現行の `AnnealedInput` を仮定して実装済み。`E[log Y_N]` の明示的な次数評価も `Setting.integral_log_Y_isBigO` で検証済み |
+| `thm:partition-clt`、`thm:free-energy-clt` | `partition_clt`、`partition_and_log_partition_clt` | `0<\|β\|<β_q` で現行の `AnnealedInput` を仮定して実装済み。`E[log Y_N]` の明示的な次数評価も `Setting.integral_log_Y_isBigO` で検証済み |
 
 相対量・スケール・極限分散は
 ```text

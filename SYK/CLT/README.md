@@ -42,7 +42,7 @@ For fixed even $q \ge 4$, conditional on `hFE : AnnealedInput q S`, the theorems
 
 These conditional results in `Main.lean` are Lean-checked. `StandardModel.lean` applies them to the standard family `N=q+2*n`. The finite-model and Gaussian-chaos results, and the explicit logarithmic mean-error estimate, are also implemented. The annealed proposition and construction of `hFE` remain unformalized and are outside the agreed formalization scope.
 
-The theorem statements are in `Main.lean` for an abstract family and in `StandardModel.lean` for the standard family; `AnnealedInput` is declared in `Basic.lean`. The CLT chapter of the [Blueprint](../../Blueprint/SYKBlueprint/CLT.lean) explains the statements, normalization, and the boundary between formalized and assumed parts. Gaussian integration by parts and moment calculations are distinct from assuming the annealed limit.
+The theorem statements are in `Main.lean` for an abstract family and in `StandardModel.lean` for the standard family; `AnnealedInput` is declared in `Basic.lean`. Under this input, `limitVariance_pos_of_ne_zero` gives positive limiting variance at every nonzero real inverse temperature; the high-temperature radius belongs to the CLT estimates. The CLT chapter of the [Blueprint](../../Blueprint/SYKBlueprint/CLT.lean) explains the statements, normalization, and the boundary between formalized and assumed parts. Gaussian integration by parts and moment calculations are distinct from assuming the annealed limit.
 
 ## Verification
 
@@ -60,7 +60,7 @@ latexmk -pdf introduction.tex
 
 Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-references and citations whose definitions lie in other subfiles remain unresolved in a standalone build; the complete manuscript build resolves them.
 
-The conditional CLT is integrated into `Main.lean`. For `partition_clt`, `log_partition_clt`, `partition_and_log_partition_clt` and the three standard-family theorems in `StandardModel.lean`, `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`; `hFE : AnnealedInput q S` remains an explicit hypothesis. After modifying a Lean file, check it from the shared workspace root:
+The conditional CLT is integrated into `Main.lean`. For `partition_clt`, `partition_and_log_partition_clt`, and `standard_partition_and_log_partition_clt` in `StandardModel.lean`, `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`; `hFE : AnnealedInput q S` remains an explicit hypothesis. After modifying a Lean file, check it from the shared workspace root:
 
 ```bash
 lake lean SYK_CLT/SYK/CLT/path/to/File.lean
