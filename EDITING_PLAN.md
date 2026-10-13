@@ -6,8 +6,8 @@
 
 | 作業ID | 課題 | 状態・着手条件 | 担当・統合 |
 | --- | --- | --- | --- |
-| `MAINT-AUDIT` | 2026-10-13 の監査に基づくコード・文書・Blueprint・設定の整備 | 内容はすべて研究者と確認済み。MA-00 は本計画と同じコミットで完了した。MA-14 を先に行い、その後 [小項目](#小項目) の順に MA-01 から実行する | 実行は任意のセッション。統合とコミットは研究者 |
-| `BLUEPRINT-PAGES` | GitHub Pages での Blueprint 公開 | 公開 workflow は main に反映済み（35ad122）。Pages の Source 設定、初回 build・deploy と公開 URL の確認待ち | 研究者が確認 |
+| `MAINT-AUDIT` | 2026-10-13 の監査に基づくコード・文書・Blueprint・設定の整備 | 内容はすべて研究者と確認済み。MA-00 と MA-14 は完了した。[小項目](#小項目) の順に MA-01 から実行する | 実行は任意のセッション。統合とコミットは研究者 |
+| `BLUEPRINT-PAGES` | GitHub Pages での Blueprint 公開 | 公開は CI の workflow の deploy job が行う（MA-14）。Pages の Source 設定、初回 build・deploy と公開 URL の確認待ち | 研究者が確認 |
 | 公開の経路 | `lakefile.toml` のメタデータ、README の利用手順（`require` で使う方法）、親の雛形なしでの `SYK`・`SYKBlueprint` 単体のビルドの CI | 保留。ライセンスと引用情報は [README](README.md#licensing-and-citation)、[LICENSE](LICENSE)、[原稿の著作権表示](Paper/COPYRIGHT.md)、[CITATION.cff](CITATION.cff) に設定済み。残る公開手順は別課題とする | 未割当 |
 
 ## MAINT-AUDIT：監査に基づく整備
@@ -16,7 +16,7 @@
 
 - 調査の基準は `f5ddd27`（2026-10-12、PR #52 のマージ）である。そこでは `lake build SYKBlueprint`、HTML 生成、`vbp check` が成功し、数学コードの警告はなく、Blueprint 側には外部依存の universe 警告2件だけがある。主要な定理は通常公理だけに依存する。
 - 本計画の内容は、2026-10-13 に研究者と項目ごとに確認して決めた。本計画を実行する依頼は、ここに書いた変更の承認を含む（AGENTS.md「作業範囲と分担」）。計画にない変更が必要になったときは、AGENTS.md に従って報告し、判断を待つ。
-- 本計画を記録したコミットで、MA-00（規則の追記）を完了した。MA-14（設定）は、ビルドの設定と、CI・`.gitignore` の2つのコミットに分けて、MA-01 より先に行う。その後の作業は MA-01（コードの変更）から始める。
+- MA-00（規則の追記）は本計画を記録したコミットで、MA-14（設定）はそれに続く2つのコミットで完了した。次の作業は MA-01（コードの変更）から始める。
 - 行番号は調査時点の目安である。作業では宣言名で対象を特定する。一覧は調査時点の結果なので、各小項目の着手時に参照と利用を調べ直す。
 - 着手前に、ワークスペース・本リポジトリ・対象の話題の AGENTS.md を読む。特に「作業範囲と分担」（小項目ごとの検証、計画の状態の更新、コミットの提案と研究者のコミット待ち）、「公開 API の変更」（互換用の別名を作らない）、「検証の補助」（検査の方法）に従う。
 - Lake のコマンドは、ワークスペースのルート（`SYK_CLT/` の親）で実行する。原稿本文は編集しない。
@@ -57,7 +57,7 @@
 | A15：`SYK/Main.lean` は1ファイルのまま、検査用の `SYK/MainAudit.lean` を置く。不変条件を `SYK/CLT/ARCHITECTURE.md` とモジュール docstring に書く | 行う | MA-11 |
 | A11：Blueprint の構成の変更と、事実関係の修正 | 行う | MA-12 |
 | A9：ルートの `README.md`（著者順、`SYK/Main.lean` の案内）と、その他の文書 | 行う | MA-13 |
-| A1：manifest の `inherited`。`experimental.module` の削除。A10：CI の二つの workflow を一つにまとめ、Lean の検証、Blueprint の検証、公開を分ける。A12：`.gitignore` の2行の削除 | 行う | MA-14 |
+| A1：manifest の `inherited`。`experimental.module` の削除。A10：CI の二つの workflow を一つにまとめ、Lean の検証、Blueprint の検証、公開を分ける。A12：`.gitignore` の2行の削除 | 行った | MA-14（完了） |
 
 次のことは行わない。
 - **A13：二つの規格化トレースの統一と、`SYK.CLT.partitionFunction` の改名。**
@@ -107,7 +107,7 @@ flowchart TD
 | MA-11 | `SYK/MainAudit.lean` と不変条件の記述 | 未着手 |
 | MA-12 | Blueprint | 未着手 |
 | MA-13 | 文書 | 未着手 |
-| MA-14 | 設定（MA-01 より先に行う） | 作業中 |
+| MA-14 | 設定（MA-01 より先に行った） | 完了 |
 | MA-15 | 最終確認と記録 | 未着手 |
 
 ### 共通の検証と注意
@@ -401,23 +401,16 @@ DEL-1 と DEL-2 について、削除した結果、原稿との対応、削除�
 - **`SYK/CLT/ARCHITECTURE.md`：** `SYK/Main.lean` の説明（「現行原稿の主張」の前の2段落）を、MA-11 で加えた不変条件と設計理由を中心に短くする。宣言の列挙は `SYK/Main.lean` の docstring に任せる。
 - **その他の構造文書：** `SYK/Model/ARCHITECTURE.md`、`SYK/SuperConcentration/ARCHITECTURE.md` など、MA-01〜MA-11 で変わった名前・配置・ファイル（`SYK/Probability/IndependentMoments.lean`、`SYK/MainAudit.lean`）を反映する。AGENTS.md の名前空間の表も確かめる。
 
-### MA-14 設定
+### MA-14 設定（完了）
 
-MA-01 より先に、次の2つのコミットで行う。最後のコミットで本表の状態を完了にする。
+MA-01 より先に、二つのコミットで行った。
 
-**ビルドの設定**
-- ワークスペースのルートの `lake-manifest.json` と `SYK_CLT/workspace/lake-manifest.json` で、`VersoBlueprint` の `inherited` を `true` にする。ワークスペースのルートは `SYKBlueprint` を通してだけ `VersoBlueprint` に依存するからである。二つの manifest は一致させる（ルートの manifest は Git の管理外）。
-- `SYK_CLT/lakefile.toml` と `SYK_CLT/Blueprint/lakefile.toml` の `[leanOptions]` から、Lean 4.32.2 では何もしない `experimental.module = true` を削る。`leanOptions` が変わるので、`lake build SYKBlueprint` で両パッケージが再ビルドされることを確かめる。
-
-**CI と `.gitignore`**
-- `lean_action_ci.yml` と `blueprint-pages.yml` を一つの workflow にまとめる。
-  - 理由：二つは同じ起動条件で同じ検証を行っており、公開側は検証側の結果を使っていなかった。
-  - Lean の検証（`lake build SYK`）、Blueprint の検証（`lake build SYKBlueprint`、HTML の生成、`vbp check`）、公開を分ける。
-  - 公開は、検証に合格した `main` の成果物だけを使う。
-  - 書き込み権限は公開の段階だけに置き、実行中の公開は取り消さない。
-  - 起動条件には、`.lean` に加えて `**/lakefile.toml`、`**/lake-manifest.json`、`**/lean-toolchain` と、この workflow 自身を含める。
-- 研究者の依頼で分けた設計（[作業履歴](WORK_HISTORY.md#blueprint-workflow-split-2026-10-10)）を戻すので、作業履歴に理由を記録する。本計画の `BLUEPRINT-PAGES` の行と補足を、新しい構成に合わせる。
-- `.gitignore` から、別プロジェクトの2項目（`2Dcollision/`、`research_public/`）を除く。
+- **ビルドの設定：**
+  - 二つの manifest で、`VersoBlueprint` の `inherited` を `true` にした。ワークスペースのルートは、`SYKBlueprint` を通してだけ `VersoBlueprint` に依存するからである。
+  - 二つの `lakefile.toml` から、Lean 4.32.2 では何もしない `experimental.module = true` を削った。
+- **CI と `.gitignore`：**
+  - `blueprint-pages.yml` を `lean_action_ci.yml` にまとめ、Lean の検証、Blueprint の検証、公開を別々の job にした。理由は[作業履歴](WORK_HISTORY.md#ci-workflow-merge-2026-10-13)に記した。
+  - `.gitignore` から、別プロジェクトの2項目を除いた。
 
 ### MA-15 最終確認と記録
 
@@ -440,4 +433,4 @@ MA-01 より先に、次の2つのコミットで行う。最後のコミット�
 
 CLT は `hFE : AnnealedInput` を明示的に仮定する形で仕様を確定した。形式化の範囲は [CLT の構造文書](SYK/CLT/ARCHITECTURE.md#仮定する命題と形式化の範囲) に記す。
 
-`BLUEPRINT-PAGES` では、`blueprint-pages.yml` を検証専用の `lean_action_ci.yml` から分離した。公開 workflow は `lake build SYKBlueprint`、HTML 生成、`vbp check` の成功後に `SYK_CLT/_out/site/html-multi` を公開する。旧案の単体パッケージ方式には切り替えない。現行設定は [公開 workflow](.github/workflows/blueprint-pages.yml) を参照する。完了条件は main での build・deploy の成功と、公開ページの章・グラフ・検索・宣言リンクの確認である。実行環境の制限により GitHub 側の状態は未確認である。Pages の URL はリポジトリ名 `SYK_CLT` に依存する。
+`BLUEPRINT-PAGES` の公開は、[CI の workflow](.github/workflows/lean_action_ci.yml) の deploy job が行う。Blueprint の job（`lake build SYKBlueprint`、HTML 生成、`vbp check`）に合格した `main` の `SYK_CLT/_out/site/html-multi` を公開する。旧案の単体パッケージ方式には切り替えない。完了条件は main での build・deploy の成功と、公開ページの章・グラフ・検索・宣言リンクの確認である。実行環境の制限により GitHub 側の状態は未確認である。Pages の URL はリポジトリ名 `SYK_CLT` に依存する。
