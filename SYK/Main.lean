@@ -22,6 +22,7 @@ The joint theorem asserts the existence of one positive high-temperature
 radius for both CLTs. The individual theorems are its projections.
 Declarations from other SYK files are used only inside the joint proof,
 after all model definitions, hypotheses, and CLT assertions.
+Keep the definitions here even when they duplicate internal definitions.
 
 The model corresponds to `subsec:SYK-model`, and the two claims to
 `thm:partition-clt` and `thm:free-energy-clt`. Majorana matrices are abstract:
