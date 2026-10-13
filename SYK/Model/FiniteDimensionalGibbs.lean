@@ -102,8 +102,8 @@ theorem density_variance_nonneg
 
 /-! ## Normalized traces and complex partition functions -/
 
-/-- The matrix trace normalized by the dimension of a nonempty index type. -/
-noncomputable def normalizedTrace [Nonempty d] (A : Matrix d d ℂ) : ℂ :=
+/-- The matrix trace divided by the dimension, with value zero for an empty index type. -/
+noncomputable def normalizedTrace (A : Matrix d d ℂ) : ℂ :=
   Matrix.trace A / (Fintype.card d : ℂ)
 
 /-- The matrix exponential `exp (-z H)` at complex inverse temperature `z`. -/
@@ -168,8 +168,8 @@ theorem partitionFunction_mul_log_deriv (H : Matrix d d ℂ) (z : ℂ)
 
 section PhysicalGibbs
 
-/-- The normalized Gibbs matrix, using the positive partition function. -/
-noncomputable def thermalDensity [Nonempty d]
+/-- The normalized Gibbs matrix; positivity and unit trace require a nonempty index type. -/
+noncomputable def thermalDensity
     (β : NNReal) (H : Matrix d d ℂ) : Matrix d d ℂ :=
   ((partitionFunction (β : ℂ) H).re⁻¹ : ℝ) •
     gibbsOperator (β : ℂ) H

@@ -24,7 +24,7 @@ open GaussianConcentration
 
 /-- The real logarithm of the partition function. -/
 noncomputable def logPartition
-    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (J : CouplingSpace P.N P.q) : ℝ :=
   Real.log
@@ -305,7 +305,7 @@ theorem logPartition_lipschitz
 
 /-- At zero inverse temperature the log-partition function is constant. -/
 theorem logPartition_eq_log_card_of_beta_zero
-    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (hβ : β = 0) (J : CouplingSpace P.N P.q) :
     logPartition P β M J = Real.log (Fintype.card d : ℝ) := by
@@ -313,7 +313,7 @@ theorem logPartition_eq_log_card_of_beta_zero
 
 /-- At zero inverse temperature every positive-deviation tail event is empty. -/
 theorem logPartition_tail_of_beta_zero
-    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (hβ : β = 0) (t : ℝ) (ht : 0 < t) :
     standardGaussianMeasure P.N P.q
@@ -476,7 +476,7 @@ theorem logPartition_hasSubgaussianMGF
 
 /-- At β = 0 the centered log-partition function vanishes pointwise. -/
 theorem logPartition_centered_of_beta_zero
-    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (hβ : β = 0) (J : CouplingSpace P.N P.q) :
     logPartition P β M J -

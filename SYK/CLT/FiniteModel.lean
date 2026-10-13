@@ -6,7 +6,8 @@ import Mathlib.Analysis.Matrix.Spectrum
 # Finite Gaussian Majorana models
 
 Dimension-normalized partition functions, trace bounds, and Gaussian moments
-for an arbitrary nonempty finite matrix Majorana representation. These results
+for a finite matrix Majorana representation. Definitions allow an empty index type;
+positivity and dimension-dependent bounds require a nonempty representation. These results
 use `Params` and `MajoranaSystem`, without an asymptotic family or annealed input.
 -/
 
@@ -142,10 +143,8 @@ theorem normalizedHamiltonian_trace_eq_zero (P : Params)
   simp [normalizedHamiltonian, hamiltonian, Matrix.trace_sum,
     Matrix.trace_smul, interactionOperator_trace_eq_zero P M]
 
-variable [Nonempty d]
-
 /-- A single nonzero Gaussian coupling gives a nonzero Hamiltonian. -/
-theorem normalizedHamiltonian_single_ne_zero (P : Params)
+theorem normalizedHamiltonian_single_ne_zero [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ))
     (s : InteractionIndex P.N P.q) :
     normalizedHamiltonian P M (WithLp.toLp 2 (Pi.single s (1 : ℝ))) ≠ 0 := by
@@ -190,20 +189,20 @@ noncomputable def partitionFunction (P : Params)
   normalizedTrace (gibbsOperator z (normalizedHamiltonian P M g))
 
 /-- Real partition function at real inverse temperature. The imaginary part
-vanishes and this real part is strictly positive, as stated below. -/
+vanishes; positivity requires a nonempty representation, as stated below. -/
 noncomputable def realPartitionFunction (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ)
     (g : CouplingSpace P.N P.q) : ℝ :=
   (partitionFunction P M (β : ℂ) g).re
 
 @[simp]
-theorem partitionFunction_zero (P : Params)
+theorem partitionFunction_zero [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ))
     (g : CouplingSpace P.N P.q) : partitionFunction P M 0 g = 1 := by
   simp [partitionFunction]
 
 @[simp]
-theorem realPartitionFunction_zero (P : Params)
+theorem realPartitionFunction_zero [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ))
     (g : CouplingSpace P.N P.q) : realPartitionFunction P M 0 g = 1 := by
   simp [realPartitionFunction]
@@ -228,7 +227,7 @@ theorem partitionFunction_im_eq_zero (P : Params)
     gibbsOperator, smul_smul, Complex.div_natCast_im] using
     congrArg (fun x : ℝ ↦ x / (Fintype.card d : ℝ)) h
 
-theorem realPartitionFunction_pos (P : Params)
+theorem realPartitionFunction_pos [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ)
     (g : CouplingSpace P.N P.q) : 0 < realPartitionFunction P M β g := by
   have hH : star ((β : ℂ) • normalizedHamiltonian P M g) =
@@ -241,7 +240,7 @@ theorem realPartitionFunction_pos (P : Params)
     div_pos h hd
 
 /-- Jensen's lower bound for the dimension-normalized SYK partition function. -/
-theorem realPartitionFunction_ge_one (P : Params)
+theorem realPartitionFunction_ge_one [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ)
     (g : CouplingSpace P.N P.q) :
     1 ≤ realPartitionFunction P M β g := by
@@ -260,7 +259,7 @@ theorem realPartitionFunction_ge_one (P : Params)
 
 /-- The lower bound is strict when the Hamiltonian and inverse temperature
 are nonzero. -/
-theorem realPartitionFunction_gt_one_of_hamiltonian_ne_zero (P : Params)
+theorem realPartitionFunction_gt_one_of_hamiltonian_ne_zero [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) (hβ : β ≠ 0)
     (g : CouplingSpace P.N P.q)
     (hH : normalizedHamiltonian P M g ≠ 0) :
@@ -282,7 +281,7 @@ theorem realPartitionFunction_gt_one_of_hamiltonian_ne_zero (P : Params)
 
 /-- A single interaction already makes the finite-size partition function
 strictly larger than its value at zero coupling. -/
-theorem realPartitionFunction_single_gt_one (P : Params)
+theorem realPartitionFunction_single_gt_one [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) (hβ : β ≠ 0)
     (s : InteractionIndex P.N P.q) :
     1 < realPartitionFunction P M β
@@ -291,12 +290,12 @@ theorem realPartitionFunction_single_gt_one (P : Params)
     (normalizedHamiltonian_single_ne_zero P M s)
 
 @[simp]
-theorem realPartitionFunction_zero_coupling (P : Params)
+theorem realPartitionFunction_zero_coupling [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) :
     realPartitionFunction P M β 0 = 1 := by
   simp [realPartitionFunction, partitionFunction, normalizedTrace, gibbsOperator]
 
-theorem exists_realPartitionFunction_exp_bound (P : Params)
+theorem exists_realPartitionFunction_exp_bound [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ g : CouplingSpace P.N P.q,
       realPartitionFunction P M β g ≤ Real.exp (C * ‖g‖) := by
@@ -340,7 +339,7 @@ theorem realPartitionFunction_continuous (P : Params)
   fun_prop
 
 /-- Finite Gaussian models have the moments needed for these centerings. -/
-theorem realPartitionFunction_moments (P : Params)
+theorem realPartitionFunction_moments [Nonempty d] (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) (β : ℝ) :
     MemLp (realPartitionFunction P M β) 2 (standardGaussianMeasure P.N P.q) ∧
       Integrable (fun g ↦ Real.log (realPartitionFunction P M β g))

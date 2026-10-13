@@ -329,7 +329,7 @@ section
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 
-/-- Normalized matrix trace `card(n)⁻¹ * Tr(A)`. It allows an empty index type and is
+/-- Normalized matrix trace `card(n)⁻¹ * Tr(A)`, zero for an empty index type. It is
 distinct from `SYK.normalizedTrace` in `SYK.Model.FiniteDimensionalGibbs`. -/
 noncomputable def normalizedTrace (A : Matrix n n 𝕜) : 𝕜 :=
   (Fintype.card n : 𝕜)⁻¹ * A.trace
@@ -653,7 +653,7 @@ private theorem sum_sv_conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν :
   exact sum_eigenvalues_eq_of_basis _ hT.isSymmetric hH.eigenvectorBasis ν
     (fun j => toEuclideanLin_conj_diagonal_apply H hH ν j) f
 
-theorem normalizedSchattenNorm_conjDiag_pow [Nonempty n] (H : Matrix n n 𝕜)
+theorem normalizedSchattenNorm_conjDiag_pow (H : Matrix n n 𝕜)
     (hH : H.IsHermitian) (ν : n → ℝ) (hν : ∀ j, 0 ≤ ν j) (l : ℕ) (hl : 1 ≤ l) :
     normalizedSchattenNorm l (conjDiag H hH ν) ^ l = (∑ j, ν j ^ l) / Fintype.card n := by
   have hlR : (0 : ℝ) < l := by exact_mod_cast hl

@@ -228,7 +228,7 @@ theorem product_standardGaussian_mgf_le
     mgf (fun x => F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι)
         (standardGaussianMeasureOnEuclidean ι) t ≤
       Real.exp (L ^ 2 * t ^ 2 / 2) :=
-  herbst_of_cov_bound F L hL hLip (gaussian_cov_bound F L hL hLip) t
+  herbst_of_cov_bound F L hLip (gaussian_cov_bound F L hL hLip) t
 
 /-- A function with Lipschitz constant zero is constant. -/
 lemma eq_const_of_lipschitz_zero {ι : Type*} [Fintype ι]
@@ -271,34 +271,10 @@ theorem product_standardGaussian_hasSubgaussianMGF
       exact centered_eq_zero_of_lipschitz_zero F (by simpa using hLip) x
     simp [hcenter]
   · refine ⟨fun t => ?_, fun t => ?_⟩
-    · have hbound : ∀ x : EuclideanSpace ℝ ι, |F x| ≤ |F 0| + L * ‖x‖ := by
-        intro x
-        have h := hLip.dist_le_mul x 0
-        simp only [dist_eq_norm, sub_zero, Real.coe_toNNReal L hL] at h
-        cases abs_cases (F x) <;> cases abs_cases (F 0) <;>
-          [skip; skip; skip; skip] <;> nlinarith [abs_le.mp h, norm_nonneg x]
-      set μ := standardGaussianMeasureOnEuclidean ι
-      have hdom := (integrable_exp_mul_norm (ι := ι) (|t| * L)).const_mul
-        (Real.exp (|t| * |F 0| + |t| * |∫ y, F y ∂μ|))
-      refine hdom.mono' ?_ ?_
-      · exact (Real.continuous_exp.comp (continuous_const.mul
-          ((hLip.continuous).sub continuous_const))).aestronglyMeasurable
-      · filter_upwards [] with x
-        rw [Real.norm_of_nonneg (Real.exp_nonneg _), ← Real.exp_add]
-        refine Real.exp_le_exp.mpr ?_
-        have hFx : F x - ∫ y, F y ∂μ ≤
-            |F 0| + L * ‖x‖ + |∫ y, F y ∂μ| := by
-          have h := abs_le.mp (hbound x)
-          have h' := neg_abs_le (∫ y, F y ∂μ)
-          nlinarith [h.1, h.2]
-        have hneg : -(|F 0| + L * ‖x‖ + |∫ y, F y ∂μ|) ≤
-            F x - ∫ y, F y ∂μ := by
-          have h := abs_le.mp (hbound x)
-          have h' := le_abs_self (∫ y, F y ∂μ)
-          nlinarith [h.1, h.2]
-        have hnn : (0 : ℝ) ≤ L * ‖x‖ := mul_nonneg hL (norm_nonneg x)
-        rcases abs_cases t with ⟨ht, _⟩ | ⟨ht, _⟩ <;> rw [ht] <;>
-          nlinarith [hFx, hneg, hnn]
+    · apply integrable_exp_smul_lipschitz
+        (fun x => F x - ∫ y, F y ∂standardGaussianMeasureOnEuclidean ι) L
+      simpa only [add_zero] using hLip.sub
+        (LipschitzWith.const (∫ y, F y ∂standardGaussianMeasureOnEuclidean ι))
     · have hmgf := product_standardGaussian_mgf_le F L hLpos hLip t
       have hcoe : ((Real.toNNReal (L ^ 2) : ℝ≥0) : ℝ) = L ^ 2 :=
         Real.coe_toNNReal _ (sq_nonneg L)

@@ -191,38 +191,43 @@ lemma quadratic_bound_of_deriv_sub_le {Φ : ℝ → ℝ} {m c : ℝ}
     simp [psi, h0] at hnonneg
     linarith
 
-/-
-For a Lipschitz function `F`, the function `exp (s • F)` is integrable against the
-standard Gaussian measure, for every real `s`.  This uses the linear growth
-`|F x| ≤ |F 0| + L * ‖x‖` together with `integrable_exp_mul_norm`.
--/
+/-- Every real exponential of a Lipschitz function is Gaussian integrable.
+The growth bound uses `L.toNNReal`, so no positivity assumption on `L` is needed. -/
 lemma integrable_exp_smul_lipschitz {ι : Type*} [Fintype ι]
-    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 < L)
+    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ)
     (hLip : LipschitzWith L.toNNReal F) (s : ℝ) :
     Integrable (fun x => Real.exp (s * F x)) (standardGaussianMeasureOnEuclidean ι) := by
-  refine MeasureTheory.Integrable.mono' (g := fun x => Real.exp ( |s| * |F 0| ) * Real.exp ( |s| * L
-    * ‖x‖ )) ?_ ?_ ?_;
-  · exact MeasureTheory.Integrable.const_mul ( integrable_exp_mul_norm ( |s| * L ) ) _;
-  · exact Continuous.aestronglyMeasurable ( by exact Real.continuous_exp.comp ( continuous_const.mul
-                                                ( hLip.continuous ) ) );
-  · -- Apply the Lipschitz condition to bound |F x|.
-    have h_bound : ∀ x, |F x - F 0| ≤ L * ‖x‖ := by
-      intro x
-      have hx := hLip.dist_le_mul x 0
-      rw [show (L.toNNReal : ℝ) = L by exact Real.coe_toNNReal L hL.le] at hx
-      simpa only [Real.dist_eq, dist_zero_right] using hx
-    simp only [Real.norm_eq_abs, Real.abs_exp, ← Real.exp_add, Real.exp_le_exp];
-    filter_upwards [ ] with x using by cases abs_cases s <;> cases abs_cases ( F 0 ) <;> nlinarith
-                                        [ abs_le.mp ( h_bound x ) ] ;
+  let K : ℝ := L.toNNReal
+  have hdom := (integrable_exp_mul_norm (ι := ι) (|s| * K)).const_mul
+    (Real.exp (|s| * |F 0|))
+  refine hdom.mono'
+    (Real.continuous_exp.comp (continuous_const.mul hLip.continuous)).aestronglyMeasurable ?_
+  filter_upwards [] with x
+  rw [Real.norm_of_nonneg (Real.exp_nonneg _), ← Real.exp_add]
+  apply Real.exp_le_exp.mpr
+  have hdist : |F x - F 0| ≤ K * ‖x‖ := by
+    simpa only [Real.dist_eq, dist_zero_right, K] using hLip.dist_le_mul x 0
+  have hgrowth : |F x| ≤ |F 0| + K * ‖x‖ := by
+    calc
+      |F x| = |F x - F 0 + F 0| := congrArg abs (sub_add_cancel (F x) (F 0)).symm
+      _ ≤ |F x - F 0| + |F 0| := abs_add_le _ _
+      _ ≤ |F 0| + K * ‖x‖ := by
+        simpa only [add_comm] using add_le_add_right hdist |F 0|
+  calc
+    s * F x ≤ |s * F x| := le_abs_self _
+    _ = |s| * |F x| := abs_mul _ _
+    _ ≤ |s| * (|F 0| + K * ‖x‖) :=
+      mul_le_mul_of_nonneg_left hgrowth (abs_nonneg s)
+    _ = |s| * |F 0| + |s| * K * ‖x‖ := by ring
 
 /-- The set of exponents `s` for which `exp (s • F)` is integrable is all of `ℝ`. -/
 lemma integrableExpSet_lipschitz_eq_univ {ι : Type*} [Fintype ι]
-    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 < L)
+    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ)
     (hLip : LipschitzWith L.toNNReal F) :
     integrableExpSet F (standardGaussianMeasureOnEuclidean ι) = Set.univ := by
   ext s
   simp only [integrableExpSet, Set.mem_setOf_eq, Set.mem_univ, iff_true]
-  exact integrable_exp_smul_lipschitz F L hL hLip s
+  exact integrable_exp_smul_lipschitz F L hLip s
 
 /-
 **Herbst's argument, assembly step.**  Given the sharp Gaussian covariance bound
@@ -236,7 +241,7 @@ The cumulant generating function `Φ = cgf F μ` is analytic (hence differentiab
 claimed bound after unfolding `mgf (F - ∫ F) μ t = exp (Φ t - t ∫ F)`.
 -/
 lemma herbst_of_cov_bound {ι : Type*} [Fintype ι]
-    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 < L)
+    (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ)
     (hLip : LipschitzWith L.toNNReal F)
     (hcov : ∀ s : ℝ,
       |(∫ x, F x * Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι)
@@ -256,14 +261,14 @@ lemma herbst_of_cov_bound {ι : Type*} [Fintype ι]
     · have h_analytic : ∀ s : ℝ, AnalyticAt ℝ Φ s := by
         intro s;
         apply_rules [ ProbabilityTheory.analyticAt_cgf ];
-        rw [ integrableExpSet_lipschitz_eq_univ F L hL hLip ] ; norm_num;
+        rw [ integrableExpSet_lipschitz_eq_univ F L hLip ] ; norm_num;
       exact fun s => ( h_analytic s |> AnalyticAt.differentiableAt );
     · simp +zetaDelta at *;
     · intro s
       have h_deriv : deriv Φ s = (∫ x, F x * Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean
         ι) / (∫ x, Real.exp (s * F x) ∂standardGaussianMeasureOnEuclidean ι) := by
         apply_rules [ ProbabilityTheory.deriv_cgf ];
-        rw [ integrableExpSet_lipschitz_eq_univ F L hL hLip ] ; norm_num;
+        rw [ integrableExpSet_lipschitz_eq_univ F L hLip ] ; norm_num;
       rw [ h_deriv, div_sub' ];
       · rw [ abs_div, abs_of_nonneg ( show 0 ≤ ∫ x, Real.exp ( s * F x )
           ∂standardGaussianMeasureOnEuclidean ι from MeasureTheory.integral_nonneg fun _ =>
@@ -274,14 +279,14 @@ lemma herbst_of_cov_bound {ι : Type*} [Fintype ι]
         rw [ MeasureTheory.integral_pos_iff_support_of_nonneg_ae ];
         · simp [ Function.support, Real.exp_ne_zero ];
         · exact Filter.Eventually.of_forall fun x => Real.exp_nonneg _;
-        · exact integrable_exp_smul_lipschitz F L hL hLip s;
+        · exact integrable_exp_smul_lipschitz F L hLip s;
   convert Real.exp_le_exp.mpr ( show Φ t - ( ∫ x, F x ∂standardGaussianMeasureOnEuclidean ι ) * t ≤
     L ^ 2 * t ^ 2 / 2 from by linarith ) using 1;
   rw [ Real.exp_sub, Real.exp_log ];
   · simp only [mgf, mul_sub, Real.exp_sub];
     rw [ MeasureTheory.integral_div, mul_comm ];
   · apply_rules [ ProbabilityTheory.mgf_pos ];
-    exact integrable_exp_smul_lipschitz F L hL hLip t
+    exact integrable_exp_smul_lipschitz F L hLip t
 
 /-- `exp (c |y|)` is integrable against the one-dimensional standard Gaussian. -/
 lemma integrable_exp_abs_gaussianReal (c : ℝ) :

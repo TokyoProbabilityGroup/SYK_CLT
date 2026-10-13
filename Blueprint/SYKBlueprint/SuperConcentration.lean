@@ -31,9 +31,12 @@ F_{\beta}(g)
       \operatorname{Tr} \exp\bigl(-\beta H(g)\bigr).
 `
 
-The matrix representation is finite-dimensional and nonempty. Self-adjointness
-of $`H(g)` makes the real part inside the logarithm strictly
-positive.
+The definition accepts any finite-dimensional matrix representation, including
+an empty index type; the total real-logarithm convention gives value zero in
+that case. For a nonempty representation, self-adjointness of $`H(g)` makes
+the real part inside the logarithm strictly positive. The directional-derivative,
+Lipschitz, and Gaussian MGF and concentration bounds below assume a nonempty
+representation.
 :::
 
 :::theorem "anticommuting_expectation_sum" (parent := "superconcentration") (lean := "SYK.sum_sq_expectation_le_one")
@@ -162,7 +165,8 @@ $$`
 F_0(g)=\log d,
 `
 
-where $`d` is the dimension of the matrix representation. Consequently, for
+where $`d` is the dimension of the matrix representation, allowing $`d=0`
+with the same total real-logarithm convention. Consequently, for
 every $`t>0`, the centered two-sided deviation event has standard Gaussian
 measure zero.
 :::

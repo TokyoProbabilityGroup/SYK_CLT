@@ -70,7 +70,7 @@ theorem hermite_aeval_sign (n : ℕ) (c x : ℝ) (hc : c = 1 ∨ c = -1) :
 
 /-- Flipping the sign of the coordinates is measure preserving for i.i.d. Gaussians. -/
 theorem integral_gaussianCouplings_sign {ι E : Type*} [Fintype ι]
-    [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E] (c : ι → ℝ)
+    [NormedAddCommGroup E] [NormedSpace ℝ E] (c : ι → ℝ)
     (hc : ∀ i, c i = 1 ∨ c i = -1) (F : (ι → ℝ) → E) :
     ∫ g, F (fun i => c i * g i) ∂gaussianCouplings ι = ∫ g, F g ∂gaussianCouplings ι := by
   have hsq : ∀ i, c i * c i = 1 := fun i => by rcases hc i with h | h <;> simp [h]
@@ -93,7 +93,7 @@ theorem integral_gaussianCouplings_sign {ι E : Type*} [Fintype ι]
 
 /-- Reindexing i.i.d. standard Gaussian coordinates preserves expectation. -/
 theorem integral_gaussianCouplings_perm {ι E : Type*} [Fintype ι]
-    [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+    [NormedAddCommGroup E] [NormedSpace ℝ E]
     (e : ι ≃ ι) (F : (ι → ℝ) → E) :
     ∫ g, F (fun i => g (e i)) ∂gaussianCouplings ι =
       ∫ g, F g ∂gaussianCouplings ι := by
@@ -114,7 +114,7 @@ theorem integral_gaussianCouplings_perm {ι E : Type*} [Fintype ι]
 
 /-- A signed permutation of i.i.d. Gaussian coordinates preserves expectation. -/
 theorem integral_gaussianCouplings_signed_perm {ι E : Type*} [Fintype ι]
-    [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+    [NormedAddCommGroup E] [NormedSpace ℝ E]
     (e : ι ≃ ι) (c : ι → ℝ) (hc : ∀ i, c i = 1 ∨ c i = -1)
     (F : (ι → ℝ) → E) :
     ∫ g, F (fun i => c i * g (e i)) ∂gaussianCouplings ι =

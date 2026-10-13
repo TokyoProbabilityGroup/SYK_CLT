@@ -113,7 +113,7 @@ flowchart TD
 
 汎用の Hermite 補題を実際に利用するのは、この CLT 内の展開と符号対称性である。そのため、共有ガウス基盤に CLT の記法を追加しない。四次モーメントの経路には、二次 CLT と `SecondChaosAsymptotic` を含めない。これにより、有限モーメント評価の数学的な前提を直接読める。
 
-有限行列解析の3つのファイルは、`SingularValues`、`TraceExponential`、`TraceExpDerivatives` の順に依存する。実際の外部の利用側は `PartitionDerivatives` だけで、Model はこれを import しない。`SYK.normalizedTrace` は複素行列と非空型、`SYK.MatrixAnalysis.normalizedTrace` は一般の `RCLike` と空型も対象にするため、両定義は統合せず別々に保つ。CLT への規格化の接続は `Setting.Z_eq_traceExp` と `Setting.norm_traceExp_disorder` に残る。この配置を採用した判断と検証は [作業履歴](../../WORK_HISTORY.md#clt-refactor-2026-10-06) を参照する。
+有限行列解析の3つのファイルは、`SingularValues`、`TraceExponential`、`TraceExpDerivatives` の順に依存する。実際の外部の利用側は `PartitionDerivatives` だけで、Model はこれを import しない。`SYK.normalizedTrace` は複素行列のトレースを次元で割り、`SYK.MatrixAnalysis.normalizedTrace` は一般の `RCLike` 上で次元の逆数をトレースに掛ける。両定義は空型も扱うが、スカラー、定義式、Model が行列解析に依存しない向きを保つため、統合しない。CLT への規格化の接続は `Setting.Z_eq_traceExp` と `Setting.norm_traceExp_disorder` に残る。この配置を採用した判断と検証は [作業履歴](../../WORK_HISTORY.md#clt-refactor-2026-10-06) を参照する。
 
 ## 証明の共有
 
