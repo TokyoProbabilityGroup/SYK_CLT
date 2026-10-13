@@ -16,7 +16,7 @@ open scoped BigOperators ENNReal NNReal
 
 namespace SYK.GaussianConcentration
 
-/-
+/--
 Approximation of an `L`-Lipschitz function on a finite-dimensional Euclidean space by a
 sequence of `C¹` functions with gradient bounded by `L`, uniform linear growth, and pointwise
 convergence.  Obtained by convolution with a normalized `ContDiffBump` of shrinking radius.
@@ -129,7 +129,7 @@ lemma exists_smooth_lipschitz_approx {ι : Type*} [Fintype ι]
     rw [Real.coe_toNNReal _ hL]
   simp [gradient, h_grad]
 
-/-
+/--
 Dominated-convergence transfer of the three relevant integrals along a uniformly
 linearly-bounded, pointwise-convergent approximating sequence.
 -/

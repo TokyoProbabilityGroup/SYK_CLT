@@ -228,7 +228,7 @@ theorem partitionFunction_pos [Nonempty d] (β : NNReal)
   exact (RCLike.pos_iff.mp h).1
 
 /-- Positivity extends from physical nonnegative inverse temperature to
-every real temperature by reversing the sign of the Hermitian matrix. -/
+every real inverse temperature by reversing the sign of the Hermitian matrix. -/
 theorem partitionFunction_re_pos_real [Nonempty d] (β : ℝ)
     {H : Matrix d d ℂ} (hH : star H = H) :
     0 < (partitionFunction (β : ℂ) H).re := by
@@ -275,7 +275,7 @@ theorem partitionFunction_ne_zero_near_real [Nonempty d] (β : ℝ)
   simp [hzero] at this
 
 /-- The existing pointwise logarithmic-derivative formula holds throughout
-the zero-free disk around a fixed real temperature. -/
+the zero-free disk around a fixed real inverse temperature. -/
 theorem partitionFunction_mul_log_deriv_near_real [Nonempty d] (β : ℝ)
     {H : Matrix d d ℂ} (hH : star H = H) :
     ∃ ε : ℝ, 0 < ε ∧ ∀ z : ℂ, dist z (β : ℂ) < ε →

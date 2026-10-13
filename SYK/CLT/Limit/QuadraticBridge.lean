@@ -34,6 +34,7 @@ theorem hermite_sum_ae {ι : Type*} [Fintype ι] [DecidableEq ι] :
     from hg i]
   exact hermiteMulti_single_two i g
 
+/-- The normalized sum of degree-two coordinate Hermite polynomials in Gaussian L². -/
 noncomputable def quadraticGaussianLp (ι : Type*) [Fintype ι]
     [DecidableEq ι] :
     Lp ℝ 2 (gaussianCouplings ι) :=

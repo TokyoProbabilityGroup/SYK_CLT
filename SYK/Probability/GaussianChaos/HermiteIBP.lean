@@ -299,7 +299,7 @@ theorem integrable_coord_mul_of_euclidean_expBound
 
 /-- A creation-operator IBP step obtained from the selected-coordinate
 exponential-growth Stein identity. The integrability hypotheses isolate the
-linear integral rearrangement; they will follow from growth bounds in the
+linear integral rearrangement; they follow from growth bounds in the
 multi-index application. -/
 theorem creation_ibp_of_expGrowth
     (i : ι) (φ ψ : (ι → ℝ) → ℝ)

@@ -101,7 +101,7 @@ flowchart TD
 | MA-05 | A17 | 完了 |
 | MA-06 | A2、A4 | 完了 |
 | MA-07 | A14、A16 | 完了 |
-| MA-08 | docstring とコメント | 未着手 |
+| MA-08 | docstring とコメント | 完了 |
 | MA-09 | 公開範囲 | 未着手 |
 | MA-10 | モジュールシステムへの移行 | 未着手 |
 | MA-11 | `SYK/MainAudit.lean` と不変条件の記述 | 未着手 |

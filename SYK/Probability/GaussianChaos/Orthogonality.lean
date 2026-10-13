@@ -332,8 +332,8 @@ theorem hermiteOrthonormal_orthonormal {ι : Type*} [Fintype ι] :
     simp [hermiteOrthonormal, inner_smul_left, inner_smul_right,
       inner_hermiteLp, hne]
 
-/-- Once density is established, the normalized Hermite products give a
-Hilbert basis. The density hypothesis is the remaining analytic input. -/
+/-- The normalized Hermite products give a Hilbert basis under the density
+hypothesis, proved by `hermiteOrthonormal_dense` in `PolynomialDensity.lean`. -/
 noncomputable def hermiteHilbertBasis {ι : Type*} [Fintype ι]
     (hdense : (Submodule.span ℝ (Set.range (hermiteOrthonormal (ι := ι)))).topologicalClosure
       = ⊤) :

@@ -5,7 +5,7 @@ import SYK.SuperConcentration.MajoranaBound
 /-!
 # Superconcentration of the SYK log-partition function
 
-This public module uses the standard Hamiltonian from
+This file uses the standard Hamiltonian from
 `SYK.Model.GaussianDisorder` and proves its Lipschitz and Gaussian concentration
 bounds in the standard Gaussian coordinates. Algebraic prerequisites live in
 `SYK.SuperConcentration.MajoranaBound`; shared finite-dimensional Gibbs states and trace

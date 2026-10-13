@@ -4,7 +4,8 @@ import SYK.CLT.Limit.QuadraticGaussianVariance
 open MeasureTheory ProbabilityTheory Filter
 open scoped Topology NNReal
 
-/-!`AnnealedInput` gives the standardized partition-function CLT at nonzero small temperatures. -/
+/-! `AnnealedInput` gives the standardized partition-function CLT
+at small nonzero inverse temperature. -/
 
 open SYK.Probability
 

@@ -195,6 +195,7 @@ theorem Setting.ZGaussian_memLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     ((gaussianCouplings ι).map (MeasurableEquiv.toLp 2 (ι → ℝ))) at h
   exact ((MeasurableEquiv.toLp 2 (ι → ℝ)).memLp_map_measure_iff).mp h
 
+/-- The finite partition function as an L² element on the product Gaussian coupling space. -/
 noncomputable def Setting.ZGaussianLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q)) :=
   (S.ZGaussian_memLp β n).toLp

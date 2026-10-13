@@ -203,6 +203,7 @@ theorem swapInteractionIndex_swap {q : ℕ} (i j : Fin N)
   apply Subtype.ext
   simp [swapInteractionIndex, Finset.image_image, Function.comp_def]
 
+/-- The equivalence of interaction subsets induced by swapping two vertex labels. -/
 def swapInteractionEquiv {q : ℕ} (i j : Fin N) :
     InteractionIndex N q ≃ InteractionIndex N q where
   toFun := swapInteractionIndex i j
@@ -449,7 +450,8 @@ def IsEvenMultiIndex {N q : ℕ} (α : InteractionIndex N q → ℕ) : Prop :=
 def IsOddMultiIndex {N q : ℕ} (α : InteractionIndex N q → ℕ) : Prop :=
   ¬ IsEvenMultiIndex α
 
-/-- Flipping the interactions containing one vertex negates an odd Hermite monomial. -/
+/-- Flipping the interactions containing vertex x negates a Hermite monomial
+whose degree at x is odd. -/
 theorem hermiteMulti_vertex_flip {N q : ℕ} (α : InteractionIndex N q → ℕ)
     (x : Fin N) (hx : Odd (∑ I with x ∈ I.1, α I))
     (g : InteractionIndex N q → ℝ) :

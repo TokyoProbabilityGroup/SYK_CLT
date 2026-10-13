@@ -91,7 +91,7 @@ lemma gaussian_ibp_coord {ι : Type*} [Fintype ι] (g : EuclideanSpace ℝ ι �
   exact eq3
 
 
-/-
+/--
 **`n`-dimensional Gaussian integration by parts.**  For a `C¹` function `g` on
 `EuclideanSpace ℝ ι` whose value and gradient grow no faster than `C e^{c‖w‖}`, and any fixed
 vector `v`, integration against the standard Gaussian satisfies
@@ -174,7 +174,7 @@ lemma gradient_exp_smul {ι : Type*} [Fintype ι]
   rw [gradient, gradient, hexp.fderiv, map_smul]
 
 
-/-
+/--
 The rotation `(a,b) ↦ (cos θ • a + sin θ • b, -(sin θ • a) + cos θ • b)` preserves the
 product standard Gaussian measure.
 -/
@@ -191,7 +191,7 @@ lemma rotation_measurePreserving (θ : ℝ) :
     · infer_instance
     · convert standardGaussianMeasureOnEuclidean_integral_id using 1
 
-/-
+/--
 Gradient of `F` composed with the affine map `z ↦ c • x - d • z`.
 -/
 lemma gradient_affine_comp (F : EuclideanSpace ℝ ι → ℝ) (hF : Differentiable ℝ F)
@@ -214,7 +214,7 @@ lemma gradient_affine_comp (F : EuclideanSpace ℝ ι → ℝ) (hF : Differentia
   rw [hasGradientAt_iff_hasFDerivAt, map_smul, toDual_gradient]
   exact hcomp'
 
-/-
+/--
 The covariance rewritten as a double integral over the product measure.
 -/
 lemma gaussian_cov_eq_double (f g : EuclideanSpace ℝ ι → ℝ)
@@ -241,7 +241,7 @@ lemma gaussian_cov_eq_double (f g : EuclideanSpace ℝ ι → ℝ)
     · exact hf.mul_const _
   · exact hf.mul_const _
 
-/-
+/--
 Fundamental theorem of calculus along the rotation path `θ ↦ cos θ • a + sin θ • b`.
 -/
 lemma gaussian_path_ftc (g : EuclideanSpace ℝ ι → ℝ) (hg : ContDiff ℝ 1 g)
@@ -292,7 +292,7 @@ lemma gaussian_path_ftc (g : EuclideanSpace ℝ ι → ℝ) (hg : ContDiff ℝ 1
   rw [h_ftc]
   ring
 
-/-
+/--
 Integrability of the change-of-variables covariance integrand
 `ψ (x,y) = F(cos θ•x - sin θ•y) · ⟪∇G x, y⟫` on the product Gaussian measure.
 -/
@@ -408,7 +408,7 @@ lemma integrable_cov_psi (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 �
           p.1) p.2 |> le_trans <| mul_le_mul_of_nonneg_right h_grad <| norm_nonneg _) (by
           positivity) (by positivity)
 
-/-
+/--
 Integrability of the original covariance integrand
 `Φ (a,b) = F a · ⟪∇G(cos θ•a+sin θ•b), -sin θ•a+cos θ•b⟫` on the product Gaussian measure.
 -/
@@ -449,7 +449,7 @@ lemma integrable_cov_Phi (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 �
       _ = Real.cos θ * (Real.cos θ * x.ofLp i + Real.sin θ * y.ofLp i) -
           Real.sin θ * (-Real.sin θ * x.ofLp i + Real.cos θ * y.ofLp i) := by ring
 
-/-
+/--
 Change of variables by the rotation on the product Gaussian measure: rewriting the
 covariance integrand `F a · ⟪∇G(cos θ•a+sin θ•b), -sin θ•a+cos θ•b⟫` as
 `F(cos θ•x - sin θ•y) · ⟪∇G x, y⟫`.  Here `G z = exp (s * F z)`.
@@ -505,7 +505,7 @@ lemma gaussian_cov_change_of_var (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (
   · rw [MeasureTheory.integral_prod]
     assumption
 
-/-
+/--
 Gaussian integration by parts in the `y`-variable, applied to the change-of-variables
 form.  Here `G z = exp (s * F z)`.
 -/
@@ -580,7 +580,7 @@ lemma gaussian_cov_per_theta (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL :
   rw [gaussian_cov_change_of_var F L hL hF hgrad s θ,
       gaussian_cov_ibp_step F L hL hF hgrad s θ]
 
-/-
+/--
 Joint integrability of the covariance integrand over `((a,b), θ)` where `θ` ranges over
 the finite interval `Ioc 0 (π/2)`.  Used for the Fubini swap.
 -/
@@ -764,7 +764,7 @@ lemma gaussian_cov_fubini_swap (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL
     erw [MeasureTheory.integral_prod]
     convert integrable_cov_Phi F L hL hF hgrad s θ using 1
 
-/-
+/--
 The covariance interpolation representation: `Cov = ∫₀^{π/2} sin θ · H θ dθ` where
 `H θ = ∫∫ ⟪∇G x, ∇F (cos θ • x - sin θ • y)⟫`.
 -/
@@ -858,7 +858,7 @@ lemma gaussian_cov_repr (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 �
               (continuous_const.mul hF.continuous)))
     · exact Filter.Eventually.of_forall h
 
-/-
+/--
 Pointwise bound on the inner double integral `H θ`.
 -/
 lemma gaussian_cov_H_bound (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ) (hL : 0 ≤ L)

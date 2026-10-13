@@ -4,8 +4,9 @@ import SYK.CLT.Basic
 # Pointwise logarithmic approximation
 
 The error in linearizing `log y` is nonnegative. On `y ≥ 1/2` it is at most
-twice the square of `y - 1`. The complementary event will be controlled using
-the lower partition-function bound and a Gaussian moment estimate.
+twice the square of `y - 1`. The complementary event is controlled in
+`CLT/Log/EventBound.lean` using the lower partition-function bound and a
+Gaussian moment estimate.
 -/
 
 open MeasureTheory ProbabilityTheory Filter
@@ -32,6 +33,7 @@ theorem log_linear_error_le_sq {y : ℝ}
     nlinarith [sq_nonneg (y - 1)]
   exact h1.trans h2
 
+/-- The error Y_N - 1 - log Y_N in the linear approximation to the logarithm. -/
 noncomputable def Setting.logLinearError {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) : ℝ :=
   S.Y β n g - 1 - Real.log (S.Y β n g)

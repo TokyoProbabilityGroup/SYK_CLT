@@ -9,12 +9,11 @@ import Mathlib.Topology.UniformSpace.LocallyUniformConvergence
 
 The setting uses an arbitrary nonempty finite-dimensional matrix Majorana
 system, the shared Gaussian Hamiltonian, and normalized trace. The main
-statements in `Main.lean` correspond to `thm:partition-clt` and
+statements in `SYK/CLT/Main.lean` correspond to `thm:partition-clt` and
 `thm:free-energy-clt`.
 
 Inverse temperature is real, and the main CLT statements use
-`|β| < βq` together with `β ≠ 0`. This supersedes the planned
-nonnegative-temperature restriction. The relative, standardized, and
+`|β| < βq` together with `β ≠ 0`. The relative, standardized, and
 logarithmic CLTs all exclude zero inverse temperature; finite-model
 zero-inverse-temperature identities remain available separately.
 
@@ -22,7 +21,7 @@ The explicit annealed input is `AnnealedInput`, containing the assertions of
 `prop:annealed-free-energy` for the given family in the CLT manuscript.
 The proposition itself is assumed. The Gaussian chaos and
 logarithmic-transfer arguments are proved in the supporting lemma modules
-and assembled in `Main.lean`.
+and assembled in `SYK/CLT/Main.lean`.
 The almost-sure free-energy law of large numbers is outside this module's
 present scope.
 -/
@@ -109,10 +108,12 @@ noncomputable def meanLogZ (β : ℝ) (n : ℕ) : ℝ :=
 /-- The common CLT scaling `N^(q/2-1)`; `q/2` is exact since `q` is even. -/
 def fluctuationScale (n : ℕ) : ℝ := (S.N n : ℝ) ^ (q / 2 - 1)
 
+/-- Scaled relative fluctuation `N^(q/2-1) (Y_N - 1)`. -/
 noncomputable def relativeFluctuation (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) : ℝ :=
   S.fluctuationScale n * (S.Y β n g - 1)
 
+/-- Scaled centered logarithmic fluctuation `N^(q/2-1) (log Z_N - E log Z_N)`. -/
 noncomputable def logFluctuation (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) : ℝ :=
   S.fluctuationScale n * (Real.log (S.Z β n g) - S.meanLogZ β n)
@@ -160,6 +161,7 @@ theorem logFluctuation_zero (n : ℕ) (g : CouplingSpace (S.N n) q) :
     S.logFluctuation 0 n g = 0 := by
   simp [logFluctuation, Z]
 
+/-- The centered partition function divided by its disorder standard deviation. -/
 noncomputable def standardizedFluctuation (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) : ℝ :=
   (S.Z β n g - S.meanZ β n) / Real.sqrt (S.varianceZ β n)

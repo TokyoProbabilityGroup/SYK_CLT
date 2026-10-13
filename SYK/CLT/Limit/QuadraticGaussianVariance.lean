@@ -3,8 +3,11 @@ import SYK.CLT.Limit.EuclideanRelativeCLT
 /-!
 # Variance of the normalized quadratic Gaussian chaos
 
-The quadratic term in the partition-function fluctuation has unit L² norm.
-This is the exact finite-size normalization needed for the variance limit.
+The normalized quadratic sum Q_N has unit L² norm. The second-chaos projection
+P₂Y_N = c_N Q_N therefore has norm |c_N|, and orthogonality gives
+Var Y_N = c_N² + ‖R_N‖². Under the annealed input, the scaled variances of Y_N
+and Z_N converge to the limiting variance, with the exact finite-size identity
+Var Z_N = (E Z_N)² Var Y_N.
 -/
 
 open MeasureTheory Filter ProbabilityTheory
@@ -122,8 +125,8 @@ theorem Setting.varianceY_pi_decomposition {q : ℕ} (S : Setting q)
     quadraticGaussianLp_norm_sq, mul_one]
   ring
 
-/-- The variance of the scaled relative partition function has the stated
-limiting value on the product coupling space. -/
+/-- Under `AnnealedInput`, the scaled variance of Y_N on the product
+coupling space tends to `limitVariance` for |β| below some positive radius. -/
 theorem Setting.scaled_varianceY_pi_tendsto {q : ℕ} (S : Setting q)
     (hFE : AnnealedInput q S) :
     ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →
@@ -174,7 +177,7 @@ theorem Setting.varianceZ_eq_mean_sq_varianceY_pi {q : ℕ}
   rfl
 
 /-- Exact normalization of the partition-function variance has the predicted
-nonzero-inverse-temperature limit. -/
+limit, including at zero inverse temperature. -/
 theorem Setting.scaled_varianceZ_over_mean_sq_tendsto {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
     ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →

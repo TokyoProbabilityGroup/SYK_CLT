@@ -22,6 +22,9 @@ exponential-growth functions against it, the Herbst-type step from a covariance 
 to an exponential-moment bound (`herbst_of_cov_bound`), and Stein's identity: in one
 dimension (`gaussianReal_stein`) and coordinatewise on the product measure
 (`pi_gaussian_stein_coord`). It is independent of the SYK model.
+
+The concentration proof uses the rotation covariance interpolation in `Smooth.lean`,
+mollification in `Lipschitz.lean`, and `herbst_of_cov_bound` in this file.
 -/
 
 open scoped BigOperators ENNReal NNReal
@@ -71,51 +74,7 @@ instance standardGaussianMeasureOnEuclidean_isGaussian {ι : Type*} [Fintype ι]
       = (PiLp.continuousLinearEquiv 2 ℝ (fun _ : ι => ℝ)).symm from rfl]
   infer_instance
 
-/-
-Analytic proof outline for the Gaussian concentration estimate.
-
-The standard Gaussian log-Sobolev inequality says that, for locally Lipschitz
-$g : \mathbb R^n \to \mathbb R$ with $e^g \in L^1(\gamma_n)$,
-$\operatorname{Ent}_{\gamma_n}(e^g) \le
-  \frac12 \int |\nabla g|^2 e^g \, d\gamma_n$, where
-$\operatorname{Ent}_{\gamma_n}(H) =
-  \int H \log H \, d\gamma_n -
-  (\int H \, d\gamma_n)\log(\int H \, d\gamma_n)$.
-Here $\nabla g$ is the a.e. gradient.
-
-If $F$ is $L$-Lipschitz, Rademacher's theorem gives
-$|\nabla F(x)| \le L$ for a.e. $x$. Also
-$|F(x)| \le |F(0)| + L|x|$, so $e^{\lambda F} \in L^1(\gamma_n)$
-for every $\lambda \in \mathbb R$. Set
-$\Phi(\lambda) = \log \mathbb E e^{\lambda F(X)}$.
-
-For $\lambda > 0$, applying log-Sobolev to $g = \lambda F$ gives
-$\operatorname{Ent}_{\gamma_n}(e^{\lambda F})
-  \le \frac{\lambda^2 L^2}{2}\mathbb E e^{\lambda F(X)}$.
-Since
-$\Phi'(\lambda) =
-  \mathbb E[F(X)e^{\lambda F(X)}] / \mathbb E e^{\lambda F(X)}$,
-the entropy identity is
-$\operatorname{Ent}_{\gamma_n}(e^{\lambda F}) =
-  \mathbb E e^{\lambda F(X)}(\lambda\Phi'(\lambda)-\Phi(\lambda))$.
-Thus
-$\lambda\Phi'(\lambda)-\Phi(\lambda) \le \lambda^2L^2/2$, hence
-$(\Phi(\lambda)/\lambda)' \le L^2/2$.
-
-Integrating from $0$ to $\lambda$ and using
-$\lim_{s \downarrow 0}\Phi(s)/s = \mathbb E F(X)$ yields
-$\Phi(\lambda) \le \lambda\mathbb E F(X) + \lambda^2L^2/2$, equivalently
-$\mathbb E e^{\lambda(F(X)-\mathbb E F(X))} \le e^{\lambda^2L^2/2}$.
-Chernoff's bound then gives
-$\mathbb P(F(X)-\mathbb E F(X) > t)
-  \le \exp(-\lambda t + \lambda^2L^2/2)$, optimized at
-$\lambda = t/L^2$, so
-$\mathbb P(F(X)-\mathbb E F(X) > t)
-  \le \exp(-t^2/(2L^2))$.
-Applying the same argument to $-F$ and using the union bound gives
-$\mathbb P(|F(X)-\mathbb E F(X)| > t)
-  \le 2\exp(-t^2/(2L^2))$.
-
+/--
 Exponential-of-norm functions are integrable against the standard Euclidean Gaussian.
 By Fernique's theorem, `exp (C ‖x‖²)` is integrable for some `C > 0`, and completing the
 square gives `c ‖x‖ ≤ C ‖x‖² + c² / (4C)`.
@@ -136,13 +95,9 @@ theorem integrable_exp_mul_norm {ι : Type*} [Fintype ι] (c : ℝ) :
         ring
     _ ≤ c ^ 2 / (4 * C) + C * ‖x‖ ^ 2 := by linarith
 
-/-
-Real-analysis Grönwall-type core of the Herbst argument.  If `Φ` is differentiable,
-vanishes at `0`, and its derivative stays within `c * |s|` of `m` for every `s`, then `Φ`
-is dominated by the quadratic `m * t + c * t ^ 2 / 2`.  (The two-sided derivative bound
-forces `Φ' - m` to have the sign of `s` at the endpoints, which is exactly what is needed
-for both `t ≥ 0` and `t ≤ 0`.)
--/
+/-- If Φ is differentiable, Φ(0) = 0, and |Φ'(s) - m| ≤ c |s|, then
+Φ(t) ≤ m t + c t² / 2. For s ≥ 0, Φ'(s) - m ≤ c s; for s ≤ 0,
+Φ'(s) - m ≥ c s. Thus ψ(s) = Φ(s) - (m s + c s² / 2) is maximized at 0. -/
 lemma quadratic_bound_of_deriv_sub_le {Φ : ℝ → ℝ} {m c : ℝ}
     (hdiff : Differentiable ℝ Φ) (h0 : Φ 0 = 0)
     (hderiv : ∀ s, |deriv Φ s - m| ≤ c * |s|) (t : ℝ) :
@@ -221,7 +176,8 @@ lemma integrable_exp_smul_lipschitz {ι : Type*} [Fintype ι]
       mul_le_mul_of_nonneg_left hgrowth (abs_nonneg s)
     _ = |s| * |F 0| + |s| * K * ‖x‖ := by ring
 
-/-- The set of exponents `s` for which `exp (s • F)` is integrable is all of `ℝ`. -/
+/-- For `F` satisfying `LipschitzWith L.toNNReal F`, every real exponent
+belongs to its Gaussian integrability set. -/
 lemma integrableExpSet_lipschitz_eq_univ {ι : Type*} [Fintype ι]
     (F : EuclideanSpace ℝ ι → ℝ) (L : ℝ)
     (hLip : LipschitzWith L.toNNReal F) :
@@ -230,7 +186,7 @@ lemma integrableExpSet_lipschitz_eq_univ {ι : Type*} [Fintype ι]
   simp only [integrableExpSet, Set.mem_setOf_eq, Set.mem_univ, iff_true]
   exact integrable_exp_smul_lipschitz F L hLip s
 
-/-
+/--
 **Herbst's argument, assembly step.**  Given the sharp Gaussian covariance bound
 `|∫ F e^{sF} - (∫ F)(∫ e^{sF})| ≤ L² |s| ∫ e^{sF}` for every `s`, the centered function
 `F - ∫ F` has a sub-Gaussian moment-generating function with parameter `L²`.
@@ -328,7 +284,7 @@ private lemma integrable_gaussianPDFReal_mul {f : ℝ → ℝ}
       (ae_of_all _ fun _ => gaussianPDF_lt_top)] at hf
   simpa only [toReal_gaussianPDF, smul_eq_mul] using hf
 
-/-
+/--
 **One-dimensional Gaussian integration by parts (Stein's identity).**  For a `C¹`
 function `g` on `ℝ` whose value and derivative grow no faster than `C e^{c|x|}`, integration
 against the standard Gaussian satisfies `∫ x * g x dγ = ∫ g' x dγ`.  This follows from the
@@ -386,7 +342,7 @@ lemma gaussianReal_stein (g g' : ℝ → ℝ)
         ext x
         ring
 
-/-
+/--
 The standard Euclidean Gaussian measure is centered: its mean is `0`.
 -/
 lemma standardGaussianMeasureOnEuclidean_integral_id {ι : Type*} [Fintype ι] :
@@ -405,7 +361,7 @@ lemma integrable_exp_c_sum_abs_pi {ι : Type*} [Fintype ι] (c : ℝ) :
   rw [this]
   exact Integrable.fintype_prod (fun j => integrable_exp_abs_gaussianReal c)
 
-/-
+/--
 `|yᵢ| exp (c ∑ⱼ |yⱼ|)` is integrable against the product standard Gaussian.
 -/
 lemma integrable_abs_coord_mul_exp_c_sum_abs_pi {ι : Type*} [Fintype ι]
@@ -469,7 +425,7 @@ private lemma integral_pi_eq_integral_slice {ι : Type*} [Fintype ι] [Decidable
   rw [integral_prod_symm (fun z => F (e z)) hFe]
   simp only [happly]
 
-/-
+/--
 **Tensorized Stein identity on the product Gaussian measure.**  For a `C¹` function `h`
 on `ι → ℝ` whose value and selected coordinate derivative have exponential growth
 `C e^{c ∑ⱼ |yⱼ|}`, integration against the product of standard Gaussians satisfies
@@ -560,7 +516,7 @@ lemma pi_gaussian_stein_coord {ι : Type*} [Fintype ι] [DecidableEq ι]
   funext y
   simpa using h_slice y
 
-/-
+/--
 Transferring the `i`-th gradient coordinate through the `toLp` identification: it becomes
 the `i`-th partial derivative of the composed function on `ι → ℝ`.
 -/
@@ -585,9 +541,9 @@ lemma gradient_toLp_coord_eq_fderiv {ι : Type*} [Fintype ι] [DecidableEq ι]
         (EuclideanSpace.equiv ι ℝ)))
     · simp
 
-/-
-The value and gradient of `g` are integrable against the standard Gaussian when they have
-exponential growth.
+/--
+The functions w ↦ w_i · g(w) and w ↦ (∇g(w))_i are integrable against the
+standard Gaussian when the value and gradient of g have exponential growth.
 -/
 lemma gaussian_ibp_integrable {ι : Type*} [Fintype ι] (g : EuclideanSpace ℝ ι → ℝ)
     (i : ι) (hg : ContDiff ℝ 1 g)

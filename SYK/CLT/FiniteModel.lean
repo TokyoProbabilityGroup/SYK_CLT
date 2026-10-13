@@ -172,6 +172,7 @@ theorem normalizedHamiltonian_normalizedTrace_eq_zero (P : Params)
     normalizedTrace (normalizedHamiltonian P M g) = 0 := by
   simp only [normalizedTrace, normalizedHamiltonian_trace_eq_zero, zero_div]
 
+/-- The normalized Hamiltonian as a continuous real linear map on the coupling space. -/
 noncomputable def normalizedHamiltonianLinear (P : Params)
     (M : MajoranaSystem P.N (Matrix d d ℂ)) :
     CouplingSpace P.N P.q →L[ℝ] Matrix d d ℂ :=
