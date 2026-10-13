@@ -15,30 +15,6 @@ open SYK.GaussianChaos
 
 namespace SYK.CLT
 
-theorem multiIndices_degree_zero {ι : Type*} [Fintype ι] :
-    multiIndices_degree (ι := ι) 0 = {0} := by
-  classical
-  ext α
-  rw [mem_multiIndices_degree, Finset.mem_singleton]
-  constructor
-  · intro h
-    funext i
-    exact (Finset.sum_eq_zero_iff_of_nonneg
-      (fun j _ => Nat.zero_le (α j))).mp h i (Finset.mem_univ i)
-  · intro h
-    subst α
-    simp
-
-theorem hermiteLp_zero {ι : Type*} [Fintype ι] :
-    (hermiteLp (ι := ι) 0) = Lp.const 2 (gaussianCouplings ι) (1 : ℝ) := by
-  apply Lp.ext
-  filter_upwards [(hermiteMulti_memLp_two (0 : ι → ℕ)).coeFn_toLp,
-    (Lp.coeFn_const (α := ι → ℝ) (μ := gaussianCouplings ι)
-      (p := 2) (c := (1 : ℝ)))] with g hg hc
-  simp only [hermiteLp]
-  rw [hg, hc]
-  simp [hermiteMulti, Polynomial.hermite_zero]
-
 theorem integral_Y_pi {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     (∫ g : InteractionIndex (S.N n) q → ℝ,
       S.Y β n (WithLp.toLp 2 g)
@@ -78,7 +54,7 @@ theorem Setting.Y_zeroChaos {q : ℕ} (S : Setting q)
       Lp.const 2 (gaussianCouplings (InteractionIndex (S.N n) q)) (1 : ℝ) := by
   classical
   simp only [hermiteDegreeProjection, hermiteFiniteProjection,
-    multiIndices_degree_zero, Finset.sum_singleton]
+    multiIndicesOfDegree_zero, Finset.sum_singleton]
   rw [inner_hermiteLp_zero_Y, hermiteLp_zero]
   simp
 

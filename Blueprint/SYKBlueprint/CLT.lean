@@ -183,7 +183,7 @@ Cauchy--Schwarz. Applying moment
 determination to every linear projection proves polynomial density below.
 :::
 
-:::theorem "clt_finite_hermite_projection" (parent := "central_limit_theorem") (uses := "clt_gaussian_hermite_ibp") (lean := "SYK.GaussianChaos.hermiteMulti_orthogonality, SYK.GaussianChaos.inner_hermiteLp, SYK.GaussianChaos.hermiteFiniteProjection_eq_starProjection, SYK.GaussianChaos.mem_multiIndices_degree, SYK.GaussianChaos.hermiteOrthonormal_orthonormal, SYK.GaussianChaos.hasSum_hermiteDegreeProjection")
+:::theorem "clt_finite_hermite_projection" (parent := "central_limit_theorem") (uses := "clt_gaussian_hermite_ibp") (lean := "SYK.GaussianChaos.hermiteMulti_orthogonality, SYK.GaussianChaos.inner_hermiteLp, SYK.GaussianChaos.hermiteFiniteProjection_eq_starProjection, SYK.GaussianChaos.mem_multiIndicesOfDegree, SYK.GaussianChaos.hermiteOrthonormal_orthonormal, SYK.GaussianChaos.hasSum_hermiteDegreeProjection")
 For every finite set of standard Gaussian coordinates, the probabilists'
 Hermite products satisfy
 

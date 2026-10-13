@@ -20,7 +20,7 @@ namespace SYK.CLT
 /-- The degree-two multi-indices supported at one interaction. -/
 noncomputable def diagonalMultiIndices (ι : Type*) [Fintype ι] [DecidableEq ι] :
     Finset (ι → ℕ) :=
-  (multiIndices_degree (ι := ι) 2).filter (fun α => ∃ I, α = Pi.single I 2)
+  (multiIndicesOfDegree (ι := ι) 2).filter (fun α => ∃ I, α = Pi.single I 2)
 
 theorem diagonalMultiIndices_eq_image (ι : Type*) [Fintype ι] [DecidableEq ι] :
     diagonalMultiIndices ι = (Finset.univ : Finset ι).image (fun I => Pi.single I 2) := by
@@ -34,7 +34,7 @@ theorem diagonalMultiIndices_eq_image (ι : Type*) [Fintype ι] [DecidableEq ι]
     obtain ⟨I, _, rfl⟩ := Finset.mem_image.mp hα
     apply Finset.mem_filter.mpr
     constructor
-    · exact (mem_multiIndices_degree 2 _).mpr (by simp)
+    · exact (mem_multiIndicesOfDegree 2 _).mpr (by simp)
     · exact ⟨I, rfl⟩
 
 theorem hermiteFactorial_single_two {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -88,7 +88,7 @@ theorem Setting.Y_secondChaos_eq_diagonal {q : ℕ} (S : Setting q)
   intro α hα
   by_cases hdiag : ∃ I, α = Pi.single I 2
   · simp [hdiag]
-  · have hdegree := (mem_multiIndices_degree 2 α).mp hα
+  · have hdegree := (mem_multiIndicesOfDegree 2 α).mp hα
     obtain hdiag' | ⟨I, J, hIJ, hpair⟩ := multiIndex_degree_two_cases α hdegree
     · exact absurd hdiag' hdiag
     · subst α

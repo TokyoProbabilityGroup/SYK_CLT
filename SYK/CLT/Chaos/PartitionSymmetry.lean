@@ -332,7 +332,7 @@ theorem Setting.Y_firstChaos_eq_zero {q : ℕ} (S : Setting q)
   unfold hermiteDegreeProjection hermiteFiniteProjection Setting.YGaussianLp
   apply Finset.sum_eq_zero
   intro α hα
-  have hdegree := (mem_multiIndices_degree 1 α).mp hα
+  have hdegree := (mem_multiIndicesOfDegree 1 α).mp hα
   have hodd := odd_multiIndex_of_degree_one
     (lt_of_lt_of_le (by decide : 0 < 4) S.q_ge_four) α hdegree
   simp [inner_smul_right, S.inner_hermiteLp_ZGaussianLp_eq_zero β n α hodd]

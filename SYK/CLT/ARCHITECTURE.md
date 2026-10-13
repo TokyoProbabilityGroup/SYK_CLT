@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | `SYK/Analysis/Matrix/` | 特異値・トレース指数関数・微分評価 | `SYK.MatrixAnalysis` |
 | `SYK/Probability/GaussianChaos/` | Hermite 基本定義・部分積分・直交性・密度・完全性 | `SYK.GaussianChaos` |
-| `SYK/Probability/` 直下 | モーメント一意性・分布移送 | `SYK.Probability` |
+| `SYK/Probability/` 直下 | 独立変数のモーメント・モーメント一意性・分布移送 | `SYK.Probability` |
 | `SYK/Probability/GaussianConcentration/` | 共有ガウス基盤 | `SYK.GaussianConcentration` |
 | `SYK/CLT/Chaos/` | 模型の符号対称性・分配関数の微分・二次・高次・零次カオス | `SYK.CLT`（符号ゲージ・頂点偶奇則は `SYK` と `SYK.MajoranaSystem`） |
 | `SYK/CLT/Quadratic/` | 有限個のガウス変数二乗の観測量・四次モーメント・二次和の CLT | `SYK.CLT` |
@@ -105,8 +105,8 @@ flowchart TD
     observable --> quadratic["GaussianQuadraticCLT"]
     asymptotic["SecondChaosAsymptotic"] --> quadratic
     fourth --> independent["IndependentFourthMoment"]
+    independentMoments["Probability/IndependentMoments"] --> independent
     setting["Basic：Setting"] --> prelim
-    setting --> independent
 ```
 
 汎用の Hermite 補題を実際に利用するのは、この CLT 内の展開と符号対称性である。そのため、共有ガウス基盤に CLT の記法を追加しない。四次モーメントの経路には、二次 CLT と `SecondChaosAsymptotic` を含めない。これにより、有限モーメント評価の数学的な前提を直接読める。
@@ -121,6 +121,8 @@ flowchart TD
 - 二次観測量の可測性は、`GaussianQuadraticObservable` から、法則の対応、二次 CLT、四次モーメントへ供給する。
 - 2 次の Hermite 多項式の値 `x² - 1`（`hermite_two_eval`）は `GaussianChaos/Basic` で共有する。
 - 四次モーメントの六つの項は、可積分性を個別に確認してから、有限和として積分する。
+- 独立な中心化実確率変数の二次・四次モーメント加法公式は `Probability/IndependentMoments.lean` に置き、ガウス平方和の有限モーメント評価が利用する。この汎用層は模型や CLT を import しない。
+- Hermite 射影のノルム、異なる次数の直交性、零次の多重指数と Hermite 積は `GaussianChaos/Orthogonality.lean` に置く。次数を固定した多重指数集合は `multiIndicesOfDegree` とする。
 - 座標ごとの中心化ガウス平方の L⁴ 評価は `GaussianFourthMoment` の `SYK.CLT.centeredGaussianSquare_eval_memLp_four` で共有し、同じファイルの全座標和と `IndependentFourthMoment` の有限部分和に使う。
 
 行列のトレース指数関数の定義は、`SYK.MatrixAnalysis.traceExp` の1つだけである。滑らかさは `SYK.MatrixAnalysis.contDiff_traceExp` が与え、Hermitian な基点での高階微分評価は、内部補題 `iteratedFDeriv_traceExp_bound_hermitian` で証明する。List に沿う微分と mathlib の反復 Fréchet 微分は、滑らかさによって接続する。この接続と、二つの規格化トレースの型は保つ。`TraceExponential` では、Schatten ノルムと語の評価、Taylor 係数が高階微分の解析的な証明を担う。Duhamel の公式は使わない。

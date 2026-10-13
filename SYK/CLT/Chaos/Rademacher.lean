@@ -169,16 +169,16 @@ open scoped Classical in
 orthogonality rule already applied. -/
 theorem radE_chaos_pow_eq_sum_multinomial_even (N q r : ℕ) :
     radE N (fun ε => chaos N q ε ^ r) =
-      ∑ α ∈ (multiIndices_degree (ι := InteractionIndex N q) r).filter IsEvenMultiIndex,
+      ∑ α ∈ (multiIndicesOfDegree (ι := InteractionIndex N q) r).filter IsEvenMultiIndex,
         (Nat.multinomial Finset.univ α : ℝ) := by
   classical
   let w : (Fin N → Bool) → InteractionIndex N q → ℝ :=
     fun ε I => ∏ x ∈ I.1, rad (ε x)
   have hindices :
       Finset.piAntidiag (Finset.univ : Finset (InteractionIndex N q)) r =
-        multiIndices_degree (ι := InteractionIndex N q) r := by
+        multiIndicesOfDegree (ι := InteractionIndex N q) r := by
     ext α
-    rw [Finset.mem_piAntidiag, mem_multiIndices_degree]
+    rw [Finset.mem_piAntidiag, mem_multiIndicesOfDegree]
     constructor
     · intro h
       simpa using h.1
@@ -186,14 +186,14 @@ theorem radE_chaos_pow_eq_sum_multinomial_even (N q r : ℕ) :
       exact ⟨by simpa using h, by simp⟩
   have hexpand (ε : Fin N → Bool) :
       chaos N q ε ^ r =
-        ∑ α ∈ multiIndices_degree (ι := InteractionIndex N q) r,
+        ∑ α ∈ multiIndicesOfDegree (ι := InteractionIndex N q) r,
           (Nat.multinomial Finset.univ α : ℝ) * ∏ I, w ε I ^ α I := by
     rw [chaos_eq_sum_interactionIndex]
     have h := Finset.sum_pow_eq_sum_piAntidiag
       (Finset.univ : Finset (InteractionIndex N q)) (w ε) r
     simpa only [hindices] using h
   rw [show (fun ε => chaos N q ε ^ r) = fun ε =>
-      ∑ α ∈ multiIndices_degree (ι := InteractionIndex N q) r,
+      ∑ α ∈ multiIndicesOfDegree (ι := InteractionIndex N q) r,
         (Nat.multinomial Finset.univ α : ℝ) * ∏ I, w ε I ^ α I by
       funext ε
       exact hexpand ε]
@@ -208,14 +208,14 @@ open scoped Classical in
 /-- `eq:even-sum-Rademacher-moment`: the factorial-weighted sum over even
 multi-indices equals the corresponding Rademacher moment divided by `r!`. -/
 theorem even_sum_rademacher_moment (N q r : ℕ) :
-    (∑ α ∈ (multiIndices_degree (ι := InteractionIndex N q) r).filter IsEvenMultiIndex,
+    (∑ α ∈ (multiIndicesOfDegree (ι := InteractionIndex N q) r).filter IsEvenMultiIndex,
       (∏ I : InteractionIndex N q, ((α I).factorial : ℝ))⁻¹) =
       ((r.factorial : ℝ)⁻¹ * radE N (fun ε => chaos N q ε ^ r)) := by
   classical
   rw [radE_chaos_pow_eq_sum_multinomial_even, Finset.mul_sum]
   apply Finset.sum_congr rfl
   intro α hα
-  simp only [Finset.mem_filter, mem_multiIndices_degree] at hα
+  simp only [Finset.mem_filter, mem_multiIndicesOfDegree] at hα
   have hspec := Nat.multinomial_spec (Finset.univ : Finset (InteractionIndex N q)) α
   rw [hα.1] at hspec
   have hspecR :

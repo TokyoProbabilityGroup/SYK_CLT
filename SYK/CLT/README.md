@@ -28,11 +28,13 @@ The principal import paths are:
 | Singular values and matrix derivatives | `SingularValues` → `TraceExponential` → `TraceExpDerivatives` |
 | Finite SYK second chaos | `Basic`, `CliffordSignParity`, `GaussianChaos/Orthogonality` → `PartitionSymmetry`; `TraceExpDerivatives` → `PartitionDerivatives`; both → `SecondChaos` |
 | Independent estimates | `Rademacher` |
-| Quadratic Gaussian moments and CLT | `GaussianQuadraticObservable` → `GaussianFourthMoment` → `IndependentFourthMoment`; `GaussianQuadraticObservable` and `SecondChaosAsymptotic` → `GaussianQuadraticCLT` |
+| Quadratic Gaussian moments and CLT | `GaussianQuadraticObservable` → `GaussianFourthMoment` → `IndependentFourthMoment`, which also uses `Probability/IndependentMoments`; `GaussianQuadraticObservable` and `SecondChaosAsymptotic` → `GaussianQuadraticCLT` |
 
 `PartitionSymmetry` imports `Basic` for `Setting`, `Z`, and `Y`. The general Gaussian Hermite integration-by-parts API used by the active CLT modules is in `../Probability/GaussianChaos/HermiteIBP.lean`.
 
 `GaussianChaos/Basic` contains the finite product Gaussian measure, Hermite products, and their sign/permutation identities. `GaussianChaos/CoefficientIBP` uses these without importing the model-specific `CliffordSignParity`. Finite quadratic observables and their first two moments are in `GaussianQuadraticObservable`; fourth-moment estimates do not import the quadratic CLT.
+
+`GaussianChaos/Orthogonality` supplies projection norms, orthogonality between degrees, and the degree-zero identities. Its finite set of multi-indices of degree `r` is `multiIndicesOfDegree r`. The independent-variable moment addition formulas are in `SYK.Probability` through `../Probability/IndependentMoments.lean`.
 
 The opening docstring of each module also states its main declarations and assumptions; `TraceExponential`, for example, documents the roles of its Schatten, word, and Taylor-coefficient estimates.
 

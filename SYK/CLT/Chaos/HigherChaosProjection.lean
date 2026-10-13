@@ -45,31 +45,6 @@ private theorem exp_tail_range_le (u : ℝ) (hu : 0 ≤ u) (m : ℕ) :
     _ ≤ _ := by
       exact mul_le_mul_of_nonneg_left (Real.sum_le_exp_of_nonneg hu m) (by positivity)
 
-theorem norm_sq_hermiteFiniteProjection {ι : Type*} [Fintype ι]
-    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
-    ‖hermiteFiniteProjection s f‖ ^ 2 =
-      ∑ α ∈ s, |⟪hermiteLp α, f⟫_ℝ| ^ 2 /
-        ∏ i : ι, ((α i).factorial : ℝ) := by
-  classical
-  rw [← real_inner_self_eq_norm_sq]
-  simp only [hermiteFiniteProjection, inner_sum, sum_inner,
-    real_inner_smul_left, inner_smul_right, inner_hermiteLp]
-  apply Finset.sum_congr rfl
-  intro α hα
-  simp only [mul_ite, mul_zero]
-  rw [Finset.sum_ite_eq' s α, if_pos hα]
-  have hfac : (∏ i : ι, ((α i).factorial : ℝ)) ≠ 0 :=
-    ne_of_gt (hermiteFactorial_pos α)
-  rw [sq_abs]
-  field_simp
-
-theorem norm_sq_hermiteDegreeProjection {ι : Type*} [Fintype ι]
-    (r : ℕ) (f : Lp ℝ 2 (gaussianCouplings ι)) :
-    ‖hermiteDegreeProjection r f‖ ^ 2 =
-      ∑ α ∈ multiIndices_degree r, |⟪hermiteLp α, f⟫_ℝ| ^ 2 /
-        ∏ i : ι, ((α i).factorial : ℝ) := by
-  exact norm_sq_hermiteFiniteProjection (multiIndices_degree r) f
-
 theorem Setting.inner_hermiteLp_YGaussianLp_eq_zero_of_odd
     {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (α : InteractionIndex (S.N n) q → ℕ) (hα : IsOddMultiIndex α) :
@@ -82,12 +57,12 @@ theorem Setting.norm_sq_hermiteDegreeProjection_le_even_sum
     {q : ℕ} (S : Setting q) (β : ℝ) (n r : ℕ) :
     ‖hermiteDegreeProjection r (S.YGaussianLp β n)‖ ^ 2 ≤
       (β ^ 2 * couplingScale (S.params n) ^ 2) ^ r *
-        ∑ α ∈ (multiIndices_degree
+        ∑ α ∈ (multiIndicesOfDegree
           (ι := InteractionIndex (S.N n) q) r).filter IsEvenMultiIndex,
           (∏ I : InteractionIndex (S.N n) q, ((α I).factorial : ℝ))⁻¹ := by
   classical
   rw [norm_sq_hermiteDegreeProjection]
-  let s := multiIndices_degree (ι := InteractionIndex (S.N n) q) r
+  let s := multiIndicesOfDegree (ι := InteractionIndex (S.N n) q) r
   have hrestrict :
       (∑ α ∈ s, |⟪hermiteLp α, S.YGaussianLp β n⟫_ℝ| ^ 2 /
           ∏ I, ((α I).factorial : ℝ)) =
@@ -106,8 +81,8 @@ theorem Setting.norm_sq_hermiteDegreeProjection_le_even_sum
   apply Finset.sum_le_sum
   intro α hα
   have hdegree : ∑ I, α I = r := by
-    have hs : α ∈ multiIndices_degree r := (Finset.mem_filter.mp hα).1
-    exact (mem_multiIndices_degree r α).mp hs
+    have hs : α ∈ multiIndicesOfDegree r := (Finset.mem_filter.mp hα).1
+    exact (mem_multiIndicesOfDegree r α).mp hs
   have hcoeff := S.abs_inner_hermiteLp_YGaussianLp_le β n α
   rw [hdegree] at hcoeff
   have hnum : |⟪hermiteLp α, S.YGaussianLp β n⟫_ℝ| ^ 2 ≤
