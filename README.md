@@ -106,6 +106,3 @@ The accompanying paper, including its LaTeX sources, bibliography, and PDF, is c
 
 Please cite Yoshinori Kamijima, Shuta Nakajima, Ryoichiro Noda, and Kohei Sasaya, *A Central Limit Theorem for High-Temperature SYK Model*. [CITATION.cff](CITATION.cff) records the preferred paper citation and identifies the formalization repository. When referring to the Lean formalization, also include the [repository URL](https://github.com/TokyoProbabilityGroup/SYK_CLT) and the commit used. No arXiv identifier, DOI, or publication date has been verified for this paper, so none is included.
 
-## References
-
-- [Spin glass by Lean](https://github.com/or4nge19/SpinGlass)
