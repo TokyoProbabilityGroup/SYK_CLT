@@ -6,7 +6,7 @@
 
 ## 依存関係
 
-`Main.lean` は `Model.GaussianDisorder` の標準ハミルトニアンと、共有模型の通常の分配関数の対数を扱い、一般スケール `𝒥` の引数を持たない。図の矢印は「上流の結果を下流が利用する」という意味である。
+`SYK/SuperConcentration/Main.lean` は `Model.GaussianDisorder` の標準ハミルトニアンと、共有模型の通常の分配関数の対数を扱い、一般スケール `𝒥` の引数を持たない。図の矢印は「上流の結果を下流が利用する」という意味である。
 
 ```mermaid
 flowchart TD
@@ -80,7 +80,7 @@ L = β / sqrt q,
 
 ## 公開定理と有限サイズの評価
 
-`Main.lean` の公開定理は `SYK.logPartition_hasSubgaussianMGF`、`logPartition_upper_tail_standardGaussian`、`logPartition_lower_tail_standardGaussian`、`logPartition_two_sided_tail_standardGaussian` である。入力は `P : SYK.Params`、非空有限行列表現の `MajoranaSystem`、`β : ℝ≥0` である。裾の指数表示には、追加で `β ≠ 0` と `t > 0` を仮定する。`β = 0` の場合は、`logPartition_tail_of_beta_zero`、`logPartition_centered_of_beta_zero` と、上側・下側の対応する定理で処理する。MGF はこの場合も含む。
+`SYK/SuperConcentration/Main.lean` の公開定理は `SYK.logPartition_hasSubgaussianMGF`、`logPartition_upper_tail_standardGaussian`、`logPartition_lower_tail_standardGaussian`、`logPartition_two_sided_tail_standardGaussian` である。入力は `P : SYK.Params`、非空有限行列表現の `MajoranaSystem`、`β : ℝ≥0` である。裾の指数表示には、追加で `β ≠ 0` と `t > 0` を仮定する。`β = 0` の場合は、`logPartition_tail_of_beta_zero`、`logPartition_centered_of_beta_zero` と、上側・下側の対応する定理で処理する。MGF はこの場合も含む。
 
 `SYK.syk_sum_sq_expectation_le` は任意の密度行列 `ρ` について次を証明する。
 

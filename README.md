@@ -14,6 +14,8 @@ This repository contains the manuscript [A Central Limit Theorem for High-Temper
 ```text
 SYK_CLT/                   # repository and mathematical Lake package
 ├── SYK/                   # mathematical Lean modules, namespace SYK
+│   ├── Main.lean          # standalone Gaussian SYK model and public CLTs
+│   ├── MainAudit.lean     # build-time check of standalone statements
 │   ├── Analysis/
 │   ├── Probability/
 │   ├── Model/
@@ -49,6 +51,7 @@ Review existing parent files before overwriting them. Projects in the parent wor
 ```bash
 lake build SYKBlueprint
 lake build SYK
+lake lean SYK_CLT/SYK/Main.lean
 lake lean SYK_CLT/SYK/CLT/Main.lean
 ```
 
@@ -59,15 +62,18 @@ The CLTs are Lean-checked conditional on `AnnealedInput`; constructing that inpu
 For the main results, inspect their types and axiom dependencies in a Lean editor or scratch file using the parent workspace:
 
 ```lean
+import SYK.Main
 import SYK.CLT.StandardModel
 
+#check SYK.CLT.GaussianSYK.syk_partition_and_log_partition_clt
+#print axioms SYK.CLT.GaussianSYK.syk_partition_and_log_partition_clt
 #check SYK.CLT.partition_and_log_partition_clt
 #print axioms SYK.CLT.partition_and_log_partition_clt
 #check SYK.CLT.standard_partition_and_log_partition_clt
 #print axioms SYK.CLT.standard_partition_and_log_partition_clt
 ```
 
-Check the displayed assumptions, quantifier order, normalizations, and conclusions against the manuscript. Both theorems require an explicit `hFE : AnnealedInput ...`; `#print axioms` checks their axiom dependencies but does not prove this input. These statement and assumption checks are needed when assessing which manuscript claims the formalization verifies, in addition to routine builds.
+Check the displayed assumptions, quantifier order, normalizations, and conclusions against the manuscript. All these theorems require an explicit `hFE : AnnealedInput ...`; `#print axioms` checks their axiom dependencies but does not prove this input. These statement and assumption checks are needed when assessing which manuscript claims the formalization verifies, in addition to routine builds.
 
 ## Blueprint
 
@@ -98,7 +104,7 @@ All original Lean source files (`.lean`) throughout this repository, including `
 
 The accompanying paper, including its LaTeX sources, bibliography, and PDF, is copyrighted by its authors, with all rights reserved, and is not covered by Apache-2.0. See [Paper/COPYRIGHT.md](Paper/COPYRIGHT.md). The intended arXiv submission license is the arXiv perpetual, non-exclusive license; it is a submission choice, not a reuse license granted to GitHub users.
 
-Please cite Yoshinori Kamijima, Kohei Sasaya, Shuta Nakajima, and Ryoichiro Noda, *A Central Limit Theorem for High-Temperature SYK Model*. [CITATION.cff](CITATION.cff) records the preferred paper citation and identifies the formalization repository. When referring to the Lean formalization, also include the [repository URL](https://github.com/TokyoProbabilityGroup/SYK_CLT) and the commit used. No arXiv identifier, DOI, or publication date has been verified for this paper, so none is included.
+Please cite Yoshinori Kamijima, Shuta Nakajima, Ryoichiro Noda, and Kohei Sasaya, *A Central Limit Theorem for High-Temperature SYK Model*. [CITATION.cff](CITATION.cff) records the preferred paper citation and identifies the formalization repository. When referring to the Lean formalization, also include the [repository URL](https://github.com/TokyoProbabilityGroup/SYK_CLT) and the commit used. No arXiv identifier, DOI, or publication date has been verified for this paper, so none is included.
 
 ## References
 

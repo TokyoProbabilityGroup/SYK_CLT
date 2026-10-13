@@ -80,6 +80,8 @@ SYK リポジトリ全体に適用する。数学コードは `SYK/`、公開用
 | 分布収束・モーメント一意性（`SYK/Probability/` 直下） | `SYK.Probability` |
 | 模型・集中評価 | `SYK` |
 | CLT 固有の結果 | `SYK.CLT` |
+| 自立した模型と主定理（`SYK/Main.lean`） | `SYK.CLT.GaussianSYK` |
+| 主定理文の依存検査（`SYK/MainAudit.lean`） | `SYK.MainAudit` |
 
 ## ビルドと Blueprint
 

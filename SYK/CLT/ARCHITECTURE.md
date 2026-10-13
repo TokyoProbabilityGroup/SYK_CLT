@@ -13,6 +13,8 @@
 | `SYK/CLT/Chaos/` | 模型の符号対称性・分配関数の微分・二次・高次・零次カオス | `SYK.CLT`（符号ゲージ・頂点偶奇則は `SYK` と `SYK.MajoranaSystem`） |
 | `SYK/CLT/Quadratic/` | 有限個のガウス変数二乗の観測量・四次モーメント・二次和の CLT | `SYK.CLT` |
 | `SYK/CLT/Limit/`・`SYK/CLT/Log/` | 模型への分布移送・分散・相対・標準化 CLT と対数への移送 | `SYK.CLT` |
+| `SYK/Main.lean` | 自立した模型・入力・主定理の入口 | `SYK.CLT.GaussianSYK` |
+| `SYK/MainAudit.lean` | 主定理文の依存境界の検査 | `SYK.MainAudit` |
 
 数学ライブラリは Lean のモジュール形式を用いる。公開宣言は `public section`、内部の補助宣言は `private` とし、公開宣言の文に必要な依存を `public import` で伝える。他ファイルで必要な定義の展開だけを `@[expose]` で公開する。公開定理の型の一致に必要な `standardSetting`・`StandardBasis` の展開も、この公開の境界に含む。公開する同値写像の逆写像の証明は `private_decl%` で非公開補題の参照を保つ。Blueprint は従来形式のままライブラリを読み込む。
 
@@ -35,13 +37,11 @@
 
 全4節の主要な主張と Lean の対応は「現行原稿の主張」に記す。改訂時には [同期手順](../../AGENTS.md#原稿の改訂と実装の同期) に従い、主張、仮定、規格化、依存関係、証明の状態への影響を確認する。
 
-模型と主定理を一つのファイルで読む入口は [SYK/Main.lean](../Main.lean) とする。研究者の指示により、`SYK.CLT.GaussianSYK` で `MajoranaOperators`、`Model`、`AnnealedInput` を実際に宣言し、自己共役性・反交換関係、積ガウス測度、昇順積と位相、ハミルトニアン、規格化分配関数、期待値、分散、極限分散を直接定義する。他の SYK 宣言の使用は末尾の共同定理の証明内に限る。それ以前の模型・入力・CLT 述語は、SYK の import を除き mathlib だけで検査できる。冒頭にも、具体的な SYK 模型について入力の収束・微分可能性・符号の仮定を証明していないことを明記する。
+模型と主定理を一つのファイルで読む入口は [SYK/Main.lean](../Main.lean) とする。模型・アニール入力・主定理を `SYK.CLT.GaussianSYK` で直接記述し、他の SYK 宣言は共同定理の証明内だけで使う。宣言と原稿の対応は同ファイルの docstring を参照する。具体模型のアニール入力は主定理の仮定として残る。
 
-同じ名前空間の `PartitionCLTAt` は `thm:partition-clt` の相対・標準化 CLT と分散の正値性、`LogPartitionCLTAt` は `thm:free-energy-clt` の中心化した対数 CLT を表示する。`syk_partition_and_log_partition_clt` は、両主張が成立する共通の正半径を存在量化する。`syk_partition_clt` と `syk_log_partition_clt` はその射影として個別の存在命題を得る。結論から半径を選ぶ定義は置かない。共同定理の証明だけが模型・入力を共有の `Setting`・`AnnealedInput` に移し、既存の共同定理を適用する。ハミルトニアン・分配関数・期待値は定義的に一致し、分散の積分公式との一致は証明内で確認する。入力の全仮定、一般表現の次元規格化、実逆温度の範囲、スケーリング・中心化・極限分散を保ち、標準表現の構成を要求しない。
+定理文は mathlib と同じファイルの定義だけで書き、内部の定義と重複していても置き換えない。定理文を mathlib だけで照合できるようにするためである。[SYK/MainAudit.lean](../MainAudit.lean) が、主定理3つの型から定義の型・値と構成子の型をたどり、他の SYK モジュールへの依存をビルド時に拒否する。定理の証明は検査の探索対象に含めない。
 
 ## 模型・型・規格化
-
-`SYK/Main.lean` の定理文は、mathlib と同じファイルの定義だけで書く。内部の定義と重複していても置き換えない。定理文を mathlib だけで照合できるようにするためであり、[SYK/MainAudit.lean](../MainAudit.lean) がビルド時にこの不変条件を検査する。検査は主定理3つの型から定義の型・値と構成子の型をたどり、定理の証明はたどらない。
 
 | 項目 | 現行の内容 |
 | --- | --- |
@@ -129,7 +129,7 @@ flowchart TD
 - Hermite 射影のノルム、異なる次数の直交性、零次の多重指数と Hermite 積は `GaussianChaos/Orthogonality.lean` に置く。次数を固定した多重指数集合は `multiIndicesOfDegree` とする。
 - 座標ごとの中心化ガウス平方の L⁴ 評価は `GaussianFourthMoment` の `SYK.CLT.centeredGaussianSquare_eval_memLp_four` で共有し、同じファイルの全座標和と `IndependentFourthMoment` の有限部分和に使う。
 
-行列のトレース指数関数の定義は、`SYK.MatrixAnalysis.traceExp` の1つだけである。滑らかさは `SYK.MatrixAnalysis.contDiff_traceExp` が与え、Hermitian な基点での高階微分評価は、内部補題 `iteratedFDeriv_traceExp_bound_hermitian` で証明する。List に沿う微分と mathlib の反復 Fréchet 微分は、滑らかさによって接続する。この接続と、二つの規格化トレースの型は保つ。`TraceExponential` では、Schatten ノルムと語の評価、Taylor 係数が高階微分の解析的な証明を担う。Duhamel の公式は使わない。
+行列のトレース指数関数の定義は、`SYK.MatrixAnalysis.traceExp` の1つだけである。滑らかさは `SYK.MatrixAnalysis.contDiff_traceExp` が与え、Hermitian な基点での高階微分評価は、公開定理 `iterDirectionalFDeriv_traceExp_bound` が与える。List に沿う微分と mathlib の反復 Fréchet 微分は、滑らかさによって接続する。この接続と、二つの規格化トレースの型は保つ。`TraceExponential` では、Schatten ノルムと語の評価、Taylor 係数が高階微分の解析的な証明を担う。Duhamel の公式は使わない。
 
 `Main` は分配関数の CLT を先に証明し、`partition_and_log_partition_clt` が下位の対数 CLT と組み合わせて共通半径を取る。`SYK/Main.lean` の個別定理は同じファイルの共同定理から射影する。矢印は証明結果から利用側へ向かい、公開定理の全結論と入力 `hFE` は変えない。
 

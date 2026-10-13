@@ -4,10 +4,11 @@ This directory contains the Lean formalization work for the central limit theore
 
 ## Current contents
 
-- [`../Main.lean`](../Main.lean): standalone definitions of the Gaussian SYK model and `AnnealedInput`, followed by a joint existential CLT theorem and its two individual projections, in `SYK.CLT.GaussianSYK`. Majorana matrices, their adjoint and anticommutation relations, the product Gaussian law, Hamiltonian, normalized partition function, expectations, and variances are defined directly. Only the joint proof uses other SYK declarations. It proves that one positive temperature radius supports both CLTs. The model, assumptions, and CLT predicates check with mathlib alone. All CLTs assume `AnnealedInput`; this file does not construct that input for the concrete model.
+- [`SYK/Main.lean`](../Main.lean): standalone Gaussian SYK model, annealed assumptions, and joint CLT with two individual projections in `SYK.CLT.GaussianSYK`. Its statement definitions use mathlib and this file alone; only the joint proof uses other SYK declarations. The annealed input remains a hypothesis.
+- [`SYK/MainAudit.lean`](../MainAudit.lean): checks this statement boundary during the library build, following types and definition bodies while excluding theorem proofs.
 - `FiniteModel.lean`: abstract finite Majorana partition functions, trace bounds, and Gaussian moment and logarithm estimates, with inputs `Params` and `MajoranaSystem`.
-- `Basic.lean`: the asymptotic family API `Setting q` and the assumed annealed input `AnnealedInput q S`. `Main.lean` states the conditional CLTs.
-- `StandardModel.lean`: the standard family of sizes `q + 2 * n`, its trace normalization, and the three conditional CLTs.
+- `Basic.lean`: the asymptotic family API `Setting q` and the assumed annealed input `AnnealedInput q S`. `SYK/CLT/Main.lean` states the conditional CLTs.
+- `StandardModel.lean`: the standard family of sizes `q + 2 * n`, its trace normalization, and the joint conditional CLT theorem.
 - `Normalization.lean`: the finite standard-representation check `partitionFunction_standard`; this module is not imported by the abstract CLT proofs.
 - `../../Paper/CLT_SYK.tex`: manuscript root containing the shared preamble, front matter, and references.
 - `../../Paper/sections/`: independently compilable top-level manuscript sections; together with the root file, these are the source of truth for the paper theorem statements.
@@ -42,9 +43,9 @@ The opening docstring of each module also states its main declarations and assum
 
 For fixed even $q \ge 4$, conditional on `hFE : AnnealedInput q S`, the theorems supply a common radius $\beta_q>0$ for real inverse temperatures $0<|\beta|<\beta_q$. The relative fluctuations $N^{q/2-1}(Z_N/\mathbb E Z_N-1)$ and centered logarithmic fluctuations $N^{q/2-1}(\log Z_N-\mathbb E\log Z_N)$ converge in distribution to centered Gaussians with variance $(q!/2)\beta^2(\ell_q'(\beta))^2$. Here $\ell_q$ is the limit supplied by `hFE`; the standardized partition-function fluctuations converge to a centered Gaussian with variance $1$.
 
-These conditional results in `Main.lean` are Lean-checked. `StandardModel.lean` applies them to the standard family `N=q+2*n`. The finite-model and Gaussian-chaos results, and the explicit logarithmic mean-error estimate, are also implemented. The annealed proposition and construction of `hFE` remain unformalized and are outside the agreed formalization scope.
+The abstract partition theorem and joint theorem in `SYK/CLT/Main.lean` are Lean-checked. `StandardModel.lean` applies them to the standard family `N=q+2*n`. The finite-model and Gaussian-chaos results, and the explicit logarithmic mean-error estimate, are also implemented. The annealed proposition and construction of `hFE` remain unformalized and are outside the agreed formalization scope.
 
-The theorem statements are in `Main.lean` for an abstract family and in `StandardModel.lean` for the standard family; `AnnealedInput` is declared in `Basic.lean`. Under this input, `limitVariance_pos_of_ne_zero` gives positive limiting variance at every nonzero real inverse temperature; the high-temperature radius belongs to the CLT estimates. The CLT chapter of the [Blueprint](../../Blueprint/SYKBlueprint/CLT.lean) explains the statements, normalization, and the boundary between formalized and assumed parts. Gaussian integration by parts and moment calculations are distinct from assuming the annealed limit.
+The theorem statements are in `SYK/CLT/Main.lean` for an abstract family and in `StandardModel.lean` for the standard family; `AnnealedInput` is declared in `Basic.lean`. Under this input, `limitVariance_pos_of_ne_zero` gives positive limiting variance at every nonzero real inverse temperature; the high-temperature radius belongs to the CLT estimates. The CLT chapter of the [Blueprint](../../Blueprint/SYKBlueprint/CLT.lean) explains the statements, normalization, and the boundary between formalized and assumed parts. Gaussian integration by parts and moment calculations are distinct from assuming the annealed limit.
 
 ## Verification
 
@@ -62,7 +63,7 @@ latexmk -pdf introduction.tex
 
 Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-references and citations whose definitions lie in other subfiles remain unresolved in a standalone build; the complete manuscript build resolves them.
 
-The conditional CLT is integrated into `Main.lean`. For `partition_clt`, `partition_and_log_partition_clt`, and `standard_partition_and_log_partition_clt` in `StandardModel.lean`, `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`; `hFE : AnnealedInput q S` remains an explicit hypothesis. After modifying a Lean file, check it from the shared workspace root:
+The abstract `partition_clt` and `partition_and_log_partition_clt` are in `SYK/CLT/Main.lean`; the joint standard-family theorem `standard_partition_and_log_partition_clt` is in `StandardModel.lean`. For these theorems, `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`; `hFE : AnnealedInput q S` remains an explicit hypothesis. After modifying a Lean file, check it from the shared workspace root:
 
 ```bash
 lake lean SYK_CLT/SYK/CLT/path/to/File.lean
