@@ -4,6 +4,16 @@
 
 この文書で「通常公理」は `[propext, Classical.choice, Quot.sound]` を指す。公理依存の確認と、定理文に残る外部入力の確認は別である。
 
+<a id="maint-audit-deletions-2026-10-13"></a>
+
+## 監査に基づく未使用結果の削除（2026-10-13）
+
+研究者の決定に従い、凸関数列の導関数収束の実装と、標準表現の固定偶数次数の相互作用のトレース直交性の実装を削除した。前者は原稿の `lem:convex-derivatives` のうち、関数の局所一様収束から導関数の収束を導く部分に対応していたが、条件付き CLT は必要な収束を `AnnealedInput` から直接受け取り、この実装を使わない。Blueprint では同じノードを原稿の補題全体の未形式化の主張として残した。後者は原稿の主張に対応するノードを持たず、現行の証明にも使われないため、Blueprint の結果と証明のノードも除いた。マヨラナ関係、標準表現の構成、次元、相互作用の二乗公式と、零逆温度の規格化に使う `normalizedTrace_one` は保つ。
+
+これらの復元元は監査の基準コミット `f5ddd27` である。凸収束の実装は `git show f5ddd27:SYK/Analysis/ConvexDerivatives.lean`、直交性とその補助補題は同コミットの `SYK/Model/StandardRepresentation.lean` と `SYK/Model/Majorana.lean` から復元できる。
+
+削除後の変更ファイルと直接の利用先の個別 Lean 検査、数学全体と Blueprint のビルド、関係する章と両入口の個別検査、HTML 生成と参照検査に成功した。数学コードに警告はなく、Blueprint 側は外部依存の既存の universe 警告2件だけである。
+
 <a id="ci-workflow-merge-2026-10-13"></a>
 
 ## CI の workflow の統合（2026-10-13）

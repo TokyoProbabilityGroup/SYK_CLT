@@ -4,7 +4,6 @@ import VersoBlueprint
 import SYK.Main
 import SYK.CLT.Normalization
 import SYK.CLT.StandardModel
-import SYK.Analysis.ConvexDerivatives
 import SYK.Probability.GaussianChaos.CoefficientIBP
 import SYK.Probability.GaussianChaos.Basic
 import SYK.CLT.Quadratic.GaussianQuadraticObservable
@@ -113,13 +112,11 @@ one family, with no additional pressure or derivative bounds as assumptions.
 Constructing `hFE` is outside the conditional CLT proof.
 :::
 
-:::theorem "clt_convex_derivative_transfer" (parent := "central_limit_theorem") (lean := "SYK.Analysis.convex_convergence_deriv_tendstoUniformlyOn")
-The Lean convexity lemma gives locally uniform convergence of derivatives
-when locally uniform convergence of differentiable convex functions to a
-$`C^1` limit is already known. The manuscript's `lem:convex-derivatives`
-also derives locally uniform convergence of the functions from pointwise
-convergence. That first step remains unformalized and is outside the agreed
-formalization scope.
+:::theorem "clt_convex_derivative_transfer" (parent := "central_limit_theorem")
+Let $`h_N:\mathbb R\to\mathbb R` be differentiable convex functions
+converging pointwise to $`h\in C^1(\mathbb R)`. The manuscript's
+`lem:convex-derivatives` gives locally uniform convergence of both
+$`h_N\to h` and $`h_N'\to h'` on $`\mathbb R`.
 :::
 
 :::theorem "clt_conditional_nondegeneracy" (parent := "central_limit_theorem") (uses := "clt_conditional_annealed_limit") (lean := "SYK.CLT.exists_small_temperature_sign, SYK.CLT.exists_small_temperature_variance_pos")

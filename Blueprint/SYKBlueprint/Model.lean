@@ -96,29 +96,6 @@ phase has modulus one, and its even-degree adjoint rule gives the square
 identity for the phase-corrected interaction.
 :::
 
-:::theorem "standard_interaction_orthonormality" (parent := "model") (uses := "standard_representation, partition_function") (lean := "SYK.standardInteraction_orthonormal")
-For even $`N` and even $`q`, the shared interaction operators of the standard
-representation, indexed by $`q`-element subsets $`A,B`, satisfy
-
-$$`
-\operatorname{tr}(\Psi_A^*\Psi_B)=\delta_{A,B},\qquad
-\operatorname{tr}(T)=\frac{\operatorname{Tr}(T)}{2^{N/2}}.
-`
-
-The increasing order and phase are those of the shared `interactionOperator`.
-Orthogonality is a proved conclusion, with no extra field in `MajoranaSystem`.
-:::
-
-:::proof "standard_interaction_orthonormality" (uses := "standard_majorana_relations, interaction_involutions")
-If $`A=B`, the square identity and $`\operatorname{tr}(I)=1` give one.
-Otherwise equal cardinalities provide $`i\in A\setminus B`. At even degree,
-$`\Psi_A` anticommutes with $`\psi_i` and $`\Psi_B` commutes with it.
-Conjugation by $`\psi_i` therefore changes the sign of $`\Psi_A\Psi_B`,
-while cyclicity of the finite matrix trace leaves its trace unchanged.
-The trace is zero. This fixed-degree argument uses the Majorana relations and
-cyclicity; it does not require a separate irreducibility assumption.
-:::
-
 :::definition "interaction_hamiltonian" (parent := "model") (lean := "SYK.hamiltonian")
 The finite-dimensional Hamiltonian is the prescribed linear combination of
 ordered Majorana interaction operators.

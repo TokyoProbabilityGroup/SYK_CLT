@@ -7,7 +7,6 @@
 | 配置（リポジトリ内） | 数学的役割 | 名前空間 |
 | --- | --- | --- |
 | `SYK/Analysis/Matrix/` | 特異値・トレース指数関数・微分評価 | `SYK.MatrixAnalysis` |
-| `SYK/Analysis/ConvexDerivatives.lean` | 凸関数列の導関数の収束 | `SYK.Analysis` |
 | `SYK/Probability/GaussianChaos/` | Hermite 基本定義・部分積分・直交性・密度・完全性 | `SYK.GaussianChaos` |
 | `SYK/Probability/` 直下 | モーメント一意性・分布移送 | `SYK.Probability` |
 | `SYK/Probability/GaussianConcentration/` | 共有ガウス基盤 | `SYK.GaussianConcentration` |
@@ -164,7 +163,7 @@ flowchart TD
 | 節・TeX ラベル | Lean の入口 | 状態・残る境界 |
 | --- | --- | --- |
 | `thm: input` | — | 各固定実逆温度でのアニール圧力の極限と、極限関数の全実軸での微分可能性を述べる外部入力。クエンチ圧力の期待値 `E[N^(-1) log Z_N]` の極限や標本ごとの概収束は定理文に含まない |
-| `lem:convex-derivatives` | `convex_convergence_deriv_tendstoUniformlyOn` | 原稿は各点収束から関数・導関数の局所一様収束を全実軸上で結論し、Rockafellar を引用して証明を省略する。Lean は関数の局所一様収束を仮定しており、補題全体は未形式化。既存の開集合上の定理は維持する |
+| `lem:convex-derivatives` | — | 原稿は各点収束から関数・導関数の局所一様収束を全実軸上で結論し、Rockafellar を引用して証明を省略する。補題全体は未形式化であり、条件付き CLT は必要な収束を `AnnealedInput` として受け取る |
 | `subsec:SYK-model`、`eq:Y_N` | `realPartitionFunction`、`Setting.Y`、`partitionFunction_standard` | 有限模型と標準表現の規格化照合は実装済み。標準模型族への条件付き適用も `StandardModel.lean` で検証済み |
 | `eq: chaos` | `hasSum_hermiteCoefficients_unconditional`、`hasSum_hermiteDegreeProjection_unconditional` | ガウス `L²` の展開・完全性は実装済み |
 | `lem: parity rule lemma` | `Setting.Z_sign_gauge`、`Setting.Z_swap`、`Setting.integral_Z_mul_hermite_eq_zero` | CLT に使う対称性と係数消滅は実装済み。原稿の一般反射・任意の符号付き置換の統一形は一部のみ対応 |
@@ -230,7 +229,7 @@ Lean の確定仕様は、`prop:annealed-free-energy` の内容を `AnnealedInpu
 
 - 命題 `prop:annealed-free-energy` 自体の証明と、`AnnealedInput` の構築
 - 一般の表現への適用可能性（表現独立性）の証明
-- 各点収束からの凸収束補題の補完
+- 各点収束から関数・導関数の局所一様収束を導く補題 `lem:convex-derivatives` 全体の証明
 - 引用元の原文の再調査と、He2026 の定理自体の全面的な形式化
 
 ## 依存関係と実装の分担

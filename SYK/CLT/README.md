@@ -27,7 +27,7 @@ The principal import paths are:
 | Gaussian Hermite coefficients and completeness | `GaussianChaos/Basic` → `GaussianChaos/HermiteIBP` → `GaussianChaos/CoefficientIBP` → `GaussianChaos/Orthogonality` → `GaussianChaos/HermiteDensity` and `GaussianMomentDetermination` → `GaussianChaos/PolynomialDensity` |
 | Singular values and matrix derivatives | `SingularValues` → `TraceExponential` → `TraceExpDerivatives` |
 | Finite SYK second chaos | `Basic`, `CliffordSignParity`, `GaussianChaos/Orthogonality` → `PartitionSymmetry`; `TraceExpDerivatives` → `PartitionDerivatives`; both → `SecondChaos` |
-| Independent estimates | `Rademacher` or `ConvexDerivatives` |
+| Independent estimates | `Rademacher` |
 | Quadratic Gaussian moments and CLT | `GaussianQuadraticObservable` → `GaussianFourthMoment` → `IndependentFourthMoment`; `GaussianQuadraticObservable` and `SecondChaosAsymptotic` → `GaussianQuadraticCLT` |
 
 `PartitionSymmetry` imports `Basic` for `Setting`, `Z`, and `Y`. The general Gaussian Hermite integration-by-parts API used by the active CLT modules is in `../Probability/GaussianChaos/HermiteIBP.lean`.

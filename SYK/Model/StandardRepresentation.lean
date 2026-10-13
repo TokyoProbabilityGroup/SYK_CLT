@@ -1,5 +1,4 @@
 import SYK.Model.Majorana
-import SYK.Model.FiniteDimensionalGibbs
 import Mathlib.LinearAlgebra.Matrix.Kronecker
 import Mathlib.Logic.Equiv.Fin.Basic
 import Mathlib.Tactic.FinCases
@@ -215,52 +214,5 @@ def standardMajoranaSystem (N : ℕ) (hN : Even N) :
     majorana_rel := fun i j => by simpa using M.majorana_rel (Fin.cast hsize i) (Fin.cast hsize j)
     self_adjoint := fun i => M.self_adjoint (Fin.cast hsize i)
   }
-
-private theorem interaction_trace_eq_zero
-    {N q : ℕ} {d : Type*} [Fintype d] [DecidableEq d]
-    (M : MajoranaSystem N (Matrix d d ℂ)) (hq : Even q)
-    (A B : InteractionIndex N q) (hAB : A ≠ B) :
-    Matrix.trace (M.interactionOperator A * M.interactionOperator B) = 0 := by
-  classical
-  have hset : A.1 ≠ B.1 := fun h => hAB (Subtype.ext h)
-  have hnot : ¬ A.1 ⊆ B.1 := by
-    intro hsub
-    exact hset (Finset.eq_of_subset_of_card_le hsub (by rw [A.2, B.2]))
-  obtain ⟨i, hiA, hiB⟩ := Finset.not_subset.mp hnot
-  let X := M.interactionOperator A * M.interactionOperator B
-  have hanti : X * M.ψ i = -(M.ψ i * X) := by
-    dsimp [X]
-    rw [mul_assoc, M.interactionOperator_mul_generator_of_not_mem hq B i hiB,
-      ← mul_assoc, M.interactionOperator_mul_generator_of_mem hq A i hiA,
-      neg_mul, mul_assoc]
-  have hconj : M.ψ i * X * M.ψ i = -X := by
-    rw [mul_assoc, hanti, mul_neg, ← mul_assoc, M.majorana_sq, one_mul]
-  have hcyclic : Matrix.trace (M.ψ i * X * M.ψ i) = Matrix.trace X := by
-    rw [Matrix.trace_mul_comm, ← mul_assoc, M.majorana_sq, one_mul]
-  have htrace : Matrix.trace X = -Matrix.trace X := by
-    calc
-      Matrix.trace X = Matrix.trace (M.ψ i * X * M.ψ i) := hcyclic.symm
-      _ = Matrix.trace (-X) := congrArg Matrix.trace hconj
-      _ = -Matrix.trace X := Matrix.trace_neg X
-  exact CharZero.eq_neg_self_iff.mp htrace
-
-/-- The shared phase-corrected interactions in the standard representation are
-orthonormal for the normalized trace inner product. No orthogonality field is
-added to the abstract Majorana system. -/
-theorem standardInteraction_orthonormal
-    (N : ℕ) (hN : Even N) {q : ℕ} (hq : Even q)
-    (A B : InteractionIndex N q) :
-    normalizedTrace
-      (star ((standardMajoranaSystem N hN).interactionOperator A) *
-        (standardMajoranaSystem N hN).interactionOperator B) =
-      if A = B then 1 else 0 := by
-  classical
-  let M := standardMajoranaSystem N hN
-  change normalizedTrace (star (M.interactionOperator A) * M.interactionOperator B) = _
-  rw [M.interactionOperator_star hq]
-  by_cases hAB : A = B
-  · subst B
-    rw [M.interactionOperator_sq hq, normalizedTrace_one, if_pos rfl]
-  · rw [if_neg hAB, normalizedTrace, interaction_trace_eq_zero M hq A B hAB, zero_div]
 
 end SYK

@@ -8,7 +8,7 @@ star-algebra `A` with `ψ i ψ j + ψ j ψ i = 2 δ_ij`. For an interaction labe
 `psiProduct` is the ordered product of its generators, `phase q = i ^ (q / 2)`, and
 `interactionOperator = phase q • psiProduct` is self-adjoint for even `q`. The file
 also proves the algebraic identities used downstream (squares, reordering signs,
-commutation with generators inside or outside `s`) and defines the deterministic
+anticommutation with generators inside `s`) and defines the deterministic
 `hamiltonian`. Nothing here assumes a matrix representation or irreducibility.
 -/
 
@@ -283,16 +283,6 @@ theorem interactionOperator_mul_generator_of_mem
     exact ⟨m - 1, by omega⟩
   rw [interactionOperator, Algebra.smul_mul_assoc, M.psiProduct_mul_generator_of_mem s i hi,
     hodd.neg_one_pow, neg_one_smul, smul_neg, Algebra.mul_smul_comm]
-
-/-- For even degree, the interaction commutes with every excluded generator. -/
-theorem interactionOperator_mul_generator_of_not_mem
-    (hq : Even q) (s : InteractionIndex N q) (i : Fin N) (hi : i ∉ s.1) :
-    M.interactionOperator s * M.ψ i = M.ψ i * M.interactionOperator s := by
-  have hnot : i ∉ orderedIndices s := by simpa [orderedIndices] using hi
-  have h := M.listProduct_mul_generator i (orderedIndices s) hnot
-  rw [length_orderedIndices, hq.neg_one_pow, one_smul] at h
-  change M.psiProduct s * M.ψ i = M.ψ i * M.psiProduct s at h
-  rw [interactionOperator, Algebra.smul_mul_assoc, h, Algebra.mul_smul_comm]
 
 end MajoranaSystem
 

@@ -75,7 +75,6 @@ SYK リポジトリ全体に適用する。数学コードは `SYK/`、公開用
 | 話題 | 名前空間 |
 | --- | --- |
 | 行列解析（`SYK/Analysis/Matrix/`） | `SYK.MatrixAnalysis` |
-| 凸関数列（`SYK/Analysis/ConvexDerivatives.lean`） | `SYK.Analysis` |
 | ガウスカオス・Hermite 展開（`SYK/Probability/GaussianChaos/`） | `SYK.GaussianChaos` |
 | ガウス集中（`SYK/Probability/GaussianConcentration/`） | `SYK.GaussianConcentration` |
 | 分布収束・モーメント一意性（`SYK/Probability/` 直下） | `SYK.Probability` |
