@@ -23,7 +23,7 @@
    "name": "VersoBlueprint",
    "manifestFile": "lake-manifest.json",
    "inputRev": "v4.32.0",
-   "inherited": false,
+   "inherited": true,
    "configFile": "lakefile.lean"},
   {"url": "https://github.com/leanprover-community/mathlib4",
    "type": "git",
