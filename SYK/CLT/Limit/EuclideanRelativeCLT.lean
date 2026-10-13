@@ -1,4 +1,10 @@
+module
+
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+public import SYK.CLT.Basic
 import SYK.CLT.Limit.RelativeCLT
+
+public section
 
 /-!
 # Relative fluctuation CLT on the model coupling space
@@ -21,7 +27,7 @@ theorem Setting.relativeFluctuation_memLp {q : ℕ} (S : Setting q)
   unfold Setting.relativeFluctuation
   exact ((S.Y_memLp β n).sub (memLp_const (1 : ℝ))).const_mul _
 
-theorem Setting.relativeFluctuation_law {q : ℕ} (S : Setting q)
+private theorem Setting.relativeFluctuation_law {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     (standardGaussianMeasure (S.N n) q).map (S.relativeFluctuation β n) =
       (gaussianCouplings (InteractionIndex (S.N n) q)).map
@@ -44,7 +50,7 @@ theorem limitVariance_eq_scaledCoefficient_sq
   rw [mul_pow, Real.sq_sqrt (by positivity)]
   ring
 
-theorem gaussian_scaled_limit_law
+private theorem gaussian_scaled_limit_law
     (q : ℕ) (ℓ : ℝ → ℝ) (β : ℝ) :
     (gaussianReal 0 1).map
       (fun x : ℝ => (β * deriv ℓ β * Real.sqrt ((q.factorial : ℝ) / 2)) * x) =

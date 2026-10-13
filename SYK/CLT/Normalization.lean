@@ -1,5 +1,9 @@
-import SYK.CLT.FiniteModel
-import SYK.Model.StandardRepresentation
+module
+
+public import SYK.CLT.FiniteModel
+public import SYK.Model.StandardRepresentation
+
+public section
 
 /-!
 # Manuscript trace normalization

@@ -1,5 +1,10 @@
+module
+
+public import SYK.Model.GaussianDisorder
+public import SYK.Probability.GaussianChaos.Basic
 import SYK.Probability.GaussianChaos.Orthogonality
-import SYK.Model.GaussianDisorder
+
+public section
 
 /-!
 # Finite Gaussian quadratic observables
@@ -17,7 +22,7 @@ open SYK.GaussianChaos
 namespace SYK.CLT
 
 /-- One centered, variance-one quadratic Gaussian observable. -/
-noncomputable def centeredGaussianSquare (x : ℝ) : ℝ :=
+@[expose] noncomputable def centeredGaussianSquare (x : ℝ) : ℝ :=
   (x ^ 2 - 1) / Real.sqrt 2
 
 /-- Measurability of the centered variance-one Gaussian square. -/
@@ -51,7 +56,7 @@ theorem centeredGaussianSquare_second_moment :
   norm_num
 
 /-- The normalized quadratic fluctuation of the Gaussian interaction coordinates. -/
-noncomputable def normalizedQuadraticSum (N q : ℕ) (g : CouplingSpace N q) : ℝ :=
+@[expose] noncomputable def normalizedQuadraticSum (N q : ℕ) (g : CouplingSpace N q) : ℝ :=
   (Real.sqrt (Fintype.card (InteractionIndex N q) : ℝ))⁻¹ *
     ∑ i : InteractionIndex N q, centeredGaussianSquare (g i)
 

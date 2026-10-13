@@ -1,14 +1,14 @@
-import Mathlib.Analysis.Calculus.ContDiff.Basic
-import Mathlib.Analysis.Convex.Deriv
-import Mathlib.Analysis.Normed.Algebra.MatrixExponential
-import Mathlib.LinearAlgebra.Matrix.Trace
-import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
-import Mathlib.MeasureTheory.Integral.Pi
-import Mathlib.Probability.Distributions.Gaussian.Multivariate
-import Mathlib.Topology.UniformSpace.LocallyUniformConvergence
-import Mathlib.Tactic.FunProp
-import Mathlib.Tactic.Positivity
+module
+
+public import Mathlib.Analysis.Calculus.ContDiff.Defs
+public import Mathlib.Analysis.InnerProductSpace.PiL2
+public import Mathlib.Analysis.Normed.Lp.MeasurableSpace
+public import Mathlib.MeasureTheory.Measure.Typeclasses.Probability
 import SYK.CLT.Main
+
+import Mathlib.Analysis.Matrix.Normed -- shake: keep (Matrix.Norms.Operator scope)
+
+public section
 
 /-!
 # Gaussian SYK: model, annealed assumptions, and two CLTs
@@ -22,6 +22,7 @@ The joint theorem asserts the existence of one positive high-temperature
 radius for both CLTs. The individual theorems are its projections.
 Declarations from other SYK files are used only inside the joint proof,
 after all model definitions, hypotheses, and CLT assertions.
+Keep the definitions here even when they duplicate internal definitions.
 
 The model corresponds to `subsec:SYK-model`, and the two claims to
 `thm:partition-clt` and `thm:free-energy-clt`. Majorana matrices are abstract:

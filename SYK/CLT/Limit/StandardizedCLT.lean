@@ -1,16 +1,25 @@
+module
+
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+public import SYK.CLT.Basic
+import SYK.CLT.Limit.EuclideanRelativeCLT
 import SYK.CLT.Limit.FiniteVariancePositivity
 import SYK.CLT.Limit.QuadraticGaussianVariance
+import SYK.Probability.DistributionTransfer
+
+public section
 
 open MeasureTheory ProbabilityTheory Filter
 open scoped Topology NNReal
 
-/-!`AnnealedInput` gives the standardized partition-function CLT at nonzero small temperatures. -/
+/-! `AnnealedInput` gives the standardized partition-function CLT
+at small nonzero inverse temperature. -/
 
 open SYK.Probability
 
 namespace SYK.CLT
 
-theorem Setting.standardizedFluctuation_eq_multiplier {q : ℕ} (S : Setting q)
+private theorem Setting.standardizedFluctuation_eq_multiplier {q : ℕ} (S : Setting q)
     (β : ℝ) (hβ : β ≠ 0) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :
     S.standardizedFluctuation β n g =
@@ -37,7 +46,7 @@ theorem Setting.standardizedFluctuation_eq_multiplier {q : ℕ} (S : Setting q)
   unfold Setting.standardizedFluctuation Setting.relativeFluctuation Setting.Y
   field_simp [ne_of_gt hs, ne_of_gt hm, ne_of_gt (Real.sqrt_pos.mpr hv)]
 
-theorem gaussian_normalized_limit_law (v : ℝ≥0) (hv : 0 < v) :
+private theorem gaussian_normalized_limit_law (v : ℝ≥0) (hv : 0 < v) :
     (gaussianReal 0 v).map
       (fun x : ℝ => (Real.sqrt (v : ℝ))⁻¹ * x) = gaussianReal 0 1 := by
   rw [gaussianReal_map_const_mul]
@@ -56,16 +65,13 @@ theorem Setting.standardizedFluctuation_clt {q : ℕ} (S : Setting q)
         (gaussianReal 0 1) := by
   obtain ⟨rrel, hrrel, hrel⟩ := S.relativeFluctuation_clt hFE
   obtain ⟨rvar, hrvar, hvar⟩ := S.scaled_varianceZ_over_mean_sq_tendsto hFE
-  obtain ⟨rpos, hrpos, hpos⟩ := exists_small_temperature_variance_pos hFE
-  refine ⟨min rrel (min rvar rpos), lt_min hrrel (lt_min hrvar hrpos), ?_⟩
+  refine ⟨min rrel rvar, lt_min hrrel hrvar, ?_⟩
   intro β hβ hβ0
   have hβrel : |β| < rrel := lt_of_lt_of_le hβ (min_le_left _ _)
   have hβvar : |β| < rvar :=
-    lt_of_lt_of_le hβ ((min_le_right _ _).trans (min_le_left _ _))
-  have hβpos : |β| < rpos :=
-    lt_of_lt_of_le hβ ((min_le_right _ _).trans (min_le_right _ _))
+    lt_of_lt_of_le hβ (min_le_right _ _)
   let v := limitVariance q hFE.ℓ β
-  have hv : 0 < v := hpos β hβpos hβ0
+  have hv : 0 < v := limitVariance_pos_of_ne_zero hFE β hβ0
   let a (n : ℕ) := (Real.sqrt (S.fluctuationScale n ^ 2 *
       S.varianceZ β n / S.meanZ β n ^ 2))⁻¹
   have ha : Tendsto a atTop (𝓝 (Real.sqrt (v : ℝ))⁻¹) :=

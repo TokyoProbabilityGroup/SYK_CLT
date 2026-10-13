@@ -1,6 +1,13 @@
-import SYK.Model.FiniteDimensionalGibbs
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.Matrix.PosDef
+module
+
+public import SYK.Model.FiniteDimensionalGibbs
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+
+import Mathlib.Analysis.Matrix.Normed -- shake: keep (Matrix.Norms.Operator scope)
+
+public section
 
 /-! Density-matrix expectation bounds for anticommuting observables. -/
 

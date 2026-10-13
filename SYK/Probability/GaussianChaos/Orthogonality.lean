@@ -1,7 +1,12 @@
+module
+
+public import Mathlib.Analysis.InnerProductSpace.l2Space
+public import SYK.Probability.GaussianChaos.Basic
+import Mathlib.Algebra.Order.Star.Real
 import SYK.Probability.GaussianChaos.CoefficientIBP
-import Mathlib.MeasureTheory.Integral.Pi
-import Mathlib.MeasureTheory.Function.L2Space
-import Mathlib.Analysis.InnerProductSpace.l2Space
+import SYK.Probability.GaussianChaos.HermiteIBP
+
+public section
 
 /-!
 # Orthogonality of Gaussian Hermite products
@@ -173,7 +178,7 @@ theorem hermiteMulti_memLp_two {ι : Type*} [Fintype ι] (α : ι → ℕ) :
   simpa only [pow_two] using integrable_hermiteMulti_mul α α
 
 /-- The Hermite product as an element of real Gaussian `L²`. -/
-noncomputable def hermiteLp {ι : Type*} [Fintype ι] (α : ι → ℕ) :
+@[expose] noncomputable def hermiteLp {ι : Type*} [Fintype ι] (α : ι → ℕ) :
     Lp ℝ 2 (gaussianCouplings ι) :=
   (hermiteMulti_memLp_two α).toLp (hermiteMulti α)
 
@@ -202,7 +207,7 @@ theorem hermiteFactorial_pos {ι : Type*} [Fintype ι] (α : ι → ℕ) :
   exact Finset.prod_pos fun i hi => Nat.cast_pos.mpr (Nat.factorial_pos _)
 
 /-- The Hermite coefficient sum over any finite set of multi-indices. -/
-noncomputable def hermiteFiniteProjection {ι : Type*} [Fintype ι]
+@[expose] noncomputable def hermiteFiniteProjection {ι : Type*} [Fintype ι]
     (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     Lp ℝ 2 (gaussianCouplings ι) :=
   ∑ α ∈ s, (⟪hermiteLp α, f⟫_ℝ /
@@ -210,7 +215,7 @@ noncomputable def hermiteFiniteProjection {ι : Type*} [Fintype ι]
 
 /-- On the chosen finite set, the coefficient sum preserves every Hermite
 coefficient. -/
-theorem inner_hermiteFiniteProjection {ι : Type*} [Fintype ι]
+private theorem inner_hermiteFiniteProjection {ι : Type*} [Fintype ι]
     (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι))
     (β : ι → ℕ) (hβ : β ∈ s) :
     ⟪hermiteLp β, hermiteFiniteProjection s f⟫_ℝ = ⟪hermiteLp β, f⟫_ℝ := by
@@ -222,7 +227,7 @@ theorem inner_hermiteFiniteProjection {ι : Type*} [Fintype ι]
 
 /-- The error of a finite Hermite coefficient sum is orthogonal to every
 Hermite polynomial included in the sum. -/
-theorem inner_hermiteFiniteProjection_error {ι : Type*} [Fintype ι]
+private theorem inner_hermiteFiniteProjection_error {ι : Type*} [Fintype ι]
     (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι))
     (β : ι → ℕ) (hβ : β ∈ s) :
     ⟪hermiteLp β, f - hermiteFiniteProjection s f⟫_ℝ = 0 := by
@@ -230,7 +235,7 @@ theorem inner_hermiteFiniteProjection_error {ι : Type*} [Fintype ι]
   exact sub_self _
 
 /-- There are only finitely many multi-indices of bounded total degree. -/
-theorem finite_multiIndices_degree_le {ι : Type*} [Fintype ι] (r : ℕ) :
+private theorem finite_multiIndices_degree_le {ι : Type*} [Fintype ι] (r : ℕ) :
     {α : ι → ℕ | ∑ i, α i ≤ r}.Finite := by
   classical
   let e : {α : ι → ℕ | ∑ i, α i ≤ r} → (ι → Fin (r + 1)) :=
@@ -246,22 +251,22 @@ theorem finite_multiIndices_degree_le {ι : Type*} [Fintype ι] (r : ℕ) :
   exact Set.finite_coe_iff.mpr this
 
 /-- Multi-indices of a fixed homogeneous Gaussian chaos. -/
-noncomputable def multiIndices_degree {ι : Type*} [Fintype ι] (r : ℕ) :
+noncomputable def multiIndicesOfDegree {ι : Type*} [Fintype ι] (r : ℕ) :
     Finset (ι → ℕ) :=
   ((finite_multiIndices_degree_le (ι := ι) r).subset
     (show {α : ι → ℕ | ∑ i, α i = r} ⊆
       {α : ι → ℕ | ∑ i, α i ≤ r} from fun _ h => h.le)).toFinset
 
-theorem mem_multiIndices_degree {ι : Type*} [Fintype ι]
+theorem mem_multiIndicesOfDegree {ι : Type*} [Fintype ι]
     (r : ℕ) (α : ι → ℕ) :
-    α ∈ multiIndices_degree r ↔ ∑ i, α i = r := by
-  simp [multiIndices_degree]
+    α ∈ multiIndicesOfDegree r ↔ ∑ i, α i = r := by
+  simp [multiIndicesOfDegree]
 
 /-- Coefficient formula for the finite sum at one homogeneous degree. -/
-noncomputable def hermiteDegreeProjection {ι : Type*} [Fintype ι]
+@[expose] noncomputable def hermiteDegreeProjection {ι : Type*} [Fintype ι]
     (r : ℕ) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     Lp ℝ 2 (gaussianCouplings ι) :=
-  hermiteFiniteProjection (multiIndices_degree r) f
+  hermiteFiniteProjection (multiIndicesOfDegree r) f
 
 /-- The finite-dimensional subspace spanned by Hermite products in `s`. -/
 noncomputable def hermiteFiniteSpan {ι : Type*} [Fintype ι] (s : Finset (ι → ℕ)) :
@@ -273,7 +278,7 @@ noncomputable instance hermiteFiniteSpan_finiteDimensional {ι : Type*} [Fintype
   unfold hermiteFiniteSpan
   exact FiniteDimensional.span_of_finite ℝ (Set.toFinite _)
 
-theorem hermiteFiniteProjection_mem {ι : Type*} [Fintype ι]
+private theorem hermiteFiniteProjection_mem {ι : Type*} [Fintype ι]
     (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     hermiteFiniteProjection s f ∈ hermiteFiniteSpan s := by
   classical
@@ -283,7 +288,7 @@ theorem hermiteFiniteProjection_mem {ι : Type*} [Fintype ι]
   apply Submodule.smul_mem
   exact Submodule.subset_span ⟨α, hα, rfl⟩
 
-theorem hermiteFiniteProjection_error_orthogonal {ι : Type*} [Fintype ι]
+private theorem hermiteFiniteProjection_error_orthogonal {ι : Type*} [Fintype ι]
     (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
     f - hermiteFiniteProjection s f ∈ (hermiteFiniteSpan s)ᗮ := by
   classical
@@ -309,7 +314,7 @@ theorem hermiteFiniteProjection_eq_starProjection {ι : Type*} [Fintype ι]
     (hermiteFiniteProjection_error_orthogonal s f)).symm
 
 /-- Unit-norm Hermite products in real Gaussian `L²`. -/
-noncomputable def hermiteOrthonormal {ι : Type*} [Fintype ι] (α : ι → ℕ) :
+@[expose] noncomputable def hermiteOrthonormal {ι : Type*} [Fintype ι] (α : ι → ℕ) :
     Lp ℝ 2 (gaussianCouplings ι) :=
   ‖hermiteLp α‖⁻¹ • hermiteLp α
 
@@ -332,8 +337,8 @@ theorem hermiteOrthonormal_orthonormal {ι : Type*} [Fintype ι] :
     simp [hermiteOrthonormal, inner_smul_left, inner_smul_right,
       inner_hermiteLp, hne]
 
-/-- Once density is established, the normalized Hermite products give a
-Hilbert basis. The density hypothesis is the remaining analytic input. -/
+/-- The normalized Hermite products give a Hilbert basis under the density
+hypothesis, proved by `hermiteOrthonormal_dense` in `PolynomialDensity.lean`. -/
 noncomputable def hermiteHilbertBasis {ι : Type*} [Fintype ι]
     (hdense : (Submodule.span ℝ (Set.range (hermiteOrthonormal (ι := ι)))).topologicalClosure
       = ⊤) :
@@ -376,7 +381,7 @@ theorem hasSum_hermiteCoefficients {ι : Type*} [Fintype ι]
   simpa only [← hermiteOrthonormal_coefficient] using hasSum_hermiteOrthonormal hdense f
 
 /-- Grouping a multi-index by its total degree. -/
-def multiIndexDegreeEquiv {ι : Type*} [Fintype ι] :
+private def multiIndexDegreeEquiv {ι : Type*} [Fintype ι] :
     (ι → ℕ) ≃ (Σ r : ℕ, {α : ι → ℕ // ∑ i, α i = r}) where
   toFun α := ⟨∑ i, α i, ⟨α, rfl⟩⟩
   invFun p := p.2.1
@@ -395,21 +400,21 @@ private noncomputable instance finiteDegreeSubtype {ι : Type*} [Fintype ι] (r 
 private noncomputable instance fintypeDegreeSubtype {ι : Type*} [Fintype ι] (r : ℕ) :
     Fintype {α : ι → ℕ // ∑ i, α i = r} := Fintype.ofFinite _
 
-theorem sum_multiIndices_degree {ι : Type*} [Fintype ι]
+private theorem sum_multiIndicesOfDegree {ι : Type*} [Fintype ι]
     (r : ℕ) {E : Type*} [AddCommMonoid E] (t : (ι → ℕ) → E) :
     (∑ α : {α : ι → ℕ // ∑ i, α i = r}, t α.1) =
-      ∑ α ∈ multiIndices_degree r, t α := by
+      ∑ α ∈ multiIndicesOfDegree r, t α := by
   classical
-  let e : {α : ι → ℕ // ∑ i, α i = r} ≃ (multiIndices_degree r) :=
-    Equiv.subtypeEquivRight fun α => (mem_multiIndices_degree r α).symm
+  let e : {α : ι → ℕ // ∑ i, α i = r} ≃ (multiIndicesOfDegree r) :=
+    Equiv.subtypeEquivRight fun α => (mem_multiIndicesOfDegree r α).symm
   calc
-    _ = ∑ α : (multiIndices_degree r), t α.1 := by
+    _ = ∑ α : (multiIndicesOfDegree r), t α.1 := by
       apply Fintype.sum_equiv e
       intro α
       rfl
-    _ = ∑ α ∈ multiIndices_degree r, t α := by
+    _ = ∑ α ∈ multiIndicesOfDegree r, t α := by
       simpa only [Finset.univ_eq_attach] using
-        (Finset.sum_attach (multiIndices_degree r) (fun α => t α))
+        (Finset.sum_attach (multiIndicesOfDegree r) (fun α => t α))
 
 /-- The degree-by-degree chaos sum converges in Gaussian `L²` once Hermite
 density is available. -/
@@ -429,7 +434,85 @@ theorem hasSum_hermiteDegreeProjection {ι : Type*} [Fintype ι]
   apply hgroup.sigma
   intro r
   simpa only [hermiteDegreeProjection, hermiteFiniteProjection,
-    ← sum_multiIndices_degree, t] using
+    ← sum_multiIndicesOfDegree, t] using
     (hasSum_fintype (fun α : {α : ι → ℕ // ∑ i, α i = r} => t α.1))
+
+/-- The squared norm of a finite Hermite projection is its factorial-weighted coefficient sum. -/
+theorem norm_sq_hermiteFiniteProjection {ι : Type*} [Fintype ι]
+    (s : Finset (ι → ℕ)) (f : Lp ℝ 2 (gaussianCouplings ι)) :
+    ‖hermiteFiniteProjection s f‖ ^ 2 =
+      ∑ α ∈ s, |⟪hermiteLp α, f⟫_ℝ| ^ 2 /
+        ∏ i : ι, ((α i).factorial : ℝ) := by
+  classical
+  rw [← real_inner_self_eq_norm_sq]
+  simp only [hermiteFiniteProjection, inner_sum, sum_inner,
+    real_inner_smul_left, inner_smul_right, inner_hermiteLp]
+  apply Finset.sum_congr rfl
+  intro α hα
+  simp only [mul_ite, mul_zero]
+  rw [Finset.sum_ite_eq' s α, if_pos hα]
+  have hfac : (∏ i : ι, ((α i).factorial : ℝ)) ≠ 0 :=
+    ne_of_gt (hermiteFactorial_pos α)
+  rw [sq_abs]
+  field_simp
+
+/-- The squared norm of a homogeneous Hermite projection is its coefficient sum. -/
+theorem norm_sq_hermiteDegreeProjection {ι : Type*} [Fintype ι]
+    (r : ℕ) (f : Lp ℝ 2 (gaussianCouplings ι)) :
+    ‖hermiteDegreeProjection r f‖ ^ 2 =
+      ∑ α ∈ multiIndicesOfDegree r, |⟪hermiteLp α, f⟫_ℝ| ^ 2 /
+        ∏ i : ι, ((α i).factorial : ℝ) := by
+  exact norm_sq_hermiteFiniteProjection (multiIndicesOfDegree r) f
+
+/-- Distinct homogeneous Hermite chaoses are orthogonal in Gaussian L². -/
+theorem inner_hermiteDegreeProjection_eq_zero {ι : Type*} [Fintype ι]
+    (r s : ℕ) (hrs : r ≠ s)
+    (f g : Lp ℝ 2 (gaussianCouplings ι)) :
+    ⟪hermiteDegreeProjection r f, hermiteDegreeProjection s g⟫_ℝ = 0 := by
+  classical
+  simp only [hermiteDegreeProjection, hermiteFiniteProjection,
+    inner_sum, sum_inner, real_inner_smul_left, inner_smul_right]
+  apply Finset.sum_eq_zero
+  intro α hα
+  suffices hinner :
+      (∑ γ ∈ multiIndicesOfDegree r,
+        (⟪hermiteLp γ, f⟫_ℝ / ∏ i, ((γ i).factorial : ℝ)) *
+          ⟪hermiteLp γ, hermiteLp α⟫_ℝ) = 0 by
+    rw [hinner, mul_zero]
+  apply Finset.sum_eq_zero
+  intro γ hγ
+  have hne : γ ≠ α := by
+    intro heq
+    have hγr := (mem_multiIndicesOfDegree r γ).mp hγ
+    have hαs := (mem_multiIndicesOfDegree s α).mp hα
+    exact hrs (hγr.symm.trans (heq ▸ hαs))
+  rw [inner_hermiteLp, if_neg hne]
+  ring
+
+/-- The unique degree-zero multi-index is zero. -/
+theorem multiIndicesOfDegree_zero {ι : Type*} [Fintype ι] :
+    multiIndicesOfDegree (ι := ι) 0 = {0} := by
+  classical
+  ext α
+  rw [mem_multiIndicesOfDegree, Finset.mem_singleton]
+  constructor
+  · intro h
+    funext i
+    exact (Finset.sum_eq_zero_iff_of_nonneg
+      (fun j _ => Nat.zero_le (α j))).mp h i (Finset.mem_univ i)
+  · intro h
+    subst α
+    simp
+
+/-- The degree-zero Hermite product is the constant one in Gaussian L². -/
+theorem hermiteLp_zero {ι : Type*} [Fintype ι] :
+    (hermiteLp (ι := ι) 0) = Lp.const 2 (gaussianCouplings ι) (1 : ℝ) := by
+  apply Lp.ext
+  filter_upwards [(hermiteMulti_memLp_two (0 : ι → ℕ)).coeFn_toLp,
+    (Lp.coeFn_const (α := ι → ℝ) (μ := gaussianCouplings ι)
+      (p := 2) (c := (1 : ℝ)))] with g hg hc
+  simp only [hermiteLp]
+  rw [hg, hc]
+  simp [hermiteMulti, Polynomial.hermite_zero]
 
 end SYK.GaussianChaos

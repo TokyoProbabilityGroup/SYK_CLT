@@ -1,15 +1,17 @@
-import SYK.CLT.Basic
-import SYK.CLT.Chaos.CliffordSignParity
-import SYK.Probability.GaussianChaos.Orthogonality
-import Mathlib.Logic.Equiv.Fintype
-import Mathlib.GroupTheory.Perm.Sign
+module
+
+public import SYK.CLT.Basic
+public import SYK.CLT.Chaos.CliffordSignParity
+public import SYK.Probability.GaussianChaos.Orthogonality
+
+public section
 
 /-!
 # Preliminary tools for the SYK central limit theorem
 
 The gauge symmetry in `lem: parity rule lemma` is specialized here to the
 normalized real partition function of a `Setting`.
-Entry points: `Setting.Z_sign_gauge`, `Setting.Z_firstChaos_eq_zero`,
+Entry points: `Setting.Z_sign_gauge`, `Setting.integral_Z_mul_hermite_eq_zero_pi`,
 `Setting.Y_firstChaos_eq_zero`,
 `Setting.inner_offDiagonal_secondChaos_eq_zero`.
 -/
@@ -43,7 +45,7 @@ theorem Setting.Z_swap {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
   exact congrArg (fun z : ℂ => (z / (Fintype.card (S.d n) : ℂ)).re) h
 
 /-- Diagonal quadratic coefficients are unchanged by a vertex transposition. -/
-theorem Setting.integral_Y_mul_sq_sub_one_swap {q : ℕ} (S : Setting q)
+private theorem Setting.integral_Y_mul_sq_sub_one_swap {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (i j : Fin (S.N n)) (hij : i ≠ j)
     (I : InteractionIndex (S.N n) q) :
     (∫ g : InteractionIndex (S.N n) q → ℝ,
@@ -67,7 +69,7 @@ theorem Setting.integral_Y_mul_sq_sub_one_swap {q : ℕ} (S : Setting q)
   simpa only [MajoranaSystem.swapInteractionEquiv, Equiv.coe_fn_mk, hY, hsq] using h.symm
 
 /-- Transpositions act transitively on interaction subsets of fixed cardinality. -/
-theorem interaction_function_constant_of_swap {N q : ℕ}
+private theorem interaction_function_constant_of_swap {N q : ℕ}
     (f : InteractionIndex N q → ℝ)
     (hf : ∀ (i j : Fin N), i ≠ j → ∀ I,
       f I = f (MajoranaSystem.swapInteractionIndex i j I))
@@ -183,21 +185,6 @@ theorem Setting.integral_Z_mul_hermite_eq_zero_pi {q : ℕ} (S : Setting q)
   simp only [hZ, hH, mul_neg, integral_neg] at key
   linear_combination -key / 2
 
-/-- The parity rule on the actual Euclidean coupling space of `Setting.Z`. -/
-theorem Setting.integral_Z_mul_hermite_eq_zero {q : ℕ} (S : Setting q)
-    (β : ℝ) (n : ℕ) (α : InteractionIndex (S.N n) q → ℕ)
-    (hα : IsOddMultiIndex α) :
-    (∫ g : CouplingSpace (S.N n) q,
-      S.Z β n g * hermiteMulti α (WithLp.ofLp g)
-        ∂standardGaussianMeasure (S.N n) q) = 0 := by
-  let ι := InteractionIndex (S.N n) q
-  let F : CouplingSpace (S.N n) q → ℝ :=
-    fun g => S.Z β n g * hermiteMulti α (WithLp.ofLp g)
-  change (∫ g, F g ∂((gaussianCouplings ι).map
-    (MeasurableEquiv.toLp 2 (ι → ℝ)))) = 0
-  rw [integral_map_equiv (MeasurableEquiv.toLp 2 (ι → ℝ)) F]
-  exact S.integral_Z_mul_hermite_eq_zero_pi β n α hα
-
 /-- Pullback of the finite partition function to the product Gaussian space
 used by the Hermite projection API. -/
 theorem Setting.ZGaussian_memLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
@@ -210,7 +197,8 @@ theorem Setting.ZGaussian_memLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     ((gaussianCouplings ι).map (MeasurableEquiv.toLp 2 (ι → ℝ))) at h
   exact ((MeasurableEquiv.toLp 2 (ι → ℝ)).memLp_map_measure_iff).mp h
 
-noncomputable def Setting.ZGaussianLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
+/-- The finite partition function as an L² element on the product Gaussian coupling space. -/
+@[expose] noncomputable def Setting.ZGaussianLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q)) :=
   (S.ZGaussian_memLp β n).toLp
     (fun g => S.Z β n (WithLp.toLp 2 g))
@@ -237,7 +225,7 @@ theorem Setting.inner_hermiteLp_ZGaussianLp_eq_zero {q : ℕ} (S : Setting q)
   exact S.integral_Z_mul_hermite_eq_zero_pi β n α hα
 
 /-- A natural multi-index of total degree one is supported at one coordinate. -/
-theorem multiIndex_eq_single_of_degree_one {ι : Type*} [Fintype ι] [DecidableEq ι]
+private theorem multiIndex_eq_single_of_degree_one {ι : Type*} [Fintype ι] [DecidableEq ι]
     (α : ι → ℕ) (hdegree : ∑ I, α I = 1) :
     ∃ I, α = Pi.single I 1 := by
   classical
@@ -312,7 +300,7 @@ theorem multiIndex_degree_two_cases {ι : Type*} [Fintype ι] [DecidableEq ι]
       exact hδK
 
 /-- A degree-one multi-index is odd when interactions are nonempty. -/
-theorem odd_multiIndex_of_degree_one {N q : ℕ} (hq : 0 < q)
+private theorem odd_multiIndex_of_degree_one {N q : ℕ} (hq : 0 < q)
     (α : InteractionIndex N q → ℕ) (hdegree : ∑ I, α I = 1) :
     IsOddMultiIndex α := by
   classical
@@ -324,21 +312,8 @@ theorem odd_multiIndex_of_degree_one {N q : ℕ} (hq : 0 < q)
   have := heven x
   simp [hsum] at this
 
-/-- The first Gaussian chaos of the finite partition function is zero. -/
-theorem Setting.Z_firstChaos_eq_zero {q : ℕ} (S : Setting q)
-    (β : ℝ) (n : ℕ) :
-    hermiteDegreeProjection 1 (S.ZGaussianLp β n) = 0 := by
-  classical
-  unfold hermiteDegreeProjection hermiteFiniteProjection
-  apply Finset.sum_eq_zero
-  intro α hα
-  have hdegree := (mem_multiIndices_degree 1 α).mp hα
-  have hodd := odd_multiIndex_of_degree_one
-    (lt_of_lt_of_le (by decide : 0 < 4) S.q_ge_four) α hdegree
-  simp [S.inner_hermiteLp_ZGaussianLp_eq_zero β n α hodd]
-
 /-- The relative partition function as a product Gaussian `L²` element. -/
-noncomputable def Setting.YGaussianLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
+@[expose] noncomputable def Setting.YGaussianLp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q)) :=
   (S.meanZ β n)⁻¹ • S.ZGaussianLp β n
 
@@ -360,13 +335,13 @@ theorem Setting.Y_firstChaos_eq_zero {q : ℕ} (S : Setting q)
   unfold hermiteDegreeProjection hermiteFiniteProjection Setting.YGaussianLp
   apply Finset.sum_eq_zero
   intro α hα
-  have hdegree := (mem_multiIndices_degree 1 α).mp hα
+  have hdegree := (mem_multiIndicesOfDegree 1 α).mp hα
   have hodd := odd_multiIndex_of_degree_one
     (lt_of_lt_of_le (by decide : 0 < 4) S.q_ge_four) α hdegree
   simp [inner_smul_right, S.inner_hermiteLp_ZGaussianLp_eq_zero β n α hodd]
 
 /-- Two distinct interactions give an odd second-order Hermite multi-index. -/
-theorem odd_multiIndex_two_distinct {N q : ℕ} (I J : InteractionIndex N q)
+private theorem odd_multiIndex_two_distinct {N q : ℕ} (I J : InteractionIndex N q)
     (hIJ : I ≠ J) :
     IsOddMultiIndex (Pi.single I 1 + Pi.single J 1) := by
   classical

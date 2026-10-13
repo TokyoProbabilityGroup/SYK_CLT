@@ -1,5 +1,11 @@
+module
+
+public import SYK.CLT.Chaos.PartitionSymmetry
+public import Mathlib.Analysis.CStarAlgebra.Matrix
+public import SYK.Probability.GaussianChaos.HermiteIBP
 import SYK.CLT.Chaos.PartitionDerivatives
-import SYK.CLT.Chaos.PartitionSymmetry
+
+public section
 
 /-!
 # Higher derivatives of the finite SYK partition function
@@ -19,14 +25,14 @@ open SYK.GaussianChaos
 
 namespace SYK.CLT
 
-theorem partialList_cons_perm_append {ι : Type*} (i : ι) (l : List ι) :
+private theorem partialList_cons_perm_append {ι : Type*} (i : ι) (l : List ι) :
     (i :: l).Perm (l ++ [i]) := by
   induction l with
   | nil => simp
   | cons j l ih =>
       exact (List.Perm.swap i j l).symm.trans (List.Perm.cons j ih)
 
-theorem contDiff_partialList_top
+private theorem contDiff_partialList_top
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (l : List ι) {f : (ι → ℝ) → ℝ} (hf : ContDiff ℝ ⊤ f) :
     ContDiff ℝ ⊤ (partialList l f) := by
@@ -37,7 +43,7 @@ theorem contDiff_partialList_top
         ih (contDiff_coordDeriv i hf)
 
 open MatrixAnalysis.DirectionalDerivative in
-theorem partialList_eq_iterDirectionalFDeriv
+private theorem partialList_eq_iterDirectionalFDeriv
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (l : List ι) {f : (ι → ℝ) → ℝ} (hf : ContDiff ℝ ⊤ f) :
     partialList l f =
@@ -58,7 +64,7 @@ theorem partialList_eq_iterDirectionalFDeriv
         ih hf]
 
 open MatrixAnalysis.DirectionalDerivative in
-theorem contDiff_iterDirectionalFDeriv
+private theorem contDiff_iterDirectionalFDeriv
     {E F : Type*}
     [NormedAddCommGroup E] [NormedSpace ℝ E]
     [NormedAddCommGroup F] [NormedSpace ℝ F]
@@ -73,7 +79,7 @@ theorem contDiff_iterDirectionalFDeriv
       simpa [iterDirectionalFDeriv] using hfd.clm_apply contDiff_const
 
 open MatrixAnalysis.DirectionalDerivative in
-theorem iterDirectionalFDeriv_comp_right
+private theorem iterDirectionalFDeriv_comp_right
     {E F G : Type*}
     [NormedAddCommGroup E] [NormedSpace ℝ E]
     [NormedAddCommGroup F] [NormedSpace ℝ F]
@@ -96,7 +102,7 @@ theorem iterDirectionalFDeriv_comp_right
       simp
 
 open MatrixAnalysis.DirectionalDerivative in
-theorem iterDirectionalFDeriv_comp_left
+private theorem iterDirectionalFDeriv_comp_left
     {E F G : Type*}
     [NormedAddCommGroup E] [NormedSpace ℝ E]
     [NormedAddCommGroup F] [NormedSpace ℝ F]
@@ -118,7 +124,7 @@ theorem iterDirectionalFDeriv_comp_left
       rw [fderiv_comp x L.differentiableAt (htail.differentiable (by simp) x)]
       simp
 
-theorem normalizedHamiltonian_single
+private theorem normalizedHamiltonian_single
     {d : Type*} [Fintype d] [DecidableEq d]
     (P : Params) (M : MajoranaSystem P.N (Matrix d d ℂ))
     (I : InteractionIndex P.N P.q) :
@@ -127,7 +133,7 @@ theorem normalizedHamiltonian_single
   classical
   simp [normalizedHamiltonian, hamiltonian, PiLp.single_apply]
 
-theorem Setting.disorderMatrix_single {q : ℕ} (S : Setting q) (n : ℕ)
+private theorem Setting.disorderMatrix_single {q : ℕ} (S : Setting q) (n : ℕ)
     (I : InteractionIndex (S.N n) q) :
     S.disorderMatrix n (PiLp.single 2 I 1) =
       couplingScale (S.params n) • (S.majorana n).interactionOperator I := by
@@ -145,7 +151,7 @@ theorem norm_interactionOperator
   rw [M.interactionOperator_star hq, M.interactionOperator_sq hq]
   exact ⟨rfl, rfl⟩
 
-theorem Setting.norm_disorderMatrix_single {q : ℕ} (S : Setting q) (n : ℕ)
+private theorem Setting.norm_disorderMatrix_single {q : ℕ} (S : Setting q) (n : ℕ)
     (I : InteractionIndex (S.N n) q) :
     ‖S.disorderMatrix n (PiLp.single 2 I 1)‖ = couplingScale (S.params n) := by
   rw [S.disorderMatrix_single, norm_smul,
@@ -153,7 +159,7 @@ theorem Setting.norm_disorderMatrix_single {q : ℕ} (S : Setting q) (n : ℕ)
   simp [abs_of_nonneg (couplingScale_nonneg (S.params n))]
 
 open MatrixAnalysis.DirectionalDerivative in
-theorem Setting.iterDirectionalFDeriv_Z_eq {q : ℕ} (S : Setting q)
+private theorem Setting.iterDirectionalFDeriv_Z_eq {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (dirs : List (CouplingSpace (S.N n) q))
     (g : CouplingSpace (S.N n) q) :
     iterDirectionalFDeriv (S.Z β n) dirs g =
@@ -173,7 +179,7 @@ theorem Setting.iterDirectionalFDeriv_Z_eq {q : ℕ} (S : Setting q)
   rfl
 
 open MatrixAnalysis.DirectionalDerivative in
-theorem Setting.abs_iterDirectionalFDeriv_Z_le {q : ℕ} (S : Setting q)
+private theorem Setting.abs_iterDirectionalFDeriv_Z_le {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (dirs : List (CouplingSpace (S.N n) q))
     (g : CouplingSpace (S.N n) q) :
     |iterDirectionalFDeriv (S.Z β n) dirs g| ≤
@@ -203,7 +209,7 @@ theorem Setting.abs_iterDirectionalFDeriv_Z_le {q : ℕ} (S : Setting q)
     _ = _ := by
       rw [S.norm_traceExp_disorder, hprod]
 
-theorem Setting.abs_partialList_Z_le {q : ℕ} (S : Setting q)
+private theorem Setting.abs_partialList_Z_le {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (l : List (InteractionIndex (S.N n) q))
     (g : InteractionIndex (S.N n) q → ℝ) :
     |partialList l
@@ -288,7 +294,7 @@ theorem Setting.hermite_coefficient_Z_eq_integral_partialMulti
   intro η _
   exact S.partialMulti_Z_exp_growth β n η
 
-theorem Setting.integral_Z_pi {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
+private theorem Setting.integral_Z_pi {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     (∫ g : InteractionIndex (S.N n) q → ℝ,
       S.Z β n (WithLp.toLp 2 g)
         ∂gaussianCouplings (InteractionIndex (S.N n) q)) = S.meanZ β n := by
@@ -299,7 +305,7 @@ theorem Setting.integral_Z_pi {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
   rw [integral_map_equiv (MeasurableEquiv.toLp 2 (ι → ℝ)) F]
   rfl
 
-theorem Setting.abs_integral_Z_mul_hermite_le
+private theorem Setting.abs_integral_Z_mul_hermite_le
     {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (α : InteractionIndex (S.N n) q → ℕ) :
     |∫ g, S.Z β n (WithLp.toLp 2 g) * hermiteMulti α g
@@ -341,7 +347,7 @@ theorem Setting.abs_integral_Z_mul_hermite_le
     _ = A * S.meanZ β n := by
       rw [integral_const_mul, S.integral_Z_pi]
 
-theorem Setting.inner_hermiteLp_ZGaussianLp_eq_integral
+private theorem Setting.inner_hermiteLp_ZGaussianLp_eq_integral
     {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (α : InteractionIndex (S.N n) q → ℕ) :
     ⟪hermiteLp α, S.ZGaussianLp β n⟫_ℝ =

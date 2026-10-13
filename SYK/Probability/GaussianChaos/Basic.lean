@@ -1,6 +1,9 @@
-import Mathlib.Probability.Distributions.Gaussian.Real
-import Mathlib.RingTheory.Polynomial.Hermite.Gaussian
-import Mathlib.MeasureTheory.Integral.Pi
+module
+
+public import Mathlib.Probability.Distributions.Gaussian.Real
+public import Mathlib.RingTheory.Polynomial.Hermite.Basic
+
+public section
 
 /-!
 # Hermite products and symmetries of finite product Gaussians
@@ -26,11 +29,11 @@ theorem hermite_two_eval (x : ℝ) :
   ring
 
 /-- The multivariate (probabilists') Hermite polynomial `H_α(g) = ∏_I He_{α_I}(g_I)`. -/
-noncomputable def hermiteMulti {ι : Type*} [Fintype ι] (α : ι → ℕ) (g : ι → ℝ) : ℝ :=
+@[expose] noncomputable def hermiteMulti {ι : Type*} [Fintype ι] (α : ι → ℕ) (g : ι → ℝ) : ℝ :=
   ∏ I, Polynomial.aeval (g I) (Polynomial.hermite (α I))
 
 /-- The law of the couplings: i.i.d. standard Gaussians. -/
-noncomputable def gaussianCouplings (ι : Type*) [Fintype ι] : Measure (ι → ℝ) :=
+@[expose] noncomputable def gaussianCouplings (ι : Type*) [Fintype ι] : Measure (ι → ℝ) :=
   Measure.pi fun _ => gaussianReal 0 1
 
 instance gaussianCouplings_isProbability (ι : Type*) [Fintype ι] :
@@ -70,7 +73,7 @@ theorem hermite_aeval_sign (n : ℕ) (c x : ℝ) (hc : c = 1 ∨ c = -1) :
 
 /-- Flipping the sign of the coordinates is measure preserving for i.i.d. Gaussians. -/
 theorem integral_gaussianCouplings_sign {ι E : Type*} [Fintype ι]
-    [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E] (c : ι → ℝ)
+    [NormedAddCommGroup E] [NormedSpace ℝ E] (c : ι → ℝ)
     (hc : ∀ i, c i = 1 ∨ c i = -1) (F : (ι → ℝ) → E) :
     ∫ g, F (fun i => c i * g i) ∂gaussianCouplings ι = ∫ g, F g ∂gaussianCouplings ι := by
   have hsq : ∀ i, c i * c i = 1 := fun i => by rcases hc i with h | h <;> simp [h]
@@ -92,8 +95,8 @@ theorem integral_gaussianCouplings_sign {ι E : Type*} [Fintype ι]
   exact hmp.integral_comp' F
 
 /-- Reindexing i.i.d. standard Gaussian coordinates preserves expectation. -/
-theorem integral_gaussianCouplings_perm {ι E : Type*} [Fintype ι]
-    [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+private theorem integral_gaussianCouplings_perm {ι E : Type*} [Fintype ι]
+    [NormedAddCommGroup E] [NormedSpace ℝ E]
     (e : ι ≃ ι) (F : (ι → ℝ) → E) :
     ∫ g, F (fun i => g (e i)) ∂gaussianCouplings ι =
       ∫ g, F g ∂gaussianCouplings ι := by
@@ -114,7 +117,7 @@ theorem integral_gaussianCouplings_perm {ι E : Type*} [Fintype ι]
 
 /-- A signed permutation of i.i.d. Gaussian coordinates preserves expectation. -/
 theorem integral_gaussianCouplings_signed_perm {ι E : Type*} [Fintype ι]
-    [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+    [NormedAddCommGroup E] [NormedSpace ℝ E]
     (e : ι ≃ ι) (c : ι → ℝ) (hc : ∀ i, c i = 1 ∨ c i = -1)
     (F : (ι → ℝ) → E) :
     ∫ g, F (fun i => c i * g (e i)) ∂gaussianCouplings ι =

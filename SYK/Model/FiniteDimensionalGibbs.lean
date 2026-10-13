@@ -1,12 +1,20 @@
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.Complex.CauchyIntegral
+module
+
+public import Mathlib.Analysis.CStarAlgebra.Classes
+public import Mathlib.Analysis.Calculus.LogDeriv
+public import Mathlib.Analysis.InnerProductSpace.Basic
+public import Mathlib.Analysis.Normed.Algebra.Exponential
+public import Mathlib.Analysis.SpecialFunctions.Complex.Log
+public import Mathlib.LinearAlgebra.Matrix.PosDef
+public import Mathlib.Topology.Algebra.Module.ModuleTopology
+public import Mathlib.Topology.Instances.Matrix
 import Mathlib.Analysis.Calculus.SmoothSeries
+import Mathlib.Analysis.Complex.CauchyIntegral
 import Mathlib.Analysis.Matrix.Order
-import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
-import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Analysis.SpecialFunctions.Complex.LogDeriv
-import Mathlib.LinearAlgebra.Matrix.Trace
+
+public section
 
 /-!
 # Finite-dimensional Gibbs states and trace-exponential calculus
@@ -31,11 +39,11 @@ variable {d : Type*} [Fintype d] [DecidableEq d]
 /-! ## Density matrices and expectations -/
 
 /-- A finite-dimensional density matrix. -/
-def IsDensityMatrix (ρ : Matrix d d ℂ) : Prop :=
+@[expose] def IsDensityMatrix (ρ : Matrix d d ℂ) : Prop :=
   ρ.PosSemidef ∧ Matrix.trace ρ = 1
 
 /-- Expectation of a matrix observable in a density matrix. -/
-noncomputable def expectation (ρ A : Matrix d d ℂ) : ℂ :=
+@[expose] noncomputable def expectation (ρ A : Matrix d d ℂ) : ℂ :=
   Matrix.trace (ρ * A)
 
 omit [DecidableEq d] in
@@ -102,16 +110,16 @@ theorem density_variance_nonneg
 
 /-! ## Normalized traces and complex partition functions -/
 
-/-- The matrix trace normalized by the dimension of a nonempty index type. -/
-noncomputable def normalizedTrace [Nonempty d] (A : Matrix d d ℂ) : ℂ :=
+/-- The matrix trace divided by the dimension, with value zero for an empty index type. -/
+@[expose] noncomputable def normalizedTrace (A : Matrix d d ℂ) : ℂ :=
   Matrix.trace A / (Fintype.card d : ℂ)
 
 /-- The matrix exponential `exp (-z H)` at complex inverse temperature `z`. -/
-noncomputable def gibbsOperator (z : ℂ) (H : Matrix d d ℂ) : Matrix d d ℂ :=
+@[expose] noncomputable def gibbsOperator (z : ℂ) (H : Matrix d d ℂ) : Matrix d d ℂ :=
   NormedSpace.exp (-z • H)
 
 /-- The partition function `Tr (exp (-z H))`. -/
-noncomputable def partitionFunction (z : ℂ) (H : Matrix d d ℂ) : ℂ :=
+@[expose] noncomputable def partitionFunction (z : ℂ) (H : Matrix d d ℂ) : ℂ :=
   Matrix.trace (gibbsOperator z H)
 
 @[simp]
@@ -168,8 +176,8 @@ theorem partitionFunction_mul_log_deriv (H : Matrix d d ℂ) (z : ℂ)
 
 section PhysicalGibbs
 
-/-- The normalized Gibbs matrix, using the positive partition function. -/
-noncomputable def thermalDensity [Nonempty d]
+/-- The normalized Gibbs matrix; positivity and unit trace require a nonempty index type. -/
+@[expose] noncomputable def thermalDensity
     (β : NNReal) (H : Matrix d d ℂ) : Matrix d d ℂ :=
   ((partitionFunction (β : ℂ) H).re⁻¹ : ℝ) •
     gibbsOperator (β : ℂ) H
@@ -199,7 +207,7 @@ theorem gibbsOperator_posDef (β : NNReal) {H : Matrix d d ℂ}
   apply hpsd.posDef_iff_isUnit.mpr
   exact Matrix.isUnit_exp A
 
-theorem partitionFunction_star_eq (β : NNReal) {H : Matrix d d ℂ}
+private theorem partitionFunction_star_eq (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) :
     star (partitionFunction (β : ℂ) H) = partitionFunction (β : ℂ) H := by
   have hG : star (gibbsOperator (β : ℂ) H) = gibbsOperator (β : ℂ) H :=
@@ -214,7 +222,7 @@ theorem partitionFunction_im_eq_zero (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) : (partitionFunction (β : ℂ) H).im = 0 :=
   Complex.conj_eq_iff_im.mp (partitionFunction_star_eq β hH)
 
-theorem partitionFunction_eq_ofReal_re (β : NNReal) {H : Matrix d d ℂ}
+private theorem partitionFunction_eq_ofReal_re (β : NNReal) {H : Matrix d d ℂ}
     (hH : star H = H) :
     ((partitionFunction (β : ℂ) H).re : ℂ) = partitionFunction (β : ℂ) H := by
   apply Complex.ext
@@ -228,7 +236,7 @@ theorem partitionFunction_pos [Nonempty d] (β : NNReal)
   exact (RCLike.pos_iff.mp h).1
 
 /-- Positivity extends from physical nonnegative inverse temperature to
-every real temperature by reversing the sign of the Hermitian matrix. -/
+every real inverse temperature by reversing the sign of the Hermitian matrix. -/
 theorem partitionFunction_re_pos_real [Nonempty d] (β : ℝ)
     {H : Matrix d d ℂ} (hH : star H = H) :
     0 < (partitionFunction (β : ℂ) H).re := by
@@ -275,7 +283,7 @@ theorem partitionFunction_ne_zero_near_real [Nonempty d] (β : ℝ)
   simp [hzero] at this
 
 /-- The existing pointwise logarithmic-derivative formula holds throughout
-the zero-free disk around a fixed real temperature. -/
+the zero-free disk around a fixed real inverse temperature. -/
 theorem partitionFunction_mul_log_deriv_near_real [Nonempty d] (β : ℝ)
     {H : Matrix d d ℂ} (hH : star H = H) :
     ∃ ε : ℝ, 0 < ε ∧ ∀ z : ℂ, dist z (β : ℂ) < ε →
@@ -321,12 +329,12 @@ section TraceExponentialDerivative
 
 variable {d : Type*} [Fintype d] [DecidableEq d]
 
-noncomputable def matrixTraceCLM : Matrix d d ℂ →L[ℝ] ℂ :=
+private noncomputable def matrixTraceCLM : Matrix d d ℂ →L[ℝ] ℂ :=
   LinearMap.toContinuousLinearMap (Matrix.traceLinearMap d ℝ ℂ)
 
 omit [DecidableEq d] in
 @[simp]
-theorem matrixTraceCLM_apply (A : Matrix d d ℂ) :
+private theorem matrixTraceCLM_apply (A : Matrix d d ℂ) :
     matrixTraceCLM A = Matrix.trace A := rfl
 
 private theorem trace_pow_mul_cycle (A B : Matrix d d ℂ)

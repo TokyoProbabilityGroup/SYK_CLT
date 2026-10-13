@@ -1,5 +1,14 @@
+module
+
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+public import SYK.CLT.Basic
+public import SYK.Model.StandardRepresentation
 import SYK.CLT.Main
 import SYK.CLT.Normalization
+
+import Mathlib.Analysis.Matrix.Normed -- shake: keep (Matrix.Norms.Operator scope)
+
+public section
 
 /-!
 # The standard Gaussian SYK family
@@ -16,7 +25,7 @@ open scoped Topology NNReal Matrix.Norms.Operator
 namespace SYK.CLT
 
 /-- Standard matrix representations at every admissible even size. -/
-def standardSetting (q : ℕ) (hq : Even q) (hq4 : 4 ≤ q) : Setting q where
+@[expose] def standardSetting (q : ℕ) (hq : Even q) (hq4 : 4 ≤ q) : Setting q where
   q_even := hq
   q_ge_four := hq4
   N n := q + 2 * n
@@ -80,40 +89,5 @@ theorem standard_partition_and_log_partition_clt {q : ℕ}
         TendstoInDistribution (S.standardizedFluctuation β) atTop (fun x : ℝ ↦ x)
           (fun n ↦ standardGaussianMeasure (S.N n) q) (gaussianReal 0 1) :=
   partition_and_log_partition_clt (standardSetting q hq hq4) hFE
-
-/-- `thm:partition-clt` for the standard family, projected from the joint CLT. -/
-theorem standard_partition_clt {q : ℕ}
-    (hq : Even q) (hq4 : 4 ≤ q)
-    (hFE : AnnealedInput q (standardSetting q hq hq4)) :
-    let S := standardSetting q hq hq4
-    ∃ βq : ℝ, 0 < βq ∧
-      ∀ β : ℝ, |β| < βq → β ≠ 0 →
-        Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) ∧
-        TendstoInDistribution (S.relativeFluctuation β) atTop (fun x : ℝ ↦ x)
-          (fun n ↦ standardGaussianMeasure (S.N n) q)
-          (gaussianReal 0 (limitVariance q hFE.ℓ β)) ∧
-        0 < limitVariance q hFE.ℓ β ∧ (∀ n, 0 < S.varianceZ β n) ∧
-        TendstoInDistribution (S.standardizedFluctuation β) atTop (fun x : ℝ ↦ x)
-          (fun n ↦ standardGaussianMeasure (S.N n) q) (gaussianReal 0 1) := by
-  obtain ⟨r, hr, h⟩ := standard_partition_and_log_partition_clt hq hq4 hFE
-  refine ⟨r, hr, ?_⟩
-  intro β hβ hβ0
-  exact ⟨(h β hβ hβ0).1, (h β hβ hβ0).2.1, (h β hβ hβ0).2.2.2⟩
-
-/-- `thm:free-energy-clt` for the standard family, with the same joint radius. -/
-theorem standard_log_partition_clt {q : ℕ}
-    (hq : Even q) (hq4 : 4 ≤ q)
-    (hFE : AnnealedInput q (standardSetting q hq hq4)) :
-    let S := standardSetting q hq hq4
-    ∃ βq : ℝ, 0 < βq ∧
-      ∀ β : ℝ, |β| < βq → β ≠ 0 →
-        Tendsto (S.annealedFreeEnergy β) atTop (𝓝 (hFE.ℓ β)) ∧
-        TendstoInDistribution (S.logFluctuation β) atTop (fun x : ℝ ↦ x)
-          (fun n ↦ standardGaussianMeasure (S.N n) q)
-          (gaussianReal 0 (limitVariance q hFE.ℓ β)) := by
-  obtain ⟨r, hr, h⟩ := standard_partition_and_log_partition_clt hq hq4 hFE
-  refine ⟨r, hr, ?_⟩
-  intro β hβ hβ0
-  exact ⟨(h β hβ hβ0).1, (h β hβ hβ0).2.2.1⟩
 
 end SYK.CLT

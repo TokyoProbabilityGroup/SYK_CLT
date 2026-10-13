@@ -1,4 +1,16 @@
-import SYK.Model.Definitions
+module
+
+public import SYK.Model.Definitions
+public import Mathlib.Algebra.Algebra.Defs
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Data.Complex.Basic
+public import Mathlib.Data.Fintype.Powerset
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.NormNum.GCD
+
+public section
 
 /-!
 # Abstract Majorana systems and interaction operators
@@ -8,7 +20,7 @@ star-algebra `A` with `ψ i ψ j + ψ j ψ i = 2 δ_ij`. For an interaction labe
 `psiProduct` is the ordered product of its generators, `phase q = i ^ (q / 2)`, and
 `interactionOperator = phase q • psiProduct` is self-adjoint for even `q`. The file
 also proves the algebraic identities used downstream (squares, reordering signs,
-commutation with generators inside or outside `s`) and defines the deterministic
+anticommutation with generators inside `s`) and defines the deterministic
 `hamiltonian`. Nothing here assumes a matrix representation or irreducibility.
 -/
 
@@ -34,7 +46,7 @@ variable {N q : ℕ} {A : Type*}
   (M : MajoranaSystem N A)
 
 /-- The ordered product of the Majorana generators in an interaction. -/
-def psiProduct (s : InteractionIndex N q) : A :=
+@[expose] def psiProduct (s : InteractionIndex N q) : A :=
   ((orderedIndices s).map M.ψ).prod
 
 theorem anticommute {i j : Fin N} (hij : i ≠ j) :
@@ -112,7 +124,7 @@ private theorem star_listProduct (l : List (Fin N)) :
       simp [List.reverse_cons]
 
 /-- Reversing a product under `star` contributes one sign for every pair of generators. -/
-theorem star_psiProduct (s : InteractionIndex N q) :
+private theorem star_psiProduct (s : InteractionIndex N q) :
     star (M.psiProduct s) =
       ((-1 : ℂ) ^ (q * (q - 1) / 2)) • M.psiProduct s := by
   rw [psiProduct, M.star_listProduct, M.reverse_listProduct]
@@ -120,7 +132,7 @@ theorem star_psiProduct (s : InteractionIndex N q) :
   · simp [orderedIndices]
 
 /-- For even `q`, the reversal sign is `(-1)^(q/2)`. -/
-theorem star_psiProduct_of_even (s : InteractionIndex N q) (hq : Even q) :
+private theorem star_psiProduct_of_even (s : InteractionIndex N q) (hq : Even q) :
     star (M.psiProduct s) = ((-1 : ℂ) ^ (q / 2)) • M.psiProduct s := by
   rw [M.star_psiProduct s]
   congr 1
@@ -144,7 +156,7 @@ theorem star_psiProduct_of_even (s : InteractionIndex N q) (hq : Even q) :
 end MajoranaSystem
 
 /-- The phase used for an even `q`. -/
-def phase (q : ℕ) : ℂ := Complex.I ^ (q / 2)
+@[expose] def phase (q : ℕ) : ℂ := Complex.I ^ (q / 2)
 
 private theorem phase_sq (q : ℕ) :
     phase q * phase q = (-1 : ℂ) ^ (q / 2) := by
@@ -152,7 +164,7 @@ private theorem phase_sq (q : ℕ) :
   norm_num
 
 /-- The phase has complex norm one. -/
-theorem star_phase_mul_self (q : ℕ) :
+private theorem star_phase_mul_self (q : ℕ) :
     star (phase q) * phase q = 1 := by
   change star (Complex.I ^ (q / 2)) * Complex.I ^ (q / 2) = 1
   rw [star_pow, ← mul_pow]
@@ -165,7 +177,7 @@ variable {N q : ℕ} {A : Type*}
   (M : MajoranaSystem N A)
 
 /-- A phase-corrected Majorana interaction observable. -/
-noncomputable def interactionOperator (s : InteractionIndex N q) : A :=
+@[expose] noncomputable def interactionOperator (s : InteractionIndex N q) : A :=
   phase q • M.psiProduct s
 
 private theorem star_phase_mul_sign (q : ℕ) :
@@ -189,35 +201,38 @@ theorem majorana_sq (i : Fin N) : M.ψ i * M.ψ i = 1 := by
   apply smul_right_injective A (show (2 : ℂ) ≠ 0 by norm_num)
   simpa [two_smul] using h
 
-/-- Permuting a Majorana word changes it by a scalar sign. -/
-theorem listProduct_eq_smul_of_perm
+/-- Reordering a word of Majorana generators changes it by a sign. -/
+theorem listProduct_eq_sign_smul_of_perm
     (l₁ l₂ : List (Fin N)) (h : l₁.Perm l₂) :
-    ∃ c : ℂ, (l₁.map M.ψ).prod = c • (l₂.map M.ψ).prod := by
+    ∃ c : ℂ, (c = 1 ∨ c = -1) ∧
+      (l₁.map M.ψ).prod = c • (l₂.map M.ψ).prod := by
   induction h with
-  | nil => exact ⟨1, by simp⟩
+  | nil => exact ⟨1, Or.inl rfl, by simp⟩
   | @cons i l₁ l₂ _ ih =>
-      rcases ih with ⟨c, hc⟩
-      refine ⟨c, ?_⟩
+      obtain ⟨c, hc, heq⟩ := ih
+      refine ⟨c, hc, ?_⟩
       simp only [List.map_cons, List.prod_cons]
-      rw [hc, Algebra.mul_smul_comm]
+      rw [heq, Algebra.mul_smul_comm]
   | @swap i j l =>
       by_cases hij : i = j
       · subst j
-        exact ⟨1, by simp⟩
-      · refine ⟨-1, ?_⟩
+        exact ⟨1, Or.inl rfl, by simp⟩
+      · refine ⟨-1, Or.inr rfl, ?_⟩
         simp only [List.map_cons, List.prod_cons]
         calc
           M.ψ j * (M.ψ i * (l.map M.ψ).prod) =
               (M.ψ j * M.ψ i) * (l.map M.ψ).prod := by rw [mul_assoc]
           _ = (-(M.ψ i * M.ψ j)) * (l.map M.ψ).prod := by
-            rw [M.anticommute (Ne.symm hij)]
+              rw [M.anticommute (Ne.symm hij)]
           _ = (-1 : ℂ) • (M.ψ i * (M.ψ j * (l.map M.ψ).prod)) := by
-            simp [mul_assoc]
+              simp [mul_assoc]
   | @trans l₁ l₂ l₃ _ _ ih₁ ih₂ =>
-      rcases ih₁ with ⟨c₁, hc₁⟩
-      rcases ih₂ with ⟨c₂, hc₂⟩
-      refine ⟨c₁ * c₂, ?_⟩
-      rw [hc₁, hc₂, smul_smul]
+      obtain ⟨c₁, hc₁, heq₁⟩ := ih₁
+      obtain ⟨c₂, hc₂, heq₂⟩ := ih₂
+      refine ⟨c₁ * c₂, ?_, ?_⟩
+      · rcases hc₁ with h₁ | h₁ <;> rcases hc₂ with h₂ | h₂ <;>
+          simp [h₁, h₂]
+      · rw [heq₁, heq₂, smul_smul]
 
 private theorem star_listProduct_mul_self
     (l : List (Fin N)) (hl : l.Nodup) :
@@ -260,7 +275,7 @@ theorem psiProduct_mul_generator_of_mem
   let l := orderedIndices s
   have hmem : i ∈ l := by simpa [l, orderedIndices] using hi
   have hnodup : l.Nodup := by simp [l, orderedIndices]
-  obtain ⟨c, hc⟩ := M.listProduct_eq_smul_of_perm l (i :: l.erase i)
+  obtain ⟨c, _hsign, hc⟩ := M.listProduct_eq_sign_smul_of_perm l (i :: l.erase i)
     (List.perm_cons_erase hmem)
   simp only [List.map_cons, List.prod_cons] at hc
   have heq : M.psiProduct s = c • (M.ψ i * ((l.erase i).map M.ψ).prod) := hc
@@ -284,20 +299,10 @@ theorem interactionOperator_mul_generator_of_mem
   rw [interactionOperator, Algebra.smul_mul_assoc, M.psiProduct_mul_generator_of_mem s i hi,
     hodd.neg_one_pow, neg_one_smul, smul_neg, Algebra.mul_smul_comm]
 
-/-- For even degree, the interaction commutes with every excluded generator. -/
-theorem interactionOperator_mul_generator_of_not_mem
-    (hq : Even q) (s : InteractionIndex N q) (i : Fin N) (hi : i ∉ s.1) :
-    M.interactionOperator s * M.ψ i = M.ψ i * M.interactionOperator s := by
-  have hnot : i ∉ orderedIndices s := by simpa [orderedIndices] using hi
-  have h := M.listProduct_mul_generator i (orderedIndices s) hnot
-  rw [length_orderedIndices, hq.neg_one_pow, one_smul] at h
-  change M.psiProduct s * M.ψ i = M.ψ i * M.psiProduct s at h
-  rw [interactionOperator, Algebra.smul_mul_assoc, h, Algebra.mul_smul_comm]
-
 end MajoranaSystem
 
 /-- The deterministic SYK Hamiltonian associated to real couplings `J`. -/
-noncomputable def hamiltonian
+@[expose] noncomputable def hamiltonian
     {A : Type*} [Ring A] [StarRing A] [Algebra ℂ A] [StarModule ℂ A]
     (P : Params) (M : MajoranaSystem P.N A)
     (J : InteractionIndex P.N P.q → ℝ) : A :=

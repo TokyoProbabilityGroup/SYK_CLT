@@ -1,7 +1,14 @@
+module
+
+public import SYK.Model.Majorana
+public import SYK.Model.FiniteDimensionalGibbs
+import Mathlib.Analysis.SpecialFunctions.Bernstein
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import SYK.SuperConcentration.DensityMatrix
-import SYK.Model.Majorana
-import Mathlib.Data.Fintype.Powerset
-import Mathlib.Data.Nat.Choose.Bounds
+
+import Mathlib.Analysis.Matrix.Normed -- shake: keep (Matrix.Norms.Operator scope)
+
+public section
 
 /-! The finite-size sum-of-squares bound for Majorana interactions. -/
 
@@ -15,11 +22,11 @@ section FixedCore
 variable {N q : ℕ}
 
 /-- Labels outside a fixed interaction core. -/
-abbrev Outside (A : InteractionIndex N (q - 1)) :=
+private abbrev Outside (A : InteractionIndex N (q - 1)) :=
   {j : Fin N // j ∉ A.1}
 
 /-- Add one label to a fixed `(q - 1)`-body core. -/
-def extendInteraction (hq : 0 < q) (A : InteractionIndex N (q - 1))
+private def extendInteraction (hq : 0 < q) (A : InteractionIndex N (q - 1))
     (j : Outside A) : InteractionIndex N q :=
   ⟨insert j.1 A.1, by
     rw [Finset.card_insert_of_notMem j.2, A.2]
@@ -42,10 +49,10 @@ private theorem psiProduct_extend_eq_smul
       (by simp [orderedIndices, j.2])).2
     intro i
     simp [orderedIndices, extendInteraction]
-  simpa [psiProduct] using
-    M.listProduct_eq_smul_of_perm _ _ hperm
+  obtain ⟨c, _hsign, hc⟩ := M.listProduct_eq_sign_smul_of_perm _ _ hperm
+  exact ⟨c, by simpa [psiProduct] using hc⟩
 
-theorem extendInteraction_anticommute
+private theorem extendInteraction_anticommute
     (hq0 : 0 < q) (hq : Even q)
     (C : InteractionIndex N (q - 1))
     (j k : Outside C) (hjk : j ≠ k) :
@@ -94,7 +101,7 @@ theorem extendInteraction_anticommute
 
 end MajoranaSystem
 
-abbrev ChosenPoint (I : InteractionIndex N q) :=
+private abbrev ChosenPoint (I : InteractionIndex N q) :=
   {j : Fin N // j ∈ I.1}
 
 private def eraseChosenPoint (_hq : 0 < q) (I : InteractionIndex N q)
@@ -104,7 +111,7 @@ private def eraseChosenPoint (_hq : 0 < q) (I : InteractionIndex N q)
 
 /-- Double-counting equivalence between cores with an added point and
 interactions with a chosen point. -/
-def extensionEquiv (hq : 0 < q) :
+private def extensionEquiv (hq : 0 < q) :
     (Σ C : InteractionIndex N (q - 1), Outside C) ≃
       (Σ I : InteractionIndex N q, ChosenPoint I) where
   toFun p :=
@@ -130,7 +137,7 @@ def extensionEquiv (hq : 0 < q) :
         simp [eraseChosenPoint, extendInteraction, j.2])).2
       rfl
 
-theorem sum_over_extensions (hq : 0 < q)
+private theorem sum_over_extensions (hq : 0 < q)
     (f : InteractionIndex N q → ℝ) :
     ∑ C : InteractionIndex N (q - 1),
       ∑ j : Outside C, f (extendInteraction hq C j) =

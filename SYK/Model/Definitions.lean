@@ -1,5 +1,13 @@
-import Mathlib.Analysis.Normed.Algebra.MatrixExponential
-import Mathlib.LinearAlgebra.Matrix.Trace
+module
+
+public import Mathlib.Algebra.Group.Even
+public import Mathlib.Data.Finset.Sort
+import Mathlib.Algebra.Order.Algebra
+import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
+import Mathlib.Data.Sym.Sym2.Init
+import Mathlib.Tactic.NormNum.GCD
+
+public section
 
 /-!
 # Parameters and interaction labels of the SYK model
@@ -30,7 +38,7 @@ structure Params where
 abbrev InteractionIndex (N q : ℕ) := {s : Finset (Fin N) // s.card = q}
 
 /-- The elements of an interaction index in their canonical increasing order. -/
-def orderedIndices {N q : ℕ} (s : InteractionIndex N q) : List (Fin N) :=
+@[expose] def orderedIndices {N q : ℕ} (s : InteractionIndex N q) : List (Fin N) :=
   s.1.sort (· ≤ ·)
 
 @[simp]

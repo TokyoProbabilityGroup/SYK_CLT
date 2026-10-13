@@ -1,20 +1,21 @@
-import SYK.CLT.FiniteModel
-import Mathlib.Analysis.Asymptotics.Lemmas
-import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
-import Mathlib.Probability.Moments.Variance
-import Mathlib.Topology.UniformSpace.LocallyUniformConvergence
+module
+
+public import SYK.CLT.FiniteModel
+import Mathlib.Algebra.Order.Star.Real
+import Mathlib.Analysis.Matrix.Normed -- shake: keep (Matrix.Norms.Operator scope)
+
+public section
 
 /-!
 # Setting and annealed input for the SYK central limit theorem
 
 The setting uses an arbitrary nonempty finite-dimensional matrix Majorana
 system, the shared Gaussian Hamiltonian, and normalized trace. The main
-statements in `Main.lean` correspond to `thm:partition-clt` and
+statements in `SYK/CLT/Main.lean` correspond to `thm:partition-clt` and
 `thm:free-energy-clt`.
 
 Inverse temperature is real, and the main CLT statements use
-`|β| < βq` together with `β ≠ 0`. This supersedes the planned
-nonnegative-temperature restriction. The relative, standardized, and
+`|β| < βq` together with `β ≠ 0`. The relative, standardized, and
 logarithmic CLTs all exclude zero inverse temperature; finite-model
 zero-inverse-temperature identities remain available separately.
 
@@ -22,7 +23,7 @@ The explicit annealed input is `AnnealedInput`, containing the assertions of
 `prop:annealed-free-energy` for the given family in the CLT manuscript.
 The proposition itself is assumed. The Gaussian chaos and
 logarithmic-transfer arguments are proved in the supporting lemma modules
-and assembled in `Main.lean`.
+and assembled in `SYK/CLT/Main.lean`.
 The almost-sure free-energy law of large numbers is outside this module's
 present scope.
 -/
@@ -74,7 +75,7 @@ namespace Setting
 variable {q : ℕ} (S : Setting q)
 
 /-- Parameters passed to the shared SYK model. -/
-def params (n : ℕ) : Params where
+@[expose] def params (n : ℕ) : Params where
   N := S.N n
   q := q
   q_even := S.q_even
@@ -82,7 +83,7 @@ def params (n : ℕ) : Params where
   q_le_N := S.q_le_N n
 
 /-- `Z_N(β;G)`, with Gaussian coefficient variance `(q-1)!/N^(q-1)`. -/
-noncomputable def Z (β : ℝ) (n : ℕ) : CouplingSpace (S.N n) q → ℝ :=
+@[expose] noncomputable def Z (β : ℝ) (n : ℕ) : CouplingSpace (S.N n) q → ℝ :=
   realPartitionFunction (S.params n) (S.majorana n) β
 
 theorem Z_ge_one (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
@@ -95,30 +96,32 @@ theorem log_Z_nonneg (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) :
   Real.log_nonneg (S.Z_ge_one β n g)
 
 /-- Disorder expectation `E Z_N(β)`. -/
-noncomputable def meanZ (β : ℝ) (n : ℕ) : ℝ :=
+@[expose] noncomputable def meanZ (β : ℝ) (n : ℕ) : ℝ :=
   ∫ g, S.Z β n g ∂standardGaussianMeasure (S.N n) q
 
 /-- Relative partition function `Y_N = Z_N / E Z_N`. -/
-noncomputable def Y (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) : ℝ :=
+@[expose] noncomputable def Y (β : ℝ) (n : ℕ) (g : CouplingSpace (S.N n) q) : ℝ :=
   S.Z β n g / S.meanZ β n
 
 /-- Disorder expectation `E log Z_N(β)`, rather than `log E Z_N(β)`. -/
-noncomputable def meanLogZ (β : ℝ) (n : ℕ) : ℝ :=
+@[expose] noncomputable def meanLogZ (β : ℝ) (n : ℕ) : ℝ :=
   ∫ g, Real.log (S.Z β n g) ∂standardGaussianMeasure (S.N n) q
 
 /-- The common CLT scaling `N^(q/2-1)`; `q/2` is exact since `q` is even. -/
-def fluctuationScale (n : ℕ) : ℝ := (S.N n : ℝ) ^ (q / 2 - 1)
+@[expose] def fluctuationScale (n : ℕ) : ℝ := (S.N n : ℝ) ^ (q / 2 - 1)
 
-noncomputable def relativeFluctuation (β : ℝ) (n : ℕ)
+/-- Scaled relative fluctuation `N^(q/2-1) (Y_N - 1)`. -/
+@[expose] noncomputable def relativeFluctuation (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) : ℝ :=
   S.fluctuationScale n * (S.Y β n g - 1)
 
-noncomputable def logFluctuation (β : ℝ) (n : ℕ)
+/-- Scaled centered logarithmic fluctuation `N^(q/2-1) (log Z_N - E log Z_N)`. -/
+@[expose] noncomputable def logFluctuation (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) : ℝ :=
   S.fluctuationScale n * (Real.log (S.Z β n g) - S.meanLogZ β n)
 
 /-- Variance with respect to Gaussian disorder, not spectral variance. -/
-noncomputable def varianceZ (β : ℝ) (n : ℕ) : ℝ :=
+@[expose] noncomputable def varianceZ (β : ℝ) (n : ℕ) : ℝ :=
   variance (S.Z β n) (standardGaussianMeasure (S.N n) q)
 
 /-- At `β = 0`, the partition function is constant and its disorder variance
@@ -160,12 +163,13 @@ theorem logFluctuation_zero (n : ℕ) (g : CouplingSpace (S.N n) q) :
     S.logFluctuation 0 n g = 0 := by
   simp [logFluctuation, Z]
 
-noncomputable def standardizedFluctuation (β : ℝ) (n : ℕ)
+/-- The centered partition function divided by its disorder standard deviation. -/
+@[expose] noncomputable def standardizedFluctuation (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) : ℝ :=
   (S.Z β n g - S.meanZ β n) / Real.sqrt (S.varianceZ β n)
 
 /-- The annealed free-energy density defining the limiting function `ℓ_q`. -/
-noncomputable def annealedFreeEnergy (β : ℝ) (n : ℕ) : ℝ :=
+@[expose] noncomputable def annealedFreeEnergy (β : ℝ) (n : ℕ) : ℝ :=
   Real.log (S.meanZ β n) / (S.N n : ℝ)
 
 /-- Apply the finite-model moment theorem to a member of the family. -/
@@ -291,28 +295,17 @@ theorem secondChaosCoefficient_tendsto {q : ℕ} {S : Setting q}
 
 /-- The common limiting variance `ρ²(β) = (q!/2) β² (ℓ_q'(β))²`.
 It is allowed to vanish, in particular at `β = 0`. -/
-noncomputable def limitVariance (q : ℕ) (ℓ : ℝ → ℝ) (β : ℝ) : ℝ≥0 :=
+@[expose] noncomputable def limitVariance (q : ℕ) (ℓ : ℝ → ℝ) (β : ℝ) : ℝ≥0 :=
   ⟨(q.factorial : ℝ) / 2 * β ^ 2 * (deriv ℓ β) ^ 2, by positivity⟩
 
-/-- `prop:annealed-free-energy` gives the sign at every nonzero inverse temperature. -/
-theorem exists_small_temperature_sign {q : ℕ} {S : Setting q}
-    (hFE : AnnealedInput q S) :
-    ∃ r : ℝ, 0 < r ∧
-      ∀ β : ℝ, |β| < r → β ≠ 0 → 0 < β * deriv hFE.ℓ β := by
-  exact ⟨1, by norm_num, fun β _ hβ0 ↦ hFE.sign β hβ0⟩
-
-/-- The limiting variance is positive at the small nonzero inverse temperatures
-selected by `prop:annealed-free-energy`. -/
-theorem exists_small_temperature_variance_pos {q : ℕ} {S : Setting q}
-    (hFE : AnnealedInput q S) :
-    ∃ r : ℝ, 0 < r ∧
-      ∀ β : ℝ, |β| < r → β ≠ 0 → 0 < limitVariance q hFE.ℓ β := by
-  obtain ⟨r, hr, hsign⟩ := exists_small_temperature_sign hFE
-  refine ⟨r, hr, ?_⟩
-  intro β hβ hβ0
+/-- Under `prop:annealed-free-energy`, the limiting variance is positive at every
+nonzero real inverse temperature. -/
+theorem limitVariance_pos_of_ne_zero {q : ℕ} {S : Setting q}
+    (hFE : AnnealedInput q S) (β : ℝ) (hβ0 : β ≠ 0) :
+    0 < limitVariance q hFE.ℓ β := by
   have hd : deriv hFE.ℓ β ≠ 0 := by
     intro hd
-    simpa [hd] using hsign β hβ hβ0
+    simpa [hd] using hFE.sign β hβ0
   change (0 : ℝ) < (q.factorial : ℝ) / 2 * β ^ 2 * (deriv hFE.ℓ β) ^ 2
   exact mul_pos
     (mul_pos (div_pos (Nat.cast_pos.mpr q.factorial_pos) (by norm_num))

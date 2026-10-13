@@ -1,4 +1,11 @@
-import SYK.CLT.Quadratic.GaussianQuadraticObservable
+module
+
+public import SYK.CLT.Quadratic.GaussianQuadraticObservable
+import Mathlib.Algebra.Order.Star.Real
+import SYK.Probability.GaussianChaos.CoefficientIBP
+import SYK.Probability.GaussianChaos.Orthogonality
+
+public section
 
 /-!
 # Fourth moments of centered Gaussian squares
@@ -116,12 +123,10 @@ theorem centeredGaussianSquare_memLp_four :
   apply (integrable_norm_rpow_iff (by fun_prop) (by norm_num) (by norm_num)).mp
   simpa using h_norm
 
-theorem centeredGaussianSquares_sum_memLp_four {ι : Type*} [Fintype ι] :
-    MemLp (fun g : ι → ℝ => ∑ i : ι, centeredGaussianSquare (g i)) 4
+/-- Each coordinate of a product standard Gaussian has its centered square in L⁴. -/
+theorem centeredGaussianSquare_eval_memLp_four {ι : Type*} [Fintype ι] (i : ι) :
+    MemLp (fun g : ι → ℝ => centeredGaussianSquare (g i)) 4
       (gaussianCouplings ι) := by
-  classical
-  apply memLp_finsetSum Finset.univ
-  intro i _
   have hmap : Measure.map (fun g : ι → ℝ => g i) (gaussianCouplings ι) =
       gaussianReal 0 1 :=
     (measurePreserving_eval (fun _ : ι => gaussianReal 0 1) i).map_eq
@@ -129,5 +134,13 @@ theorem centeredGaussianSquares_sum_memLp_four {ι : Type*} [Fintype ι] :
   rw [← hmap] at h
   simpa only [Function.comp_def] using h.comp_of_map
     ((by fun_prop : Measurable (fun g : ι → ℝ => g i)).aemeasurable)
+
+theorem centeredGaussianSquares_sum_memLp_four {ι : Type*} [Fintype ι] :
+    MemLp (fun g : ι → ℝ => ∑ i : ι, centeredGaussianSquare (g i)) 4
+      (gaussianCouplings ι) := by
+  classical
+  apply memLp_finsetSum Finset.univ
+  intro i _
+  exact centeredGaussianSquare_eval_memLp_four i
 
 end SYK.CLT

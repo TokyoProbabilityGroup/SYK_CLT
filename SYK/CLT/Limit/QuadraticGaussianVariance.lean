@@ -1,10 +1,22 @@
+module
+
+public import SYK.CLT.Limit.QuadraticBridge
+import SYK.CLT.Chaos.SecondChaos
+import SYK.CLT.Chaos.SecondChaosAsymptotic
+import SYK.CLT.Chaos.ZeroChaos
 import SYK.CLT.Limit.EuclideanRelativeCLT
+import SYK.Probability.GaussianChaos.PolynomialDensity
+
+public section
 
 /-!
 # Variance of the normalized quadratic Gaussian chaos
 
-The quadratic term in the partition-function fluctuation has unit L² norm.
-This is the exact finite-size normalization needed for the variance limit.
+The normalized quadratic sum Q_N has unit L² norm. The second-chaos projection
+P₂Y_N = c_N Q_N therefore has norm |c_N|, and orthogonality gives
+Var Y_N = c_N² + ‖R_N‖². Under the annealed input, the scaled variances of Y_N
+and Z_N converge to the limiting variance, with the exact finite-size identity
+Var Z_N = (E Z_N)² Var Y_N.
 -/
 
 open MeasureTheory Filter ProbabilityTheory
@@ -14,7 +26,7 @@ open SYK.GaussianChaos
 
 namespace SYK.CLT
 
-theorem inner_hermiteLp_single_two {ι : Type*} [Fintype ι]
+private theorem inner_hermiteLp_single_two {ι : Type*} [Fintype ι]
     [DecidableEq ι] (i j : ι) :
     ⟪hermiteLp (Pi.single i 2), hermiteLp (Pi.single j 2)⟫_ℝ =
       if i = j then 2 else 0 := by
@@ -28,7 +40,7 @@ theorem inner_hermiteLp_single_two {ι : Type*} [Fintype ι]
       simp [hij] at hi
     simp [hij, hne]
 
-theorem quadraticGaussianLp_norm_sq {ι : Type*} [Fintype ι]
+private theorem quadraticGaussianLp_norm_sq {ι : Type*} [Fintype ι]
     [DecidableEq ι] [Nonempty ι] : ‖quadraticGaussianLp ι‖ ^ 2 = 1 := by
   classical
   have hcard : 0 < (Fintype.card ι : ℝ) := by
@@ -48,7 +60,7 @@ theorem quadraticGaussianLp_norm_sq {ι : Type*} [Fintype ι]
   rw [Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 2), Real.sq_sqrt hcard.le]
 
 /-- The quadratic chaos is orthogonal to the full higher-degree remainder. -/
-theorem Setting.inner_secondChaos_higherChaosRemainder_eq_zero {q : ℕ}
+private theorem Setting.inner_secondChaos_higherChaosRemainder_eq_zero {q : ℕ}
     (S : Setting q) (β : ℝ) (n : ℕ) :
     ⟪hermiteDegreeProjection 2 (S.YGaussianLp β n),
       S.higherChaosRemainderLp β n⟫_ℝ = 0 := by
@@ -67,7 +79,7 @@ theorem Setting.inner_secondChaos_higherChaosRemainder_eq_zero {q : ℕ}
 
 /-- The disorder variance of the relative partition function is its centered
 Gaussian `L²` norm squared on the product coupling space. -/
-theorem Setting.varianceY_pi_eq_norm_sq {q : ℕ} (S : Setting q)
+private theorem Setting.varianceY_pi_eq_norm_sq {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     variance (fun g : InteractionIndex (S.N n) q → ℝ =>
       S.Y β n (WithLp.toLp 2 g))
@@ -122,8 +134,8 @@ theorem Setting.varianceY_pi_decomposition {q : ℕ} (S : Setting q)
     quadraticGaussianLp_norm_sq, mul_one]
   ring
 
-/-- The variance of the scaled relative partition function has the stated
-limiting value on the product coupling space. -/
+/-- Under `AnnealedInput`, the scaled variance of Y_N on the product
+coupling space tends to `limitVariance` for |β| below some positive radius. -/
 theorem Setting.scaled_varianceY_pi_tendsto {q : ℕ} (S : Setting q)
     (hFE : AnnealedInput q S) :
     ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →
@@ -155,7 +167,7 @@ theorem Setting.scaled_varianceY_pi_tendsto {q : ℕ} (S : Setting q)
 
 /-- The Euclidean disorder variance is the product-space relative variance,
 multiplied by the square of the partition-function mean. -/
-theorem Setting.varianceZ_eq_mean_sq_varianceY_pi {q : ℕ}
+private theorem Setting.varianceZ_eq_mean_sq_varianceY_pi {q : ℕ}
     (S : Setting q) (β : ℝ) (n : ℕ) :
     S.varianceZ β n = (S.meanZ β n) ^ 2 *
       variance (fun g : InteractionIndex (S.N n) q → ℝ =>
@@ -174,7 +186,7 @@ theorem Setting.varianceZ_eq_mean_sq_varianceY_pi {q : ℕ}
   rfl
 
 /-- Exact normalization of the partition-function variance has the predicted
-nonzero-inverse-temperature limit. -/
+limit, including at zero inverse temperature. -/
 theorem Setting.scaled_varianceZ_over_mean_sq_tendsto {q : ℕ}
     (S : Setting q) (hFE : AnnealedInput q S) :
     ∃ βq : ℝ, 0 < βq ∧ ∀ β : ℝ, |β| < βq →

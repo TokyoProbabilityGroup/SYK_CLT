@@ -1,14 +1,17 @@
-import SYK.Analysis.Matrix.TraceExpDerivatives
-import SYK.CLT.Basic
-import SYK.Probability.GaussianChaos.Basic
-import SYK.Probability.GaussianChaos.HermiteIBP
-import Mathlib.Analysis.Calculus.ParametricIntegral
+module
+
+public import SYK.Analysis.Matrix.TraceExpDerivatives
+public import SYK.CLT.Basic
+public import SYK.Probability.GaussianChaos.HermiteIBP
+
+public section
 
 /-!
 # Finite partition-function derivatives
 
 The first-order analytic inputs for `prop:exact-second-chaos` are proved for
-the existing normalized model, at every real inverse temperature.
+the normalized model at every real inverse temperature. They also provide the
+foundation for the higher derivative estimates in `PartitionHigherDerivatives.lean`.
 Entry points: `Setting.Z_contDiff_couplings`, `Setting.Z_hasDerivAt_beta`,
 `Setting.coordDeriv_Z_eq`, `Setting.integral_Z_mul_sq_sub_one_ibp`,
 `Setting.sum_integral_Y_mul_sq_sub_one`.
@@ -21,15 +24,20 @@ open SYK.GaussianChaos
 
 namespace SYK.CLT
 
-/-- The shared Hamiltonian, viewed with the matrix operator norm used by `Tool`. -/
-noncomputable def Setting.disorderMatrix {q : ℕ} (S : Setting q) (n : ℕ) :
+/-- The Hamiltonian g ↦ H_N(g), viewed as a continuous real linear map into
+the matrix space equipped with the L² operator norm. -/
+@[expose] noncomputable def Setting.disorderMatrix {q : ℕ} (S : Setting q) (n : ℕ) :
     CouplingSpace (S.N n) q →L[ℝ] Matrix (S.d n) (S.d n) ℂ :=
   (normalizedHamiltonianLinear (S.params n) (S.majorana n)).toLinearMap.toContinuousLinearMap
 
+/-- The continuous linear Hamiltonian map evaluates to the normalized Hamiltonian. -/
 theorem Setting.disorderMatrix_apply {q : ℕ} (S : Setting q) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :
     S.disorderMatrix n g = normalizedHamiltonian (S.params n) (S.majorana n) g := rfl
 
+/-- Express the CLT partition function as the real part of the normalized trace exponential.
+This bridges `SYK.normalizedTrace`, used in the CLT definition, and
+`SYK.MatrixAnalysis.normalizedTrace`, used by `traceExp`. -/
 theorem Setting.Z_eq_traceExp {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :
     S.Z β n g =
@@ -59,6 +67,7 @@ theorem Setting.Z_smul {q : ℕ} (S : Setting q) (β t : ℝ) (n : ℕ)
   congr 3
   ring
 
+/-- The norm of the trace exponential equals the positive real partition function. -/
 theorem Setting.norm_traceExp_disorder {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :
     ‖MatrixAnalysis.traceExp ((-β) • S.disorderMatrix n g)‖ = S.Z β n g := by
@@ -74,7 +83,7 @@ theorem Setting.norm_traceExp_disorder {q : ℕ} (S : Setting q) (β : ℝ) (n :
   exact le_trans (by norm_num) (S.Z_ge_one β n g)
 
 /-- A first directional derivative bound, with no restriction on inverse temperature. -/
-theorem Setting.norm_fderiv_Z_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
+private theorem Setting.norm_fderiv_Z_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (g v : CouplingSpace (S.N n) q) :
     ‖fderiv ℝ (S.Z β n) g v‖ ≤
       |β| * ‖S.disorderMatrix n v‖ * S.Z β n g := by
@@ -106,12 +115,14 @@ theorem Setting.norm_fderiv_Z_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
       rw [S.norm_traceExp_disorder, norm_smul]
       simp
 
-theorem Setting.Z_contDiff_beta {q : ℕ} (S : Setting q) (n : ℕ)
+/-- The finite partition function is smooth in real inverse temperature. -/
+private theorem Setting.Z_contDiff_beta {q : ℕ} (S : Setting q) (n : ℕ)
     (g : CouplingSpace (S.N n) q) : ContDiff ℝ ⊤ (fun β => S.Z β n g) := by
   have hg : ContDiff ℝ ⊤ (fun b : ℝ => b • g) := contDiff_id.smul contDiff_const
   have h := (S.Z_contDiff_couplings 1 n).comp hg
   simpa only [Function.comp_def, S.Z_smul, mul_one] using h
 
+/-- The inverse-temperature derivative is the disorder derivative at β • g in direction g. -/
 theorem Setting.Z_hasDerivAt_beta {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :
     HasDerivAt (fun b => S.Z b n g) (fderiv ℝ (S.Z 1 n) (β • g) g) β := by
@@ -133,14 +144,17 @@ theorem Setting.fderiv_Z_self_eq_beta_deriv {q : ℕ} (S : Setting q)
   have h := hleft.unique hright
   simpa only [mul_comm] using h
 
-theorem Setting.norm_deriv_Z_beta_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
+/-- Bound the inverse-temperature derivative by the Hamiltonian norm
+times the partition function. -/
+private theorem Setting.norm_deriv_Z_beta_le {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (g : CouplingSpace (S.N n) q) :
     ‖deriv (fun b => S.Z b n g) β‖ ≤ ‖S.disorderMatrix n g‖ * S.Z β n g := by
   rw [(S.Z_hasDerivAt_beta β n g).deriv]
   simpa only [abs_one, one_mul, S.Z_smul, mul_one] using
     S.norm_fderiv_Z_le 1 n (β • g) g
 
-theorem Setting.continuous_deriv_Z_beta {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
+/-- The inverse-temperature derivative is continuous as a function of disorder. -/
+private theorem Setting.continuous_deriv_Z_beta {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     Continuous (fun g : CouplingSpace (S.N n) q => deriv (fun b => S.Z b n g) β) := by
   have hg : Continuous (fun g : CouplingSpace (S.N n) q => β • g) :=
     continuous_id.const_smul β
@@ -153,7 +167,7 @@ theorem Setting.continuous_deriv_Z_beta {q : ℕ} (S : Setting q) (β : ℝ) (n 
   rw [heq]
   exact h'
 
-/-- An exponential bound uniform on bounded inverse-temperature intervals. -/
+/-- There is C ≥ 0 such that Z_β(g) ≤ exp(C |β| ‖g‖) for every β and g. -/
 theorem Setting.exists_Z_exp_bound_all_beta {q : ℕ} (S : Setting q) (n : ℕ) :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (β : ℝ) (g : CouplingSpace (S.N n) q),
       S.Z β n g ≤ Real.exp (C * |β| * ‖g‖) := by
@@ -162,7 +176,7 @@ theorem Setting.exists_Z_exp_bound_all_beta {q : ℕ} (S : Setting q) (n : ℕ) 
   have h : S.Z 1 n (β • g) ≤ Real.exp (C * ‖β • g‖) := hb (β • g)
   simpa only [S.Z_smul, mul_one, norm_smul, Real.norm_eq_abs, mul_assoc] using h
 
-/-- Differentiating the finite Gaussian expectation is valid at every real temperature. -/
+/-- Differentiating the finite Gaussian expectation is valid at every real inverse temperature. -/
 theorem Setting.meanZ_hasDerivAt {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     HasDerivAt (fun b => S.meanZ b n)
       (∫ g, deriv (fun b => S.Z b n g) β ∂standardGaussianMeasure (S.N n) q) β := by
@@ -200,11 +214,14 @@ theorem Setting.meanZ_hasDerivAt {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) 
       ((S.Z_contDiff_beta n g).differentiable (by simp) b).hasDerivAt)
   exact h.2
 
+/-- The partition function is smooth on the product coordinate space. -/
 theorem Setting.Z_contDiff_pi {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     ContDiff ℝ ⊤ (fun g : InteractionIndex (S.N n) q → ℝ => S.Z β n (WithLp.toLp 2 g)) :=
   (S.Z_contDiff_couplings β n).comp
     (PiLp.continuousLinearEquiv 2 ℝ (fun _ : InteractionIndex (S.N n) q => ℝ)).symm.contDiff
 
+/-- The coordinate derivative on the product space equals the disorder derivative
+in direction e_I. -/
 theorem Setting.coordDeriv_Z_eq {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
     (I : InteractionIndex (S.N n) q) (g : InteractionIndex (S.N n) q → ℝ) :
     coordDeriv I (fun x => S.Z β n (WithLp.toLp 2 x)) g =
@@ -218,7 +235,7 @@ theorem Setting.coordDeriv_Z_eq {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ)
   rfl
 
 /-- The value and each selected first partial derivative have exponential growth. -/
-theorem Setting.Z_coord_exp_bounds {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
+private theorem Setting.Z_coord_exp_bounds {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ) :
     ∃ C c : ℝ, 0 ≤ C ∧ 0 ≤ c ∧
       (∀ g : InteractionIndex (S.N n) q → ℝ,
         |S.Z β n (WithLp.toLp 2 g)| ≤ C * Real.exp (c * ‖WithLp.toLp 2 g‖)) ∧
@@ -248,7 +265,7 @@ theorem Setting.Z_coord_exp_bounds {q : ℕ} (S : Setting q) (β : ℝ) (n : ℕ
           (hb β _) (le_trans (by norm_num) (S.Z_ge_one β n _)) (by positivity)
       _ ≤ (K + 1) * Real.exp ((c * |β|) * ‖WithLp.toLp 2 g‖) := by gcongr; linarith
 
-/-- First-order Gaussian IBP suffices for the diagonal quadratic coefficient. -/
+/-- Gaussian integration by parts gives E[Z(g_I² - 1)] = E[g_I ∂_I Z]. -/
 theorem Setting.integral_Z_mul_sq_sub_one_ibp {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) (I : InteractionIndex (S.N n) q) :
     (∫ g : InteractionIndex (S.N n) q → ℝ,

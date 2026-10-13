@@ -1,5 +1,12 @@
+module
+
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+public import SYK.CLT.Basic
+public import SYK.Probability.GaussianChaos.Basic
 import SYK.CLT.Limit.QuadraticBridge
 import SYK.Probability.LpDistributionTransfer
+
+public section
 
 /-!
 # Relative partition fluctuation on the product Gaussian space
@@ -15,7 +22,7 @@ open SYK.GaussianChaos SYK.Probability
 
 namespace SYK.CLT
 
-theorem Setting.scaled_higherChaosRemainderLp_ae {q : ℕ} (S : Setting q)
+private theorem Setting.scaled_higherChaosRemainderLp_ae {q : ℕ} (S : Setting q)
     (β : ℝ) (n : ℕ) :
     (S.fluctuationScale n • S.higherChaosRemainderLp β n :
       (InteractionIndex (S.N n) q → ℝ) → ℝ) =ᵐ[

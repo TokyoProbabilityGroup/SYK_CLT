@@ -1,5 +1,9 @@
+module
+
+public import SYK.Probability.GaussianChaos.Basic
 import SYK.Probability.GaussianChaos.HermiteIBP
-import SYK.Probability.GaussianChaos.Basic
+
+public section
 
 /-!
 # Gaussian Hermite coefficients for finite product Gaussians

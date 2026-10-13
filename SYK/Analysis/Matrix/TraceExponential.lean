@@ -1,30 +1,13 @@
-import SYK.Analysis.Matrix.SingularValues
-import Mathlib.Analysis.Analytic.ChangeOrigin
-import Mathlib.Analysis.Analytic.IteratedFDeriv
-import Mathlib.Analysis.Calculus.Deriv.Mul
-import Mathlib.Analysis.Calculus.ContDiff.RestrictScalars
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.InnerProductSpace.Positive
-import Mathlib.Analysis.InnerProductSpace.SingularValues
-import Mathlib.Analysis.InnerProductSpace.Spectrum
+module
+
+public import Mathlib.Analysis.InnerProductSpace.Positive
 import Mathlib.Analysis.InnerProductSpace.Trace
-import Mathlib.Analysis.Matrix.Spectrum
-import Mathlib.Analysis.MeanInequalitiesPow
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Analysis.SpecialFunctions.Exponential
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
-import Mathlib.Tactic.FieldSimp
-import Mathlib.Tactic.FinCases
-import Mathlib.Tactic.FunProp
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.NoncommRing
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
-import Mathlib.Tactic.Tauto
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import SYK.Analysis.Matrix.SingularValues
 
-@[expose] public section
+public section
 
 set_option autoImplicit false
 
@@ -41,8 +24,6 @@ Schatten norms and the trace bounds for words together with the Taylor coefficie
 -/
 
 open scoped BigOperators InnerProductSpace
-
-noncomputable section
 
 namespace SYK.MatrixAnalysis.PositiveTrace
 
@@ -97,8 +78,6 @@ end SYK.MatrixAnalysis.PositiveTrace
 
 
 open scoped Matrix.Norms.L2Operator
-
-noncomputable section
 
 namespace SYK.MatrixAnalysis.ExpAux
 
@@ -178,12 +157,6 @@ private theorem singularValues_sum_rpow (T : E →ₗ[𝕜] E) {p : ℝ} (hp : 0
     exact (Finsupp.mem_support_iff.mp hi) hz
   · intro i hi
     simp [Real.zero_rpow hp.ne']
-
-private theorem eigenvalues_adjoint_comp_self_of_positive (T : E →ₗ[𝕜] E)
-    (hT : T.IsPositive) :
-    T.isSymmetric_adjoint_comp_self.eigenvalues rfl =
-      fun i => (hT.isSymmetric.eigenvalues rfl i) ^ 2 :=
-  eigenvalues_adjoint_comp_self_of_positive' T hT
 
 end SYK.MatrixAnalysis.SVDAux
 
@@ -335,9 +308,9 @@ section
 
 variable {𝕜 n : Type*} [RCLike 𝕜] [Fintype n] [DecidableEq n]
 
-/-- Normalized matrix trace `card(n)⁻¹ * Tr(A)`. It allows an empty index type and is
+/-- Normalized matrix trace `card(n)⁻¹ * Tr(A)`, zero for an empty index type. It is
 distinct from `SYK.normalizedTrace` in `SYK.Model.FiniteDimensionalGibbs`. -/
-noncomputable def normalizedTrace (A : Matrix n n 𝕜) : 𝕜 :=
+@[expose] noncomputable def normalizedTrace (A : Matrix n n 𝕜) : 𝕜 :=
   (Fintype.card n : 𝕜)⁻¹ * A.trace
 
 /-- Normalized trace as a continuous linear map. -/
@@ -373,17 +346,17 @@ private theorem normalizedSchattenNorm_eq_sum {p : ℝ} (hp : 0 < p) (A : Matrix
     show (Module.finrank 𝕜 (EuclideanSpace 𝕜 n) : ℝ) = Fintype.card n by
       rw [finrank_euclideanSpace]]
 
-theorem toEuclideanLin_mul' (A B : Matrix n n 𝕜) :
+private theorem toEuclideanLin_mul' (A B : Matrix n n 𝕜) :
     Matrix.toEuclideanLin (A * B) = Matrix.toEuclideanLin A ∘ₗ Matrix.toEuclideanLin B := by
   rw [Matrix.toEuclideanLin_eq_toLin_orthonormal,
     Matrix.toLin_mul _ (EuclideanSpace.basisFun n 𝕜).toBasis]
 
-theorem norm_toContinuousLinearMap_toEuclideanLin (B : Matrix n n 𝕜) :
+private theorem norm_toContinuousLinearMap_toEuclideanLin (B : Matrix n n 𝕜) :
     ‖LinearMap.toContinuousLinearMap (Matrix.toEuclideanLin B)‖ = ‖B‖ := by
   rw [← Matrix.l2_opNorm_toEuclideanCLM]
   rfl
 
-theorem trace_eq_trace_toEuclideanLin (A : Matrix n n 𝕜) :
+private theorem trace_eq_trace_toEuclideanLin (A : Matrix n n 𝕜) :
     A.trace = LinearMap.trace 𝕜 (EuclideanSpace 𝕜 n) (Matrix.toEuclideanLin A) := by
   rw [Matrix.toEuclideanLin_eq_toLin_orthonormal,
     LinearMap.trace_eq_matrix_trace 𝕜 (EuclideanSpace.basisFun n 𝕜).toBasis,
@@ -503,7 +476,7 @@ section WordBounds
 
 open scoped Nat
 
-theorem normalizedSchattenNorm_nonneg' {p : ℝ} (hp : 0 < p) (A : Matrix n n 𝕜) :
+private theorem normalizedSchattenNorm_nonneg' {p : ℝ} (hp : 0 < p) (A : Matrix n n 𝕜) :
     0 ≤ normalizedSchattenNorm p A := by
   rw [normalizedSchattenNorm_eq_sum hp]
   exact Real.rpow_nonneg (div_nonneg (sum_sv_rpow_nonneg A p) (Nat.cast_nonneg _)) _
@@ -615,7 +588,7 @@ noncomputable def conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n �
   (↑hH.eigenvectorUnitary : Matrix n n 𝕜) * Matrix.diagonal (fun j => (ν j : 𝕜)) *
     star (↑hH.eigenvectorUnitary : Matrix n n 𝕜)
 
-theorem conjDiag_pow (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ) (l : ℕ) :
+private theorem conjDiag_pow (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ) (l : ℕ) :
     conjDiag H hH ν ^ l = conjDiag H hH (fun j => ν j ^ l) := by
   unfold conjDiag
   rw [← Unitary.conjStarAlgAut_apply (S := 𝕜), ← map_pow, Matrix.diagonal_pow,
@@ -624,7 +597,7 @@ theorem conjDiag_pow (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ)
   ext j
   simp
 
-theorem trace_conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ) :
+private theorem trace_conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ) :
     (conjDiag H hH ν).trace = ∑ j, (ν j : 𝕜) := by
   unfold conjDiag
   rw [Matrix.trace_mul_comm, ← Matrix.mul_assoc, Unitary.coe_star_mul_self, one_mul,
@@ -641,7 +614,7 @@ theorem normalizedTrace_conjDiag_pow (H : Matrix n n 𝕜) (hH : H.IsHermitian) 
 section
 open scoped ComplexOrder
 
-theorem posSemidef_conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ)
+private theorem posSemidef_conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν : n → ℝ)
     (hν : ∀ j, 0 ≤ ν j) : (conjDiag H hH ν).PosSemidef := by
   unfold conjDiag
   have hU : IsUnit (↑hH.eigenvectorUnitary : Matrix n n 𝕜) := Unitary.isUnit_coe
@@ -659,7 +632,7 @@ private theorem sum_sv_conjDiag (H : Matrix n n 𝕜) (hH : H.IsHermitian) (ν :
   exact sum_eigenvalues_eq_of_basis _ hT.isSymmetric hH.eigenvectorBasis ν
     (fun j => toEuclideanLin_conj_diagonal_apply H hH ν j) f
 
-theorem normalizedSchattenNorm_conjDiag_pow [Nonempty n] (H : Matrix n n 𝕜)
+theorem normalizedSchattenNorm_conjDiag_pow (H : Matrix n n 𝕜)
     (hH : H.IsHermitian) (ν : n → ℝ) (hν : ∀ j, 0 ≤ ν j) (l : ℕ) (hl : 1 ≤ l) :
     normalizedSchattenNorm l (conjDiag H hH ν) ^ l = (∑ j, ν j ^ l) / Fintype.card n := by
   have hlR : (0 : ℝ) < l := by exact_mod_cast hl
@@ -701,7 +674,7 @@ theorem abs_eigenvalues_le (H : Matrix n n 𝕜) (hH : H.IsHermitian) (j : n) :
     add_zero] at hle
   exact hle
 
-theorem prod_weight_finSumEquivOfFinset {k l : ℕ} {s : Finset (Fin (k + l))}
+private theorem prod_weight_finSumEquivOfFinset {k l : ℕ} {s : Finset (Fin (k + l))}
     (hs : s.card = l) (hl : sᶜ.card = k) (D : Matrix n n 𝕜) (w : Fin k → Matrix n n 𝕜) :
     (∏ i : Fin (k + l), if i ∈ s then (1 : ℝ) else
         ‖Sum.elim (fun _ : Fin l => D) w ((finSumEquivOfFinset hs hl).symm i)‖) =
@@ -716,7 +689,7 @@ theorem prod_weight_finSumEquivOfFinset {k l : ℕ} {s : Finset (Fin (k + l))}
     Sum.elim_inr]
 
 omit [RCLike 𝕜] [Fintype n] [DecidableEq n] in
-theorem elim_finSumEquivOfFinset_of_mem {k l : ℕ} {s : Finset (Fin (k + l))}
+private theorem elim_finSumEquivOfFinset_of_mem {k l : ℕ} {s : Finset (Fin (k + l))}
     (hs : s.card = l) (hl : sᶜ.card = k) (D : Matrix n n 𝕜) (w : Fin k → Matrix n n 𝕜)
     (i : Fin (k + l)) (hi : i ∈ s) :
     Sum.elim (fun _ : Fin l => D) w ((finSumEquivOfFinset hs hl).symm i) = D := by

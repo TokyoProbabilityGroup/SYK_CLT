@@ -6,21 +6,26 @@ on:
       - 'main'
     paths:
       - '**.lean'
+      - '**/lakefile.toml'
+      - '**/lake-manifest.json'
+      - '**/lean-toolchain'
+      - '.github/workflows/lean_action_ci.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+# Concurrency is set per job: a newer run cancels older checks, but never a running deployment.
 
 jobs:
-  build:
+  lean:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-lean-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - name: Set up Git repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           path: SYK_CLT
 
@@ -33,8 +38,33 @@ jobs:
           ls -la
 
       - uses: leanprover/lean-action@v1
-        # The parent workspace has no default targets; build the Blueprint package,
-        # which also checks the complete mathematical library.
+        # The parent workspace has no default targets; build the mathematical library.
+        with:
+          build-args: SYK
+          use-github-cache: false
+
+  blueprint:
+    needs: lean
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-blueprint-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v7
+        with:
+          path: SYK_CLT
+
+      - name: Materialize workspace root
+        run: |
+          set -euo pipefail
+          cp SYK_CLT/workspace/lakefile.toml      ./lakefile.toml
+          cp SYK_CLT/workspace/lake-manifest.json ./lake-manifest.json
+          cp SYK_CLT/workspace/lean-toolchain     ./lean-toolchain
+          ls -la
+
+      - uses: leanprover/lean-action@v1
+        # Jobs do not share build outputs, so this also rebuilds the mathematical library.
         with:
           build-args: SYKBlueprint
           use-github-cache: false
@@ -44,3 +74,30 @@ jobs:
 
       - name: Check Blueprint output
         run: lake exe vbp check --site SYK_CLT/_out/site
+
+      - name: Upload GitHub Pages artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: SYK_CLT/_out/site/html-multi
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: blueprint
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-deploy
+      cancel-in-progress: false
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

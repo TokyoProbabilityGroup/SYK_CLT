@@ -1,5 +1,11 @@
+module
+
+public import SYK.CLT.Chaos.PartitionSymmetry
+import Mathlib.Algebra.Order.Star.Real
 import SYK.CLT.Chaos.HigherChaosProjection
 import SYK.Probability.GaussianChaos.PolynomialDensity
+
+public section
 
 /-!
 # The higher-chaos remainder in Gaussian L²
@@ -14,31 +20,6 @@ open scoped Topology InnerProductSpace
 open SYK.GaussianChaos
 
 namespace SYK.CLT
-/-- Distinct homogeneous Hermite chaoses are orthogonal in Gaussian L². -/
-theorem inner_hermiteDegreeProjection_eq_zero {ι : Type*} [Fintype ι]
-    (r s : ℕ) (hrs : r ≠ s)
-    (f g : Lp ℝ 2 (gaussianCouplings ι)) :
-    ⟪hermiteDegreeProjection r f, hermiteDegreeProjection s g⟫_ℝ = 0 := by
-  classical
-  simp only [hermiteDegreeProjection, hermiteFiniteProjection,
-    inner_sum, sum_inner, real_inner_smul_left, inner_smul_right]
-  apply Finset.sum_eq_zero
-  intro α hα
-  suffices hinner :
-      (∑ γ ∈ multiIndices_degree r,
-        (⟪hermiteLp γ, f⟫_ℝ / ∏ i, ((γ i).factorial : ℝ)) *
-          ⟪hermiteLp γ, hermiteLp α⟫_ℝ) = 0 by
-    rw [hinner, mul_zero]
-  apply Finset.sum_eq_zero
-  intro γ hγ
-  have hne : γ ≠ α := by
-    intro heq
-    have hγr := (mem_multiIndices_degree r γ).mp hγ
-    have hαs := (mem_multiIndices_degree s α).mp hα
-    exact hrs (hγr.symm.trans (heq ▸ hαs))
-  rw [inner_hermiteLp, if_neg hne]
-  ring
-
 private theorem norm_sum_range_sq_of_pairwise_orthogonal
     {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
     (v : ℕ → E) (horth : ∀ i j, i ≠ j → ⟪v i, v j⟫_ℝ = 0)
@@ -71,7 +52,7 @@ private theorem norm_sq_eq_tsum_of_pairwise_orthogonal
   exact hsum.tsum_eq.symm
 
 /-- The Gaussian L² sum of Hermite chaoses of degree at least three. -/
-noncomputable def Setting.higherChaosRemainderLp {q : ℕ}
+@[expose] noncomputable def Setting.higherChaosRemainderLp {q : ℕ}
     (S : Setting q) (β : ℝ) (n : ℕ) :
     Lp ℝ 2 (gaussianCouplings (InteractionIndex (S.N n) q)) :=
   S.YGaussianLp β n -

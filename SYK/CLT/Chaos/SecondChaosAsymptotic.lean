@@ -1,5 +1,9 @@
-import SYK.CLT.Basic
+module
+
+public import SYK.CLT.Basic
 import Mathlib.Analysis.SpecialFunctions.Choose
+
+public section
 
 /-!
 # Asymptotics of the second-chaos coefficient
@@ -16,7 +20,7 @@ open scoped Topology
 namespace SYK.CLT
 
 /-- Fixed-order binomial coefficients are asymptotic to N^q/q!. -/
-theorem Setting.choose_ratio_tendsto {q : ℕ} (S : Setting q) :
+private theorem Setting.choose_ratio_tendsto {q : ℕ} (S : Setting q) :
     Tendsto (fun n => (Nat.choose (S.N n) q : ℝ) /
       ((S.N n : ℝ) ^ q / (q.factorial : ℝ))) atTop (𝓝 1) := by
   have hequiv := (isEquivalent_choose q).comp_tendsto S.N_tendsto
@@ -29,7 +33,7 @@ theorem Setting.choose_ratio_tendsto {q : ℕ} (S : Setting q) :
     exact ne_of_gt (div_pos (pow_pos hN _) (by positivity))
   exact (isEquivalent_iff_tendsto_one hnonzero).1 hequiv
 
-theorem Setting.inverse_choose_ratio_tendsto {q : ℕ} (S : Setting q) :
+private theorem Setting.inverse_choose_ratio_tendsto {q : ℕ} (S : Setting q) :
     Tendsto (fun n => (S.N n : ℝ) ^ q /
       (2 * (Nat.choose (S.N n) q : ℝ))) atTop
       (𝓝 ((q.factorial : ℝ) / 2)) := by
@@ -49,7 +53,7 @@ theorem Setting.inverse_choose_ratio_tendsto {q : ℕ} (S : Setting q) :
   dsimp
   field_simp
 
-theorem Setting.normalized_choose_factor_tendsto {q : ℕ} (S : Setting q) :
+private theorem Setting.normalized_choose_factor_tendsto {q : ℕ} (S : Setting q) :
     Tendsto (fun n => (S.N n : ℝ) ^ (q / 2) /
       Real.sqrt (2 * (Nat.choose (S.N n) q : ℝ))) atTop
       (𝓝 (Real.sqrt ((q.factorial : ℝ) / 2))) := by

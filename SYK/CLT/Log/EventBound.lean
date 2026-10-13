@@ -1,5 +1,13 @@
-import SYK.CLT.Quadratic.IndependentFourthMoment
+module
+
+public import SYK.CLT.Chaos.HigherChaosRemainder
+import Mathlib.Algebra.Order.Star.Real
+import SYK.CLT.Chaos.ZeroChaos
 import SYK.CLT.Limit.QuadraticBridge
+import SYK.CLT.Quadratic.GaussianFourthMoment
+import SYK.CLT.Quadratic.IndependentFourthMoment
+
+public section
 
 /-! # Small-event estimates for the logarithmic CLT -/
 
@@ -18,7 +26,7 @@ private theorem integral_Lp_sq_eq_norm_sq
   funext ω
   simp [Real.norm_eq_abs, sq_abs]
 
-theorem measureReal_abs_ge_le_fourth {Ω : Type*} [MeasurableSpace Ω]
+private theorem measureReal_abs_ge_le_fourth {Ω : Type*} [MeasurableSpace Ω]
     {μ : Measure Ω} [IsProbabilityMeasure μ] {X : Ω → ℝ}
     (hX : Integrable (fun ω => X ω ^ 4) μ) {t : ℝ} (ht : 0 < t) :
     μ.real {ω | t ≤ |X ω|} ≤ (∫ ω, X ω ^ 4 ∂μ) / t ^ 4 := by
@@ -37,7 +45,7 @@ theorem measureReal_abs_ge_le_fourth {Ω : Type*} [MeasurableSpace Ω]
     (mul_le_mul_of_nonneg_left hle ht4.le).trans hmarkov
   exact (le_div_iff₀ ht4).2 (by simpa only [mul_comm] using hbound)
 
-theorem measureReal_abs_ge_le_second {Ω : Type*} [MeasurableSpace Ω]
+private theorem measureReal_abs_ge_le_second {Ω : Type*} [MeasurableSpace Ω]
     {μ : Measure Ω} [IsProbabilityMeasure μ] {X : Ω → ℝ}
     (hX : Integrable (fun ω => X ω ^ 2) μ) {t : ℝ} (ht : 0 < t) :
     μ.real {ω | t ≤ |X ω|} ≤ (∫ ω, X ω ^ 2 ∂μ) / t ^ 2 := by
@@ -58,7 +66,7 @@ theorem measureReal_abs_ge_le_second {Ω : Type*} [MeasurableSpace Ω]
 
 /-- Split a half-sized fluctuation into a fourth-moment principal part and
 a second-moment remainder. -/
-theorem measureReal_abs_add_ge_half_le_moments
+private theorem measureReal_abs_add_ge_half_le_moments
     {Ω : Type*} [MeasurableSpace Ω]
     {μ : Measure Ω} [IsProbabilityMeasure μ] {A B : Ω → ℝ}
     (hA : Integrable (fun ω => A ω ^ 4) μ)
@@ -90,7 +98,7 @@ theorem measureReal_abs_add_ge_half_le_moments
     _ = 256 * (∫ ω, A ω ^ 4 ∂μ) +
           16 * (∫ ω, B ω ^ 2 ∂μ) := by ring
 
-theorem measureReal_lt_half_le_moments_of_ae_decomposition
+private theorem measureReal_lt_half_le_moments_of_ae_decomposition
     {Ω : Type*} [MeasurableSpace Ω]
     {μ : Measure Ω} [IsProbabilityMeasure μ] {Y A B : Ω → ℝ}
     (hdecomp : (fun ω => Y ω - 1) =ᵐ[μ] (fun ω => A ω + B ω))
@@ -121,7 +129,7 @@ theorem measureReal_lt_half_le_moments_of_ae_decomposition
 
 /-- The model's exact chaos decomposition, expressed almost everywhere as
 a quadratic Gaussian sum plus the higher-chaos remainder. -/
-theorem Setting.Y_minus_one_ae_quadratic_remainder {q : ℕ}
+private theorem Setting.Y_minus_one_ae_quadratic_remainder {q : ℕ}
     (S : Setting q) (β : ℝ) (n : ℕ) :
     (fun g : InteractionIndex (S.N n) q → ℝ =>
       S.Y β n (WithLp.toLp 2 g) - 1) =ᵐ[
@@ -170,7 +178,7 @@ theorem Setting.Y_minus_one_ae_quadratic_remainder {q : ℕ}
 
 /-- Finite-size lower-tail estimate from the fourth moment of the quadratic
 Gaussian term and the `L²` higher-chaos remainder. -/
-theorem Setting.Y_pi_lt_half_le_moments {q : ℕ}
+private theorem Setting.Y_pi_lt_half_le_moments {q : ℕ}
     (S : Setting q) (β : ℝ) (n : ℕ) :
     (gaussianCouplings (InteractionIndex (S.N n) q)).real
       {g | S.Y β n (WithLp.toLp 2 g) < (1 / 2 : ℝ)} ≤

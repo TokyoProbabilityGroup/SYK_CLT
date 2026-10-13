@@ -1,4 +1,8 @@
-import SYK.CLT.Basic
+module
+
+public import SYK.CLT.Basic
+
+public section
 
 /-!
 # Positive finite-size disorder variance

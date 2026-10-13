@@ -15,7 +15,7 @@ This directory supplies the parent `ResearchWorkspace` configuration for the loc
     ├── lakefile.toml        # mathematical SYK package, mathlib only
     ├── lake-manifest.json   # mathematical dependency lock
     ├── lean-toolchain      # same Lean version as the parent
-    ├── SYK/                # Analysis, Probability, Model, SuperConcentration, CLT
+    ├── SYK/                # Main.lean, MainAudit.lean, Analysis, Probability, Model, SuperConcentration, CLT
     ├── Blueprint/          # SYKBlueprint package: lakefile.toml, lake-manifest.json,
     │   ├── lean-toolchain         # same Lean version as the parent
     │   ├── SYKBlueprint.lean      # the document
@@ -84,7 +84,7 @@ git -C SYK_CLT diff --binary HEAD > syk-worktree.patch
 git -C SYK_CLT ls-files --others --exclude-standard
 ```
 
-A clone at the commit alone omits uncommitted changes. Transfer untracked sources separately, apply the patch with `git -C SYK_CLT apply ../syk-worktree.patch`, and verify the received files before editing. Read parent, repository, and applicable topic `AGENTS.md` files; start coding agents in the parent workspace, where Lake commands are run, so that this chain applies. Remaining tasks, their status, and pending decisions are in `SYK/EDITING_PLAN.md`. Do not fill in missing files by guesswork. State the task, owner, purpose, editable scope, inputs, integration owner, and verification conditions in the request, and treat commits and publication as separate explicit steps.
+A clone at the commit alone omits uncommitted changes. Transfer untracked sources separately, apply the patch with `git -C SYK_CLT apply ../syk-worktree.patch`, and verify the received files before editing. Read parent, repository, and applicable topic `AGENTS.md` files; start coding agents in the parent workspace, where Lake commands are run, so that this chain applies. Remaining tasks, their status, and pending decisions are in `SYK_CLT/EDITING_PLAN.md`. Do not fill in missing files by guesswork. State the task, owner, purpose, editable scope, inputs, integration owner, and verification conditions in the request, and treat commits and publication as separate explicit steps.
 
 Check an edited mathematical file with `lake lean SYK_CLT/SYK/path/to/File.lean` (it builds the imports and applies the library's `leanOptions`, which `lake env lean` does not), then the affected build target, and finally `lake build SYKBlueprint`. For Blueprint source or referenced Lean declarations, also check the affected chapter and `SYKBlueprint.lean` and `SYKBlueprintMain.lean`, generate HTML, and run `vbp check`. Inspect theorem statements, assumptions, and `#print axioms` separately; successful generation does not complete an assumed mathematical input.
 

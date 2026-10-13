@@ -1,29 +1,10 @@
-import Mathlib.Analysis.Analytic.ChangeOrigin
-import Mathlib.Analysis.Analytic.IteratedFDeriv
-import Mathlib.Analysis.Calculus.Deriv.Mul
-import Mathlib.Analysis.Calculus.ContDiff.RestrictScalars
-import Mathlib.Analysis.CStarAlgebra.Matrix
-import Mathlib.Analysis.InnerProductSpace.Positive
-import Mathlib.Analysis.InnerProductSpace.SingularValues
-import Mathlib.Analysis.InnerProductSpace.Spectrum
-import Mathlib.Analysis.InnerProductSpace.Trace
-import Mathlib.Analysis.Matrix.Spectrum
-import Mathlib.Analysis.MeanInequalitiesPow
-import Mathlib.Analysis.Normed.Algebra.MatrixExponential
-import Mathlib.Analysis.SpecialFunctions.Exponential
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
-import Mathlib.Tactic.FieldSimp
-import Mathlib.Tactic.FinCases
-import Mathlib.Tactic.FunProp
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.NoncommRing
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
-import Mathlib.Tactic.Tauto
+module
 
-@[expose] public section
+public import Mathlib.Analysis.InnerProductSpace.SingularValues
+import Mathlib.Analysis.InnerProductSpace.Trace
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+
+public section
 
 set_option autoImplicit false
 
@@ -483,7 +464,7 @@ private theorem rpow_tangent (r : ℝ) (hr : 1 ≤ r) (x y : ℝ) (hx : 0 ≤ x)
       field_simp
     linarith
 
-/-- Weak majorization implies majorization of `r`-th powers (`r ≥ 1`). -/
+/-- Weak majorization implies Σ x_i^r ≤ Σ y_i^r for `r ≥ 1`. -/
 private theorem sum_rpow_le_of_weak_maj (n : ℕ) (x y : ℕ → ℝ)
     (hx : ∀ i j, i ≤ j → j < n → x j ≤ x i)
     (hx0 : ∀ i < n, 0 ≤ x i) (hy0 : ∀ i < n, 0 ≤ y i)
@@ -655,7 +636,8 @@ variable {𝕜 E : Type*} [RCLike 𝕜]
 set_option quotPrecheck false in
 local notation "bas" T => (LinearMap.isSymmetric_adjoint_comp_self T).eigenvectorBasis rfl
 
-/-- The Ky Fan partial isometry `v ↦ ∑_{a<k} ⟪w_a, v⟫ b_a`. -/
+/-- The Ky Fan partial isometry `v ↦ ∑_{a<k} ⟪w_a, v⟫ b_a`. It is isometric only
+on the span of right singular vectors with a < k and s_a > 0; zero singular values are killed. -/
 private noncomputable def kyFan (X : E →ₗ[𝕜] E) (k : ℕ) : E →ₗ[𝕜] E :=
   ∑ a : Fin (Module.finrank 𝕜 E),
     if (a : ℕ) < k then (innerₛₗ 𝕜 (wv X a)).smulRight ((bas X) a) else 0

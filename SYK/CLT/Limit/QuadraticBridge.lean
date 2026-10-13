@@ -1,8 +1,15 @@
-import SYK.CLT.Chaos.ZeroChaos
+module
+
+public import Mathlib.MeasureTheory.Function.ConvergenceInDistribution
+public import SYK.CLT.Chaos.HigherChaosRemainder
+public import SYK.CLT.Quadratic.GaussianQuadraticObservable
+import SYK.CLT.Chaos.SecondChaos
 import SYK.CLT.Chaos.SecondChaosAsymptotic
+import SYK.CLT.Chaos.ZeroChaos
 import SYK.CLT.Quadratic.GaussianQuadraticCLT
 import SYK.Probability.DistributionTransfer
-import SYK.CLT.Chaos.SecondChaos
+
+public section
 
 /-!
 # Quadratic Hermite sum and Gaussian-square sum
@@ -18,7 +25,7 @@ open SYK.GaussianChaos SYK.Probability
 
 namespace SYK.CLT
 
-theorem hermite_sum_ae {ι : Type*} [Fintype ι] [DecidableEq ι] :
+private theorem hermite_sum_ae {ι : Type*} [Fintype ι] [DecidableEq ι] :
     (fun g => (∑ i : ι, hermiteLp (Pi.single i 2) :
       Lp ℝ 2 (gaussianCouplings ι)) g) =ᵐ[gaussianCouplings ι]
       fun g => ∑ i : ι, (g i ^ 2 - 1) := by
@@ -34,7 +41,8 @@ theorem hermite_sum_ae {ι : Type*} [Fintype ι] [DecidableEq ι] :
     from hg i]
   exact hermiteMulti_single_two i g
 
-noncomputable def quadraticGaussianLp (ι : Type*) [Fintype ι]
+/-- The normalized sum of degree-two coordinate Hermite polynomials in Gaussian L². -/
+@[expose] noncomputable def quadraticGaussianLp (ι : Type*) [Fintype ι]
     [DecidableEq ι] :
     Lp ℝ 2 (gaussianCouplings ι) :=
   (Real.sqrt (2 * (Fintype.card ι : ℝ)))⁻¹ •

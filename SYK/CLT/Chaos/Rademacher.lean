@@ -1,18 +1,14 @@
-import Mathlib.Algebra.BigOperators.Field
+module
+
+public import SYK.Probability.GaussianChaos.Orthogonality
+public import SYK.CLT.Chaos.CliffordSignParity
 import Mathlib.Algebra.Order.Field.GeomSum
+import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Series
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.Analysis.Real.Sqrt
 import Mathlib.Data.Nat.Choose.Multinomial
 import Mathlib.RingTheory.MvPolynomial.Symmetric.NewtonIdentities
-import Mathlib.Tactic.FieldSimp
-import Mathlib.Tactic.GCongr
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.NormNum
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
-import SYK.Probability.GaussianChaos.Orthogonality
-import SYK.CLT.Chaos.CliffordSignParity
+
+public section
 
 /-!
 # Rademacher bounds for higher SYK chaoses
@@ -39,7 +35,7 @@ noncomputable def rad (b : Bool) : ℝ := if b then 1 else -1
 
 /-- Expectation over `N` independent Rademacher signs: the uniform average over
 `{true, false}^N` (this is exactly the joint law of `N` independent Rademachers). -/
-noncomputable def radE (N : ℕ) (f : (Fin N → Bool) → ℝ) : ℝ :=
+@[expose] noncomputable def radE (N : ℕ) (f : (Fin N → Bool) → ℝ) : ℝ :=
   ((2 : ℝ) ^ N)⁻¹ * ∑ ε : Fin N → Bool, f ε
 
 /-- The Rademacher chaos `S_{N,q} = ∑_{|I| = q} ∏_{x ∈ I} ε_x`. -/
@@ -49,15 +45,15 @@ noncomputable def chaos (N q : ℕ) (ε : Fin N → Bool) : ℝ :=
 /-- The sum of the signs `s = ∑ ε_x`. -/
 noncomputable def sgnSum (N : ℕ) (ε : Fin N → Bool) : ℝ := ∑ x, rad (ε x)
 
-lemma abs_rad (b : Bool) : |rad b| = 1 := by cases b <;> simp [rad]
+private lemma abs_rad (b : Bool) : |rad b| = 1 := by cases b <;> simp [rad]
 
-lemma rad_pow (b : Bool) (j : ℕ) : rad b ^ j = if Even j then 1 else rad b := by
+private lemma rad_pow (b : Bool) (j : ℕ) : rad b ^ j = if Even j then 1 else rad b := by
   have h2 : rad b ^ 2 = 1 := by cases b <;> simp [rad]
   rcases Nat.even_or_odd j with ⟨m, rfl⟩ | ⟨m, rfl⟩
   · rw [if_pos ⟨m, rfl⟩, ← two_mul, pow_mul, h2, one_pow]
   · rw [if_neg (Nat.not_even_iff_odd.mpr ⟨m, rfl⟩), pow_succ, pow_mul, h2, one_pow, one_mul]
 
-lemma abs_sgnSum_le (N : ℕ) (ε : Fin N → Bool) : |sgnSum N ε| ≤ N := by
+private lemma abs_sgnSum_le (N : ℕ) (ε : Fin N → Bool) : |sgnSum N ε| ≤ N := by
   unfold sgnSum
   calc |∑ x, rad (ε x)| ≤ ∑ x, |rad (ε x)| := abs_sum_le_sum_abs _ _
     _ = N := by simp [abs_rad]
@@ -80,7 +76,7 @@ lemma radE_sum (N : ℕ) {ι : Type*} (s : Finset ι) (f : ι → (Fin N → Boo
 
 /-- The finite-subset definition of the Rademacher chaos is the corresponding
 sum over the repository's interaction-index type. -/
-lemma chaos_eq_sum_interactionIndex (N q : ℕ) (ε : Fin N → Bool) :
+private lemma chaos_eq_sum_interactionIndex (N q : ℕ) (ε : Fin N → Bool) :
     chaos N q ε =
       ∑ I : InteractionIndex N q, ∏ x ∈ I.1, rad (ε x) := by
   classical
@@ -91,7 +87,7 @@ lemma chaos_eq_sum_interactionIndex (N q : ℕ) (ε : Fin N → Bool) :
 
 /-- Regroup an interaction monomial by vertices.  The exponent at a vertex is
 the incidence sum in `IsEvenMultiIndex`. -/
-lemma interactionMonomial_eq_vertexProduct (N q : ℕ)
+private lemma interactionMonomial_eq_vertexProduct (N q : ℕ)
     (α : InteractionIndex N q → ℕ) (ε : Fin N → Bool) :
     (∏ I : InteractionIndex N q,
         (∏ x ∈ I.1, rad (ε x)) ^ α I) =
@@ -119,7 +115,7 @@ lemma interactionMonomial_eq_vertexProduct (N q : ℕ)
 
 /-- Orthogonality of independent Rademacher monomials on the explicit finite
 probability space. -/
-lemma radE_vertexProduct (N : ℕ) (m : Fin N → ℕ) :
+private lemma radE_vertexProduct (N : ℕ) (m : Fin N → ℕ) :
     radE N (fun ε => ∏ x, rad (ε x) ^ m x) =
       if ∀ x, Even (m x) then 1 else 0 := by
   classical
@@ -144,7 +140,7 @@ lemma radE_vertexProduct (N : ℕ) (m : Fin N → ℕ) :
 open scoped Classical in
 /-- The expectation of an interaction monomial is one exactly for the even
 multi-indices selected by the Clifford sign rule, and zero otherwise. -/
-lemma radE_interactionMonomial (N q : ℕ)
+private lemma radE_interactionMonomial (N q : ℕ)
     (α : InteractionIndex N q → ℕ) :
     radE N (fun ε =>
       ∏ I : InteractionIndex N q,
@@ -167,18 +163,18 @@ lemma radE_interactionMonomial (N q : ℕ)
 open scoped Classical in
 /-- Multinomial expansion of the `r`-th moment, with the Rademacher
 orthogonality rule already applied. -/
-theorem radE_chaos_pow_eq_sum_multinomial_even (N q r : ℕ) :
+private theorem radE_chaos_pow_eq_sum_multinomial_even (N q r : ℕ) :
     radE N (fun ε => chaos N q ε ^ r) =
-      ∑ α ∈ (multiIndices_degree (ι := InteractionIndex N q) r).filter IsEvenMultiIndex,
+      ∑ α ∈ (multiIndicesOfDegree (ι := InteractionIndex N q) r).filter IsEvenMultiIndex,
         (Nat.multinomial Finset.univ α : ℝ) := by
   classical
   let w : (Fin N → Bool) → InteractionIndex N q → ℝ :=
     fun ε I => ∏ x ∈ I.1, rad (ε x)
   have hindices :
       Finset.piAntidiag (Finset.univ : Finset (InteractionIndex N q)) r =
-        multiIndices_degree (ι := InteractionIndex N q) r := by
+        multiIndicesOfDegree (ι := InteractionIndex N q) r := by
     ext α
-    rw [Finset.mem_piAntidiag, mem_multiIndices_degree]
+    rw [Finset.mem_piAntidiag, mem_multiIndicesOfDegree]
     constructor
     · intro h
       simpa using h.1
@@ -186,14 +182,14 @@ theorem radE_chaos_pow_eq_sum_multinomial_even (N q r : ℕ) :
       exact ⟨by simpa using h, by simp⟩
   have hexpand (ε : Fin N → Bool) :
       chaos N q ε ^ r =
-        ∑ α ∈ multiIndices_degree (ι := InteractionIndex N q) r,
+        ∑ α ∈ multiIndicesOfDegree (ι := InteractionIndex N q) r,
           (Nat.multinomial Finset.univ α : ℝ) * ∏ I, w ε I ^ α I := by
     rw [chaos_eq_sum_interactionIndex]
     have h := Finset.sum_pow_eq_sum_piAntidiag
       (Finset.univ : Finset (InteractionIndex N q)) (w ε) r
     simpa only [hindices] using h
   rw [show (fun ε => chaos N q ε ^ r) = fun ε =>
-      ∑ α ∈ multiIndices_degree (ι := InteractionIndex N q) r,
+      ∑ α ∈ multiIndicesOfDegree (ι := InteractionIndex N q) r,
         (Nat.multinomial Finset.univ α : ℝ) * ∏ I, w ε I ^ α I by
       funext ε
       exact hexpand ε]
@@ -208,14 +204,14 @@ open scoped Classical in
 /-- `eq:even-sum-Rademacher-moment`: the factorial-weighted sum over even
 multi-indices equals the corresponding Rademacher moment divided by `r!`. -/
 theorem even_sum_rademacher_moment (N q r : ℕ) :
-    (∑ α ∈ (multiIndices_degree (ι := InteractionIndex N q) r).filter IsEvenMultiIndex,
+    (∑ α ∈ (multiIndicesOfDegree (ι := InteractionIndex N q) r).filter IsEvenMultiIndex,
       (∏ I : InteractionIndex N q, ((α I).factorial : ℝ))⁻¹) =
       ((r.factorial : ℝ)⁻¹ * radE N (fun ε => chaos N q ε ^ r)) := by
   classical
   rw [radE_chaos_pow_eq_sum_multinomial_even, Finset.mul_sum]
   apply Finset.sum_congr rfl
   intro α hα
-  simp only [Finset.mem_filter, mem_multiIndices_degree] at hα
+  simp only [Finset.mem_filter, mem_multiIndicesOfDegree] at hα
   have hspec := Nat.multinomial_spec (Finset.univ : Finset (InteractionIndex N q)) α
   rw [hα.1] at hspec
   have hspecR :
@@ -228,14 +224,14 @@ theorem even_sum_rademacher_moment (N q r : ℕ) :
   field_simp
   nlinarith
 
-lemma newton (N k : ℕ) (ε : Fin N → Bool) :
+private lemma newton (N k : ℕ) (ε : Fin N → Bool) :
     (k : ℝ) * chaos N k ε = (-1) ^ (k + 1) * ∑ a ∈ antidiagonal k with a.1 < k,
       (-1) ^ a.1 * chaos N a.1 ε * ∑ x, rad (ε x) ^ a.2 := by
   have h := congrArg (MvPolynomial.eval (fun x => rad (ε x)))
     (MvPolynomial.mul_esymm_eq_sum (Fin N) ℝ k)
   simpa [chaos, MvPolynomial.esymm, MvPolynomial.psum, map_sum, map_prod] using h
 
-lemma psum_bound (N j : ℕ) (hj : 1 ≤ j) (ε : Fin N → Bool) :
+private lemma psum_bound (N j : ℕ) (hj : 1 ≤ j) (ε : Fin N → Bool) :
     |∑ x, rad (ε x) ^ j| ≤ (|sgnSum N ε| + √N) ^ j := by
   simp_rw [rad_pow]
   rcases Nat.eq_zero_or_pos N with rfl | hN
@@ -255,7 +251,7 @@ lemma psum_bound (N j : ℕ) (hj : 1 ≤ j) (ε : Fin N → Bool) :
       _ ≤ (|sgnSum N ε| + √N) ^ 1 := by rw [pow_one]; linarith [sqrt_nonneg (N:ℝ)]
       _ ≤ _ := pow_le_pow_right₀ hu hj
 
-lemma chaos_bound (N k : ℕ) (ε : Fin N → Bool) :
+private lemma chaos_bound (N k : ℕ) (ε : Fin N → Bool) :
     |chaos N k ε| ≤ (k + 1).factorial * (|sgnSum N ε| + √N) ^ k := by
   set u := |sgnSum N ε| + √N with hu
   have hu0 : 0 ≤ u := by positivity
@@ -297,7 +293,7 @@ lemma chaos_bound (N k : ℕ) (ε : Fin N → Bool) :
   rw [hfac]
   nlinarith [abs_nonneg (chaos N k ε)]
 
-lemma radE_exp (N : ℕ) (θ : ℝ) :
+private lemma radE_exp (N : ℕ) (θ : ℝ) :
     radE N (fun ε => exp (θ * sgnSum N ε)) = cosh θ ^ N := by
   unfold radE sgnSum
   have : ∀ ε : Fin N → Bool, exp (θ * ∑ x, rad (ε x)) = ∏ x, exp (θ * rad (ε x)) := by
@@ -311,7 +307,7 @@ lemma radE_exp (N : ℕ) (θ : ℝ) :
   congr 1
   ring
 
-lemma radE_cosh_le (N : ℕ) (θ : ℝ) :
+private lemma radE_cosh_le (N : ℕ) (θ : ℝ) :
     radE N (fun ε => cosh (θ * sgnSum N ε)) ≤ exp (θ ^ 2 / 2) ^ N := by
   have h : radE N (fun ε => cosh (θ * sgnSum N ε)) =
       (radE N (fun ε => exp (θ * sgnSum N ε)) +
@@ -325,7 +321,7 @@ lemma radE_cosh_le (N : ℕ) (θ : ℝ) :
   have := pow_le_pow_left₀ h0 this N
   linarith
 
-lemma exp_sq_le_sum (M : ℕ) (b : ℝ) (hb : |b| ≤ M) :
+private lemma exp_sq_le_sum (M : ℕ) (b : ℝ) (hb : |b| ≤ M) :
     exp (b ^ 2 / 4) ≤ 2 * exp 1 *
       ∑ n ∈ range (M + 2), exp (-(n : ℝ) ^ 2) * cosh (n * b) := by
   set j : ℤ := ⌊b / 2⌋ with hj
@@ -404,7 +400,7 @@ lemma subgaussian (N : ℕ) (hN : 1 ≤ N) :
       cosh ((n / √N) * sgnSum N ε)) ≤ 2 * exp 1 * (1 / (1 - exp (-1 / 2))) := by gcongr
     _ = _ := by ring
 
-lemma pointwise_bound (k N : ℕ) (hN : 1 ≤ N) (c t : ℝ)
+private lemma pointwise_bound (k N : ℕ) (hN : 1 ≤ N) (c t : ℝ)
     (hc : c * (2 * k + 1).factorial = 1 / 2 ^ (2 * k + 2))
     (ht0 : 0 ≤ t) (ht : t ≤ c / (N : ℝ) ^ (2 * k - 1)) (hk : 1 ≤ k) (ε : Fin N → Bool) :
     |chaos N (2 * k) ε| ^ 3 * exp (t * |chaos N (2 * k) ε|) ≤
