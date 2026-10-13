@@ -97,7 +97,7 @@ flowchart TD
 | MA-01 | DEL-1、DEL-2 と作業履歴の記録 | 完了 |
 | MA-02 | DEL-3、DEL-4、DEL-6、DEL-7、DEL-9 | 完了 |
 | MA-03 | GEN-1〜GEN-3 | 完了 |
-| MA-04 | REF-1〜REF-3 と書式 | 未着手 |
+| MA-04 | REF-1〜REF-3 と書式 | 完了 |
 | MA-05 | A17 | 未着手 |
 | MA-06 | A2、A4 | 未着手 |
 | MA-07 | A14、A16 | 未着手 |

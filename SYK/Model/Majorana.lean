@@ -189,35 +189,38 @@ theorem majorana_sq (i : Fin N) : M.ψ i * M.ψ i = 1 := by
   apply smul_right_injective A (show (2 : ℂ) ≠ 0 by norm_num)
   simpa [two_smul] using h
 
-/-- Permuting a Majorana word changes it by a scalar sign. -/
-theorem listProduct_eq_smul_of_perm
+/-- Reordering a word of Majorana generators changes it by a sign. -/
+theorem listProduct_eq_sign_smul_of_perm
     (l₁ l₂ : List (Fin N)) (h : l₁.Perm l₂) :
-    ∃ c : ℂ, (l₁.map M.ψ).prod = c • (l₂.map M.ψ).prod := by
+    ∃ c : ℂ, (c = 1 ∨ c = -1) ∧
+      (l₁.map M.ψ).prod = c • (l₂.map M.ψ).prod := by
   induction h with
-  | nil => exact ⟨1, by simp⟩
+  | nil => exact ⟨1, Or.inl rfl, by simp⟩
   | @cons i l₁ l₂ _ ih =>
-      rcases ih with ⟨c, hc⟩
-      refine ⟨c, ?_⟩
+      obtain ⟨c, hc, heq⟩ := ih
+      refine ⟨c, hc, ?_⟩
       simp only [List.map_cons, List.prod_cons]
-      rw [hc, Algebra.mul_smul_comm]
+      rw [heq, Algebra.mul_smul_comm]
   | @swap i j l =>
       by_cases hij : i = j
       · subst j
-        exact ⟨1, by simp⟩
-      · refine ⟨-1, ?_⟩
+        exact ⟨1, Or.inl rfl, by simp⟩
+      · refine ⟨-1, Or.inr rfl, ?_⟩
         simp only [List.map_cons, List.prod_cons]
         calc
           M.ψ j * (M.ψ i * (l.map M.ψ).prod) =
               (M.ψ j * M.ψ i) * (l.map M.ψ).prod := by rw [mul_assoc]
           _ = (-(M.ψ i * M.ψ j)) * (l.map M.ψ).prod := by
-            rw [M.anticommute (Ne.symm hij)]
+              rw [M.anticommute (Ne.symm hij)]
           _ = (-1 : ℂ) • (M.ψ i * (M.ψ j * (l.map M.ψ).prod)) := by
-            simp [mul_assoc]
+              simp [mul_assoc]
   | @trans l₁ l₂ l₃ _ _ ih₁ ih₂ =>
-      rcases ih₁ with ⟨c₁, hc₁⟩
-      rcases ih₂ with ⟨c₂, hc₂⟩
-      refine ⟨c₁ * c₂, ?_⟩
-      rw [hc₁, hc₂, smul_smul]
+      obtain ⟨c₁, hc₁, heq₁⟩ := ih₁
+      obtain ⟨c₂, hc₂, heq₂⟩ := ih₂
+      refine ⟨c₁ * c₂, ?_, ?_⟩
+      · rcases hc₁ with h₁ | h₁ <;> rcases hc₂ with h₂ | h₂ <;>
+          simp [h₁, h₂]
+      · rw [heq₁, heq₂, smul_smul]
 
 private theorem star_listProduct_mul_self
     (l : List (Fin N)) (hl : l.Nodup) :
@@ -260,7 +263,7 @@ theorem psiProduct_mul_generator_of_mem
   let l := orderedIndices s
   have hmem : i ∈ l := by simpa [l, orderedIndices] using hi
   have hnodup : l.Nodup := by simp [l, orderedIndices]
-  obtain ⟨c, hc⟩ := M.listProduct_eq_smul_of_perm l (i :: l.erase i)
+  obtain ⟨c, _hsign, hc⟩ := M.listProduct_eq_sign_smul_of_perm l (i :: l.erase i)
     (List.perm_cons_erase hmem)
   simp only [List.map_cons, List.prod_cons] at hc
   have heq : M.psiProduct s = c • (M.ψ i * ((l.erase i).map M.ψ).prod) := hc

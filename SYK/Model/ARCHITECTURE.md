@@ -125,7 +125,7 @@ flowchart TD
 
 `StandardBasis m` は `Unit` から `Fin 2 × StandardBasis m` を繰り返す計算基底であり、`standardBasis_card` はその次元 `2^m` を与える。`jordanWigner m a b` は、前の各サイトに Pauli Z、指定サイトに X（b=0）または Y（b=1）、後の各サイトに恒等行列を置く Kronecker 積である。Y は講義ノートと同じ `[[0,-i],[i,0]]` とする。`jordanWignerSystem m` の零始まりのラベルは `2*a+b` であり、講義ノートのラベルとは1だけ異なる。`standardMajoranaSystem N hN` は偶数 N に対し `N/2` サイトを用い、ちょうど N 個の生成子を持つ共有構造を返す。
 
-`majorana_sq`、語の随伴との積、相互作用の二乗、および語の並べ替えの補題は `Model.Majorana` に置く。生成子が添字集合に含まれる場合の相互作用との反交換則も同じ共有層に置く。集中評価側はこれらを直接利用し、Model から集中評価への import は作らない。
+`majorana_sq`、語の随伴との積、相互作用の二乗、および語の並べ替えの補題は `Model.Majorana` に置く。`MajoranaSystem.listProduct_eq_sign_smul_of_perm` は並べ替えの係数が ±1 であることを含めて与え、CLT の符号対称性と集中評価が共有する。生成子が添字集合に含まれる場合の相互作用との反交換則も同じ共有層に置く。集中評価側はこれらを直接利用し、Model から集中評価への import は作らない。
 
 ## 利用側
 

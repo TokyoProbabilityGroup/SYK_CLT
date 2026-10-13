@@ -42,8 +42,8 @@ private theorem psiProduct_extend_eq_smul
       (by simp [orderedIndices, j.2])).2
     intro i
     simp [orderedIndices, extendInteraction]
-  simpa [psiProduct] using
-    M.listProduct_eq_smul_of_perm _ _ hperm
+  obtain ⟨c, _hsign, hc⟩ := M.listProduct_eq_sign_smul_of_perm _ _ hperm
+  exact ⟨c, by simpa [psiProduct] using hc⟩
 
 theorem extendInteraction_anticommute
     (hq0 : 0 < q) (hq : Even q)

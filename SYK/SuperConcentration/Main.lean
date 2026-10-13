@@ -338,6 +338,24 @@ theorem logPartition_tail_of_beta_zero
   rw [hset]
   simp
 
+/-- The common Lipschitz constant and exponent identity for the three Gaussian tails. -/
+private theorem logPartition_tail_parameters
+    {d : Type*} [Fintype d] [DecidableEq d] [Nonempty d]
+    (P : Params) (β : NNReal) (M : MajoranaSystem P.N (Matrix d d ℂ))
+    (hβ : (β : ℝ) ≠ 0) :
+    let L : ℝ := |(β : ℝ)| / Real.sqrt (P.q : ℝ)
+    0 < L ∧ LipschitzWith L.toNNReal (logPartition P β M) ∧
+      ∀ t : ℝ, -t ^ 2 / (2 * L ^ 2) =
+        -(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2) := by
+  have hq : 0 < (P.q : ℝ) := by exact_mod_cast P.q_pos
+  have hsqrt : 0 < Real.sqrt (P.q : ℝ) := Real.sqrt_pos.2 hq
+  refine ⟨div_pos (abs_pos.mpr hβ) hsqrt, logPartition_lipschitz P β M, ?_⟩
+  intro t
+  have hq0 : (P.q : ℝ) ≠ 0 := ne_of_gt hq
+  have hβ0 : (β : ℝ) ^ 2 ≠ 0 := pow_ne_zero 2 hβ
+  rw [div_pow, sq_abs, Real.sq_sqrt hq.le]
+  field_simp
+
 /--
 The upper-tail concentration estimate for the product standard Gaussian
 coupling measure, with the SYK Lipschitz bound proved internally.
@@ -354,29 +372,12 @@ theorem logPartition_upper_tail_standardGaussian
       ENNReal.ofReal
         (Real.exp
           (-(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2))) := by
-  have hq : 0 < (P.q : ℝ) := by exact_mod_cast P.q_pos
-  have hsqrt : 0 < Real.sqrt (P.q : ℝ) := Real.sqrt_pos.2 hq
   let L : ℝ := |(β : ℝ)| / Real.sqrt (P.q : ℝ)
-  have hL : 0 < L := div_pos (abs_pos.mpr hβ) hsqrt
-  have hLip' : LipschitzWith L.toNNReal (logPartition P β M) := by
-    simpa [L, logPartitionLipschitzConstant] using (logPartition_lipschitz P β M)
+  obtain ⟨hL, hLip, hexponent⟩ := logPartition_tail_parameters P β M hβ
   have htail :=
     product_standardGaussian_upper_tail
-      (ι := InteractionIndex P.N P.q) (logPartition P β M) L t hL ht hLip'
-  have hq0 : (P.q : ℝ) ≠ 0 := ne_of_gt hq
-  have hsqrt0 : Real.sqrt (P.q : ℝ) ≠ 0 := ne_of_gt hsqrt
-  have hβ0 : (β : ℝ) ^ 2 ≠ 0 := pow_ne_zero 2 hβ
-  have hsqrt_sq : Real.sqrt (P.q : ℝ) ^ 2 = (P.q : ℝ) :=
-    Real.sq_sqrt hq.le
-  have hLsq : L ^ 2 = (β : ℝ) ^ 2 / (P.q : ℝ) := by
-    dsimp [L]
-    rw [div_pow, sq_abs, hsqrt_sq]
-  have hexponent :
-      -t ^ 2 / (2 * L ^ 2) =
-        -(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2) := by
-    rw [hLsq]
-    field_simp
-  rwa [hexponent] at htail
+      (ι := InteractionIndex P.N P.q) (logPartition P β M) L t hL ht hLip
+  rwa [hexponent t] at htail
 
 /--
 The lower-tail concentration estimate for the product standard Gaussian
@@ -393,29 +394,12 @@ theorem logPartition_lower_tail_standardGaussian
       ENNReal.ofReal
         (Real.exp
           (-(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2))) := by
-  have hq : 0 < (P.q : ℝ) := by exact_mod_cast P.q_pos
-  have hsqrt : 0 < Real.sqrt (P.q : ℝ) := Real.sqrt_pos.2 hq
   let L : ℝ := |(β : ℝ)| / Real.sqrt (P.q : ℝ)
-  have hL : 0 < L := div_pos (abs_pos.mpr hβ) hsqrt
-  have hLip' : LipschitzWith L.toNNReal (logPartition P β M) := by
-    simpa [L, logPartitionLipschitzConstant] using (logPartition_lipschitz P β M)
+  obtain ⟨hL, hLip, hexponent⟩ := logPartition_tail_parameters P β M hβ
   have htail :=
     product_standardGaussian_lower_tail
-      (ι := InteractionIndex P.N P.q) (logPartition P β M) L t hL ht hLip'
-  have hq0 : (P.q : ℝ) ≠ 0 := ne_of_gt hq
-  have hsqrt0 : Real.sqrt (P.q : ℝ) ≠ 0 := ne_of_gt hsqrt
-  have hβ0 : (β : ℝ) ^ 2 ≠ 0 := pow_ne_zero 2 hβ
-  have hsqrt_sq : Real.sqrt (P.q : ℝ) ^ 2 = (P.q : ℝ) :=
-    Real.sq_sqrt hq.le
-  have hLsq : L ^ 2 = (β : ℝ) ^ 2 / (P.q : ℝ) := by
-    dsimp [L]
-    rw [div_pow, sq_abs, hsqrt_sq]
-  have hexponent :
-      -t ^ 2 / (2 * L ^ 2) =
-        -(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2) := by
-    rw [hLsq]
-    field_simp
-  rwa [hexponent] at htail
+      (ι := InteractionIndex P.N P.q) (logPartition P β M) L t hL ht hLip
+  rwa [hexponent t] at htail
 
 /--
 The two-sided superconcentration estimate for the product standard Gaussian
@@ -433,29 +417,12 @@ theorem logPartition_two_sided_tail_standardGaussian
       ENNReal.ofReal
         (2 * Real.exp
           (-(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2))) := by
-  have hq : 0 < (P.q : ℝ) := by exact_mod_cast P.q_pos
-  have hsqrt : 0 < Real.sqrt (P.q : ℝ) := Real.sqrt_pos.2 hq
   let L : ℝ := |(β : ℝ)| / Real.sqrt (P.q : ℝ)
-  have hL : 0 < L := div_pos (abs_pos.mpr hβ) hsqrt
-  have hLip' : LipschitzWith L.toNNReal (logPartition P β M) := by
-    simpa [L, logPartitionLipschitzConstant] using (logPartition_lipschitz P β M)
+  obtain ⟨hL, hLip, hexponent⟩ := logPartition_tail_parameters P β M hβ
   have htail :=
     euclidean_lipschitz_gaussian_concentration
-      (ι := InteractionIndex P.N P.q) (logPartition P β M) L t hL ht hLip'
-  have hq0 : (P.q : ℝ) ≠ 0 := ne_of_gt hq
-  have hsqrt0 : Real.sqrt (P.q : ℝ) ≠ 0 := ne_of_gt hsqrt
-  have hβ0 : (β : ℝ) ^ 2 ≠ 0 := pow_ne_zero 2 hβ
-  have hsqrt_sq : Real.sqrt (P.q : ℝ) ^ 2 = (P.q : ℝ) :=
-    Real.sq_sqrt hq.le
-  have hLsq : L ^ 2 = (β : ℝ) ^ 2 / (P.q : ℝ) := by
-    dsimp [L]
-    rw [div_pow, sq_abs, hsqrt_sq]
-  have hexponent :
-      -t ^ 2 / (2 * L ^ 2) =
-        -(P.q : ℝ) * t ^ 2 / (2 * (β : ℝ) ^ 2) := by
-    rw [hLsq]
-    field_simp
-  rwa [hexponent] at htail
+      (ι := InteractionIndex P.N P.q) (logPartition P β M) L t hL ht hLip
+  rwa [hexponent t] at htail
 
 /-- Sub-Gaussian MGF with parameter β²/q, including β = 0. -/
 theorem logPartition_hasSubgaussianMGF

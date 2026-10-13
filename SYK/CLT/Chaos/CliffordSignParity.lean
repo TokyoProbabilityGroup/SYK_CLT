@@ -156,39 +156,6 @@ theorem exists_generator_swap (i j : Fin N) (hij : i ≠ j) :
       M.anticommute (Ne.symm hkj)]
     abel
 
-/-- Reordering a word of Majorana generators changes it by a sign. -/
-theorem listProduct_eq_sign_smul_of_perm
-    (l₁ l₂ : List (Fin N)) (h : l₁.Perm l₂) :
-    ∃ c : ℂ, (c = 1 ∨ c = -1) ∧
-      (l₁.map M.ψ).prod = c • (l₂.map M.ψ).prod := by
-  induction h with
-  | nil => exact ⟨1, Or.inl rfl, by simp⟩
-  | @cons i l₁ l₂ _ ih =>
-      obtain ⟨c, hc, heq⟩ := ih
-      refine ⟨c, hc, ?_⟩
-      simp only [List.map_cons, List.prod_cons]
-      rw [heq, Algebra.mul_smul_comm]
-  | @swap i j l =>
-      by_cases hij : i = j
-      · subst j
-        exact ⟨1, Or.inl rfl, by simp⟩
-      · refine ⟨-1, Or.inr rfl, ?_⟩
-        simp only [List.map_cons, List.prod_cons]
-        calc
-          M.ψ j * (M.ψ i * (l.map M.ψ).prod) =
-              (M.ψ j * M.ψ i) * (l.map M.ψ).prod := by rw [mul_assoc]
-          _ = (-(M.ψ i * M.ψ j)) * (l.map M.ψ).prod := by
-              rw [M.anticommute (Ne.symm hij)]
-          _ = (-1 : ℂ) • (M.ψ i * (M.ψ j * (l.map M.ψ).prod)) := by
-              simp [mul_assoc]
-  | @trans l₁ l₂ l₃ _ _ ih₁ ih₂ =>
-      obtain ⟨c₁, hc₁, heq₁⟩ := ih₁
-      obtain ⟨c₂, hc₂, heq₂⟩ := ih₂
-      refine ⟨c₁ * c₂, ?_, ?_⟩
-      · rcases hc₁ with h₁ | h₁ <;> rcases hc₂ with h₂ | h₂ <;>
-          simp [h₁, h₂]
-      · rw [heq₁, heq₂, smul_smul]
-
 /-- The swap conjugation as a signed permutation of generator labels. -/
 theorem exists_generator_swap_action (i j : Fin N) (hij : i ≠ j) :
     ∃ U V : A, U * V = 1 ∧ V * U = 1 ∧

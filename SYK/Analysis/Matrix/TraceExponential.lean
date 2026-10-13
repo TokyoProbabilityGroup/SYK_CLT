@@ -42,8 +42,6 @@ Schatten norms and the trace bounds for words together with the Taylor coefficie
 
 open scoped BigOperators InnerProductSpace
 
-noncomputable section
-
 namespace SYK.MatrixAnalysis.PositiveTrace
 
 variable {𝕜 E : Type*} [RCLike 𝕜]
@@ -97,8 +95,6 @@ end SYK.MatrixAnalysis.PositiveTrace
 
 
 open scoped Matrix.Norms.L2Operator
-
-noncomputable section
 
 namespace SYK.MatrixAnalysis.ExpAux
 

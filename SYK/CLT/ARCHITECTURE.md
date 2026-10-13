@@ -123,6 +123,7 @@ flowchart TD
 - 二次観測量の可測性は、`GaussianQuadraticObservable` から、法則の対応、二次 CLT、四次モーメントへ供給する。
 - 2 次の Hermite 多項式の値 `x² - 1`（`hermite_two_eval`）は `GaussianChaos/Basic` で共有する。
 - 四次モーメントの六つの項は、可積分性を個別に確認してから、有限和として積分する。
+- 座標ごとの中心化ガウス平方の L⁴ 評価は `GaussianFourthMoment` の `SYK.CLT.centeredGaussianSquare_eval_memLp_four` で共有し、同じファイルの全座標和と `IndependentFourthMoment` の有限部分和に使う。
 
 行列のトレース指数関数の定義は、`SYK.MatrixAnalysis.traceExp` の1つだけである。滑らかさは `SYK.MatrixAnalysis.contDiff_traceExp` が与え、Hermitian な基点での高階微分評価は、内部補題 `iteratedFDeriv_traceExp_bound_hermitian` で証明する。List に沿う微分と mathlib の反復 Fréchet 微分は、滑らかさによって接続する。この接続と、二つの規格化トレースの型は保つ。`TraceExponential` では、Schatten ノルムと語の評価、Taylor 係数が高階微分の解析的な証明を担う。Duhamel の公式は使わない。
 

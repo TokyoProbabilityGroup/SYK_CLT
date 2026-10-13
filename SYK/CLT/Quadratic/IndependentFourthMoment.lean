@@ -181,23 +181,12 @@ variable {ι : Type*} [Fintype ι]
 private noncomputable def centeredSquareSum (s : Finset ι) (g : ι → ℝ) : ℝ :=
   ∑ i ∈ s, centeredGaussianSquare (g i)
 
-private theorem centeredSquareCoordinate_memLp_four (i : ι) :
-    MemLp (fun g : ι → ℝ => centeredGaussianSquare (g i)) 4
-      (gaussianCouplings ι) := by
-  have hmap : Measure.map (fun g : ι → ℝ => g i) (gaussianCouplings ι) =
-      gaussianReal 0 1 :=
-    (measurePreserving_eval (fun _ : ι => gaussianReal 0 1) i).map_eq
-  have h := centeredGaussianSquare_memLp_four
-  rw [← hmap] at h
-  simpa only [Function.comp_def] using h.comp_of_map
-    ((by fun_prop : Measurable (fun g : ι → ℝ => g i)).aemeasurable)
-
 private theorem centeredSquareSum_memLp_four (s : Finset ι) :
     MemLp (centeredSquareSum s) 4 (gaussianCouplings ι) := by
   classical
   apply memLp_finsetSum s
   intro i _
-  exact centeredSquareCoordinate_memLp_four i
+  exact centeredGaussianSquare_eval_memLp_four i
 
 private theorem centeredSquareCoordinate_mean (i : ι) :
     (∫ g : ι → ℝ, centeredGaussianSquare (g i) ∂gaussianCouplings ι) = 0 := by
@@ -228,7 +217,7 @@ private theorem centeredSquareSum_mean (s : Finset ι) :
   have hi : ∀ i ∈ s, Integrable
       (fun g : ι → ℝ => centeredGaussianSquare (g i)) (gaussianCouplings ι) := by
     intro i _
-    simpa using integrable_pow_le_four (centeredSquareCoordinate_memLp_four i)
+    simpa using integrable_pow_le_four (centeredGaussianSquare_eval_memLp_four i)
       1 (by decide)
   have h := integral_finsetSum (s := s)
     (f := fun i (g : ι → ℝ) => centeredGaussianSquare (g i)) hi
@@ -263,7 +252,7 @@ private theorem centeredSquareSum_second (s : Finset ι) :
   | @insert i s hi ih =>
       have hadd := second_moment_add_of_indep
         (centeredSquareSum_memLp_four s)
-        (centeredSquareCoordinate_memLp_four i)
+        (centeredGaussianSquare_eval_memLp_four i)
         (centeredSquareSum_indep s hi)
         (centeredSquareSum_mean s)
         (centeredSquareCoordinate_mean i)
@@ -290,7 +279,7 @@ private theorem centeredSquareSum_fourth (s : Finset ι) :
   | @insert i s hi ih =>
       have hadd := fourth_moment_add_of_indep
         (centeredSquareSum_memLp_four s)
-        (centeredSquareCoordinate_memLp_four i)
+        (centeredGaussianSquare_eval_memLp_four i)
         (centeredSquareSum_indep s hi)
         (centeredSquareSum_mean s)
         (centeredSquareCoordinate_mean i)
