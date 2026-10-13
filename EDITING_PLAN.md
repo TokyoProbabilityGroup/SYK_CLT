@@ -113,7 +113,7 @@ flowchart TD
 ### 共通の検証と注意
 
 - 変更した Lean ファイルは、それぞれ `lake lean SYK_CLT/<パス>` で検査する。小項目の終わりに `lake build SYK` を実行する。Blueprint の章や、`lean :=` が参照する宣言を変えた場合は、`lake build SYKBlueprint`、HTML の生成、`vbp check` を行う（[README の Blueprint の節](README.md#blueprint) のコマンド）。新しい警告を出さない。
-- 削除・非公開化・改名・移動の前に、`rg -nw <名前> SYK_CLT` で Lean、Blueprint、`*.md` からの参照を調べ、同じ小項目の中で直す。`WORK_HISTORY.md` は当時の記録なので直さない。互換用の別名は作らない。
+- 削除・非公開化・改名・移動の前に、`rg -nw <名前> SYK_CLT` で Lean、Blueprint、`*.md` からの参照を調べ、同じ小項目の中で直す。宣言名を含まない説明文（構造文書の段落など）も、内容から探して直す。削除・移動で不要になった import は、同じ小項目で除く。`WORK_HISTORY.md` は当時の記録なので直さない。互換用の別名は作らない。
 - `rfl` で閉じる `simp` 補題は、使われても名前が証明項に残らない。削除の後のビルドで暗黙の利用がないことを確かめる。
 - Blueprint の `lean :=` から、存在しない宣言や非公開の宣言を参照しない。
 - `SYK/Main.lean` の証明は、他のファイルの定義を展開して一致させている。定義の形を変えた小項目では、`lake lean SYK_CLT/SYK/Main.lean` で接続が壊れていないことを確かめる。
@@ -129,9 +129,9 @@ flowchart TD
 - 対象：`SYK.Analysis.convex_convergence_deriv_tendstoUniformlyOn`、`abs_slope_sub_le`、`abs_slope_sub_deriv_lt`
 - 理由：原稿の `lem:convex-derivatives` のうち導関数の収束の部分にあたるが、`AnnealedInput` が導関数の収束を直接仮定しているため、どこからも使われない。
 - 付随する更新：
-  - Blueprint `CLT.lean` から import を除く。ノード `clt_convex_derivative_transfer` は消さず、`lean :=` を外して `lem:convex-derivatives` の未形式化ノードにする（MA-12 で構成し直す）。
+  - Blueprint `CLT.lean`：import を除く。ノード `clt_convex_derivative_transfer`（原稿の `lem:convex-derivatives`）は名前を変えずに残し、`lean :=` を外して未形式化のノードにする。本文の「The Lean convexity lemma gives …」は、原稿の補題の主張に書き直す（構成は MA-12 で直す）。
   - `AGENTS.md` の名前空間の表から `SYK.Analysis` の行を除く。
-  - `SYK/CLT/ARCHITECTURE.md` の配置の表と、「現行原稿の主張」の `lem:convex-derivatives` の行（Lean の入口なし・未形式化とする）
+  - `SYK/CLT/ARCHITECTURE.md`：配置の表、「現行原稿の主張」の `lem:convex-derivatives` の行（Lean の入口なし・未形式化とする）、「仮定する命題と形式化の範囲」の除外項目「各点収束からの凸収束補題の補完」（補題全体が未形式化になるので書き直す）
   - `SYK/CLT/README.md` の `ConvexDerivatives` への言及
 
 **DEL-2 標準表現の直交性**
@@ -139,7 +139,9 @@ flowchart TD
   - `SYK.standardInteraction_orthonormal` と private の `SYK.interaction_trace_eq_zero`（`SYK/Model/StandardRepresentation.lean`）
   - `SYK.MajoranaSystem.interactionOperator_mul_generator_of_not_mem`（`SYK/Model/Majorana.lean`）
 - `SYK.normalizedTrace_one` は `SYK.CLT.partitionFunction_zero`（DEL-8 で残す）が使うので残す。
-- 付随する更新：Blueprint `Model.lean` のノード `standard_interaction_orthonormality`、`SYK/Model/ARCHITECTURE.md` の言及（規約の表の「標準表現の直交性」、標準行列表現の行、直交性の段落）
+- 付随する更新：
+  - Blueprint `Model.lean`：ノード `standard_interaction_orthonormality` を証明ブロックごと削除する。原稿に対応する主張がなく、Lean の結果を示すためだけのノードだからである。
+  - `SYK/Model/ARCHITECTURE.md`：直交性への言及をすべて直す。規約の表のトレースの行（規格化トレースを使う場面）、「直交性」の意味の段落、標準行列表現の行、汎用の層の「規格化トレースは直交性など…」の文、`standardInteraction_orthonormal` の段落、「生成子が添字集合に含まれる場合・含まれない場合の相互作用との交換則も同じ共有層に置く」の文（`_of_not_mem` の削除で、含まれない場合が事実でなくなる）。
 
 **作業履歴への記録**
 
@@ -160,10 +162,11 @@ DEL-1 と DEL-2 について、削除した結果、原稿との対応、削除�
   - Blueprint：`clt_gaussian_quadratic_moments` の `lean :=` と本文
 - **DEL-7 Lipschitz 定数 0 の裾評価：**
   - 対象：`SYK.GaussianConcentration.product_standardGaussian_two_sided_tail_zero`（`SYK/Probability/GaussianConcentration/Lipschitz.lean`）
-  - Blueprint：`GaussianConcentration.lean` のノード `gaussian_zero_lipschitz_tail`
+  - Blueprint：`GaussianConcentration.lean` のノード `gaussian_zero_lipschitz_tail` を削除する（原稿に対応する主張がない）。
+  - `SYK/SuperConcentration/ARCHITECTURE.md` の「零の場合に裾の事象の測度が零になる定理は、分けて述べる」を除く。
 - **DEL-9 Jordan–Wigner の `simp` 補題：**
   - 対象：`SYK.jordanWigner_zero`、`SYK.jordanWigner_succ`
-  - 削除後のビルドで暗黙の利用がないことを確かめ、利用があれば残して本表に記す。
+  - 削除後のビルドで暗黙の利用がないことを確かめ、利用があれば残して、小項目の表の MA-02 の行に記す。
   - Blueprint：`standard_majorana_relations` の `lean :=`
 
 ### MA-03 一般化
@@ -183,6 +186,7 @@ DEL-1 と DEL-2 について、削除した結果、原稿との対応、削除�
   - 対象：`SYK.GaussianConcentration.integrable_exp_smul_lipschitz`、`integrableExpSet_lipschitz_eq_univ`、`herbst_of_cov_bound`
   - L ≤ 0 なら `L.toNNReal = 0` で F は定数なので、仮定なしで成り立つ。
   - そのうえで、`Lipschitz.lean` の L=0 を別扱いしている部分（`eq_const_of_lipschitz_zero`、`centered_eq_zero_of_lipschitz_zero`、`product_standardGaussian_hasSubgaussianMGF` の場合分け）を簡単にできるか確かめる。公開されている結論は変えない。
+  - `SYK/SuperConcentration/ARCHITECTURE.md` の L = 0 の扱いの段落（「`L > 0` の場合の既存の証明を保ち…」）を、変更後の仮定と証明に合わせる。
 
 ### MA-04 重複の統合と書式（定理文は変えない）
 
@@ -230,7 +234,7 @@ DEL-1 と DEL-2 について、削除した結果、原稿との対応、削除�
 
 | 補題 | 移動先のファイル | 名前空間 |
 | --- | --- | --- |
-| `fourth_moment_add_of_indep`（`CLT/Quadratic/IndependentFourthMoment.lean`）と、その証明だけに使う `second_moment_add_of_indep` | 新しいファイル `SYK/Probability/IndependentMoments.lean` | `SYK.Probability` |
+| `fourth_moment_add_of_indep` と `second_moment_add_of_indep`（`CLT/Quadratic/IndependentFourthMoment.lean`。後者は同じファイルの private の `centeredSquareSum_second` が使う） | 新しいファイル `SYK/Probability/IndependentMoments.lean` | `SYK.Probability` |
 | `norm_sq_hermiteFiniteProjection`、`norm_sq_hermiteDegreeProjection`（`CLT/Chaos/HigherChaosProjection.lean`） | `SYK/Probability/GaussianChaos/Orthogonality.lean` | `SYK.GaussianChaos` |
 | `inner_hermiteDegreeProjection_eq_zero`（`CLT/Chaos/HigherChaosRemainder.lean`） | 同上 | `SYK.GaussianChaos` |
 | `hermiteLp_zero`、`multiIndicesOfDegree_zero`（`CLT/Chaos/ZeroChaos.lean`） | 同上 | `SYK.GaussianChaos` |
@@ -363,8 +367,8 @@ DEL-1 と DEL-2 について、削除した結果、原稿との対応、削除�
 
 **構成の変更**
 - 依存の構造を次のようにする。
-  - `thm: input`（外部の結果、未形式化）と `lem:convex-derivatives`（未形式化。MA-01 で Lean を外したノード）から、Lean に結ばない命題ノード `prop:annealed-free-energy`（未形式化）へつなぐ。
-  - `prop:annealed-free-energy` から、`AnnealedInput` に結んだ定義ノード（`gaussian_annealed_input`）へ、さらに CLT の各ノードへつなぐ。
+  - ノード `clt_expected_pressure_limit`（原稿の `thm: input`。外部の結果で未形式化）と `clt_convex_derivative_transfer`（原稿の `lem:convex-derivatives`。MA-01 で Lean を外した）から、原稿の `prop:annealed-free-energy` に対応する新しい命題ノード（Lean に結ばない）へつなぐ。
+  - その命題ノードから、`AnnealedInput` に結んだ定義ノード（`gaussian_annealed_input`）へ、さらに CLT の各ノードへつなぐ。
   - これで、主定理が「Lean で証明済み、ただし上流に未形式化の仮定がある」と自動の進捗表示に現れる。
 - **状態の記述：** 本文から状態の記述（`sorryAx`、「Lean proves」「checked」「verified」など）を除く。状態は Verso Blueprint が自動で表示する。断り書きで説明していた「仮定であって証明していない」ことは、上の依存の構造で示す。
 - **Lean の識別子：** 本文に並んでいる Lean の識別子は `lean :=` に移して、本文から除く。原稿との対応は、本文の LaTeX ラベルで参照する（AGENTS.md の規則どおり）。出典メタデータは使わない。
@@ -389,17 +393,17 @@ DEL-1 と DEL-2 について、削除した結果、原稿との対応、削除�
 
 **検証**
 
-関係する章と両方の入口を Lean で検査し、HTML を生成して `vbp check` を実行する。`lake exe vbp query --site SYK_CLT/_out/site work-queue` で、作業キューに残るのが未形式化の3ノード（`thm: input`、`lem:convex-derivatives`、`prop:annealed-free-energy`）だけであることを確かめる。
+関係する章と両方の入口を Lean で検査し、HTML を生成して `vbp check` を実行する。`lake exe vbp query --site SYK_CLT/_out/site work-queue` で、作業キューに残るのが未形式化の3ノード（`clt_expected_pressure_limit`、`clt_convex_derivative_transfer`、`prop:annealed-free-energy` に対応する新しいノード）だけであることを確かめる。
 
 ### MA-13 文書
 
 - **ルートの `README.md`（A9）：**
   - 引用文の著者順を、原稿・`CITATION.cff`（Kamijima, Nakajima, Noda, Sasaya）に合わせる。
   - 構成図と、主結果の確認手順（`import SYK.Main`、`#print axioms SYK.CLT.GaussianSYK.syk_partition_and_log_partition_clt`）に `SYK/Main.lean` を加える。
-- **`workspace/README.md`：** `SYK/EDITING_PLAN.md` を `SYK_CLT/EDITING_PLAN.md` に直す。
 - **`SYK/CLT/README.md`：** `../Main.lean`（`SYK/Main.lean`）と `Main.lean`（`SYK/CLT/Main.lean`）を区別して書く。MA-06・MA-07 の変更を反映する。
-- **`SYK/CLT/ARCHITECTURE.md`：** `SYK/Main.lean` の説明（「現行原稿の主張」の前の2段落）を、MA-11 で加えた不変条件と設計理由を中心に短くする。宣言の列挙は `SYK/Main.lean` の docstring に任せる。
-- **その他の構造文書：** `SYK/Model/ARCHITECTURE.md`、`SYK/SuperConcentration/ARCHITECTURE.md` など、MA-01〜MA-11 で変わった名前・配置・ファイル（`SYK/Probability/IndependentMoments.lean`、`SYK/MainAudit.lean`）を反映する。AGENTS.md の名前空間の表も確かめる。
+- **`SYK/CLT/ARCHITECTURE.md`：** `SYK/Main.lean` の説明（「原稿改訂と実装の対応」の節の2段落）を、MA-11 で加えた不変条件と設計理由を中心に短くする。宣言の列挙は `SYK/Main.lean` の docstring に任せる。
+- **その他の構造文書：** `SYK/Model/ARCHITECTURE.md`、`SYK/SuperConcentration/ARCHITECTURE.md` など、MA-01〜MA-11 で変わった名前・配置・ファイル（`SYK/Probability/IndependentMoments.lean`、`SYK/MainAudit.lean`）を反映する。
+- **AGENTS.md：** 名前空間の表に、`SYK/Main.lean` の `SYK.CLT.GaussianSYK` を加える。`SYK/CLT/AGENTS.md` の「抽象的な `Main.lean`」を `SYK/CLT/Main.lean` と明記する（`Main.lean` は3つある）。
 
 ### MA-14 設定（完了）
 

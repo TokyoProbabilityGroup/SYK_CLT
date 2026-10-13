@@ -84,9 +84,9 @@ SYK リポジトリ全体に適用する。数学コードは `SYK/`、公開用
 
 ## ビルドと Blueprint
 
-現行の数学ライブラリは `SYK`、Blueprint は独立した Lake パッケージ `SYKBlueprint`（`Blueprint/`）である。`SYKBlueprint` は `needs = ["SYK/SYK:leanArts"]` により、数学全体も検査する。親のワークスペースは既定の対象を持たないので、全体の検査は `lake build SYKBlueprint` と指定する。
+現行の数学ライブラリは `SYK`、Blueprint は独立した Lake パッケージ `SYKBlueprint`（`Blueprint/`）である。`SYKBlueprint` は `needs = ["SYK/SYK:leanArts"]` により、数学全体も検査する。親のワークスペースは既定の対象を持たないので、全体の検査は `lake build SYKBlueprint` と指定する。宣言の削除・改名・移動・非公開化は Blueprint の `lean :=` の参照を壊しうるので、完了前に `lake build SYKBlueprint` も実行する。
 
-コマンドと環境の準備は、[README](README.md#building-and-testing)（Blueprint は [README の Blueprint の節](README.md#blueprint)）と [ワークスペースの案内](workspace/README.md) を参照する。配布設定を変更するときは、他のプロジェクトを保持し、親との整合を確認する。
+コマンドと環境の準備は、[README](README.md#building-and-testing)（Blueprint は [README の Blueprint の節](README.md#blueprint)）と [ワークスペースの案内](workspace/README.md) を参照する。配布設定を変更するときは、他のプロジェクトを保持し、親との整合を確認する。配布設定（`workspace/`）は、ワークスペースのルートの `lakefile.toml`・`lake-manifest.json`・`lean-toolchain`・`AGENTS.md` の雛形である。これらを変更するときは、ルートと配布設定の両方に同じ変更を行う。`workspace/AGENTS.md` は雛形であり、`workspace/` の中の作業に追加で適用する規則ではない。
 
 章、本文、生成の入口、参照する宣言を変更したら、関係する章と両方の入口を Lean で検査し、HTML を生成して `vbp check` を実行する。あわせて、数学ライブラリの検査と、章の主張・仮定・宣言の参照の照合も行う。対応する TeX 環境での PDF は、任意の検査とする。
 
