@@ -25,11 +25,11 @@ The public entry point is `SYK.SuperConcentration.Main`. The exact assumptions, 
 
 ## Building
 
-From the shared workspace root:
+From the repository root (`SYK_CLT/`):
 
 ```bash
 lake build SYK
-lake lean SYK_CLT/SYK/SuperConcentration/Main.lean
+lake lean SYK/SuperConcentration/Main.lean
 ```
 
 Downstream Lean files can import the result with:

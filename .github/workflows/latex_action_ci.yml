@@ -5,9 +5,20 @@ on:
     branches:
       - 'main'
     paths:
-      - '**.tex'
+      - 'Paper/**.tex'
+      - 'Paper/**.bib'
+      - '.github/workflows/latex_action_ci.yml'
+  pull_request:
+    branches:
+      - 'main'
+    paths:
+      - 'Paper/**.tex'
+      - 'Paper/**.bib'
       - '.github/workflows/latex_action_ci.yml'
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

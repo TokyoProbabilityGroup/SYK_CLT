@@ -36,7 +36,7 @@ Euclidean (`L²`) structure on the coordinate space.
 It equals mathlib's `stdGaussian (EuclideanSpace ℝ ι)` by `map_pi_eq_stdGaussian`. The product
 form is kept as the definition on purpose: the coordinatewise Stein identity, the Hermite
 expansion and the CLT work in this form, so proofs use `stdGaussian` lemmas only through that
-equation. See `SYK/SuperConcentration/ARCHITECTURE.md`. -/
+equation. -/
 @[expose] noncomputable def standardGaussianMeasureOnEuclidean
     (ι : Type*) [Fintype ι] :
     Measure (EuclideanSpace ℝ ι) :=

@@ -12,7 +12,7 @@ authors:
   - family-names: Noda
     given-names: Ryoichiro
   - family-names: Sasaya
-    given-names: Kohei
+    given-names: Kôhei
 
 repository-code: "https://github.com/TokyoProbabilityGroup/SYK_CLT"
 url: "https://github.com/TokyoProbabilityGroup/SYK_CLT"
@@ -22,7 +22,7 @@ abstract: >-
   SYK Model. Apache-2.0 applies only to the original Lean sources; the paper
   remains all rights reserved.
 preferred-citation:
-  type: generic
+  type: article
   title: "A Central Limit Theorem for High-Temperature SYK Model"
   authors:
     - family-names: Kamijima
@@ -32,5 +32,8 @@ preferred-citation:
     - family-names: Noda
       given-names: Ryoichiro
     - family-names: Sasaya
-      given-names: Kohei
-  notes: "Manuscript source: Paper/CLT_SYK.tex."
+      given-names: Kôhei
+  year: 2026
+  date-released: 2026-10-13
+  url: "https://arxiv.org/abs/2610.18440"
+  notes: "Preprint, arXiv:2610.18440 [math.PR]. Manuscript source: Paper/CLT_SYK.tex."

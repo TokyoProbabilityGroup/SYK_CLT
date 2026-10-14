@@ -10,6 +10,15 @@ on:
       - '**/lake-manifest.json'
       - '**/lean-toolchain'
       - '.github/workflows/lean_action_ci.yml'
+  pull_request:
+    branches:
+      - 'main'
+    paths:
+      - '**.lean'
+      - '**/lakefile.toml'
+      - '**/lake-manifest.json'
+      - '**/lean-toolchain'
+      - '.github/workflows/lean_action_ci.yml'
   workflow_dispatch:
 
 permissions:
@@ -26,21 +35,11 @@ jobs:
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v7
-        with:
-          path: SYK_CLT
-
-      - name: Materialize workspace root
-        run: |
-          set -euo pipefail
-          cp SYK_CLT/workspace/lakefile.toml      ./lakefile.toml
-          cp SYK_CLT/workspace/lake-manifest.json ./lake-manifest.json
-          cp SYK_CLT/workspace/lean-toolchain     ./lean-toolchain
-          ls -la
 
       - uses: leanprover/lean-action@v1
-        # The parent workspace has no default targets; build the mathematical library.
         with:
           build-args: SYK
+          use-mathlib-cache: true
           use-github-cache: false
 
   blueprint:
@@ -52,37 +51,31 @@ jobs:
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v7
-        with:
-          path: SYK_CLT
-
-      - name: Materialize workspace root
-        run: |
-          set -euo pipefail
-          cp SYK_CLT/workspace/lakefile.toml      ./lakefile.toml
-          cp SYK_CLT/workspace/lake-manifest.json ./lake-manifest.json
-          cp SYK_CLT/workspace/lean-toolchain     ./lean-toolchain
-          ls -la
 
       - uses: leanprover/lean-action@v1
         # Jobs do not share build outputs, so this also rebuilds the mathematical library.
         with:
+          lake-package-directory: Blueprint
           build-args: SYKBlueprint
+          use-mathlib-cache: true
           use-github-cache: false
 
       - name: Build Blueprint site
-        run: lake lean SYK_CLT/Blueprint/SYKBlueprintMain.lean -- --run SYK_CLT/Blueprint/SYKBlueprintMain.lean --output SYK_CLT/_out/site
+        working-directory: Blueprint
+        run: lake exe vbp build
 
       - name: Check Blueprint output
-        run: lake exe vbp check --site SYK_CLT/_out/site
+        working-directory: Blueprint
+        run: lake exe vbp check --site _out/site
 
       - name: Upload GitHub Pages artifact
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v5
         with:
-          path: SYK_CLT/_out/site/html-multi
+          path: Blueprint/_out/site/html-multi
 
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: blueprint
     runs-on: ubuntu-latest
     concurrency:

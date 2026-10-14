@@ -12,14 +12,10 @@ This directory contains the Lean formalization work for the central limit theore
 - `Normalization.lean`: the finite standard-representation check `partitionFunction_standard`; this module is not imported by the abstract CLT proofs.
 - `../../Paper/CLT_SYK.tex`: manuscript root containing the shared preamble, front matter, and references.
 - `../../Paper/sections/`: independently compilable top-level manuscript sections; together with the root file, these are the source of truth for the paper theorem statements.
-- `ARCHITECTURE.md` (Japanese): current mathematical API, proof dependencies, and manuscript correspondence.
-- `AGENTS.md` (Japanese): topic-specific instructions for coding agents.
-
-The internal planning documents are written in Japanese for collaboration between the researcher and coding agents. Public mathematical artifacts, including this README, the manuscript, and Lean source files, are written in English.
 
 ## Finding a lemma
 
-From the shared workspace root, start with a declaration name and its callers: `rg -n 'NAME' SYK_CLT/SYK/CLT SYK_CLT/SYK/Probability SYK_CLT/SYK/Model SYK_CLT/SYK/Analysis`. For an unfamiliar file, search its `theorem`, `lemma`, `def`, and `namespace` lines before reading proofs. Each lemma module's opening docstring lists its role and main entry points.
+From the repository root, start with a declaration name and its callers: `rg -n 'NAME' SYK/CLT SYK/Probability SYK/Model SYK/Analysis`. For an unfamiliar file, search its `theorem`, `lemma`, `def`, and `namespace` lines before reading proofs. Each lemma module's opening docstring lists its role and main entry points.
 
 The principal import paths are:
 
@@ -49,24 +45,25 @@ The theorem statements are in `SYK/CLT/Main.lean` for an abstract family and in 
 
 ## Verification
 
-Compile the complete manuscript from `../../Paper/`:
+From the repository root, compile the complete manuscript:
 
 ```bash
+cd Paper
 latexmk -pdf CLT_SYK.tex
 ```
 
-Each file under `../../Paper/sections/` can also be compiled from that directory, for example:
+Each file under `Paper/sections/` can also be compiled from `Paper/`, for example:
 
 ```bash
-latexmk -pdf introduction.tex
+latexmk -cd -pdf sections/introduction.tex
 ```
 
-Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-references and citations whose definitions lie in other subfiles remain unresolved in a standalone build; the complete manuscript build resolves them.
+The `-cd` option runs LaTeX in the section's directory. Standalone section builds inherit the shared preamble from `CLT_SYK.tex`. Cross-references and citations whose definitions lie in other subfiles remain unresolved in a standalone build; the complete manuscript build resolves them.
 
-The abstract `partition_clt` and `partition_and_log_partition_clt` are in `SYK/CLT/Main.lean`; the joint standard-family theorem `standard_partition_and_log_partition_clt` is in `StandardModel.lean`. For these theorems, `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`; `hFE : AnnealedInput q S` remains an explicit hypothesis. After modifying a Lean file, check it from the shared workspace root:
+The abstract `partition_clt` and `partition_and_log_partition_clt` are in `SYK/CLT/Main.lean`; the joint standard-family theorem `standard_partition_and_log_partition_clt` is in `StandardModel.lean`. For these theorems, `#print axioms` reports only `propext`, `Classical.choice`, and `Quot.sound`; `hFE : AnnealedInput q S` remains an explicit hypothesis. After modifying a Lean file, check it from the repository root:
 
 ```bash
-lake lean SYK_CLT/SYK/CLT/path/to/File.lean
+lake lean SYK/CLT/path/to/File.lean
 ```
 
-Use `lake build SYK` for the mathematical library and `lake build SYKBlueprint` for the mathematics together with the Blueprint. Inspect the principal theorem types and `#print axioms` as described in [the repository guide](../../README.md#building-and-testing). The LaTeX manuscript and Lean formalization have separate verification requirements; successful verification of one does not establish the correctness of the other.
+Use `lake build SYK` from the repository root for the mathematical library. Use `lake build SYKBlueprint` from `Blueprint/` for the mathematics together with the Blueprint; see [Blueprint setup](../../README.md#blueprint) for dependency downloads, rendering, and reference checks. Inspect the principal theorem types and `#print axioms` as described in [the repository guide](../../README.md#building-and-testing). The LaTeX manuscript and Lean formalization have separate verification requirements; successful verification of one does not establish the correctness of the other.
