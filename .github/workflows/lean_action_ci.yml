@@ -10,15 +10,6 @@ on:
       - '**/lake-manifest.json'
       - '**/lean-toolchain'
       - '.github/workflows/lean_action_ci.yml'
-  pull_request:
-    branches:
-      - 'main'
-    paths:
-      - '**.lean'
-      - '**/lakefile.toml'
-      - '**/lake-manifest.json'
-      - '**/lean-toolchain'
-      - '.github/workflows/lean_action_ci.yml'
   workflow_dispatch:
 
 permissions:
