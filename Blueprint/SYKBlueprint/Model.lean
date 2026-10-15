@@ -33,6 +33,8 @@ $$`
 \psi_i\psi_j+\psi_j\psi_i=2\delta_{ij}I.
 `
 In particular, $`\psi_i^2=I`, and distinct generators anticommute.
+The anticommutation relation has the normalization of `eq: clifford relation`
+in the CLT manuscript.
 :::
 
 :::definition "standard_representation" (parent := "model") (uses := "majorana_system") (lean := "SYK.StandardBasis, SYK.jordanWignerPauli, SYK.jordanWignerZ, SYK.jordanWigner, SYK.jordanWignerSystem, SYK.standardMajoranaSystem")
@@ -52,11 +54,11 @@ $$`
 `
 
 The implementation uses Kronecker products with the first site outermost.
-The zero-based label $`j` corresponds to label $`j+1` in the lecture notes'
-Jordan--Wigner subsection and `eq:majoranaCAR`. For even $`N`, setting
-$`m=N/2` gives a matrix realization with exactly $`N` generators.
-The same representation and trace normalization are used in the CLT manuscript
-at `subsec:SYK-model`.
+For even $`N`, setting $`m=N/2` gives $`N` self-adjoint generators on a
+space of dimension $`2^{N/2}`. Relabeling the generators from
+$`0,\ldots,N-1` to $`1,\ldots,N` gives a concrete realization of the
+Majorana matrices specified in the manuscript's `subsec:SYK-model`,
+with anticommutation relation `eq: clifford relation`.
 :::
 
 :::theorem "standard_representation_dimension" (parent := "model") (lean := "SYK.standardBasis_card")
@@ -125,8 +127,8 @@ are independent centered Gaussians, each with variance
 $`\sigma_N^2=(q-1)!/N^{q-1}`. This is the variance of one coefficient,
 not of the whole Hamiltonian. Concentration estimates use the Euclidean norm
 of $`g`, rather than the actual coefficient vector $`J`.
-This matches the lecture notes at `eq:Hqnormalized` and `eq:Jcovariance`,
-and the CLT manuscript at `subsec:SYK-model`; the shared construction does not
+This Hamiltonian and coefficient variance match `subsec:SYK-model`
+in the CLT manuscript; the shared construction does not
 impose the manuscript's additional $`q\ge4` or standard representation.
 :::
 
