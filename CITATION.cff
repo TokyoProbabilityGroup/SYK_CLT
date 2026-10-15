@@ -19,8 +19,8 @@ url: "https://github.com/TokyoProbabilityGroup/SYK_CLT"
 license: Apache-2.0
 abstract: >-
   Lean 4 formalization accompanying A Central Limit Theorem for High-Temperature
-  SYK Model. Apache-2.0 applies only to the original Lean sources; the paper
-  remains all rights reserved.
+  SYK Model. Apache-2.0 applies to everything except the paper, which remains
+  all rights reserved.
 preferred-citation:
   type: article
   title: "A Central Limit Theorem for High-Temperature SYK Model"
