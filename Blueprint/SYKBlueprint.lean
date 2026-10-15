@@ -19,8 +19,7 @@ open Informal
 This Blueprint records the finite-dimensional SYK model, Gaussian concentration,
 superconcentration, and the conditional central limit theorem, with
 their mathematical dependencies.
-It distinguishes declarations already checked by Lean from results that remain to be
-formalized.
+It distinguishes results checked by Lean from results that are not formalized.
 
 {include 0 SYKBlueprint.Model}
 {include 0 SYKBlueprint.GaussianConcentration}

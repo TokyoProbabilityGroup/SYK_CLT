@@ -16,8 +16,8 @@ Gaussian concentration
 :::
 
 :::theorem "gaussian_subgaussian_mgf" (parent := "gaussian_concentration") (lean := "SYK.GaussianConcentration.product_standardGaussian_hasSubgaussianMGF")
-Let $`F` be a real Lipschitz function on a finite-dimensional Euclidean space
-with standard Gaussian measure and Lipschitz constant $`L\ge0`.
+Let $`F` be a real Lipschitz function, with constant $`L\ge0`, on a
+finite-dimensional Euclidean space equipped with the standard Gaussian measure.
 For every $`s\in\mathbb R`,
 $$`
 \mathbb E e^{s(F-\mathbb E F)}\le e^{s^2L^2/2}.

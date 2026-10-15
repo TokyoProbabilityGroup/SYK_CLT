@@ -21,7 +21,7 @@ Finite-dimensional SYK model
 :::definition "model_parameters" (parent := "model") (lean := "SYK.Params")
 The shared finite model has integers $`N,q` satisfying
 $`0<q\le N` and $`q` even, hence $`N>0` and $`q\ge2`.
-It does not require $`N` even. The CLT manuscript's `subsec:SYK-model`
+It does not require $`N` to be even. The CLT manuscript's `subsec:SYK-model`
 additionally requires even $`N` and $`q\ge4`.
 Inverse temperature is a separate argument.
 :::
@@ -30,9 +30,11 @@ Inverse temperature is a separate argument.
 A Majorana system consists of self-adjoint operators with
 $$`
 \psi_i^*=\psi_i,\qquad
-\psi_i\psi_j+\psi_j\psi_i=2\delta_{ij}I.
+\psi_i\psi_j+\psi_j\psi_i=2\delta_{ij}\mathbb I.
 `
-In particular, $`\psi_i^2=I`, and distinct generators anticommute.
+In particular, $`\psi_i^2=\mathbb I`, and distinct generators anticommute.
+The anticommutation relation has the normalization of `eq: clifford relation`
+in the CLT manuscript.
 :::
 
 :::definition "standard_representation" (parent := "model") (uses := "majorana_system") (lean := "SYK.StandardBasis, SYK.jordanWignerPauli, SYK.jordanWignerZ, SYK.jordanWigner, SYK.jordanWignerSystem, SYK.standardMajoranaSystem")
@@ -44,7 +46,7 @@ $$`
 Y=\begin{pmatrix}0&-i\\i&0\end{pmatrix}.
 `
 
-With zero-based site labels $`0\le a<m`, the Jordan--Wigner generators are
+With zero-based site labels $`0\le a<m`, the Jordan–Wigner generators are
 
 $$`
 \psi_{2a}=Z^{\otimes a}\otimes X\otimes I^{\otimes(m-a-1)},\qquad
@@ -52,11 +54,11 @@ $$`
 `
 
 The implementation uses Kronecker products with the first site outermost.
-The zero-based label $`j` corresponds to label $`j+1` in the lecture notes'
-Jordan--Wigner subsection and `eq:majoranaCAR`. For even $`N`, setting
-$`m=N/2` gives a matrix realization with exactly $`N` generators.
-The same representation and trace normalization are used in the CLT manuscript
-at `subsec:SYK-model`.
+For even $`N`, setting $`m=N/2` gives $`N` self-adjoint generators on a
+space of dimension $`2^{N/2}`. Relabeling the generators from
+$`0,\ldots,N-1` to $`1,\ldots,N` gives a concrete realization of the
+Majorana matrices specified in the manuscript's `subsec:SYK-model`,
+with anticommutation relation `eq: clifford relation`.
 :::
 
 :::theorem "standard_representation_dimension" (parent := "model") (lean := "SYK.standardBasis_card")
@@ -70,12 +72,12 @@ cardinality of the basis.
 :::
 
 :::theorem "standard_majorana_relations" (parent := "model") (lean := "SYK.jordanWigner_sq, SYK.jordanWigner_self_adjoint, SYK.jordanWigner_anticommute")
-Every Jordan--Wigner generator is self-adjoint and squares to the identity.
+Every Jordan–Wigner generator is self-adjoint and squares to the identity.
 Distinct site/type pairs anticommute, so the standard realization obeys
 
 $$`
 \psi_i^*=\psi_i,\qquad
-\psi_i\psi_j+\psi_j\psi_i=2\delta_{ij}I.
+\psi_i\psi_j+\psi_j\psi_i=2\delta_{ij}\mathbb I.
 `
 :::
 
@@ -89,15 +91,17 @@ site anticommutes with the later generator's parity-string Z factor.
 :::theorem "interaction_involutions" (parent := "model") (lean := "SYK.MajoranaSystem.majorana_sq, SYK.MajoranaSystem.psiProduct_star_mul_self, SYK.MajoranaSystem.interactionOperator_star, SYK.MajoranaSystem.interactionOperator_sq")
 For any complex star-algebra Majorana system and even $`q`, let
 $`I=\{i_1<\cdots<i_q\}` and
-$`\psi_I=i^{q/2}\psi_{i_1}\cdots\psi_{i_q}`. Then
-$`\psi_I^*=\psi_I` and $`\psi_I^2=I`. For the unphased increasing word $`W_I`, $`W_I^*W_I=I` as well.
+$`\psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}`. Then
+$`\psi_I^*=\psi_I` and $`\psi_I^2=\mathbb I`. For the unphased increasing word $`W_I`, $`W_I^*W_I=\mathbb I` as well.
 :::
 
 :::proof "interaction_involutions" (uses := "majorana_system")
-The Majorana relation with equal indices gives $`\psi_i^2=I`. Reverse the
-word under the adjoint and cancel the pairs of equal generators. The shared
-phase has modulus one, and its even-degree adjoint rule gives the square
-identity for the phase-corrected interaction.
+The Majorana relation with equal indices gives $`\psi_i^2=\mathbb I`. Reverse the
+word under the adjoint and cancel the pairs of equal generators to obtain
+$`W_I^*W_I=\mathbb I`. Since distinct generators anticommute, reversing a word of
+even length $`q` gives the sign $`(-1)^{q/2}`, so $`W_I^*=(-1)^{q/2}W_I`. The phase
+$`\mathrm i^{q/2}` absorbs this sign; hence $`\psi_I^*=\psi_I` and
+$`\psi_I^2=\psi_I^*\psi_I=W_I^*W_I=\mathbb I`.
 :::
 
 :::definition "interaction_hamiltonian" (parent := "model") (lean := "SYK.hamiltonian")
@@ -110,7 +114,7 @@ H=\sum_{I:\,|I|=q}J_I\psi_I.
 :::
 
 :::definition "scaled_syk_hamiltonian" (parent := "model") (uses := "interaction_hamiltonian") (lean := "SYK.CouplingSpace, SYK.standardGaussianMeasure, SYK.couplingScale, SYK.normalizedHamiltonian")
-For valid parameters $`(N,q)` and a finite matrix Majorana system, let
+For valid parameters $`(N,q)` and a finite-dimensional matrix Majorana system, let
 $`g=(g_I)_{|I|=q}` be standard Gaussian coordinates and define
 
 $$`
@@ -119,15 +123,15 @@ $$`
 \qquad H(g)=\sum_{|I|=q}J_I\psi_I.
 `
 
-Here $`\psi_I=i^{q/2}\psi_{i_1}\cdots\psi_{i_q}` uses increasing labels.
+Here $`\psi_I=\mathrm i^{q/2}\psi_{i_1}\cdots\psi_{i_q}` uses increasing labels.
 Under the product standard Gaussian measure, the actual coefficients $`J_I`
 are independent centered Gaussians, each with variance
 $`\sigma_N^2=(q-1)!/N^{q-1}`. This is the variance of one coefficient,
 not of the whole Hamiltonian. Concentration estimates use the Euclidean norm
-of $`g`, rather than the actual coefficient vector $`J`.
-This matches the lecture notes at `eq:Hqnormalized` and `eq:Jcovariance`,
-and the CLT manuscript at `subsec:SYK-model`; the shared construction does not
-impose the manuscript's additional $`q\ge4` or standard representation.
+of $`g`, rather than that of the coefficient vector $`J`.
+This Hamiltonian and coefficient variance match `subsec:SYK-model`
+in the CLT manuscript; the shared construction does not
+impose the manuscript's additional conditions, $`q\ge4` and the standard representation.
 :::
 
 :::theorem "standard_hamiltonian_properties" (parent := "model") (lean := "SYK.couplingScale_nonneg, SYK.couplingScale_sq, SYK.normalizedHamiltonian_zero, SYK.normalizedHamiltonian_add, SYK.normalizedHamiltonian_smul, SYK.normalizedHamiltonian_affine, SYK.normalizedHamiltonian_self_adjoint")
@@ -171,7 +175,7 @@ Cyclicity identifies the sum with $`-\operatorname{Tr}(He^{-zH})`.
 
 :::theorem "partition_function_analytic" (parent := "model") (lean := "SYK.partitionFunction_differentiable, SYK.partitionFunction_analytic_at")
 The same partition function is complex differentiable and analytic at every
-$`z \in \mathbb{C}`. This records entire analyticity pointwise; it does not
+$`z \in \mathbb{C}`. Thus $`Z_H` is entire; this does not
 assert that the partition function has no zeros.
 :::
 
@@ -194,13 +198,13 @@ at a point where the partition function is nonzero.
 :::
 
 :::theorem "partition_function_local_zero_free" (parent := "model") (lean := "SYK.partitionFunction_re_pos_real, SYK.partitionFunction_re_pos_near_real, SYK.partitionFunction_ne_zero_near_real, SYK.partitionFunction_mul_log_deriv_near_real, SYK.partitionFunction_log_differentiable_near_real")
-Fix a nonempty finite-dimensional matrix space and a Hermitian matrix $`H`.
+Fix a Hermitian matrix $`H` of positive finite dimension.
 For every real inverse temperature $`\beta`, there is a radius
 $`\varepsilon(H,\beta)>0` such that
 $`\operatorname{Re}Z_H(z)>0` whenever $`|z-\beta|<\varepsilon(H,\beta)`.
 This supplies $`Z_H(z)\ne0` to the pointwise logarithmic-derivative formula.
-The principal complex logarithm $`\log Z_H` is holomorphic on the same disk,
-because its values lie in the right half-plane. The radius need not be
+The principal complex logarithm $`\log Z_H` is holomorphic on a disk around
+$`\beta`, because $`Z_H` takes values in the right half-plane there. The radius need not be
 uniform in $`H`, matrix dimension, or disorder realization; no such
 uniformity is used by the current real inverse-temperature CLT.
 :::

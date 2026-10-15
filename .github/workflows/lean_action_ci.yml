@@ -1,16 +1,13 @@
 name: Lean Action CI
 
+# Checks both Lake packages on pushes to main and deploys Blueprint/_out/site/html-multi to GitHub Pages.
+# Markdown-only changes do not trigger this workflow; run it manually on main to redeploy.
+# A manual run on another branch checks the packages without deploying.
+# Pages setup: Settings → Pages → Build and deployment → Source: GitHub Actions.
+# The github-pages environment must allow deployments from main.
+
 on:
   push:
-    branches:
-      - 'main'
-    paths:
-      - '**.lean'
-      - '**/lakefile.toml'
-      - '**/lake-manifest.json'
-      - '**/lean-toolchain'
-      - '.github/workflows/lean_action_ci.yml'
-  pull_request:
     branches:
       - 'main'
     paths:
@@ -29,6 +26,7 @@ permissions:
 jobs:
   lean:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     concurrency:
       group: ${{ github.workflow }}-lean-${{ github.ref }}
       cancel-in-progress: true
@@ -43,8 +41,8 @@ jobs:
           use-github-cache: false
 
   blueprint:
-    needs: lean
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     concurrency:
       group: ${{ github.workflow }}-blueprint-${{ github.ref }}
       cancel-in-progress: true
@@ -69,14 +67,14 @@ jobs:
         run: lake exe vbp check --site _out/site
 
       - name: Upload GitHub Pages artifact
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v5
         with:
           path: Blueprint/_out/site/html-multi
 
   deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    needs: blueprint
+    if: github.ref == 'refs/heads/main'
+    needs: [lean, blueprint]
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-deploy

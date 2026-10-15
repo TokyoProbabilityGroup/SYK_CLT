@@ -8,13 +8,6 @@ on:
       - 'Paper/**.tex'
       - 'Paper/**.bib'
       - '.github/workflows/latex_action_ci.yml'
-  pull_request:
-    branches:
-      - 'main'
-    paths:
-      - 'Paper/**.tex'
-      - 'Paper/**.bib'
-      - '.github/workflows/latex_action_ci.yml'
   workflow_dispatch:
 
 permissions:

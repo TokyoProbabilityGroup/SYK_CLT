@@ -9,14 +9,14 @@ open Verso.Genre
 open Verso.Genre.Manual
 open Informal
 
-#doc (Manual) "Concentration of the SYK log-partition function" =>
+#doc (Manual) "Superconcentration of the SYK log-partition function" =>
 
 :::group "superconcentration"
-SYK log-partition concentration
+SYK log-partition superconcentration
 :::
 
 The standard Hamiltonian is shared with the finite model above.
-Lipschitz constants use the standard Gaussian coordinates.
+Lipschitz constants refer to the Euclidean norm of the standard Gaussian coordinates.
 
 :::definition "syk_log_partition" (parent := "superconcentration") (uses := "partition_function, scaled_syk_hamiltonian") (lean := "SYK.logPartition")
 For $`\beta \in \mathbb{R}_{\ge 0}`, define the real log-partition function by
@@ -28,17 +28,17 @@ F_{\beta}(g)
 `
 
 The definition accepts any finite-dimensional matrix representation, including
-an empty index type; the total real-logarithm convention gives value zero in
-that case. For a nonempty representation, self-adjointness of $`H(g)` makes
+dimension zero; the convention $`\log 0=0` then gives the value zero.
+In positive dimension, self-adjointness of $`H(g)` makes
 the real part inside the logarithm strictly positive. The directional-derivative,
-Lipschitz, and Gaussian MGF and concentration bounds below assume a nonempty
-representation.
+Lipschitz, and Gaussian MGF and concentration bounds below assume positive
+dimension.
 :::
 
 :::theorem "anticommuting_expectation_sum" (parent := "superconcentration") (lean := "SYK.sum_sq_expectation_le_one")
 Let $`\rho` be a density matrix and let
 $`\{A_i\}_{i \in \iota}` be a finite
-family of self-adjoint matrices such that $`A_i^2=1` and
+family of self-adjoint matrices such that $`A_i^2=\mathbb I` and
 $`A_iA_j=-A_jA_i` whenever $`i \ne j`. Then
 
 $$`
@@ -51,7 +51,7 @@ $$`
 :::proof "anticommuting_expectation_sum"
 Put $`c_i=\operatorname{Tr}(\rho A_i)` and $`B=\sum_i c_iA_i`.
 Self-adjointness makes each $`c_i` real. The anticommutation relations cancel
-all cross terms and give $`B^2=(\sum_i |c_i|^2)1`. Positivity of the variance
+all cross terms and give $`B^2=(\sum_i |c_i|^2)\mathbb I`. Positivity of the variance
 of $`B` in the state $`\rho` yields $`s-s^2 \ge 0` for
 $`s=\sum_i |c_i|^2`, hence $`s \le 1`.
 :::
@@ -124,7 +124,7 @@ $$`
 
 :::proof "syk_directional_gradient_bound" (uses := "majorana_expectation_sum, scaled_syk_hamiltonian")
 Expand the expectation as a Euclidean inner product between $`V` and the
-interaction expectations. Cauchy--Schwarz and
+interaction expectations. Cauchy–Schwarz and
 {uses "majorana_expectation_sum"}[] give the exact finite-volume bound. The
 falling-factorial estimate
 
@@ -162,7 +162,7 @@ F_0(g)=\log d,
 `
 
 where $`d` is the dimension of the matrix representation, allowing $`d=0`
-with the same total real-logarithm convention. Consequently, for
+with the same convention $`\log 0=0`. Consequently, for
 every $`t>0`, the centered two-sided deviation event has standard Gaussian
 measure zero.
 :::
@@ -182,8 +182,8 @@ $$`
 `
 
 The sub-Gaussian parameter is $`\beta^2/q`, including zero inverse
-temperature. This is an upper bound parameter, not an assertion of equality
-for the variance or of optimality. Expectation is with respect to the product
+temperature. The parameter is an upper bound; it is not claimed to equal the
+variance or to be optimal. Expectation is with respect to the product
 standard Gaussian coordinate measure.
 :::
 
@@ -214,7 +214,7 @@ Simplifying their exponent gives the stated bound.
 
 :::theorem "log_partition_concentration" (parent := "superconcentration") (lean := "SYK.logPartition_two_sided_tail_standardGaussian")
 Let the coordinates $`g_I` be independent standard Gaussian variables. If
-$`\beta \ne 0` and $`t>0`, then
+$`\beta>0` and $`t>0`, then
 
 $$`
 \mathbb P\left(
