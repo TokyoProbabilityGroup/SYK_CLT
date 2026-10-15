@@ -23,7 +23,7 @@ open Informal
 
 The manuscript is `Paper/CLT_SYK.tex`. The three groups correspond to
 `gaussian-chaos.tex`, `higher-chaoses.tex`, and `main-results.tex`.
-At every size the representation is nonempty. The standalone entry
+The standalone entry point
 `SYK/Main.lean` states the model, annealed conditions, and both CLTs together.
 
 :::group "clt_gaussian_chaos"
@@ -32,7 +32,7 @@ Gaussian chaos
 
 :::definition "clt_partition_function" (parent := "clt_gaussian_chaos") (uses := "scaled_syk_hamiltonian") (lean := "SYK.CLT.partitionFunction, SYK.CLT.realPartitionFunction, SYK.CLT.Setting, SYK.CLT.GaussianSYK.MajoranaOperators, SYK.CLT.GaussianSYK.Model, SYK.CLT.GaussianSYK.disorderLaw, SYK.CLT.GaussianSYK.Model.H, SYK.CLT.GaussianSYK.Model.Z, SYK.CLT.GaussianSYK.Model.varianceZ")
 Fix even $`q\ge4` and a diverging sequence of even sizes $`N\ge q`.
-At each size choose a nonempty finite Majorana representation of dimension $`d_N`.
+At each size choose a Majorana representation of positive finite dimension $`d_N`.
 For independent standard Gaussian coordinates $`G=(g_I)_{I\in\mathcal I_N}`,
 where $`\mathcal I_N=\{I\subset[N]:|I|=q\}`, put
 $$`
@@ -43,7 +43,7 @@ Z_N(z;G)=\frac1{d_N}\operatorname{Tr}e^{-zH_N(G)}.
 For real $`\beta`, define $`Y_N(\beta)=Z_N(\beta)/\mathbb E Z_N(\beta)`
 and note that $`|\mathcal I_N|=\binom Nq`.
 The manuscript's `subsec:SYK-model` uses $`d_N=2^{N/2}`; the family here
-also permits other nonempty finite representations.
+also permits other representations of positive finite dimension.
 :::
 
 :::lemma_ "clt_finite_partition_properties" (parent := "clt_gaussian_chaos") (lean := "SYK.CLT.partitionFunction_zero, SYK.CLT.partitionFunction_eq_trace_div_card, SYK.CLT.partitionFunction_im_eq_zero, SYK.CLT.realPartitionFunction_pos")
@@ -81,8 +81,8 @@ The lower bound $`Z_N\ge1` bounds the logarithm between zero and $`C\|G\|_2`.
 :::
 
 :::lemma_ "clt_gaussian_hermite_ibp" (parent := "clt_gaussian_chaos") (lean := "SYK.GaussianChaos.hermite_coefficient_ibp, SYK.GaussianChaos.hermite_coefficient_integrable, SYK.GaussianChaos.hermiteMulti_pair_ibp, SYK.GaussianChaos.hermiteList_multiIndexList, SYK.GaussianChaos.partialList_perm, SYK.GaussianChaos.integral_hermiteMulti_eq_zero")
-In `lem:Gaussian-Hermite-IBP`, let $`\alpha` be a multi-index on a finite
-coordinate set and $`f\in C^{|\alpha|}`. For each componentwise $`\eta\le\alpha`,
+As in `lem:Gaussian-Hermite-IBP`, let $`\alpha` be a multi-index on a finite
+coordinate set and $`f\in C^{|\alpha|}`. For each multi-index $`\eta\le\alpha` (componentwise),
 assume $`|\partial^\eta f(G)|\le C_\eta e^{C_\eta\|G\|_2}` with $`C_\eta>0`.
 For $`H_\alpha(G)=\prod_i\operatorname{He}_{\alpha_i}(G_i)`,
 both sides are integrable and
@@ -176,7 +176,7 @@ $`\mathbb E[\operatorname{He}_2(g_I)^2]=2`.
 :::
 
 :::proof "clt_exact_second_chaos" (uses := "clt_partition_moments, clt_gaussian_hermite_ibp")
-For `lem: parity rule lemma`, define $`\Gamma=\psi_1\cdots\psi_N`.
+Following `lem: parity rule lemma`, define $`\Gamma=\psi_1\cdots\psi_N`.
 It is unitary, and for even $`N` it anticommutes with every $`\psi_j`.
 For a real unit vector $`v`, set $`C_v=\sum_jv_j\psi_j` and $`U_v=\Gamma C_v`.
 Then $`U_v\psi_jU_v^*=\psi_j-2v_jC_v`.
@@ -202,18 +202,18 @@ $$`
 |\partial_G^\alpha Z_N(\beta;G)|
 \le (|\beta|\sigma_N)^{|\alpha|}Z_N(\beta;G).
 `
-All derivatives have exponential growth. Hermite integration by parts therefore
+All derivatives have at most exponential growth. Hermite integration by parts therefore
 bounds $`|\mathbb E[Y_NH_\alpha]|\le(|\beta|\sigma_N)^{|\alpha|}`.
 :::
 
 :::proof "clt_partition_higher_derivatives" (uses := "clt_gaussian_hermite_ibp, clt_partition_moments, interaction_involutions")
 The manuscript uses the iterated Duhamel formula from
 `eq:iterated-Duhamel-formula`: there are $`k!` ordered words over a simplex
-of volume $`1/k!`. Normalized Schatten Hölder bounds each word by $`Z_N`,
+of volume $`1/k!`. The normalized Schatten–Hölder inequality bounds each word by $`Z_N`,
 since every $`\psi_I` has operator norm one.
 The corresponding matrix derivative estimate also follows from the exponential
 power series and Schatten bounds. Pull it through the real part and the linear
-disorder map. Smoothness, exponential growth, and Hermite integration by parts
+disorder map. Smoothness, at most exponential growth, and Hermite integration by parts
 then give the coefficient bound.
 :::
 
@@ -247,7 +247,7 @@ uniformly in $`N`. This is `lem:Rademacher-encoding`.
 :::
 
 :::lemma_ "clt_degree_projection_bound" (parent := "clt_higher_chaoses") (lean := "SYK.CLT.Setting.norm_sq_hermiteDegreeProjection_le_even_sum, SYK.CLT.Setting.norm_sq_hermiteDegreeProjection_le_rademacher_moment")
-For every homogeneous degree $`r`, `eq:Hermite-Rademacher-bound` and
+For every degree $`r`, `eq:Hermite-Rademacher-bound` and
 its Rademacher form give
 $$`
 \|P_rY_N(\beta)\|_2^2
@@ -330,7 +330,7 @@ Gaussian symmetry and $`Z_N(0)=1` extend the positive inverse-temperature pressu
 limit to the real line. The normalization conversion is
 $`\ell_q(\beta)=p_q(2^{q/2}|\beta|)` for $`\beta\ne0`,
 with $`\ell_q(0)=0`, as in `eq:He-normalization-conversion`.
-The external Schwinger--Dyson derivative formula and positive Lehmann
+The external Schwinger–Dyson derivative formula and positive Lehmann
 representation in `eq:ell-kernel-derivative` and `eq:ell-kernel-representation`
 give $`0<\ell_q'(\beta)\le\beta/q` for $`\beta>0`.
 Evenness gives the sign on the negative half-line, and this derivative bound

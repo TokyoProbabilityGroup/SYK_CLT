@@ -22,9 +22,9 @@ The [CLT chapter of the Blueprint](../Blueprint/SYKBlueprint/CLT.lean) explains 
 
 The CLTs are conditional on `hFE : AnnealedInput q S`. This structure records the conclusions of `prop:annealed-free-energy`: a limit $\ell_q$ that is even, convex, and $C^1$; locally uniform convergence of $N^{-1}\log\mathbb E Z_N$ and of its $\beta$-derivative to $\ell_q$ and $\ell_q'$; and $\beta\ell_q'(\beta)>0$ for $\beta\neq0$. The manuscript proves this proposition using results of He ([arXiv:2607.18998](https://arxiv.org/abs/2607.18998)) and a standard convergence theorem for convex functions. Neither these results nor this derivation are formalized, so the Lean theorems take the conclusions as an explicit hypothesis. The standalone `SYK.CLT.GaussianSYK.AnnealedInput` and the library's `SYK.CLT.AnnealedInput` have the same fields.
 
-## Concentration of the log-partition function
+## Superconcentration of the log-partition function
 
-`SYK.SuperConcentration.Main` proves that $\log Z$ is Lipschitz in the couplings (`SYK.logPartition_lipschitz`) and that its centered version satisfies a subgaussian MGF bound (`SYK.logPartition_hasSubgaussianMGF`) and a two-sided Gaussian tail bound (`SYK.logPartition_two_sided_tail_standardGaussian`). Here $Z=\operatorname{Tr}(\exp(-\beta H))$ uses the ordinary matrix trace, $H$ is built from any matrix Majorana system of positive finite dimension, and the couplings are independent standard Gaussians. The theorem statements give the exact constants. These results do not use the annealed input.
+`SYK.SuperConcentration.Main` proves that $\log Z$ is Lipschitz in the couplings (`SYK.logPartition_lipschitz`) and that its centered version satisfies a sub-Gaussian MGF bound (`SYK.logPartition_hasSubgaussianMGF`) and a two-sided Gaussian tail bound (`SYK.logPartition_two_sided_tail_standardGaussian`). Here $Z=\operatorname{Tr}(\exp(-\beta H))$ uses the ordinary matrix trace, $H$ is built from any matrix Majorana system of positive finite dimension, and the couplings are independent standard Gaussians. The theorem statements give the exact constants. These results do not use the annealed input.
 
 ## Source guide
 
@@ -37,7 +37,7 @@ Paths below are relative to `SYK/`. Each module's opening docstring describes it
 | [Probability/GaussianChaos/](Probability/GaussianChaos/) | Gaussian Hermite expansion and integration by parts |
 | [Probability/GaussianConcentration/](Probability/GaussianConcentration/) | Gaussian concentration, independent of the SYK model |
 | [Probability/](Probability/) | Distribution transfer and moment results |
-| [SuperConcentration/](SuperConcentration/) | Majorana bounds and concentration of the log-partition function |
+| [SuperConcentration/](SuperConcentration/) | Majorana bounds and superconcentration of the log-partition function |
 | [CLT/](CLT/) | Finite models, chaos estimates, the quadratic CLT, limit transfer, logarithmic errors, and the CLT statements |
 
 ## Verification
