@@ -6,7 +6,8 @@
 
 \section*{Research process with AI and Lean}
 
-In the past year, AI has been used more and more in mathematical research, often together with the Lean proof assistant \cite{GGTW2025}.   
+In the past year, AI has been used more and more in mathematical research, often together with the Lean proof assistant \cite{GGTW2025,OpenAI}. 
+Lean is a programming language and proof assistant that verifies the correctness of formalized proofs.
 We had been studying the Sachdev--Ye--Kitaev (SYK) model together in a seminar, during which we became  interested in establishing  a central limit theorem (CLT) for its free energy. 
 We decided to investigate this problem as a case study of a mathematical research workflow involving AI and Lean.
 
@@ -17,6 +18,15 @@ We subsequently examined the AI-generated proof carefully and worked on verifyin
 In particular, the initial proof of a key estimate relied on a complicated analytic argument. 
 Through further discussions with AI (ChatGPT 5.6 Pro), we finally developed a simpler combinatorial argument, which is the approach adopted in Section~\ref{sec:Rademacher-remainder} to control the higher-order chaos terms.
 We then reorganized the paper so that the proofs are more accessible to human readers. In parallel, we formalized the refined proofs in Lean: the AI generated the code, and we reviewed it.
+
+We now describe how we used AI to develop the Lean formalization. 
+We first asked AI to formalize the model and the statements of our main results, and checked that these accurately represented the mathematics we intended. 
+We then used AI to write the corresponding proofs in Lean. 
+To guide this work, we prepared written instructions and supporting documents specifying how AI should proceed. 
+In particular, these documents were intended to reduce the risk of AI changing the statements to be proved or introducing additional assumptions. 
+Although preparing these documents requires some initial effort, it can reduce the human effort needed to identify and correct such problems later.
+Finally, we used AI to reorganize and simplify the Lean code to make it easier to read, while preserving its mathematical content.
+For further details, see \url{https://github.com/TokyoProbabilityGroup/SYK_CLT}.
 
 We expect that the workflow illustrated in Figure~\ref{fig:workflow} will be useful particularly for master's and PhD students beginning mathematical research with AI. Moreover, the process of examining and discussing AI-generated arguments may itself help researchers deepen their mathematical understanding.  
 From a practical perspective, refining a mathematical proof before formalizing it in Lean can help produce simpler and better-structured code. 
